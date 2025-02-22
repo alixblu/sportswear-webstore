@@ -13,7 +13,14 @@
     <div style=" display: flex; flex-direction: column; min-height: 100vh;">
         <?php include './layout/header.php'?>
         <div style="flex:1;">
-            content
+            <?php
+                $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+                $method = $_SERVER['REQUEST_METHOD'];
+
+                if ($requestUri === '/signup' && $method === 'GET') {
+                    include './layout/signup.php';
+                }
+            ?>
         </div>
         <?php include './layout/footer.php'?>
     </div>
