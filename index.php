@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,6 +18,9 @@
 
                 if ($requestUri === '/signup' && $method === 'GET') {
                     include './layout/signup.php';
+                }
+                if ($requestUri === '/login' && $method === 'GET') {
+                    include './layout/login.php';
                 }
             ?>
         </div>
