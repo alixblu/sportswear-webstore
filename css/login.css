@@ -1,0 +1,17 @@
+.login_logout{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+}
+
+.left{
+    background-color: beige;
+    width: 100%;
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+}
