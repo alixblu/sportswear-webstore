@@ -60,7 +60,7 @@ a {
 }
 
 /*=============== REUSABLE CSS CLASSES ===============*/
-.container {
+.header .container {
   max-width: 1400px;
   display: flex;
   justify-content: space-between;

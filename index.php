@@ -46,12 +46,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div style=" display: flex; flex-direction: column; min-height: 100vh;">
-        <?php include './layout/header.php'?>
-        <div style="flex:1;">
-            content
-        </div>
-        <!--<?php include './layout/main/login.php'?>-->
-        <?php include './layout/footer.php'?>
+
+    <div class="wrapper">
+        <?php include './layout/header.php'; ?>
+
+        <?php //include './layout/main/login.php'; ?>
+
+        <?php include './layout/footer.php'; ?>
     </div>
+
+
 </body>
