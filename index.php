@@ -47,13 +47,10 @@
 </head>
 <body>
 
-    <div class="wrapper">
         <?php include './layout/header.php'; ?>
 
-        <?php //include './layout/main/login.php'; ?>
 
         <?php include './layout/footer.php'; ?>
-    </div>
 
 
 </body>
