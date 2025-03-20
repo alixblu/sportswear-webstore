@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
     <style>
-        .chuc-nang {
+        .actionUser {
             display: flex;
             justify-content: center;
             gap: 8px;
@@ -32,7 +32,7 @@
             <th>Giới Tính</th>
             <th>Vai Trò</th>
             <th>Ngày Tạo</th>
-            <th class="chuc-nang">Chức Năng</th>
+            <th class="actionUser">Chức Năng</th>
             </tr>
         </thead>
         <tbody>
