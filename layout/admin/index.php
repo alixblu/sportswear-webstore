@@ -31,7 +31,7 @@
             document.querySelector("#mainContent").innerHTML = pageTitleHTML;
             console.log(pageTitleHTML);
           </script>
-              <?php include './modules/dashboard.php'; ?>
+              <?php include './modules/user.php'; ?>
           </div>
 
         </div>
