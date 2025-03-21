@@ -17,23 +17,16 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../../css/admin/style.css" />
-  <script src="../../JS/admin/pageTitle.js"></script> 
+    <script src="../../JS/admin/pageTitle.js"></script> 
+    <script src="../../JS/admin/table.js"></script> 
+
   </head>
   <body>
-        <div class="container">
-              
-          <?php include './includes/header.php'; ?>
-          <?php include './includes/sidebar.php'; ?>
-          <div id="mainContent" class="main-content">
-          <script>
-            // Call the createPageTitle function from the external JS file
-            const pageTitleHTML = createPageTitle("Dashboard", true, true); 
-            document.querySelector("#mainContent").innerHTML = pageTitleHTML;
-            console.log(pageTitleHTML);
-          </script>
-              <?php include './modules/user.php'; ?>
-          </div>
-
-        </div>
+    <div class="container">
+      <?php include './includes/header.php'; ?>
+      <?php include './includes/sidebar.php'; ?>
+      <?php include './modules/dashboard.php'; ?>
+      </div>
+    </div>
 </body>
 </html>
