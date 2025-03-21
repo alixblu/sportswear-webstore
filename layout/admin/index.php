@@ -22,11 +22,29 @@
 
   </head>
   <body>
+<<<<<<< HEAD
     <div class="container">
       <?php include './includes/header.php'; ?>
       <?php include './includes/sidebar.php'; ?>
       <?php include './modules/dashboard.php'; ?>
       </div>
     </div>
+=======
+        <div class="container">
+              
+          <?php include './includes/header.php'; ?>
+          <?php include './includes/sidebar.php'; ?>
+          <div id="mainContent" class="main-content">
+          <script>
+            // Call the createPageTitle function from the external JS file
+            const pageTitleHTML = createPageTitle("Dashboard", true, true); 
+            document.querySelector("#mainContent").innerHTML = pageTitleHTML;
+            console.log(pageTitleHTML);
+          </script>
+              <?php include './modules/user.php'; ?>
+          </div>
+
+        </div>
+>>>>>>> 068d99e (add icon to user)
 </body>
 </html>

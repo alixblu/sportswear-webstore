@@ -44,9 +44,8 @@
     .inputUserCss{
         border: none;
         outline: none;
-        color: black;
-        font-size: 15px;
-        color: black;
+        color: #2d3748;
+        font-size: 17px;
     }
     body{
         background-color:black;
