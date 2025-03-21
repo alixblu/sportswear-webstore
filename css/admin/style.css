@@ -449,7 +449,7 @@
   .card-icon.orange {
     background: linear-gradient(135deg, var(--warning), #ffbd59);
   }
-  
+    
   .card-value {
     font-size: 32px;
     font-weight: 700;

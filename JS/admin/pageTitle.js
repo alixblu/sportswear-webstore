@@ -1,6 +1,10 @@
+
+//reuseable function to create page title
+
+//inside <div class="page-title">
+
 function createPageTitle(newTitle, showDownloadBtn, showAddBtn) {
     return `
-      <div class="page-title">
         <div class="title">${newTitle}</div>
         <div class="action-buttons">
           ${showDownloadBtn ? `
@@ -12,7 +16,6 @@ function createPageTitle(newTitle, showDownloadBtn, showAddBtn) {
               <i class="fas fa-plus"></i> Add New
             </button>` : ""}
         </div>
-      </div>
     `;
   }
   
