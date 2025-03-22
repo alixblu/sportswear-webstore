@@ -152,6 +152,36 @@
         color: #0891b2;
         border: 1px solid rgba(76, 201, 240, 0.3);
     }
+    .deleteUserCss{
+        display: flex;
+        justify-content: center;
+        gap:30px;
+        margin: 10px;
+    }
+    .titleDeleteUserCss{
+        margin: 10px;
+        font-size: 17px
+    }
+    #cancelDelete{
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, var(--secondary), var(--primary));
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+    #confirmDelete{
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, var(--secondary), var(--primary));
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 15px;
+    }
     </style>
 </head>
 <body>
@@ -211,13 +241,13 @@
                             <td>User</td>
                             <td>14/03/2024</td>
                             <td >
-                                <button class="btn btn-outline btn-sm" onclick="infoAccount(this)">
+                                <button class="btn btn-outline btn-sm" onclick="infoAccount()">
                                 <i class="fas fa-eye"></i> Xem
                                 </button>
                                 <button class="btn btn-outline btn-sm" onclick="showFormEditUser(this)">
                                 <i class="fa-solid fa-pen"></i> Sửa
                                 </button>
-                                <button class="btn btn-outline btn-sm">
+                                <button class="btn btn-outline btn-sm" onclick="deleteUser()">
                                 <i class="fa-solid fa-user-xmark"></i> Xóa
                                 </button>
                             </td>
@@ -436,11 +466,34 @@
                         <div class="infoCss">Thông Tin Tài Khoản</div>
                         <div>Tài Khoản: leminh0001</div>
                         <div>Mật Khẩu: *********</div>
-                        <div>Trạng Thái: <span class="status active"><i class="fas fa-check-circle"></i> Đang Hoạt Động</span> </div>
+                        <div>Trạng Thái: <span class="status active"><i class="fas fa-check-circle"></i>Hoạt Động</span> </div>
                     </div>
                 </div>
             `;
             document.body.appendChild(portalRoot);
+        }
+        function deleteUser(){
+            const portalRoot = document.createElement('div');
+            portalRoot.id = 'portal-root';
+            portalRoot.innerHTML=`
+                <div class="formUserCss">
+                    <div class="titleDeleteUserCss">Bạn có chắc chắn muốn xóa không?</div>
+                    <div class="deleteUserCss">
+                        <button id="cancelDelete">Hủy</button>
+                        <button id="confirmDelete">Xác nhận</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(portalRoot);
+
+
+            document.getElementById('confirmDelete').addEventListener('click', function () {
+                closeFormAddUser();
+            });
+
+            document.getElementById('cancelDelete').addEventListener('click', function () {
+                closeFormAddUser();
+            });
         }
     </script>
 </body>
