@@ -187,8 +187,9 @@
         max-width: 500px;
         border-radius: 10px;
         font-family: 'Poppins', sans-serif;
-        padding: 10px;
-
+        padding-left: 10px;
+        padding-bottom: 10px;
+        padding-right: 10px;
     }
     </style>
 </head>
@@ -509,7 +510,7 @@
             portalRoot.id = 'portal-root';
             portalRoot.innerHTML=`
             <div class="wrapperFilterCss">
-                <div>Tìm Kiếm</div>
+                <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
                 <div class="wrapperInputCss">
                     <input class="inputUserCss" type="text" id="search" placeholder="Nội Dung Tìm Kiếm">
                 </div>
