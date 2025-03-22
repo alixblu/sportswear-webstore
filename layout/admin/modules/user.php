@@ -77,6 +77,7 @@
     .genderCss{
         display: flex;
         margin: 10px 0px;
+        gap:5px
     }
     .inputUserCss{
         border: none;
@@ -108,7 +109,7 @@
     .buttonUserCss {
             width: 100%;
             padding: 12px;
-            background-color: #4CAF50;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
             color: #fff;
             border: none;
             border-radius: 6px;
@@ -117,7 +118,8 @@
         }
 
     .buttonUserCss:hover {
-        background-color: #45a049;
+        background: linear-gradient(135deg, var(--secondary), var(--primary));
+        box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
     }
     .wrapperButton{
         display: flex;
@@ -269,7 +271,7 @@
                             <p>*Tài khoản nhân viên được thêm tự động,Tên Tài khoản là số điện thoại, mật khẩu: 123456</p>
                         </div>
                         <div class="wrapperButton">
-                            <input class="buttonUserCss" type="submit" value="Thêm">
+                            <input class="buttonUserCss" type="submit" value="Thêm" onclick="addUser()">
                         </div>
                     </div>
                 </div>
@@ -281,6 +283,34 @@
             if (portalRoot) {
                 portalRoot.remove();
             }
+        }
+
+        function addUser(){
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const birthday = document.getElementById('birthday').value.trim();
+            const gender = document.querySelector('input[name="gender"]:checked');
+            const role = document.getElementById('role').value;
+
+            if (!name || !email || !phone || !birthday || !gender || !role) {
+                alert('Vui lòng điền đầy đủ thông tin.');
+                return;
+            }
+
+            if (!validateEmail(email)) {
+                alert('Email không hợp lệ.');
+                return;
+            }
+
+            if (!/^\d{10}$/.test(phone)) {
+                alert('Số điện thoại phải gồm 10 chữ số.');
+                return;
+            }
+        }
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
         }
     </script>
 </body>
