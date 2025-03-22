@@ -193,19 +193,19 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>#User-001</td>
+                            <td>User001</td>
                             <td>Lê Minh</td>
                             <td>14/03/2004</td>
                             <td>minhleminh@gmail.com</td>
                             <td>0837002323</td>
                             <td>Nam</td>
-                            <td>Admin</td>
+                            <td>User</td>
                             <td>14/03/2024</td>
                             <td >
                                 <button class="btn btn-outline btn-sm">
                                 <i class="fas fa-eye"></i> Xem
                                 </button>
-                                <button class="btn btn-outline btn-sm">
+                                <button class="btn btn-outline btn-sm" onclick="showFormEditUser(this)">
                                 <i class="fa-solid fa-pen"></i> Sửa
                                 </button>
                                 <button class="btn btn-outline btn-sm">
@@ -271,7 +271,7 @@
                             <p>*Tài khoản nhân viên được thêm tự động,Tên Tài khoản là số điện thoại, mật khẩu: 123456</p>
                         </div>
                         <div class="wrapperButton">
-                            <input class="buttonUserCss" type="submit" value="Thêm" onclick="addUser()">
+                            <input class="buttonUserCss" type="submit" value="Thêm Nhân Viên" onclick="addUser()">
                         </div>
                     </div>
                 </div>
@@ -311,6 +311,105 @@
         function validateEmail(email) {
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);
+        }
+
+        function showFormEditUser(button){
+            const row = button.closest('tr');
+            const userInfo = {
+                userId: row.children[0].innerText.trim(),
+                fullName: row.children[1].innerText.trim(),
+                birthDate: row.children[2].innerText.trim(),
+                email: row.children[3].innerText.trim(),
+                phone: row.children[4].innerText.trim(),
+                gender: row.children[5].innerText.trim(),
+                role: row.children[6].innerText.trim(),
+            };
+            
+            const portalRoot = document.createElement('div');
+            portalRoot.id = 'portal-root';
+            portalRoot.innerHTML=`
+                <div class="formUserCss">
+                    <div class="CloseCss" onclick="closeFormAddUser()"><i class="fa-solid fa-xmark"></i></div>
+                    <div class="wrapperCss">
+                        <label for="name">Họ và tên</label>
+                        <div class="wrapperInputCss">
+                            <input class="inputUserCss" type="text" id="name" value="${userInfo.fullName}">
+                        </div>
+                        
+                        <label for="email">Email</label>
+
+                        <div class="wrapperInputCss">
+                            <input class="inputUserCss" type="text" id="email" value="${userInfo.email}">
+                        </div>
+
+                        
+                        <label for="phone">Số điện thoại</label>
+                        
+                        <div class="wrapperInputCss">
+                            <input type="text" class="inputUserCss" id="phone" value="${userInfo.phone}">
+                        </div>
+                        <div class="birthdayGenderCss">
+                            <div >
+                                <label for="birthday">Ngày Sinh</label><br>
+                                    <input class="wrapperBirthday" type="date" id="birthday" value="${formatDateForInput(userInfo.birthDate)}">     
+                            </div>
+                            <div class="wrapperGender">
+                                <label for="" >Giới Tính</label>
+                                <div class="genderCss">
+                                    <input type="radio" id="male" name="gender" ${userInfo.gender === 'Nam' ? 'checked' : ''}>
+                                    <label for="male">Nam</label><br>
+                                    <input type="radio" id="female" name="gender" ${userInfo.gender === 'Nữ' ? 'checked' : ''}>
+                                    <label for="female" >Nữ</label><br>
+                                </div>
+                            </div>
+                        </div>
+                        <label for="role">Vai Trò:</label>
+                        <select class="selectUser" id="role">
+                            <option value="admin" ${userInfo.role === 'Admin' ? 'selected' : ''}>Admin</option>
+                            <option value="user" ${userInfo.role === 'User' ? 'selected' : ''}>User</option>
+                        </select>
+
+                        <div>
+                            <p>*Tài khoản nhân viên được thêm tự động,Tên Tài khoản là số điện thoại, mật khẩu: 123456</p>
+                        </div>
+                        <div class="wrapperButton">
+                            <input class="buttonUserCss" type="submit" value="Sửa Thông Tin" onclick="editUser()">
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(portalRoot);
+        }
+        function formatDateForInput(dateString) {
+            const parts = dateString.split('/');
+            if (parts.length === 3) {
+                const [day, month, year] = parts;
+                return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            }
+            return ''; 
+        }
+        function editUser(){
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const birthday = document.getElementById('birthday').value.trim();
+            const gender = document.querySelector('input[name="gender"]:checked');
+            const role = document.getElementById('role').value;
+
+            if (!name || !email || !phone || !birthday || !gender || !role) {
+                alert('Vui lòng điền đầy đủ thông tin.');
+                return;
+            }
+
+            if (!validateEmail(email)) {
+                alert('Email không hợp lệ.');
+                return;
+            }
+
+            if (!/^\d{10}$/.test(phone)) {
+                alert('Số điện thoại phải gồm 10 chữ số.');
+                return;
+            }
         }
     </script>
 </body>
