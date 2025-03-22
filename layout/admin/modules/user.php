@@ -182,6 +182,14 @@
         cursor: pointer;
         margin-top: 15px;
     }
+    .wrapperFilterCss{
+        background-color:white;
+        max-width: 500px;
+        border-radius: 10px;
+        font-family: 'Poppins', sans-serif;
+        padding: 10px;
+
+    }
     </style>
 </head>
 <body>
@@ -211,7 +219,7 @@
                             <i class="ri-search-line"></i>
                         <input type="text"placeholder="Tìm Kiếm Theo Số Điện Thoại">
                     </div>
-                    <button class="btn btn-outline btn-sm">
+                    <button class="btn btn-outline btn-sm" onclick="showFormFilter()">
                         <i class="fa-solid fa-filter"></i>Bộ Lọc
                     </button>
                 </div>
@@ -494,6 +502,29 @@
             document.getElementById('cancelDelete').addEventListener('click', function () {
                 closeFormAddUser();
             });
+        }
+
+        function showFormFilter(){
+            const portalRoot = document.createElement('div');
+            portalRoot.id = 'portal-root';
+            portalRoot.innerHTML=`
+            <div class="wrapperFilterCss">
+                <div>Tìm Kiếm</div>
+                <div class="wrapperInputCss">
+                    <input class="inputUserCss" type="text" id="search" placeholder="Nội Dung Tìm Kiếm">
+                </div>
+                <input type="checkbox" id="nameUser" name="nameUser" value="name">
+                <label for="nameUser">Họ Và Tên</label><br>
+                <input type="checkbox" id="vehicle2" name="emailUser" value="email">
+                <label for="emailUser">Email</label><br>
+                <input type="checkbox" id="phone" name="phone" value="phone">
+                <label for="phone">Số Điện Thoại</label><br>
+                 <div class="wrapperButton">
+                    <input class="buttonUserCss" type="submit" value="Áp Dụng">
+                </div>
+            </div>
+            `;
+            document.body.appendChild(portalRoot);
         }
     </script>
 </body>
