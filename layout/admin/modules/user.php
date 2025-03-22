@@ -143,6 +143,15 @@
         justify-content: center;
         z-index: 999; 
     }
+    .infoCss{
+        margin-bottom: 15px;
+        font-weight: bold; 
+    }
+    .status.active {
+        background-color: rgba(76, 201, 240, 0.15);
+        color: #0891b2;
+        border: 1px solid rgba(76, 201, 240, 0.3);
+    }
     </style>
 </head>
 <body>
@@ -150,10 +159,10 @@
         <div id="pageTitle" class="page-title">
             <div class="title">User</div>
             <div class="action-buttons">
-                <button id="importBtn" class="btn btn-outline">
+                <button id="importBtn" class="btn btn-outline" onclick="uploadFile()">
                     <i class="fa-solid fa-upload"></i> Import
                 </button>
-
+                <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
                 <button id="exportBtn" class="btn btn-outline">
                     <i class="fas fa-download"></i> Export
                 </button>
@@ -202,7 +211,7 @@
                             <td>User</td>
                             <td>14/03/2024</td>
                             <td >
-                                <button class="btn btn-outline btn-sm">
+                                <button class="btn btn-outline btn-sm" onclick="infoAccount(this)">
                                 <i class="fas fa-eye"></i> Xem
                                 </button>
                                 <button class="btn btn-outline btn-sm" onclick="showFormEditUser(this)">
@@ -227,7 +236,7 @@
             portalRoot.id = 'portal-root';
             portalRoot.innerHTML=`
                 <div class="formUserCss">
-                    <div class="CloseCss" onclick="closeFormAddUser()"><i class="fa-solid fa-xmark"></i></div>
+                    <div class="CloseCss" ><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
                     <div class="wrapperCss">
                         <label for="name">Họ và tên</label>
                         <div class="wrapperInputCss">
@@ -329,7 +338,7 @@
             portalRoot.id = 'portal-root';
             portalRoot.innerHTML=`
                 <div class="formUserCss">
-                    <div class="CloseCss" onclick="closeFormAddUser()"><i class="fa-solid fa-xmark"></i></div>
+                    <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
                     <div class="wrapperCss">
                         <label for="name">Họ và tên</label>
                         <div class="wrapperInputCss">
@@ -410,6 +419,28 @@
                 alert('Số điện thoại phải gồm 10 chữ số.');
                 return;
             }
+        }
+
+        function uploadFile(){
+            document.getElementById('fileInput').click()
+
+        }
+
+        function infoAccount(){
+            const portalRoot = document.createElement('div');
+            portalRoot.id = 'portal-root';
+            portalRoot.innerHTML=`
+                <div class="formUserCss">
+                    <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
+                    <div class="wrapperCss">
+                        <div class="infoCss">Thông Tin Tài Khoản</div>
+                        <div>Tài Khoản: leminh0001</div>
+                        <div>Mật Khẩu: *********</div>
+                        <div>Trạng Thái: <span class="status active"><i class="fas fa-check-circle"></i> Đang Hoạt Động</span> </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(portalRoot);
         }
     </script>
 </body>
