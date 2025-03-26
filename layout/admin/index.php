@@ -25,7 +25,7 @@
     <div class="container">
       <?php include './includes/header.php'; ?>
       <?php include './includes/sidebar.php'; ?>
-      <?php include './modules/dathang.php'; ?>
+      <?php include './modules/account.php'; ?>
       </div>
     </div>
 </body>
