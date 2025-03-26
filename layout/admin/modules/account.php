@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -137,14 +135,11 @@
                                 <td><span class="status active">Active</span></td>
                                 <td>01/01/2023</td>
                                 <td>
-                                    <button class="btn btn-outline btn-sm" onclick="viewAccount('staff', this)">
-                                        <i class="fas fa-eye"></i> View
+                                    <button class="btn btn-outline btn-sm" onclick="showPermissionsModal(this)">
+                                        <i class="fas fa-user-shield"></i> Permissions
                                     </button>
                                     <button class="btn btn-outline btn-sm" onclick="editStaffAccount(this)">
                                         <i class="fa-solid fa-pen"></i> Edit
-                                    </button>
-                                    <button class="btn btn-outline btn-sm" onclick="deleteAccount('staff')">
-                                        <i class="fa-solid fa-user-xmark"></i> Delete
                                     </button>
                                 </td>
                             </tr>
@@ -191,9 +186,6 @@
                                 <td><span class="status active">Active</span></td>
                                 <td>15/02/2023</td>
                                 <td>
-                                    <button class="btn btn-outline btn-sm" onclick="viewAccount('customer', this)">
-                                        <i class="fas fa-eye"></i> View
-                                    </button>
                                     <button class="btn btn-outline btn-sm" onclick="editCustomerAccount(this)">
                                         <i class="fa-solid fa-pen"></i> Edit
                                     </button>
@@ -225,22 +217,46 @@
             document.getElementById(`${tabName}-tab`).classList.add('active');
         }
 
-        // View account details
-        function viewAccount(type, button) {
+        // Show permissions modal
+        function showPermissionsModal(button) {
             const row = button.closest('tr');
             const cells = row.querySelectorAll('td');
             
-            let accountInfo = {
+            const accountInfo = {
                 username: cells[0].innerText,
                 fullName: cells[1].innerText,
-                email: cells[2].innerText,
-                phone: cells[3].innerText,
-                status: cells[type === 'staff' ? 5 : 4].innerText,
-                date: cells[type === 'staff' ? 6 : 5].innerText
+                role: cells[4].innerText
             };
 
-            if (type === 'staff') {
-                accountInfo.role = cells[4].innerText;
+            // Sample permissions (in a real app, these would come from the server)
+            const permissions = {
+                "Dashboard": ["view", "export"],
+                "User Management": ["view", "create", "edit", "delete"],
+                "Product Management": ["view", "create", "edit", "delete"],
+                "Order Management": ["view", "create", "edit", "cancel"],
+                "Reports": ["view", "generate", "export"]
+            };
+
+            let permissionHTML = '';
+            for (const [module, actions] of Object.entries(permissions)) {
+                permissionHTML += `
+                    <div class="permission-group">
+                        <div class="permission-group-title">${module}</div>
+                        <div class="permission-checkboxes">
+                `;
+                
+                for (const action of actions) {
+                    // Random checked state for demo (replace with actual permission check)
+                    const isChecked = Math.random() > 0.5;
+                    permissionHTML += `
+                        <div class="permission-option">
+                            <input type="checkbox" id="perm-${module}-${action}" ${isChecked ? 'checked' : ''}>
+                            <label for="perm-${module}-${action}">${action.charAt(0).toUpperCase() + action.slice(1)}</label>
+                        </div>
+                    `;
+                }
+                
+                permissionHTML += `</div></div>`;
             }
 
             const portalRoot = document.getElementById('portal-root');
@@ -248,14 +264,18 @@
                 <div class="formUserCss">
                     <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeModal()"></i></div>
                     <div class="wrapperCss">
-                        <div class="infoCss">Account Details</div>
-                        <div>Username: ${accountInfo.username}</div>
-                        <div>Full Name: ${accountInfo.fullName}</div>
-                        <div>Email: ${accountInfo.email}</div>
-                        <div>Phone: ${accountInfo.phone}</div>
-                        ${type === 'staff' ? `<div>Role: ${accountInfo.role}</div>` : ''}
-                        <div>Status: ${accountInfo.status}</div>
-                        <div>${type === 'staff' ? 'Created' : 'Registered'} At: ${accountInfo.date}</div>
+                        <div class="infoCss">Permission Management</div>
+                        <div><strong>Account:</strong> ${accountInfo.username}</div>
+                        <div><strong>Name:</strong> ${accountInfo.fullName}</div>
+                        <div><strong>Current Role:</strong> ${accountInfo.role}</div>
+                        
+                        ${permissionHTML}
+                        
+                        <div class="wrapperButton">
+                            <button class="buttonUserCss" onclick="savePermissions()">
+                                <i class="fas fa-save"></i> Save Permissions
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -306,9 +326,9 @@
                         
                         <label for="staff-role">Role</label>
                         <select class="selectUser" id="staff-role">
-                            <option value="admin" ${accountInfo.role === 'Administrator' ? 'selected' : ''}>Administrator</option>
-                            <option value="manager" ${accountInfo.role === 'Manager' ? 'selected' : ''}>Manager</option>
-                            <option value="staff" ${accountInfo.role === 'Staff' ? 'selected' : ''}>Staff</option>
+                            <option value="Administrator" ${accountInfo.role === 'Administrator' ? 'selected' : ''}>Administrator</option>
+                            <option value="Manager" ${accountInfo.role === 'Manager' ? 'selected' : ''}>Manager</option>
+                            <option value="Staff" ${accountInfo.role === 'Staff' ? 'selected' : ''}>Staff</option>
                         </select>
                         
                         <label>Status</label>
@@ -320,7 +340,9 @@
                         </div>
                         
                         <div class="wrapperButton">
-                            <input class="buttonUserCss" type="submit" value="Save Changes" onclick="saveStaffAccount()">
+                            <button class="buttonUserCss" onclick="saveStaffAccount()">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -378,7 +400,9 @@
                         </div>
                         
                         <div class="wrapperButton">
-                            <input class="buttonUserCss" type="submit" value="Save Changes" onclick="saveCustomerAccount()">
+                            <button class="buttonUserCss" onclick="saveCustomerAccount()">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -386,34 +410,17 @@
             portalRoot.style.display = 'flex';
         }
 
-        // Delete account
-        function deleteAccount(type) {
-            const portalRoot = document.getElementById('portal-root');
-            portalRoot.innerHTML = `
-                <div class="formUserCss">
-                    <div class="titleDeleteUserCss">Are you sure you want to delete this ${type} account?</div>
-                    <div class="deleteUserCss">
-                        <button id="cancelDelete">Cancel</button>
-                        <button id="confirmDelete">Confirm</button>
-                    </div>
-                </div>
-            `;
-            portalRoot.style.display = 'flex';
-
-            document.getElementById('confirmDelete').addEventListener('click', function() {
-                alert(`${type} account deleted successfully.`);
-                closeModal();
-            });
-
-            document.getElementById('cancelDelete').addEventListener('click', closeModal);
-        }
-
         // Close modal
         function closeModal() {
             document.getElementById('portal-root').style.display = 'none';
         }
 
-        // Save functions (cần tích hợp với backend)
+        // Save functions (to be integrated with backend)
+        function savePermissions() {
+            alert('Permissions saved successfully!');
+            closeModal();
+        }
+
         function saveStaffAccount() {
             alert('Staff account changes saved!');
             closeModal();
