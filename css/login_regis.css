@@ -105,6 +105,7 @@ a {
     top: 18px;
     z-index: 10;
     cursor: pointer;
+    color: white;
 }
 
 .login__box:nth-child(2) input {

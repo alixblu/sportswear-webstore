@@ -1,12 +1,13 @@
 /*=============== SHOW HIDDEN - PASSWORD ===============*/
 document.addEventListener('DOMContentLoaded', function() {
-    // Get all password input fields
-    const passwordInputs = document.querySelectorAll('input[type="password"]');
-    
-    // Add click event to each password field's eye icon
-    passwordInputs.forEach(input => {
-        const eyeIcon = input.nextElementSibling.nextElementSibling; // Gets the eye icon after the label
-        if (eyeIcon && eyeIcon.classList.contains('login__eye')) {
+    // Get all password input fields with their corresponding eye icons
+    const passwordInputs = document.querySelectorAll('.login__box-input');
+
+    passwordInputs.forEach(box => {
+        const input = box.querySelector('input[type="password"]');
+        const eyeIcon = box.querySelector('.login__eye');
+
+        if (input && eyeIcon) {
             eyeIcon.addEventListener('click', () => {
                 const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
                 input.setAttribute('type', type);
@@ -23,11 +24,11 @@ function displayform(formName) {
     const registerForm = document.getElementById('registerForm');
     
     if (formName === 'register') {
-        if (loginForm) loginForm.style.display = 'none';
-        if (registerForm) registerForm.style.display = 'block';
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
     } else {
-        if (registerForm) registerForm.style.display = 'none';
-        if (loginForm) loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        loginForm.style.display = 'block';
     }
 }
 
