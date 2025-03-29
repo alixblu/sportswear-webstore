@@ -1,5 +1,4 @@
-
-   <head>
+<head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -8,6 +7,7 @@
 
       <!--=============== CSS ===============-->
       <link rel="stylesheet" href="css/header.css">
+
    </head>
    <body>
       <!--=============== HEADER ===============-->
@@ -120,7 +120,9 @@
                </div>
                
                <i class="ri-shopping-cart-2-line nav__cart"></i>
-               <i class="ri-account-circle-line"></i>
+               <a class="nav__account"  id="account">
+                  <i class="ri-account-circle-line"></i>
+               </a>
                <div class="nav__toggle" id="nav-toggle">
                   <i class="ri-menu-line nav__burger"></i>
                   <i class="ri-close-line nav__close"></i>
@@ -129,7 +131,35 @@
             
          </nav>
       </header>
+    <div id="loginOverlay" class="login-overlay">
+        <?php include 'login.php'; ?>
+    </div>
+      <script>
+        const showMenu = (toggleId, navId) =>{
+    const toggle = document.getElementById(toggleId),
+     nav = document.getElementById(navId)
+    
+    toggle.addEventListener('click', () =>{
+    // Add show-menu class to nav menu
+    nav.classList.toggle('show-menu')
+    
+    // Add show-icon to show and hide the menu icon
+    toggle.classList.toggle('show-icon')
+    })
+}
+    
+    showMenu('nav-toggle','nav-menu')
+    
+    document.getElementById('account').addEventListener('click', function() {
+        document.getElementById('loginOverlay').style.display = 'flex';
+    });
 
-      <!--=============== MAIN JS ===============-->
-      <script src="JS/header.js"></script>
+    // Close overlay when clicking outside the form
+    document.getElementById('loginOverlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
+    });
+      </script>
+
    </body>

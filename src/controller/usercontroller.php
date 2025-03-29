@@ -11,22 +11,27 @@
         }
 
         public function login($userName, $passWord){
+            if (empty($userName) || empty($passWord)) {
+                throw new Exception("Please enter complete information to login",400);
+            }
             $user = $this -> userService->login($userName, $passWord);
             $_SESSION['user'] =  [
-                'id' => $user['id'],
+                'id' => $user['userID'],
                 'username' => $user['username'],
+
             ];        
             ApiResponse::customApiResponse("Login successful",200);
         }
 
         public function signup($userName, $passWord, $phone){
             if (empty($userName) || empty($passWord) || empty($phone)) {
-                throw new Exception("Please enter complete information",400);
+                throw new Exception("Please enter complete information to sign up",400);
             }
             $user =  $this -> userService->signup($userName, $passWord,$phone);
             $_SESSION['user'] =  [
-                'id' => $user['id'],
-                'username' => $user['username']
+                'id' => $user['userID'],
+                'username' => $user['username'],
+                'roleid' => $user['roleID']
             ];  
             ApiResponse::customApiResponse("Signup successful",200);
         }

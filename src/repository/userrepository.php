@@ -1,10 +1,14 @@
 <?php
+    require_once './src/config/mysqli/mysqli.php';
+
     class UserRepository{
         function findUserByUsername($userName) {
             $mysql = new configMysqli();
             $conn = $mysql->connectDatabase();
         
-            $stmt = $conn->prepare("SELECT * FROM users WHERE userName = ? LIMIT 1");
+            $stmt = $conn->prepare("SELECT * FROM useraccount ua 
+                                    INNER JOIN users u ON ua.userID = u.ID 
+                                    WHERE ua.username = ?");
             $stmt->bind_param("s", $userName);
             $stmt->execute();
         

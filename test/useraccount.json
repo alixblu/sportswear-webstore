@@ -1,0 +1,30 @@
+[
+{"type":"header","version":"5.2.1","comment":"Export to JSON plugin for PHPMyAdmin"},
+{"type":"database","name":"sportswear"},
+{"type":"table","name":"useraccount","database":"sportswear","data":
+[
+{"ID":"1","username":"admin@gmail.com","password":"admin1","userID":"1","createdAt":"2024-03-20 08:00:00","status":"active"},
+{"ID":"2","username":"phuonganh@gmail.com","password":"phuong2","userID":"2","createdAt":"2024-03-20 08:05:00","status":"active"},
+{"ID":"3","username":"khanhnam@gmail.com","password":"nam123","userID":"3","createdAt":"2024-03-20 08:10:00","status":"active"},
+{"ID":"4","username":"camdao@gmail.com","password":"dao456","userID":"4","createdAt":"2024-03-20 08:15:00","status":"active"},
+{"ID":"5","username":"nguyenthihang@gmail.com","password":"hang78","userID":"5","createdAt":"2024-03-20 08:45:00","status":"active"},
+{"ID":"6","username":"tranminhquan@gmail.com","password":"quan99","userID":"6","createdAt":"2024-03-20 08:50:00","status":"active"},
+{"ID":"7","username":"phamthilan@gmail.com","password":"lan234","userID":"7","createdAt":"2024-03-21 12:00:00","status":"active"},
+{"ID":"8","username":"lehoanganh@gmail.com","password":"hoang56","userID":"8","createdAt":"2024-03-22 12:00:00","status":"active"},
+{"ID":"9","username":"dangthihuyen@gmail.com","password":"huyen89","userID":"9","createdAt":"2024-03-23 12:00:00","status":"active"},
+{"ID":"10","username":"nguyenthimai@gmail.com","password":"mai111","userID":"10","createdAt":"2024-04-01 10:00:00","status":"active"},
+{"ID":"11","username":"phamquocbao@gmail.com","password":"bao222","userID":"11","createdAt":"2024-04-03 10:45:00","status":"active"},
+{"ID":"12","username":"dothilan@gmail.com","password":"lan333","userID":"12","createdAt":"2024-04-05 11:00:00","status":"active"},
+{"ID":"13","username":"vuthanhbinh@gmail.com","password":"binh444","userID":"26","createdAt":"2024-05-16 13:10:00","status":"active"},
+{"ID":"14","username":"lethihuong@gmail.com","password":"huong555","userID":"27","createdAt":"2024-05-19 13:15:00","status":"active"},
+{"ID":"15","username":"tranvannam@gmail.com","password":"nam666","userID":"28","createdAt":"2024-05-22 13:20:00","status":"active"},
+{"ID":"16","username":"nguyenthihanh@gmail.com","password":"hanh777","userID":"29","createdAt":"2024-05-25 13:25:00","status":"active"},
+{"ID":"17","username":"phamminhtuan@gmail.com","password":"tuan888","userID":"30","createdAt":"2024-05-28 13:30:00","status":"active"},
+{"ID":"18","username":"hoangthithu@gmail.com","password":"thu999","userID":"31","createdAt":"2025-03-16 13:35:00","status":"active"},
+{"ID":"19","username":"levanhung@gmail.com","password":"hung000","userID":"32","createdAt":"2025-03-16 13:40:00","status":"active"},
+{"ID":"20","username":"tranthimai@gmail.com","password":"mai112","userID":"33","createdAt":"2025-03-16 13:45:00","status":"active"},
+{"ID":"21","username":"nguyenminhkhoa@gmail.com","password":"khoa223","userID":"34","createdAt":"2025-03-16 13:50:00","status":"active"},
+{"ID":"22","username":"phamthithanh@gmail.com","password":"thanh334","userID":"35","createdAt":"2025-03-16 13:55:00","status":"active"}
+]
+}
+]

@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
         <title>Client</title>
-        <link rel="stylesheet" href="./css/login_regis.css">
+        <link rel="stylesheet" href="./css/login_regis2.css">
         <link rel="stylesheet" href="./css/styles.css">
 
         <!-- font -->
@@ -18,7 +18,7 @@
         <div id="main-page-container">
 
         <?php
-        include './layout/header.php';
+        include './layout/header2.php';
         include './layout/footer.php';
 
         ?>
