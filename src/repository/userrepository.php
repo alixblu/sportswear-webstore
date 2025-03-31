@@ -1,24 +1,36 @@
 <?php
-    require_once './src/config/mysqli/mysqli.php';
+if (!class_exists('UserRepository')) {
+    require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
 
     class UserRepository{
         function findUserByUsername($userName) {
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
-        
-            $stmt = $conn->prepare("SELECT * FROM useraccount ua 
-                                    INNER JOIN users u ON ua.userID = u.ID 
-                                    WHERE ua.username = ?");
-            $stmt->bind_param("s", $userName);
-            $stmt->execute();
-        
-            $result = $stmt->get_result();
-            $user = $result->fetch_assoc();
-        
-            $stmt->close();
-            $conn->close();
-        
-            return $user;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+            
+                $stmt = $conn->prepare("SELECT * FROM useraccount ua 
+                                        INNER JOIN user u ON ua.userID = u.ID 
+                                        WHERE ua.username = ?");
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+                
+                $stmt->bind_param("s", $userName);
+                $stmt->execute();
+            
+                $result = $stmt->get_result();
+                $user = $result->fetch_assoc();
+            
+                $stmt->close();
+                $conn->close();
+            
+                return $user;
+            } catch (Exception $e) {
+                if (isset($conn)) {
+                    $conn->close();
+                }
+                throw new Exception("Database error: " . $e->getMessage());
+            }
         }
         public function findUserById($id) {
             $mysql = new configMysqli();
@@ -169,4 +181,5 @@
             return $user;
         }
     }
+}
 ?>

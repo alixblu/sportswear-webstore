@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -6,7 +9,8 @@
       <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
 
       <!--=============== CSS ===============-->
-      <link rel="stylesheet" href="css/header.css">
+      <link rel="stylesheet" href="./css/header.css">
+      <link rel="stylesheet" href="./css/user-menu.css">
 
    </head>
    <body>
@@ -132,7 +136,27 @@
          </nav>
       </header>
       <div id="loginOverlay" class="login-overlay">
-         <?php include 'login_regis.php'; ?>
+         <?php if(isset($_SESSION['user'])): ?>
+            <!-- User is logged in -->
+            <div class="user-menu">
+               <div class="user-info">
+                  <i class="ri-user-circle-line"></i>
+                  <span><?php echo htmlspecialchars($_SESSION['user']['username']); ?></span>
+               </div>
+               <ul class="user-menu-list">
+                  
+                  <li>
+                     <a href="#"><i class="ri-user-settings-line"></i> Profile</a>
+                  </li>
+                  <li>
+                     <a href="#" onclick="handleLogout(event)"><i class="ri-logout-box-line"></i> Logout</a>
+                  </li>
+               </ul>
+            </div>
+         <?php else: ?>
+            <!-- User is not logged in -->
+            <?php include 'login_regis.php'; ?>
+         <?php endif; ?>
       </div>
       <script>
          const showMenu = (toggleId, navId) =>{
@@ -147,19 +171,39 @@
          toggle.classList.toggle('show-icon')
          })
          }
-         
          showMenu('nav-toggle','nav-menu')
          
          document.getElementById('account').addEventListener('click', function() {
-            document.getElementById('loginOverlay').style.display = 'flex';
-         });
+                document.getElementById('loginOverlay').style.display = 'flex';
+        });
 
-         // Close overlay when clicking outside the form
-         document.getElementById('loginOverlay').addEventListener('click', function(e) {
-            if (e.target === this) {
-                  this.style.display = 'none';
-            }
-         });
+        document.getElementById('loginOverlay').addEventListener('click', function(e) {
+                if (e.target === this) {
+                this.style.display = 'none';
+                }
+        });
+
+        function handleLogout(event) {
+            event.preventDefault();
+            fetch('./layout/login_regis.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'submitLogout=1'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert('Logout failed: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Logout failed: ' + error.message);
+            });
+        }
       </script>
 
    </body>
