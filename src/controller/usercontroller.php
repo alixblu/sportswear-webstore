@@ -1,5 +1,4 @@
 <?php
-if (!class_exists('UserController')) {
     include dirname(__FILE__) . '/../service/userservice.php';
     include dirname(__FILE__) . '/../config/response/apiresponse.php';
     
@@ -40,41 +39,27 @@ if (!class_exists('UserController')) {
             }
         }
 
-        public function signup($userName, $passWord, $phone, $gender){
+        public function signup($name, $email, $passWord, $phone, $gender, $roleID){
             try {
-                if (empty($userName) || empty($passWord) || empty($phone)) {
+                if (empty($name) || empty($email) || empty($passWord) || empty($phone) || empty($gender)) {
                     throw new Exception("Please enter complete information to sign up", 400);
                 }
 
-                $user = $this->userService->signup($userName, $passWord, $phone);
-                $_SESSION['user'] =  [
-                    'id' => $user['userID'],
-                    'username' => $user['username'],
-                    'roleid' => $user['roleID']
-                ];  
-                
-                http_response_code(200);
-                echo json_encode(['success' => true, 'message' => 'Signup successful']);
-                exit;
+                $user = $this->userService->signup($name, $email, $passWord, $phone, $gender, $roleID);
+                return ['success' => true, 'message' => 'Signup successful', 'user' => $user];
             } catch (Exception $e) {
-                http_response_code($e->getCode() ?: 400);
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-                exit;
+                throw $e;
             }
         }
 
         public function logout(){
             try {
                 $_SESSION = [];            
-                http_response_code(200);
-                echo json_encode(['success' => true, 'message' => 'Logout successful']);
-                exit;
+                return ['success' => true, 'message' => 'Logout successful'];
             } catch (Exception $e) {
-                http_response_code($e->getCode() ?: 400);
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-                exit;
+                throw $e;
             }
         }
     }
-}
+
 ?>

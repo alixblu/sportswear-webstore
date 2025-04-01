@@ -12,15 +12,15 @@ function handleLogin(event) {
     .then(data => {
         if (data.success) {
             alert(data.message);
-            window.location.href = './layout/admin/index.php';
+            window.location.reload(); 
         } else {
             alert('Login failed: ' + data.message);
         }
     })
     .catch(error => {
+        console.error('Error:', error);
         alert('Login failed: ' + error.message);
     });
-    
     return false;
 }
 
@@ -28,21 +28,30 @@ function handleLogin(event) {
 function handleRegister(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
+    formData.append('submitRegister', '1');
     
     fetch('./layout/login_regis.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.message || 'Registration failed');
+            });
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             alert(data.message);
-            displayform('login');
+            displayform('login'); // Switch to login form after successful registration
         } else {
             alert('Registration failed: ' + data.message);
         }
     })
     .catch(error => {
+        console.error('Error:', error);
         alert('Registration failed: ' + error.message);
     });
     

@@ -1,9 +1,16 @@
 <?php
-if (!class_exists('UserRepository')) {
     require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
 
     class UserRepository{
-        function findUserByUsername($userName) {
+        /**
+         * Find a user by their username (email)
+         * @param string $userName The username (email) to search for
+         * @return array|null User data if found, null otherwise
+         * @throws Exception If database error occurs
+         */
+        public function findUserByUsername($userName) {
+            $conn = null;
+            $stmt = null;
             try {
                 $mysql = new configMysqli();
                 $conn = $mysql->connectDatabase();
@@ -19,17 +26,13 @@ if (!class_exists('UserRepository')) {
                 $stmt->execute();
             
                 $result = $stmt->get_result();
-                $user = $result->fetch_assoc();
-            
-                $stmt->close();
-                $conn->close();
-            
-                return $user;
+                return $result->fetch_assoc();
             } catch (Exception $e) {
-                if (isset($conn)) {
-                    $conn->close();
-                }
+                error_log("Database error in findUserByUsername: " . $e->getMessage());
                 throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
             }
         }
         public function findUserById($id) {
@@ -40,42 +43,123 @@ if (!class_exists('UserRepository')) {
             $stmt->bind_param("s", $id);
             $stmt->execute();
 
-            
             $result = $stmt->get_result();
             $user = $result->fetch_assoc();
 
-    
-            
             $stmt->close(); 
             $conn->close();
 
             return $user;
 
         }
-        public function save($userName, $passWord,$phone) {
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
+        /**
+         * Find a user by their email
+         * @param string $email The email to search for
+         * @return array|null User data if found, null otherwise
+         * @throws Exception If database error occurs
+         */
+        public function findUserByEmail($email) {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
             
-            $stmt = $conn->prepare("INSERT INTO users (username, password, phone) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $userName, $passWord,$phone);
-            $stmt->execute();
-
-            $userId = $conn->insert_id;
-            $user = null;
-            if ($stmt->affected_rows > 0) {
-                $user = [
-                    'id' => $userId,
-                    'username' => $userName,
-                    'password' => $passWord,
-                    'phone' => $phone
-                ];
+                $stmt = $conn->prepare("SELECT * FROM useraccount ua 
+                                        INNER JOIN user u ON ua.userID = u.ID 
+                                        WHERE u.email = ?");
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+                
+                $stmt->bind_param("s", $email);
+                $stmt->execute();
+            
+                $result = $stmt->get_result();
+                return $result->fetch_assoc();
+            } catch (Exception $e) {
+                error_log("Database error in findUserByEmail: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
             }
+        }
+        /**
+         * Save a new user to the database
+         * @param string $name Full name of the user
+         * @param string $email Email address
+         * @param string $passWord Password
+         * @param string $phone Phone number
+         * @param int $gender Gender (0 for male, 1 for female)
+         * @param int $roleID Role ID
+         * @return array User data
+         * @throws Exception If database error occurs
+         */
+        public function save($name, $email, $passWord, $phone, $gender, $roleID) {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+                
+                if (!$conn) {
+                    throw new Exception("Failed to connect to database");
+                }
+                
+                // Start transaction
+                if (!$conn->begin_transaction()) {
+                    throw new Exception("Failed to start transaction");
+                }
+                
+                // Insert into user table first
+                $stmt = $conn->prepare("INSERT INTO user (fullname, email, phone, gender, roleID) VALUES (?, ?, ?, ?, ?)");
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare user insert: " . $conn->error);
+                }
+                
+                $stmt->bind_param("sssii", $name, $email, $phone, $gender, $roleID);
+                if (!$stmt->execute()) {
+                    throw new Exception("Failed to insert user: " . $stmt->error);
+                }
 
-            $stmt->close(); 
-            $conn->close();
+                $userId = $conn->insert_id;
 
-            return $user;
+                // Then insert into useraccount table with email as username
+                $stmt = $conn->prepare("INSERT INTO useraccount (username, password, userID, status) VALUES (?, ?, ?, 'active')");
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare useraccount insert: " . $conn->error);
+                }
+                
+                $stmt->bind_param("ssi", $email, $passWord, $userId);
+                if (!$stmt->execute()) {
+                    throw new Exception("Failed to insert useraccount: " . $stmt->error);
+                }
 
+                // Commit transaction
+                if (!$conn->commit()) {
+                    throw new Exception("Failed to commit transaction");
+                }
+
+                return [
+                    'userID' => $userId,
+                    'username' => $email,
+                    'email' => $email,
+                    'phone' => $phone,
+                    'gender' => $gender,
+                    'roleID' => $roleID
+                ];
+            } catch (Exception $e) {
+                // Rollback transaction on error
+                if ($conn) {
+                    $conn->rollback();
+                }
+                error_log("Registration error: " . $e->getMessage());
+                throw $e;
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
         }
         public function userUpdate($id,$address){
             $mysql = new configMysqli();
@@ -181,5 +265,5 @@ if (!class_exists('UserRepository')) {
             return $user;
         }
     }
-}
+
 ?>

@@ -4,10 +4,10 @@
     --white-color: hsl(0,0%,100%);
     --black-color: hsl(0, 0% , 0%);
     --body-font: "Poppins", sans-serif; 
-    --h1-font-size: 1.75rem;
-    --normal-font-size: 1rem;
-    --small-font-size: .813rem;
-    --font-medium: 500; 
+    --h1-font-size: 1rem;
+    --normal-font-size: .85rem;
+    --small-font-size: .7rem;
+    --font-medium: 550; 
 }
 
 * {
@@ -41,19 +41,19 @@ a {
     position: relative;
     background-color: hsla(0, 0%, 10%, 0.1);
     border: 2px solid var(--white-color);
-    margin-inline: 1.5rem;
-    padding: 2.5rem 1.5rem;
+    margin-inline: 1rem;
+    padding: 2rem 1rem;
     border-radius: 1rem;
     backdrop-filter: blur(8px);
     max-width: 432px;
-    margin: 2rem auto;
+    margin: 1.5rem auto;
 }
 
 .login__title {
     text-align: center;
     font-size: var(--h1-font-size);
     font-weight: var(--font-medium);
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .login__content, 
@@ -62,14 +62,14 @@ a {
 }
 
 .login__content {
-    row-gap: 1.75rem;
-    margin-bottom: 1.5rem;
+    row-gap: 1.1rem;
+    margin-bottom: 1.25rem;
 }
 
 .login__box {
     grid-template-columns: max-content 1fr;
     align-items: center;
-    column-gap: 0.75rem;
+    column-gap: 0.5rem;
     border-bottom: 2px solid var(--white-color);
 }
 
@@ -80,7 +80,7 @@ a {
 
 .login__input {
     width: 100%;
-    padding-block: 0.8rem;
+    padding-block: 0.5rem;
     background: none;
     color: var(--white-color);
     position: relative;
@@ -120,7 +120,7 @@ a {
 }
 
 .login__check {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .login__check-label, 
@@ -134,8 +134,8 @@ a {
 }
 
 .login__check-input {
-    width: 16px;
-    height: 16px;
+    width: 10px;
+    height: 10px;
 }
 
 .login__forgot {
@@ -153,7 +153,7 @@ a {
     background-color: var(--white-color);
     font-weight: var(--font-medium);
     cursor: pointer;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .login__register {
@@ -171,24 +171,65 @@ a {
 
 /* Input focus move up label */
 .login__input:focus + .login__label {
-    top: -15px;
+    top: -12px;
     font-size: var(--small-font-size);
   }
   
   /* Input focus sticky top label */
   .login__input:not(:placeholder-shown).login__input:not(:focus) + .login__label {
-    top: -15px;
+    top: -12px;
     font-size: var(--small-font-size);
   }
 
 @media screen and (min-width: 576px) {
     .login__form {
         width: 432px;
-        padding: 4rem 3rem 3.5rem;
-        border-radius: 1.5rem;
+        padding: 2.5rem 1.5rem 1.5rem;
+        border-radius: 1.25rem;
     }
     
     .login__title {
         font-size: 2rem;
     }
+}
+
+/* Gender radio buttons styling */
+.gender-container {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding-block: 0.8rem;
+    margin-top: 15px;
+}
+
+.gender-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    color: var(--white-color);
+    font-size: var(--small-font-size);
+}
+
+.gender-label input[type="radio"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--white-color);
+}
+
+.gender-label span {
+    font-weight: var(--font-medium);
+    font-size: var(--small-font-size);
+}
+
+.login__label:nth-of-type(2) {
+    top: 0;
+}
+
+.login__box-input .login__label {
+    position: absolute;
+    left: 0;
+    top: 13px;
+    font-weight: var(--font-medium);
+    transition: top 0.3s, font-size 0.3s;
 } 

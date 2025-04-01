@@ -1,35 +1,25 @@
 <?php
-// Start session if not already started
+ob_start();
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-// Check if this is a POST request
 if($_SERVER['REQUEST_METHOD']==='POST'){
-    // Prevent any output before headers
+    // Clear any previous output
     ob_clean();
     
-    // Set header to indicate JSON response for POST requests
+    // Set headers for JSON response
     header('Content-Type: application/json');
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: POST');
+    header('Access-Control-Allow-Headers: Content-Type');
     
-    try {
-        // Check if file exists before including
-        $controllerPath = __DIR__ . '/../src/controller/usercontroller.php';
-        if (!file_exists($controllerPath)) {
-            throw new Exception("Controller file not found at: " . $controllerPath, 500);
-        }
-        
-        include $controllerPath;
-        
-        if (!class_exists('UserController')) {
-            throw new Exception("UserController class not found", 500);
-        }
-        
+    try {   
+        include __DIR__ . '/../src/controller/usercontroller.php';
+
         $userController = new UserController();
+        $response = ['success' => false, 'message' => ''];
         
         if(isset($_POST['submitLogin'])){
             $userName = $_POST['login-username'];
@@ -41,42 +31,68 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
             
             $userController->login($userName, $passWord);
         }else if(isset($_POST['submitRegister'])){
-            $userName = $_POST['register-name'];
+            $name = $_POST['register-name'];
+            $email = $_POST['register-email'];
             $passWord = $_POST['register-password'];
             $phone = $_POST['register-phone'];
             $gender = $_POST['register-gender'];
             $confirmPassWord = $_POST['register-confirm-pass'];
             
+            // Validate required fields
+            if(empty($name) || empty($email) || empty($passWord) || empty($phone) || empty($gender) || empty($confirmPassWord)) {
+                throw new Exception("All fields are required", 400);
+            }
+
+            // Validate email format
+            if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("Please enter a valid email address", 400);
+            }
+
+            // Validate phone number
+            if(!preg_match("/^[0-9]{10}$/", $phone)) {
+                throw new Exception("Please enter a valid 10-digit phone number", 400);
+            }
+
+            // Validate password match
             if($passWord !== $confirmPassWord){
                 throw new Exception("Passwords do not match", 400);
             }
-            
-            $userController->signup($userName, $passWord, $phone, $gender);
+
+            // Validate password length
+            if(strlen($passWord) < 6) {
+                throw new Exception("Password must be at least 6 characters long", 400);
+            }
+
+            // Call signup with all required fields
+            $roleID = 5; // Default role ID for new users
+            $result = $userController->signup($name, $email, $passWord, $phone, $gender, $roleID);
+            $response = $result;
+        
         }else if(isset($_POST['submitLogout'])){
-            $userController->logout();
-            exit;
+            $result = $userController->logout();
+            $response = $result;
         } else {
             throw new Exception("Invalid form submission", 400);
         }
+
+        // Send response for both login and register
+        if(isset($_POST['submitLogin']) || isset($_POST['submitRegister']) || isset($_POST['submitLogout'])) {
+            http_response_code(200);
+            echo json_encode($response);
+        }
+        
     } catch (Exception $e) {
         error_log("Login error: " . $e->getMessage());
         http_response_code($e->getCode() ?: 400);
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-        exit;
+    } catch (Error $e) {
+        error_log("PHP Error: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'An internal server error occurred']);
     }
-    exit; // Ensure we exit after handling POST request
-}
-
-// For non-POST requests, display the form
-try {
-    $controllerPath = __DIR__ . '/../src/controller/usercontroller.php';
-    if (!file_exists($controllerPath)) {
-        throw new Exception("Controller file not found at: " . $controllerPath, 500);
-    }
-    include $controllerPath;
-} catch (Exception $e) {
-    error_log("Error loading controller: " . $e->getMessage());
-    die("Error loading controller: " . $e->getMessage());
+    
+    // End the request
+    exit;
 }
 ?>
 
@@ -111,7 +127,7 @@ try {
                 <i class="ri-lock-2-line login__icon"></i>
 
                 <div class="login__box-input">
-                    <input type="password" name="login-password" required class="login__input" id="login-pas" placeholder="">
+                    <input type="password" name="login-password" required class="login__input" placeholder="">
                     <label for="" class="login__label">Password</label>
                     <i class="login__eye"></i>
                 </div>
@@ -135,7 +151,7 @@ try {
     </form>
 
     <!-- Register Form -->
-    <form method="POST" id="registerForm" class="login__form" style="display: none;" onsubmit="return handleRegister(event)">
+    <form id="registerForm" class="login__form" style="display: none;" onsubmit="return handleRegister(event)">
         <h1 class="login__title">Register</h1>
 
         <div class="login__content">
@@ -143,8 +159,8 @@ try {
             <div class="login__box">
                 <i class="ri-user-3-line login__icon"></i>
                 <div class="login__box-input">
-                <input type="text" name="register-name" required class="login__input" id="register-name" placeholder=" ">
-                <label for="register-name" class="login__label">Full Name</label>
+                    <input type="text" name="register-name" required class="login__input" placeholder=" ">
+                    <label for="register-name" class="login__label">Full Name</label>
                 </div>
             </div>
 
@@ -152,12 +168,33 @@ try {
             <div class="login__box">
                 <i class="ri-group-line login__icon"></i>
                 <div class="login__box-input">
-                <select required class="login__input" id="register-gender" name="register-gender" >
-                    <option value="" disabled selected>Choose gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-                <label for="register-gender" class="login__label">Gender</label>
+                    <div class="gender-container">
+                        <label class="gender-label">
+                            <input type="radio" name="register-gender" value="0" required>
+                            <span>Male</span>
+                        </label>
+                        <label class="gender-label">
+                            <input type="radio" name="register-gender" value="1" required>
+                            <span>Female</span>
+                        </label>
+                    </div>
+                    <label class="login__label">Gender</label>
+                </div>
+            </div>
+
+            <!-- Phone Field -->
+            <div class="login__box">
+                <i class="ri-phone-line login__icon"></i>
+                <div class="login__box-input">
+                    <input type="tel" 
+                           name="register-phone" 
+                           required 
+                           class="login__input" 
+                           placeholder=" "
+                           pattern="[0-9]{10}"
+                           maxlength="10"
+                           title="Please enter a valid 10-digit phone number">
+                    <label for="register-phone" class="login__label">Phone number</label>
                 </div>
             </div>
 
@@ -165,8 +202,8 @@ try {
             <div class="login__box">
                 <i class="ri-mail-line login__icon"></i>
                 <div class="login__box-input">
-                <input type="email" name="register-email" required class="login__input" id="register-email" placeholder=" ">
-                <label for="register-email" class="login__label">Email</label>
+                    <input type="email" name="register-email" required class="login__input" placeholder=" ">
+                    <label for="register-email" class="login__label">Email</label>
                 </div>
             </div>
 
@@ -174,9 +211,9 @@ try {
             <div class="login__box">
                 <i class="ri-lock-2-line login__icon"></i>
                 <div class="login__box-input">
-                <input type="password" name="register-password" required class="login__input" id="register-pass" placeholder=" ">
-                <label for="register-pass" class="login__label">Password</label>
-                <i class="login__eye"></i>
+                    <input type="password" name="register-password" required class="login__input" placeholder=" ">
+                    <label for="register-pass" class="login__label">Password</label>
+                    <i class="login__eye"></i>
                 </div>
             </div>
 
@@ -184,9 +221,9 @@ try {
             <div class="login__box">
                 <i class="ri-lock-password-line login__icon"></i>
                 <div class="login__box-input">
-                <input type="password" name="register-confirm-pass" required class="login__input" id="register-confirm-pass" placeholder=" ">
-                <label for="register-confirm-pass" class="login__label">Confirm Password</label>
-                <i class="login__eye"></i>
+                    <input type="password" name="register-confirm-pass" required class="login__input" placeholder=" ">
+                    <label for="register-confirm-pass" class="login__label">Confirm Password</label>
+                    <i class="login__eye"></i>
                 </div>
             </div>
         </div>

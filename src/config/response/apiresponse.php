@@ -1,5 +1,4 @@
 <?php
-if (!class_exists('ApiResponse')) {
     class ApiResponse{
 
         public static function customApiResponse($data,$status)
@@ -10,5 +9,4 @@ if (!class_exists('ApiResponse')) {
             ]);
         }
     }
-}
 ?>

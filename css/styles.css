@@ -7,4 +7,35 @@ body {
 /* display login screen */
 /* Full-screen blur overlay */
 
+/* Gender radio buttons styling */
+.gender-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 10px 0;
+}
+
+.gender-label {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.gender-label input[type="radio"] {
+    margin-right: 5px;
+}
+
+.gender-label span {
+    font-size: 14px;
+    color: #333;
+}
+
+.login__box-input {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 

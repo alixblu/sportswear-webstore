@@ -10,7 +10,6 @@ session_start();
 
       <!--=============== CSS ===============-->
       <link rel="stylesheet" href="./css/header.css">
-      <link rel="stylesheet" href="./css/user-menu.css">
 
    </head>
    <body>
@@ -141,10 +140,17 @@ session_start();
             <div class="user-menu">
                <div class="user-info">
                   <i class="ri-user-circle-line"></i>
-                  <span><?php echo htmlspecialchars($_SESSION['user']['username']); ?></span>
+                  <span><?php 
+                  echo htmlspecialchars($_SESSION['user']['username']);
+                   ?></span>
                </div>
                <ul class="user-menu-list">
-                  
+                  <!-- check roleid if not customer (customer roleid is 5?)-->
+                  <?php if(isset($_SESSION['user']['roleid']) && $_SESSION['user']['roleid'] !== '05'): ?>
+                  <li>
+                     <a href="#" onclick="adminPageRedirect()"><i class="ri-admin-line"></i> Go to admin page</a>
+                  </li>
+                  <?php endif; ?>
                   <li>
                      <a href="#"><i class="ri-user-settings-line"></i> Profile</a>
                   </li>
@@ -182,28 +188,33 @@ session_start();
                 this.style.display = 'none';
                 }
         });
-
-        function handleLogout(event) {
+      
+         function handleLogout(event) {
             event.preventDefault();
             fetch('./layout/login_regis.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'submitLogout=1'
+               method: 'POST',
+               headers: {
+                     'Content-Type': 'application/x-www-form-urlencoded',
+               },
+               body: 'submitLogout=1'
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert('Logout failed: ' + data.message);
-                }
+               if (data.success) {
+                     window.location.reload();
+               } else {
+                     alert('Logout failed: ' + data.message);
+               }
             })
             .catch(error => {
-                alert('Logout failed: ' + error.message);
+               alert('Logout failed: ' + error.message);
             });
-        }
+         }
+         // redirect to admin page 
+         function adminPageRedirect() {
+            window.location.href = './layout/admin/index.php';
+         }
+
       </script>
 
    </body>
