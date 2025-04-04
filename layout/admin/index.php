@@ -19,13 +19,23 @@
     <link rel="stylesheet" href="../../css/admin/style.css" />
     <script src="../../JS/admin/pageTitle.js"></script> 
     <script src="../../JS/admin/table.js"></script> 
-
+  
   </head>
   <body>
     <div class="container">
         <?php include './includes/header.php'; ?>
         <?php include './includes/sidebar.php'; ?>
-        <?php include './modules/user.php'; ?>
+        <?php
+        $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
+        $allowed_pages = ['dashboard', 'user', 'dathang', 'product', 'account'];
+
+        if (in_array($page, $allowed_pages)) {
+            include "./modules/$page.php";
+        } else {
+            echo "<h2>404 - Page not found</h2>";
+        }
+        ?>
+
     </div>
 
 </body>
