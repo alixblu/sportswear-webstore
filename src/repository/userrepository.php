@@ -35,23 +35,34 @@
                 if ($conn) $conn->close();
             }
         }
-        public function findUserById($id) {
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
 
-            $stmt = $conn->prepare("SELECT * FROM users WHERE id = ? LIMIT 1");
-            $stmt->bind_param("s", $id);
-            $stmt->execute();
+        public function findAccountByUserId($id) {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+            
+                $stmt = $conn->prepare("SELECT * FROM useraccount WHERE id = ? LIMIT 1");
 
-            $result = $stmt->get_result();
-            $user = $result->fetch_assoc();
-
-            $stmt->close(); 
-            $conn->close();
-
-            return $user;
-
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+                
+                $stmt->bind_param("s", $id);
+                $stmt->execute();
+            
+                $result = $stmt->get_result();
+                return $result->fetch_assoc();
+            } catch (Exception $e) {
+                error_log("Database error in findUserByUsername: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
         }
+
         /**
          * Find a user by their email
          * @param string $email The email to search for
@@ -161,6 +172,25 @@
                 if ($conn) $conn->close();
             }
         }
+
+        public function findUserById($id) {
+            $mysql = new configMysqli();
+            $conn = $mysql->connectDatabase();
+
+            $stmt = $conn->prepare("SELECT * FROM users WHERE id = ? LIMIT 1");
+            $stmt->bind_param("s", $id);
+            $stmt->execute();
+
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
+
+            $stmt->close(); 
+            $conn->close();
+
+            return $user;
+
+        }
+
         public function userUpdate($id,$address){
             $mysql = new configMysqli();
             $conn = $mysql->connectDatabase();

@@ -316,7 +316,7 @@
                             <option value="user">User</option>
                         </select>
                         <div>
-                            <p>*Tài khoản nhân viên được thêm tự động,Tên Tài khoản là số điện thoại, mật khẩu: 123456</p>
+                            <p>*Tài khoản nhân viên được thêm tự động,Tên Tài khoản là Email, mật khẩu: 123456</p>
                         </div>
                         <div class="wrapperButton">
                             <input class="buttonUserCss" type="submit" value="Thêm Nhân Viên" onclick="addUser()">
