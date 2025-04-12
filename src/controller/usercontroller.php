@@ -26,8 +26,18 @@
             ApiResponse::customApiResponse($users,200);
         }
 
+        public function updateUsers($id, $name, $phone, $gender, $roleID){
+            $users = $this->userService->updateUser($id, $name, $phone, $gender, $roleID);
+            ApiResponse::customApiResponse($users,200);
+        }
+
         public function deleteUsers($userId){
             $users = $this->userService->deleteUsers($userId);
+            ApiResponse::customApiResponse($users,200);
+        }
+
+        public function getAllRoles(){
+            $users = $this->userService->getAllRoles();
             ApiResponse::customApiResponse($users,200);
         }
     }
