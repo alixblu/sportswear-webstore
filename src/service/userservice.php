@@ -56,8 +56,8 @@
 
         public function getAccountByUserId($userId) {
             try {
-                $this->userRepository->findAccountByUserId($userId);
-
+                $user = $this->userRepository->findAccountByUserId($userId);
+                return $user;
             } catch (Exception $e) {
                 throw new Exception($e->getMessage(), $e->getCode() ?: 400);
             }

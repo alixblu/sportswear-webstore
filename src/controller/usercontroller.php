@@ -16,7 +16,10 @@
             ApiResponse::customApiResponse($user,200);
         }
         
-
+        public function getAccountByUserId($userId){
+            $user = $this->userService->getAccountByUserId($userId);
+            ApiResponse::customApiResponse($user,200);
+        }
     }
 
 ?>
