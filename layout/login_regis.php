@@ -16,9 +16,9 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     header('Access-Control-Allow-Headers: Content-Type');
     
     try {   
-        include __DIR__ . '/../src/controller/usercontroller.php';
+        include __DIR__ . '/../src/controller/authcontroller.php';
 
-        $userController = new UserController();
+        $authcontroller = new AuthController();
         $response = ['success' => false, 'message' => ''];
         
         if(isset($_POST['submitLogin'])){
@@ -29,7 +29,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
                 throw new Exception("Please enter both username and password", 400);
             }
             
-            $userController->login($userName, $passWord);
+            $authcontroller->login($userName, $passWord);
         }else if(isset($_POST['submitRegister'])){
             $name = $_POST['register-name'];
             $email = $_POST['register-email'];
@@ -65,11 +65,11 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
 
             // Call signup with all required fields
             $roleID = 5; // Default role ID for new users
-            $result = $userController->signup($name, $email, $passWord, $phone, $gender, $roleID);
+            $result = $authcontroller->signup($name, $email, $passWord, $phone, $gender, $roleID);
             $response = $result;
         
         }else if(isset($_POST['submitLogout'])){
-            $result = $userController->logout();
+            $result = $authcontroller->logout();
             $response = $result;
         } else {
             throw new Exception("Invalid form submission", 400);

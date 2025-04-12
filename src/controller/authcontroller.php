@@ -2,7 +2,7 @@
     include dirname(__FILE__) . '/../service/userservice.php';
     include dirname(__FILE__) . '/../config/response/apiresponse.php';
     
-    class UserController{
+    class AuthController{
 
         private $userService;
     
