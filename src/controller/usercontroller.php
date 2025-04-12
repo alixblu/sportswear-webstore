@@ -20,6 +20,16 @@
             $user = $this->userService->getAccountByUserId($userId);
             ApiResponse::customApiResponse($user,200);
         }
+
+        public function getAllUsers(){
+            $users = $this->userService->getAllUsers();
+            ApiResponse::customApiResponse($users,200);
+        }
+
+        public function deleteUsers($userId){
+            $users = $this->userService->deleteUsers($userId);
+            ApiResponse::customApiResponse($users,200);
+        }
     }
 
 ?>

@@ -63,6 +63,24 @@
             }
         }
 
+        public function getAllUsers() {
+            try {
+                $users = $this->userRepository->findAllUsers();
+                return $users;
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
+            }
+        }
+
+        public function deleteUsers($userId){
+            try {
+                $users = $this->userRepository->deleteByUserID($userId);
+                return $users;
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
+            }
+        }
+
         public function isEmailExists($email) {
             try {
                 $existingUser = $this->userRepository->findUserByEmail($email);

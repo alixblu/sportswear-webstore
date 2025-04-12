@@ -63,6 +63,80 @@
             }
         }
 
+        public function findAllUsers() {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+        
+                $status = UserStatus::Active->value;
+
+                $stmt = $conn->prepare("
+                    SELECT u.id, u.name, u.email, d.status
+                    FROM users u
+                    INNER JOIN useraccount d ON u.id = d.user_id
+                    WHERE u.status = ?
+                ");
+            
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+
+                $stmt->bind_param("s", $status);
+                $stmt->execute();
+
+                $result = $stmt->get_result();
+        
+                $users = [];
+                while ($row = $result->fetch_assoc()) {
+                    $users[] = $row;
+                }
+        
+                return $users;
+            } catch (Exception $e) {
+                error_log("Database error in findAllUsers: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
+        }
+        
+        public function deleteByUserID($id){
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+                
+                $status = UserStatus::Active->value;
+
+                $stmt = $conn->prepare("UPDATE useraccount d
+                    JOIN users u ON u.id = d.user_id
+                    SET d.status = ?
+                    WHERE u.id = ?");
+
+                $stmt->bind_param("si", $status, $id);
+            
+                $stmt->execute();
+                
+                $user = null;
+                if ($stmt->affected_rows > 0) {
+                    $user = [
+                        'id' => $id,
+                    ];
+                }
+                return $user;
+            } catch (Exception $e) {
+                error_log("Database error in findAllUsers: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            }
+            finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
+        }
         /**
          * Find a user by their email
          * @param string $email The email to search for
@@ -217,27 +291,7 @@
             return $user;
            
         }
-        public function userDelete($id){
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
-        
-            $sql = "DELETE FROM users WHERE id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $id);
-        
-            $stmt->execute();
-            $user = null;
-            if ($stmt->affected_rows > 0) {
-                $user = [
-                    'id' => $id,
-                ];
-            }
-
-            $stmt->close(); 
-            $conn->close();
-
-            return $user;
-        }
+     
         public function userFindAll(){
             $mysql = new configMysqli();
             $conn = $mysql->connectDatabase();
