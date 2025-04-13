@@ -28,19 +28,20 @@ export const getAllUsers = async () => {
 };
 
 export const createDefaultAccount = async (name, email, phone, gender, roleID) => {
+    const formData = new URLSearchParams();
+    formData.append('action', 'defaultAccount');
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('phone', phone);
+    formData.append('gender', gender);
+    formData.append('roleID', roleID);
+
     const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({
-            action: 'defaultAccount',
-            name,
-            email,
-            phone,
-            gender,
-            roleID,
-        }),
+        body: formData.toString(),
     });
 
     if (!response.ok) {

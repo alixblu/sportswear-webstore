@@ -345,8 +345,6 @@
                         <label for="role">Vai Trò:</label>
 
                         <select class="selectUser" type="role" id="role">
-                            <option value="admin">Admin</option>
-                            <option value="user">User</option>
                         </select>
                         <div>
                             <p>*Tài khoản nhân viên được thêm tự động,Tên Tài khoản là Email, mật khẩu: 123456</p>
@@ -358,6 +356,26 @@
                 </div>
             `;
             document.body.appendChild(portalRoot);
+
+            try {
+                const select = portalRoot.querySelector('#role');
+                userApi.getAllRoles()
+                    .then(result => {
+                        const roles = result.data;
+
+                        roles.forEach(role => {
+                            const option = document.createElement('option');
+                            option.value = role.id;
+                            option.textContent = role.name;
+                            select.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Không thể load roles:', error);
+                    });
+            } catch (error) {
+                console.error('Lỗi xảy ra:', error);
+            }
         }
         function closeFormAddUser(){
             const portalRoot = document.getElementById('portal-root');
@@ -371,10 +389,17 @@
             const email = document.getElementById('email').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const birthday = document.getElementById('birthday').value.trim();
-            const gender = document.querySelector('input[name="gender"]:checked');
+            const genderEl = document.querySelector('input[name="gender"]:checked');
+            let genderValue = null;
+            if (genderEl) {
+                genderValue = genderEl.value === 'nam' ? 0 : 1;
+            } else {
+                console.log('Chưa chọn giới tính');
+            }
             const role = document.getElementById('role').value;
 
-            if (!name || !email || !phone || !birthday || !gender || !role) {
+
+            if (!name || !email || !phone || !birthday || !genderValue || !role) {
                 alert('Vui lòng điền đầy đủ thông tin.');
                 return;
             }
@@ -388,6 +413,16 @@
                 alert('Số điện thoại phải gồm 10 chữ số.');
                 return;
             }
+            try {
+                userApi.createDefaultAccount(name, email,phone, genderValue, role);
+                alert('Thêm Thành Công.');
+                closeFormAddUser();
+                showAllUsers();
+            } catch (error) {
+                console.error(error);
+                alert('Có lỗi xảy ra.');
+            }
+            closeFormAddUser()
         }
         function validateEmail(email) {
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -463,7 +498,7 @@
                 const select = portalRoot.querySelector('#role');
                 userApi.getAllRoles()
                     .then(result => {
-                        const roles = result.data; // result = { status: 200, data: [...] }
+                        const roles = result.data;
 
                         roles.forEach(role => {
                             const option = document.createElement('option');
@@ -498,7 +533,7 @@
             const name = document.getElementById('name').value.trim();
             const address = document.getElementById('address').value.trim();
             const phone = document.getElementById('phone').value.trim();
-            const birthday = document.getElementById('birthday').value.trim(); // nếu cần sử dụng
+            const birthday = document.getElementById('birthday').value.trim();
             const genderEl = document.querySelector('input[name="gender"]:checked');
             let genderValue = null;
             if (genderEl) {
@@ -614,6 +649,7 @@
         window.showFormEditUser = showFormEditUser;
         window.deleteUser = deleteUser;
         window.showFormAddUser = showFormAddUser;
+        window.addUser = addUser;
     </script>
 </body>
 </html>
