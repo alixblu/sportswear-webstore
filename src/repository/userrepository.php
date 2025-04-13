@@ -1,5 +1,6 @@
 <?php
     require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
+    require_once dirname(__FILE__) . '/../enums/UserStatus.php';
 
     class UserRepository{
         /**
@@ -71,21 +72,68 @@
                 $conn = $mysql->connectDatabase();
         
                 $status = UserStatus::Active->value;
-
+        
                 $stmt = $conn->prepare("
-                    SELECT u.id, u.name, u.email, d.status
-                    FROM users u
-                    INNER JOIN useraccount d ON u.id = d.user_id
-                    WHERE u.status = ?
+                    SELECT 
+                        u.id, 
+                        u.fullname, 
+                        u.email, 
+                        u.phone,
+                        u.address,
+                        u.gender,
+                        r.name AS roleName,
+                        u.createdAt,
+                        u.dateOfBirth,
+                        d.status
+                    FROM user u
+                    INNER JOIN useraccount d ON u.id = d.id
+                    INNER JOIN role r ON u.roleID = r.id
+                    WHERE d.status = ?
                 ");
             
                 if (!$stmt) {
                     throw new Exception("Database error: " . $conn->error);
                 }
-
+        
                 $stmt->bind_param("s", $status);
                 $stmt->execute();
-
+        
+                $result = $stmt->get_result();
+        
+                $users = [];
+                while ($row = $result->fetch_assoc()) {
+                    $users[] = $row;
+                }
+        
+                return $users;
+            } catch (Exception $e) {
+                error_log("Database error in findAllUsers: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
+        }
+        public function getAllRoles() {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+        
+                $status = UserStatus::Active->value;
+        
+                $stmt = $conn->prepare("
+                    SELECT id,name
+                    FROM role
+                ");
+            
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+        
+                $stmt->execute();
+        
                 $result = $stmt->get_result();
         
                 $users = [];
@@ -110,10 +158,10 @@
                 $mysql = new configMysqli();
                 $conn = $mysql->connectDatabase();
                 
-                $status = UserStatus::Active->value;
+                $status = UserStatus::Banned->value;
 
                 $stmt = $conn->prepare("UPDATE useraccount d
-                    JOIN users u ON u.id = d.user_id
+                    JOIN user u ON u.id = d.id
                     SET d.status = ?
                     WHERE u.id = ?");
 
@@ -264,34 +312,43 @@
             return $user;
 
         }
-
-        public function userUpdate($id,$address){
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
+        public function userUpdate($id, $name, $phone, $gender, $roleID) {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+                
+                $sql = "UPDATE user 
+                        SET fullname = ?, phone = ?, gender = ?, roleID = ?
+                        WHERE id = ?";
         
-            $sql = "UPDATE users 
-                    SET address = ?
-                    WHERE id = ?";
-            
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("si", $address,$id);
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ssssi", $name,  $phone, $gender, $roleID, $id);
         
-            $stmt->execute();
-            $user = null;
-            if ($stmt->affected_rows > 0) {
-                $user = [
-                    'id' => $id,
-                    'address' => $address,
-                ];
+                $stmt->execute();
+        
+                $user = null;
+                if ($stmt->affected_rows > 0) {
+                    $user = [
+                        'id' => $id,
+                        'name' => $name,
+                        'phone' => $phone,
+                        'gender' => $gender,
+                        'roleID' => $roleID
+                    ];
+                }
+        
+                return $user;
+            } catch (Exception $e) {
+                error_log("Database error in userUpdate: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
             }
-
-            $stmt->close(); 
-            $conn->close();
-
-            return $user;
-           
         }
-     
+        
         public function userFindAll(){
             $mysql = new configMysqli();
             $conn = $mysql->connectDatabase();
