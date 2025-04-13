@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 28, 2025 at 10:42 AM
+-- Generation Time: Apr 08, 2025 at 12:53 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.1.25
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,6 +20,52 @@ SET time_zone = "+00:00";
 --
 -- Database: `sportswear`
 --
+CREATE DATABASE IF NOT EXISTS `sportswear` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `sportswear`;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `access`
+--
+
+CREATE TABLE IF NOT EXISTS `access` (
+  `roleid` int(11) NOT NULL,
+  `moduleid` int(11) NOT NULL,
+  PRIMARY KEY (`roleid`,`moduleid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `access`
+--
+
+INSERT INTO `access` (`roleid`, `moduleid`) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(1, 5),
+(1, 6),
+(1, 7),
+(1, 8),
+(1, 9),
+(1, 10),
+(1, 11),
+(1, 12),
+(2, 1),
+(2, 3),
+(2, 4),
+(2, 5),
+(2, 7),
+(2, 9),
+(2, 10),
+(2, 11),
+(3, 3),
+(3, 5),
+(3, 7),
+(3, 11),
+(4, 5),
+(4, 11);
 
 -- --------------------------------------------------------
 
@@ -37,6 +83,54 @@ CREATE TABLE IF NOT EXISTS `bankaccount` (
   KEY `FK_PaymentMethod_Bank` (`paymentMethodID`),
   KEY `FK_UserAcc_Bank` (`userAccID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `billingdetail`
+--
+
+CREATE TABLE IF NOT EXISTS `billingdetail` (
+  `ID` int(10) NOT NULL,
+  `orderID` int(10) NOT NULL,
+  `receiverName` varchar(50) NOT NULL,
+  `address` text NOT NULL,
+  `phone` varchar(10) NOT NULL,
+  `email` text DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `billingdetail`
+--
+
+INSERT INTO `billingdetail` (`ID`, `orderID`, `receiverName`, `address`, `phone`, `email`) VALUES
+(1, 1, 'Nguyễn Văn Tùng', '123 Đường Lê Lợi, Thành phố Hồ Chí Minh', '0901234567', 'nguyenvantung@gmail.com'),
+(2, 2, 'Trần Thị Phượng', '456 Phố Trần Hưng Đạo, Hà Nội', '0912345678', 'tranthiphuong@gmail.com'),
+(3, 3, 'Lê Minh Hưng', '789 Ngõ Nguyễn Thái Học, Đà Nẵng', '0923456789', 'leminhhung@gmail.com'),
+(4, 4, 'Phạm Thị Hoa', '321 Đường Quang Trung, Hải Phòng', '0934567890', 'phamthihoa@gmail.com'),
+(5, 5, 'Hoàng Văn Khánh', '654 Phố Lý Thường Kiệt, Huế', '0945678901', 'hoangvankhanh@gmail.com'),
+(6, 6, 'Đặng Thu Hương', '987 Đường Trần Phú, Cần Thơ', '0956789012', 'dangthuhuong@gmail.com'),
+(7, 7, 'Phùng Văn Toàn', '135 Đường Nguyễn Trãi, Vũng Tàu', '0967890123', 'phungvantoan@gmail.com'),
+(8, 8, 'Trương Thị Thanh', '246 Ngõ Bà Triệu, Bình Dương', '0978901234', 'truongthithanh@gmail.com'),
+(9, 9, 'Ngô Hoàng Nam', '357 Phố Hoàng Diệu, Quảng Ninh', '0989012345', 'ngohoangnam@gmail.com'),
+(10, 10, 'Đỗ Thị Ngọc', '468 Đường Hùng Vương, Nha Trang', '0990123456', 'dothingoc@gmail.com'),
+(11, 11, 'Vũ Văn Tuấn', '579 Phố Điện Biên Phủ, Lâm Đồng', '0901122334', 'vuvantuan@gmail.com'),
+(12, 12, 'Bùi Thị Minh', '680 Đường Phạm Văn Đồng, Thanh Hóa', '0912233445', 'buithiminh@gmail.com'),
+(13, 13, 'Đỗ Văn Hải', '791 Phố Võ Nguyên Giáp, Bình Định', '0923344556', 'dovanhai@gmail.com'),
+(14, 14, 'Lý Thị Phương', '892 Đường Nguyễn Văn Cừ, Phú Quốc', '0934455667', 'lythiphuong@gmail.com'),
+(15, 15, 'Nguyễn Văn Hòa', '903 Phố Nguyễn Huệ, Sóc Trăng', '0945566778', 'nguyenvanhoa@gmail.com'),
+(16, 16, 'Phan Thanh Tú', '314 Đường Hoàng Hoa Thám, Bắc Ninh', '0956677889', 'phanthanhtu@gmail.com'),
+(17, 17, 'Trịnh Thị Hiền', '425 Phố Lạc Long Quân, Nam Định', '0967788990', 'trinhthihien@gmail.com'),
+(18, 18, 'Dương Văn Hậu', '536 Đường Hai Bà Trưng, Hà Giang', '0978899001', 'duongvanhau@gmail.com'),
+(19, 19, 'Hà Thị Bích', '647 Phố Lê Đại Hành, Ninh Bình', '0989900112', 'hathibich@gmail.com'),
+(20, 20, 'Đặng Văn Tài', '758 Đường Tôn Đức Thắng, Cao Bằng', '0991011122', 'dangvantai@gmail.com'),
+(21, 21, 'Hoàng Văn Mạnh', '869 Phố Phan Chu Trinh, Bến Tre', '0902233445', 'hoangvanmanh@gmail.com'),
+(22, 22, 'Tạ Minh Hoàng', '970 Đường Phạm Hồng Thái, An Giang', '0913344556', 'taminhhoang@gmail.com'),
+(23, 23, 'Nguyễn Văn Phát', '081 Phố Trường Chinh, Nghệ An', '0924455667', 'nguyenvanphat@gmail.com'),
+(24, 24, 'Trần Văn Huy', '192 Đường Láng Hạ, Hòa Bình', '0935566778', 'tranvanhuy@gmail.com'),
+(25, 25, 'Lê Văn Khoa', '203 Phố Xuân Thủy, Quảng Ngãi', '0946677889', 'levankhoa@gmail.com'),
+(26, 26, 'Phạm Văn Lâm', '314 Đường Giải Phóng, Long An', '0957788990', 'phamvanlam@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -169,7 +263,18 @@ CREATE TABLE IF NOT EXISTS `comment` (
   `content` varchar(255) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `comment`
+--
+
+INSERT INTO `comment` (`ID`, `content`, `createdAt`) VALUES
+(1, 'Excellent product quality!', '2024-06-01 10:00:00'),
+(2, 'Good value for money.', '2024-06-05 11:00:00'),
+(3, 'Quick delivery, very satisfied.', '2024-06-10 12:00:00'),
+(4, 'Product was well-packaged.', '2024-06-15 13:00:00'),
+(5, 'Highly recommend to others.', '2024-06-20 14:00:00');
 
 -- --------------------------------------------------------
 
@@ -698,6 +803,37 @@ INSERT INTO `lot` (`ID`, `purchaseOrderID`, `quantity`, `totalPrice`, `status`) 
 (448, 4, 20, 4400000, 'approved'),
 (449, 4, 20, 4600000, 'approved'),
 (450, 4, 20, 4600000, 'approved');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `module`
+--
+
+CREATE TABLE IF NOT EXISTS `module` (
+  `ID` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `icon` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `module`
+--
+
+INSERT INTO `module` (`ID`, `name`, `icon`) VALUES
+(1, 'Dashboard', '<i class=\"ri-dashboard-line\"></i>'),
+(2, 'Employees', '<i class=\"ri-user-line\"></i>'),
+(3, 'Products', '<i class=\"ri-shopping-bag-line\"></i>'),
+(4, 'Warehouse', '<i class=\"ri-warehouse-line\"></i>'),
+(5, 'Orders', '<i class=\"ri-file-list-line\"></i>'),
+(6, 'Coupon & Discount', '<i class=\"ri-price-tag-line\"></i>'),
+(7, 'Warranty', '<i class=\"ri-shield-line\"></i>'),
+(8, 'Account & Access', '<i class=\"ri-lock-line\"></i>'),
+(9, 'Analytics', '<i class=\"ri-bar-chart-line\"></i>'),
+(10, 'Sales', '<i class=\"ri-money-dollar-circle-line\"></i>'),
+(11, 'Notifications', '<i class=\"ri-notification-line\"></i>'),
+(12, 'Settings', '<i class=\"ri-settings-line\"></i>');
 
 -- --------------------------------------------------------
 
@@ -10545,16 +10681,29 @@ INSERT INTO `purchaseorder` (`ID`, `userAccID`, `suppilerID`, `totalPrice`, `cre
 CREATE TABLE IF NOT EXISTS `review` (
   `ID` int(10) NOT NULL AUTO_INCREMENT,
   `userAccID` int(10) NOT NULL,
-  `commentID` int(10) NOT NULL,
+  `commentID` int(10) DEFAULT NULL COMMENT 'a review could have a comment or not\r\n',
   `productID` int(10) NOT NULL,
-  `rating` decimal(5,2) NOT NULL,
+  `rating` int(1) NOT NULL DEFAULT 5 COMMENT 'rate 1-5 start\r\n',
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `status` enum('active','inactive') DEFAULT 'active',
   PRIMARY KEY (`ID`),
   KEY `FK_UserAcc_Review` (`userAccID`),
   KEY `FK_Comment_Review` (`commentID`),
   KEY `FK_ProVariant_Review` (`productID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `review`
+--
+
+INSERT INTO `review` (`ID`, `userAccID`, `commentID`, `productID`, `rating`, `createdAt`, `status`) VALUES
+(1, 10, 1, 68, 5, '2024-06-01 10:05:00', 'active'),
+(2, 11, 2, 19, 4, '2024-06-05 11:05:00', 'active'),
+(3, 12, 3, 212, 5, '2024-06-10 12:05:00', 'active'),
+(4, 13, 4, 109, 4, '2024-06-15 13:05:00', 'active'),
+(5, 14, 5, 77, 5, '2024-06-20 14:05:00', 'active'),
+(6, 15, NULL, 8, 5, '2025-01-20 11:05:00', 'active'),
+(7, 16, NULL, 356, 4, '2025-01-20 11:05:00', 'active');
 
 -- --------------------------------------------------------
 
@@ -10642,13 +10791,13 @@ INSERT INTO `shipmentmethod` (`ID`, `name`, `cost`, `estimatedTime`, `status`) V
 CREATE TABLE IF NOT EXISTS `shipmenttracking` (
   `ID` int(10) NOT NULL AUTO_INCREMENT,
   `code` varchar(10) NOT NULL,
-  `orderID` int(10) NOT NULL,
+  `billID` int(10) NOT NULL,
   `shipmentID` int(10) NOT NULL,
   `shipmentMethodID` int(10) NOT NULL,
   `status` enum('pending','in_trasit','failed','delivered') NOT NULL DEFAULT 'pending',
   PRIMARY KEY (`ID`) USING BTREE,
   UNIQUE KEY `code` (`code`),
-  KEY `FK_Order_ShipTrack` (`orderID`),
+  KEY `FK_Order_ShipTrack` (`billID`),
   KEY `FK_Shipment_ShipTrack` (`shipmentID`),
   KEY `FK_ShipMethod_ShipTrack` (`shipmentMethodID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -10701,7 +10850,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `contact` (`email`,`phone`) USING BTREE,
   KEY `FK_Role_User` (`roleID`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
@@ -10760,7 +10909,7 @@ CREATE TABLE IF NOT EXISTS `useraccount` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `username` (`username`),
   KEY `FK_User_Account` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `useraccount`
@@ -11075,7 +11224,7 @@ ALTER TABLE `review`
 -- Constraints for table `shipmenttracking`
 --
 ALTER TABLE `shipmenttracking`
-  ADD CONSTRAINT `FK_Order_ShipTrack` FOREIGN KEY (`orderID`) REFERENCES `order` (`ID`),
+  ADD CONSTRAINT `FK_Order_ShipTrack` FOREIGN KEY (`billID`) REFERENCES `order` (`ID`),
   ADD CONSTRAINT `FK_ShipMethod_ShipTrack` FOREIGN KEY (`shipmentMethodID`) REFERENCES `shipmentmethod` (`ID`),
   ADD CONSTRAINT `FK_Shipment_ShipTrack` FOREIGN KEY (`shipmentID`) REFERENCES `shipment` (`ID`);
 
