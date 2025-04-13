@@ -40,6 +40,18 @@
             }
         }
 
+        public function updateUser($id, $name,  $phone, $gender, $roleID) {
+            try {
+                $user = $this->userRepository->userUpdate($id, $name,  $phone, $gender, $roleID);
+                if (!$user) {
+                    throw new Exception("Failed to create user", 500);
+                }
+                return $user;
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
+            }
+        }
+
         public function defaultAccount($name, $email, $phone, $gender, $roleID) {
             try {
                 $passWordDefault ='123456';
@@ -71,7 +83,14 @@
                 throw new Exception($e->getMessage(), $e->getCode() ?: 400);
             }
         }
-
+        public function getAllRoles() {
+            try {
+                $users = $this->userRepository->getAllRoles();
+                return $users;
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
+            }
+        }
         public function deleteUsers($userId){
             try {
                 $users = $this->userRepository->deleteByUserID($userId);
