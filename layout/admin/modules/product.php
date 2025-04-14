@@ -24,20 +24,333 @@
         .product-image {
             position: relative;
         }
+
+        /* Product Card Styles */
+        .product-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .product-info {
+            padding: 12px;
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stars {
+            color: var(--warning);
+            margin-right: 6px;
+            font-size: 12px;
+        }
+
+        .rating-count {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .product-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow: hidden;
+            z-index: 1001;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            background-color: rgba(248, 249, 250, 0.5);
+        }
+
+        .modal-header h2 {
+            font-size: 19px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: row;
+            height: calc(90vh - 120px);
+        }
+
+        .product-image-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: var(--light);
+            border-right: 1px solid var(--border);
+            width: 240px;
+        }
+
+        .product-image-large {
+            width: 160px;
+            height: 160px;
+            background: white;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .product-image-large i {
+            font-size: 80px;
+            color: var(--border);
+        }
+
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .product-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .product-info-section {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .info-item {
+            background: var(--light);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 15px;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .variants-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 14px;
+        }
+
+        .variants-table th {
+            background: var(--light);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .variants-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .variants-table tr:hover {
+            background-color: rgba(67, 97, 238, 0.03);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        #variants-tab {
+            overflow-x: auto;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .status-badge i {
+            margin-right: 6px;
+            font-size: 12px;
+        }
+
+        .status-in_stock {
+            background-color: rgba(76, 201, 240, 0.15);
+            color: #0891b2;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+
+        .status-out_of_stock {
+            background-color: rgba(247, 37, 133, 0.15);
+            color: #db2777;
+            border: 1px solid rgba(247, 37, 133, 0.3);
+        }
+
+        .btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn i {
+            font-size: 12px;
+            margin-right: 4px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-light);
+            color: var(--primary);
+            background-color: transparent;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+        }
     </style>
 </head>
 <body>
     <div class="main-content">
-        <div id="pageTitle" class="page-title">
-            <div class="title">Products</div>
-            <div class="action-buttons">
-                <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
-                <button id="exportBtn" class="btn btn-outline">
-                    <i class="fas fa-download"></i> Export
-                </button>
-                <button id="addBtn" class="btn btn-primary" onclick="">
-                    <i class="fas fa-plus"></i> Add New
-                </button>
+<div id="pageTitle" class="page-title">
+        <div class="title">Products</div>
+        <div class="action-buttons">
+            <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+            <button id="exportBtn" class="btn btn-outline">
+                <i class="fas fa-download"></i> Export
+            </button>
             </div>
         </div>
 
@@ -69,6 +382,98 @@
         <!-- Product Grid -->
         <div class="product-grid" id="productGrid">
             <!-- Products will be loaded here dynamically -->
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Product Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-image-section">
+                    <div class="product-image-large">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Edit Product
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-image"></i> Change Image
+                        </button>
+                    </div>
+                </div>
+                <div class="product-info-section">
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab('details')">Details</div>
+                        <div class="tab" onclick="switchTab('variants')">Variants</div>
+            </div>
+
+                    <div id="details-tab" class="tab-content active">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Product ID</div>
+                                <div class="info-value" id="modal-product-id">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Name</div>
+                                <div class="info-value" id="modal-product-name">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Category</div>
+                                <div class="info-value" id="modal-product-category">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Brand</div>
+                                <div class="info-value" id="modal-product-brand">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Markup Percentage</div>
+                                <div class="info-value" id="modal-product-markup">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Rating</div>
+                                <div class="info-value" id="modal-product-rating">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Stock</div>
+                                <div class="info-value" id="modal-product-stock">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Status</div>
+                                <div class="info-value" id="modal-product-status">-</div>
+                            </div>
+                        </div>
+                        <div class="info-item" style="margin-top: 15px;">
+                            <div class="info-label">Description</div>
+                            <div class="info-value" id="modal-product-description">-</div>
+                        </div>
+                    </div>
+
+                    <div id="variants-tab" class="tab-content">
+                        <table class="variants-table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Full Name</th>
+                                    <th>Color</th>
+                                    <th>Size</th>
+                                    <th>Weight</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-variants-list">
+                                <!-- Variants will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -146,9 +551,6 @@
                                 <span class="rating-count">${product.rating ? `(${product.rating})` : '(No rating)'}</span>
                             </div>
                             <div class="product-actions">
-                                <button class="btn btn-outline" onclick="editProduct(${product.ID})">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
                                 <button class="btn btn-primary" onclick="viewProduct(${product.ID})">
                                     <i class="fas fa-eye"></i> View
                                 </button>
@@ -174,16 +576,46 @@
         // Load products when the page loads
         document.addEventListener('DOMContentLoaded', loadProducts);
 
-        // Placeholder functions for edit and view
-        function editProduct(id) {
-            console.log('Edit product:', id);
-            // Implement edit functionality
+        // Modal functions
+        function viewProduct(id) {
+            const modal = document.getElementById('productModal');
+            modal.style.display = 'block';
+            
+            // For demo purposes, we'll just show the ID
+            document.getElementById('modal-product-id').textContent = id;
+            
+            // Fetch product details from the server
+            
         }
 
-        function viewProduct(id) {
-            console.log('View product:', id);
-            // Implement view functionality
+        function closeModal() {
+            const modal = document.getElementById('productModal');
+            modal.style.display = 'none';
+        }
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content and mark tab as active
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('productModal');
+            if (event.target === modal) {
+                closeModal();
+            }
         }
     </script>
 </body>
-</html>
+</html> 

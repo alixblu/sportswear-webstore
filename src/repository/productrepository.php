@@ -1,6 +1,8 @@
 <?php
 require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
-/**
+/**=======src of product include variant and category====
+ * 
+ * 
  * Functions in ProductRepository:
  * - findAll() - Get all products with their variants
  * - findById($id) - Find a product by ID with its variants
@@ -335,3 +337,4 @@ class ProductRepository {
 
 }
 ?> 
+ 
