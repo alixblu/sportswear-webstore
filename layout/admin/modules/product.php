@@ -5,26 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../../css/admin/style.css">
     <link rel="stylesheet" href="../../css/admin/product.css">
-    <style>
-        .product-id-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background-color: #fff;
-            color: #333;
-            padding: 1px 4px;
-            border-radius: 3px;
-            font-size: 10px;
-            font-weight: bold;
-            border: 1px solid #000;
-            box-shadow: 0 0 2px rgba(0,0,0,0.3);
-        }
-        .product-image {
-            position: relative;
-        }
-    </style>
 </head>
 <body>
     <div class="main-content">
@@ -35,16 +16,15 @@
                 <button id="exportBtn" class="btn btn-outline">
                     <i class="fas fa-download"></i> Export
                 </button>
-                <button id="addBtn" class="btn btn-primary" onclick="">
-                    <i class="fas fa-plus"></i> Add New
-                </button>
             </div>
         </div>
 
         <!-- Product Filters -->
         <div class="product-filters">
+            <div class="filter-group search-group">
+                <input type="text" id="search" class="filter-input" placeholder="Search products...">
+            </div>
             <div class="filter-group">
-                <label for="category">Category:</label>
                 <select id="category" class="filter-select">
                     <option value="">All Categories</option>
                     <option value="1">T-Shirts</option>
@@ -53,7 +33,14 @@
                 </select>
             </div>
             <div class="filter-group">
-                <label for="status">Status:</label>
+                <select id="brand" class="filter-select">
+                    <option value="">All Brands</option>
+                    <option value="1">Nike</option>
+                    <option value="2">Adidas</option>
+                    <option value="3">Puma</option>
+                </select>
+            </div>
+            <div class="filter-group">
                 <select id="status" class="filter-select">
                     <option value="">All Status</option>
                     <option value="in_stock">In Stock</option>
@@ -61,14 +48,147 @@
                 </select>
             </div>
             <div class="filter-group">
-                <label for="search">Search:</label>
-                <input type="text" id="search" class="filter-input" placeholder="Search products...">
+                <select id="rating" class="filter-select">
+                    <option value="">All Ratings</option>
+                    <option value="4-5">4-5 Stars</option>
+                    <option value="3-4">3-4 Stars</option>
+                    <option value="2-3">2-3 Stars</option>
+                    <option value="1-2">1-2 Stars</option>
+                </select>
+            </div>
+            <div class="filter-group price-range-group">
+                <div class="price-range-inputs">
+                    <input type="number" id="priceStart" class="filter-input" placeholder="Min Price" min="0">
+                    <span class="price-range-separator">-</span>
+                    <input type="number" id="priceEnd" class="filter-input" placeholder="Max Price" min="0">
+                </div>
             </div>
         </div>
 
         <!-- Product Grid -->
         <div class="product-grid" id="productGrid">
             <!-- Products will be loaded here dynamically -->
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Product Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-image-section">
+                    <div class="product-image-large">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Edit Product
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-image"></i> Change Image
+                        </button>
+                    </div>
+                </div>
+                <div class="product-info-section">
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab('details')">Details</div>
+                        <div class="tab" onclick="switchTab('variants')">Variants</div>
+                    </div>
+
+                    <div id="details-tab" class="tab-content active">
+                        <div class="info-grid">
+                            <div class="info-item feature">
+                                <div class="info-label">
+                                    <i class="fas fa-barcode"></i> Product ID
+                                </div>
+                                <div class="info-value" id="modal-product-id">-</div>
+                            </div>
+                            <div class="info-item feature">
+                                <div class="info-label">
+                                    <i class="fas fa-tag"></i> Name
+                                </div>
+                                <div class="info-value" id="modal-product-name">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-layer-group"></i> Category
+                                </div>
+                                <div class="info-value" id="modal-product-category">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-copyright"></i> Brand
+                                </div>
+                                <div class="info-value" id="modal-product-brand">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-percentage"></i> Markup Percentage
+                                </div>
+                                <div class="info-value" id="modal-product-markup">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-tags"></i> Discount ID
+                                </div>
+                                <div class="info-value" id="modal-product-discount-id">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-dollar-sign"></i> Base Price
+                                </div>
+                                <div class="info-value" id="modal-product-base-price">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-star"></i> Rating
+                                </div>
+                                <div class="info-value" id="modal-product-rating">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-box"></i> Stock
+                                </div>
+                                <div class="info-value" id="modal-product-stock">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-info-circle"></i> Status
+                                </div>
+                                <div class="info-value" id="modal-product-status">-</div>
+                            </div>
+                        </div>
+                        <div class="info-item description">
+                            <div class="info-label">
+                                <i class="fas fa-align-left"></i> Description
+                            </div>
+                            <div class="info-value" id="modal-product-description">-</div>
+                        </div>
+                    </div>
+
+                    <div id="variants-tab" class="tab-content">
+                        <table class="variants-table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Full Name</th>
+                                    <th>Color</th>
+                                    <th>Size</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-variants-list">
+                                <!-- Variants will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -107,14 +227,10 @@
         async function loadProducts() {
             try {
                 const response = await getAllProducts();
-                console.log('API Response:', response); // Debug log
-                
                 const productGrid = document.getElementById('productGrid');
                 productGrid.innerHTML = '';
 
-                // Check if response is an array
                 if (!Array.isArray(response)) {
-                    console.error('Expected an array of products, got:', response);
                     throw new Error('Invalid response format from server');
                 }
 
@@ -146,9 +262,6 @@
                                 <span class="rating-count">${product.rating ? `(${product.rating})` : '(No rating)'}</span>
                             </div>
                             <div class="product-actions">
-                                <button class="btn btn-outline" onclick="editProduct(${product.ID})">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
                                 <button class="btn btn-primary" onclick="viewProduct(${product.ID})">
                                     <i class="fas fa-eye"></i> View
                                 </button>
@@ -174,16 +287,118 @@
         // Load products when the page loads
         document.addEventListener('DOMContentLoaded', loadProducts);
 
-        // Placeholder functions for edit and view
-        function editProduct(id) {
-            console.log('Edit product:', id);
-            // Implement edit functionality
+        // Modal functions
+        async function viewProduct(id) {
+            const modal = document.getElementById('productModal');
+            modal.style.display = 'block';
+            
+            try {
+                // Get product details
+                let response = await getProductById(id);
+                if (!response || !response.data) {
+                    throw new Error('No product data received');
+                }
+
+                const product = response.data;
+                const modalElements = {
+                    id: document.getElementById('modal-product-id'),
+                    name: document.getElementById('modal-product-name'),
+                    markup: document.getElementById('modal-product-markup'),
+                    rating: document.getElementById('modal-product-rating'),
+                    stock: document.getElementById('modal-product-stock'),
+                    status: document.getElementById('modal-product-status'),
+                    description: document.getElementById('modal-product-description'),
+                    category: document.getElementById('modal-product-category'),
+                    brand: document.getElementById('modal-product-brand'),
+                    discountId: document.getElementById('modal-product-discount-id'),
+                    basePrice: document.getElementById('modal-product-base-price')
+                };
+
+                // Update modal with product details
+                modalElements.id.textContent = product.ID || '-';
+                modalElements.name.textContent = product.name || '-';
+                modalElements.markup.textContent = (product.markup_percentage || '0') + '%';
+                modalElements.rating.innerHTML = renderStars(product.rating);
+                modalElements.stock.textContent = product.stock || '0';
+                modalElements.status.textContent = product.status === 'in_stock' ? 'In Stock' : 'Out of Stock';
+                modalElements.description.textContent = product.description || 'No description available';
+                modalElements.discountId.textContent = product.discountID || '-';
+                modalElements.basePrice.textContent = product.price || '-';
+
+                // Get and display category name
+                if (product.categoryID) {
+                    response = await getCategoryById(product.categoryID);
+                    const category = response.data;
+                    modalElements.category.textContent = category ? category.name : 'Unknown Category';
+                } else {
+                    modalElements.category.textContent = 'No category';
+                }
+
+                // Get and display brand name
+                if (product.brandID) {
+                    response = await getBrandById(product.brandID);
+                    const brand = response.data;
+                    modalElements.brand.textContent = brand ? brand.name : 'Unknown Brand';
+                } else {
+                    modalElements.brand.textContent = 'No brand';
+                }
+
+                // Get and display variants
+                const res = await getProductVariants(id);
+                const variants = res.data || [];
+                const variantsList = document.getElementById('modal-variants-list');
+                
+                if (variantsList) {
+                    variantsList.innerHTML = '';
+                    if (variants && variants.length > 0) {
+                        variants.forEach(variant => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${variant.Code || '-'}</td>
+                                <td>${variant.fullName || '-'}</td>
+                                <td>${variant.color || '-'}</td>
+                                <td>${variant.size || '-'}</td>
+                                <td>${variant.quantity || '0'}</td>
+                                <td>${variant.price || '0'}</td>
+                                <td>${variant.status || '-'}</td>
+                            `;
+                            variantsList.appendChild(row);
+                        });
+                    } else {
+                        variantsList.innerHTML = '<tr><td colspan="8" class="text-center">No variants found</td></tr>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading product details:', error);
+                alert('Error loading product details: ' + error.message);
+            }
         }
 
-        function viewProduct(id) {
-            console.log('View product:', id);
-            // Implement view functionality
+        function closeModal() {
+            const modal = document.getElementById('productModal');
+            modal.style.display = 'none';
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('productModal');
+            if (event.target === modal) {
+                closeModal();
+            }
         }
     </script>
 </body>
-</html>
+</html> 

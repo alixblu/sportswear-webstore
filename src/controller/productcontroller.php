@@ -138,5 +138,51 @@ class ProductController {
             return ApiResponse::customResponse($productId, 500, 'Failed to fetch product variants: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Handle GET request to get a category by ID
+     * @param int $id Category ID
+     */
+    public function getCategoryById($id) {
+        try {
+            if (!isset($id) || !is_numeric($id)) {
+                ApiResponse::customResponse($id, 400, 'Invalid category ID');
+                return;
+            }
+
+            $category = $this->productService->getCategoryById($id);
+            if (!$category) {
+                ApiResponse::customResponse($category, 404, 'Category not found');
+                return;
+            }
+
+            ApiResponse::customResponse($category, 200);
+        } catch (Exception $e) {
+            ApiResponse::customResponse($id, 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Handle GET request to get a brand by ID
+     * @param int $id Brand ID
+     */
+    public function getBrandById($id) {
+        try {
+            if (!isset($id) || !is_numeric($id)) {
+                ApiResponse::customResponse($id, 400, 'Invalid brand ID');
+                return;
+            }
+
+            $brand = $this->productService->getBrandById($id);
+            if (!$brand) {
+                ApiResponse::customResponse($brand, 404, 'Brand not found');
+                return;
+            }
+
+            ApiResponse::customResponse($brand, 200);
+        } catch (Exception $e) {
+            ApiResponse::customResponse($id, 500, $e->getMessage());
+        }
+    }
 }
 ?> 
