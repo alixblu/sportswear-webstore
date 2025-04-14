@@ -16,6 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $userController->getAllUsers();
     }else if (isset($_GET['action']) && $_GET['action'] === 'getAllRoles') {
         $userController->getAllRoles();
+    }else if (isset($_GET['action']) && $_GET['action'] === 'exportFile') {
+        $userController->exportExcel();
     } else {
         echo "Invalid GET request.";
     }

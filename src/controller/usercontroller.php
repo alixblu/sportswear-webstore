@@ -45,6 +45,10 @@
             $result = $this->userService->importExcel($file);
             ApiResponse::customApiResponse($result,200);
         }
+        public function exportExcel(){
+            $result = $this->userService->exportExcel();
+            ApiResponse::customApiResponse($result,200);
+        }
     }
 
 ?>

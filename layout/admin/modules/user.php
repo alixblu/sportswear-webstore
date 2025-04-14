@@ -192,7 +192,7 @@
                     <i class="fa-solid fa-upload"></i> Import
                 </button>
                 <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleFileChange(event)">
-                <button id="exportBtn" class="btn btn-outline">
+                <button id="exportBtn" class="btn btn-outline" onclick="exportFile()">
                     <i class="fas fa-download"></i> Export
                 </button>
 
@@ -566,7 +566,14 @@
             }
         }
 
-
+        function exportFile(){
+            try {
+                userApi.exportFile();
+            } catch (error) {
+                console.error(error);
+                alert('Có lỗi xảy ra khi cập nhật người dùng.');
+            }
+        }
         function uploadFile(){
             document.getElementById('fileInput').click()
         }
@@ -655,6 +662,7 @@
         window.addUser = addUser;
         window.uploadFile = uploadFile;
         window.handleFileChange = handleFileChange;
+        window.exportFile = exportFile;
     </script>
 </body>
 </html>

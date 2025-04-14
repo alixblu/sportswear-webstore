@@ -154,6 +154,35 @@
                 throw new Exception("Lỗi import Excel: " . $e->getMessage(), $e->getCode() ?: 400);
             }
         }
-        
+        public function exportExcel()
+        {
+            try {
+                $users = $this->userRepository->findAllUsers();
+
+                $dataToExport = [];
+                foreach ($users as $user) {
+                    $dataToExport[] = [
+                        'full_name'    => $user['fullname'] ?? '',
+                        'date_of_birth' => $user['dateOfBirth'] ?? '',
+                        'email'        => $user['email'] ?? '',
+                        'phone'        => $user['phone'] ?? '',
+                        'address'      => $user['address'] ?? '',
+                        'gender'       => $user['gender'] ?? '',
+                        'role_id'      => $user['roleID'] ?? '',
+                        'created_at'   => $user['createdAt'] ?? ''
+                    ];
+                }
+
+                $headers = [
+                    'Họ và tên', 'Ngày sinh', 'Email', 'SĐT', 'Địa chỉ', 'Giới tính', 'Role ID', 'Ngày tạo'
+                ];
+
+                $excelUtils = new ExcelUtils();
+                $excelUtils->exportExcel($dataToExport, $headers, 'user_list.xlsx');
+            } catch (Exception $e) {
+                throw new Exception("Lỗi export Excel: " . $e->getMessage(), $e->getCode() ?: 400);
+            }
+        }
+
     }
 ?>

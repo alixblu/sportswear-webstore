@@ -84,7 +84,8 @@
                         r.name AS roleName,
                         u.createdAt,
                         u.dateOfBirth,
-                        d.status
+                        d.status,
+                        u.roleID
                     FROM user u
                     INNER JOIN useraccount d ON u.id = d.id
                     INNER JOIN role r ON u.roleID = r.id
