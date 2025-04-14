@@ -191,7 +191,7 @@
                 <button id="importBtn" class="btn btn-outline" onclick="uploadFile()">
                     <i class="fa-solid fa-upload"></i> Import
                 </button>
-                <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+                <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleFileChange(event)">
                 <button id="exportBtn" class="btn btn-outline">
                     <i class="fas fa-download"></i> Export
                 </button>
@@ -569,9 +569,12 @@
 
         function uploadFile(){
             document.getElementById('fileInput').click()
-
         }
-
+        function handleFileChange(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            userApi.uploadFile(file);
+        }
         function infoAccount(id){
             userApi.getAccountByUserId(id).then(result => {
                 const user = result.data;
@@ -650,6 +653,8 @@
         window.deleteUser = deleteUser;
         window.showFormAddUser = showFormAddUser;
         window.addUser = addUser;
+        window.uploadFile = uploadFile;
+        window.handleFileChange = handleFileChange;
     </script>
 </body>
 </html>

@@ -40,6 +40,11 @@
             $users = $this->userService->getAllRoles();
             ApiResponse::customApiResponse($users,200);
         }
+
+        public function importExcel($file){
+            $result = $this->userService->importExcel($file);
+            ApiResponse::customApiResponse($result,200);
+        }
     }
 
 ?>

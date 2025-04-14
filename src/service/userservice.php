@@ -1,6 +1,8 @@
 <?php
     include dirname(__FILE__) . '/../repository/userrepository.php';
     require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
+    require_once dirname(__FILE__) .'/../../vendor/autoload.php';
+    use PhpOffice\PhpSpreadsheet\IOFactory;
     
     class UserService{
         private $userRepository;
@@ -112,6 +114,32 @@
                 throw new Exception($e->getMessage(), $e->getCode() ?: 400);
             }
         }
+        public function importExcel($file) {
+            try {
+                $spreadsheet = IOFactory::load($file);
+                $sheet = $spreadsheet->getActiveSheet();
+                $rows = $sheet->toArray();
         
+                $first = true;
+                $dataToInsert = [];
+        
+                foreach ($rows as $row) {
+                    if ($first) { $first = false; continue; }
+        
+                    $name = $row[0] ?? '';
+                    $email = $row[1] ?? '';
+                    if (!$name || !$email) continue;
+        
+                    $dataToInsert[] = [
+                        'name' => $name,
+                        'email' => $email
+                    ];
+                }
+                $this->userRepository->bulkInsert($dataToInsert);
+                
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
+            }
+        }
     }
 ?>

@@ -405,6 +405,28 @@
 
             return $user;
         }
-    }
+        public function bulkInsert($data) {
+            $mysql = new configMysqli();
+            $conn = $mysql->connectDatabase();
 
+            if (empty($data)) return;
+    
+            $values = [];
+            foreach ($data as $row) {
+                $name = $conn->real_escape_string($row['name']);
+                $email = $conn->real_escape_string($row['email']);
+                $values[] = "('$name', '$email')";
+            }
+    
+            $chunks = array_chunk($values, 1000);
+            foreach ($chunks as $chunk) {
+                $sql = "INSERT INTO users (name, email) VALUES " . implode(',', $chunk);
+                if (!$conn->query($sql)) {
+                    throw new Exception("Lỗi khi chèn dữ liệu: " . $conn->error);
+                }
+            }
+
+            $conn->close();
+        }
+    }
 ?>

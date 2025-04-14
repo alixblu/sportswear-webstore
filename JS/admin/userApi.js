@@ -99,3 +99,19 @@ export const getAllRoles = async () => {
 
     return await response.json();
 };
+
+export const uploadFile = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append("excel_file", file);
+        const response = await fetch(`${API_URL}?action=uploadFile`, {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.text();
+        alert("Kết quả: " + result);
+    } catch (err) {
+        console.error("Lỗi:", err);
+    }
+};
