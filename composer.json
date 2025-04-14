@@ -1,6 +1,5 @@
 {
     "name": "admin/sportswear-webstore",
-    "type": "project",
     "autoload": {
         "psr-4": {
             "Admin\\SportswearWebstore\\": "src/"
@@ -12,7 +11,5 @@
             "email": "luongcamdao@gmail.com"
         }
     ],
-    "require": {
-        "phpoffice/phpspreadsheet": "^4.1"
-    }
+    "require": {}
 }

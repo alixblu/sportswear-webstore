@@ -1,15 +1,15 @@
 <?php
     include dirname(__FILE__) . '/../repository/userrepository.php';
-    require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
-    require_once dirname(__FILE__) .'/../../vendor/autoload.php';
-    use PhpOffice\PhpSpreadsheet\IOFactory;
-    
+    include dirname(__FILE__) . '/../utils/ExcelUtils.php';
+
     class UserService{
         private $userRepository;
+        private $excelUtils;
     
         public function __construct()
         {
             $this->userRepository = new UserRepository();
+            $this->excelUtils = new ExcelUtils();
         }
 
         public function login($userName, $passWord) {
@@ -116,30 +116,44 @@
         }
         public function importExcel($file) {
             try {
-                $spreadsheet = IOFactory::load($file);
-                $sheet = $spreadsheet->getActiveSheet();
-                $rows = $sheet->toArray();
+                $rows = $this->excelUtils->readExcelRows($file);
         
                 $first = true;
                 $dataToInsert = [];
         
                 foreach ($rows as $row) {
-                    if ($first) { $first = false; continue; }
+                    if ($first) { 
+                        $first = false; 
+                        continue; 
+                    }
         
-                    $name = $row[0] ?? '';
-                    $email = $row[1] ?? '';
-                    if (!$name || !$email) continue;
+                    $fullName    = $row[0] ?? '';
+                    $dateOfBirth = $row[1] ?? '';
+                    $email       = $row[2] ?? '';
+                    $phone       = $row[3] ?? '';
+                    $address     = $row[4] ?? '';
+                    $gender      = $row[5] ?? '';
+                    $roleID      = $row[6] ?? '';
+                    $createdAt   = $row[7] ?? '';
         
                     $dataToInsert[] = [
-                        'name' => $name,
-                        'email' => $email
+                        'full_name'     => $fullName,
+                        'date_of_birth' => $dateOfBirth,
+                        'email'         => $email,
+                        'phone'         => $phone,
+                        'address'       => $address,
+                        'gender'        => $gender,
+                        'role_id'       => $roleID,
+                        'created_at'    => $createdAt
                     ];
                 }
-                $this->userRepository->bulkInsert($dataToInsert);
-                
+        
+                $this->userRepository->bulkInsertWithNPlus1($dataToInsert);
+        
             } catch (Exception $e) {
-                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
+                throw new Exception("Lỗi import Excel: " . $e->getMessage(), $e->getCode() ?: 400);
             }
         }
+        
     }
 ?>
