@@ -17,7 +17,6 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../../css/admin/style.css" />
-    <script src="../../JS/admin/pageTitle.js"></script> 
     <script src="../../JS/admin/table.js"></script> 
   
   </head>

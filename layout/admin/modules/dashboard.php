@@ -9,7 +9,18 @@
 <body>
     <div class="main-content">
         <!-- Page Title -->
-        <div id="pageTitle" class="page-title"></div>
+        <div id="pageTitle" class="page-title">
+            <div class="title">Products</div>
+            <!-- <div class="action-buttons">
+                <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+                <button id="exportBtn" class="btn btn-outline">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                <button id="addBtn" class="btn btn-primary" onclick="showFormAddUser()">
+                    <i class="fas fa-plus"></i> Add New
+                </button>
+            </div> -->
+        </div>
 
         <!-- Stats Cards -->
         <div class="stats-cards">
@@ -91,11 +102,7 @@
 
     
     <script>
-        
-        // Call the createPageTitle function from the external JS file
-        const pageTitleHTML = createPageTitle("Dashboard", true, true); 
-        document.querySelector("#pageTitle").innerHTML = pageTitleHTML;
-
+    
         // Example usage
         const iconClass = "fas fa-shopping-bag";
             const tableName = "Recent Orders";
