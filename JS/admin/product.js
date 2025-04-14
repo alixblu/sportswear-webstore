@@ -53,7 +53,28 @@ const getProductVariants = async (id) => {
 
     return await response.json();
 };
+const getCategoryById = async (id) => {
+    const response = await fetch(`${API_URL}?action=getCategoryById&id=${id}`, {
+        method: 'GET',
+    });
 
+    if (!response.ok) {
+        throw new Error('Không thể lấy phân loại sản phẩm');
+    }
+
+    return await response.json();
+};
+const getBrandById = async (id) => {
+    const response = await fetch(`${API_URL}?action=getBrandById&id=${id}`, {
+        method: 'GET',
+    });
+
+    if (!response.ok) {
+        throw new Error('Không thể lấy phân loại sản phẩm');
+    }
+
+    return await response.json();
+};
 const updateProduct = async (
     id,
     categoryID,

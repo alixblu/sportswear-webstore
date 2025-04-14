@@ -14,6 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $productController->getProductById($_GET['id']);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getProductVariants' && isset($_GET['id'])) {
         $productController->getProductVariants($_GET['id']);
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getCategoryById' && isset($_GET['id'])) {
+        $productController->getCategoryById($_GET['id']);
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getBrandById' && isset($_GET['id'])) {
+        $productController->getBrandById($_GET['id']);
     } else {
         echo json_encode(['error' => 'Invalid GET request']);
     }

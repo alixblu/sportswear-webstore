@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
-/**=======src of product include variant and category====
+/**=======src of product include VARIANT and CATEGORY AND BRAND====
  * 
  * 
  * Functions in ProductRepository:
@@ -332,6 +332,48 @@ class ProductRepository {
         } catch (Exception $e) {
             error_log("Error in updateProductStock: " . $e->getMessage());
             throw new Exception("Failed to update product stock");
+        }
+    }
+
+    /**
+     * Get category by ID
+     * @param int $id Category ID
+     * @return array|null Category data if found, null otherwise
+     * @throws Exception If database error occurs
+     */
+    public function getCategoryById($id) {
+        try {
+            $query = "SELECT * FROM category WHERE ID = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            return $result->fetch_assoc();
+        } catch (Exception $e) {
+            error_log("Error in getCategoryById: " . $e->getMessage());
+            throw new Exception("Failed to get category");
+        }
+    }
+
+    /**
+     * Get brand by ID
+     * @param int $id Brand ID
+     * @return array|null Brand data if found, null otherwise
+     * @throws Exception If database error occurs
+     */
+    public function getBrandById($id) {
+        try {
+            $query = "SELECT * FROM brand WHERE ID = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            return $result->fetch_assoc();
+        } catch (Exception $e) {
+            error_log("Error in getBrandById: " . $e->getMessage());
+            throw new Exception("Failed to get brand");
         }
     }
 

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../../css/admin/style.css">
     <link rel="stylesheet" href="../../css/admin/product.css">
     <style>
         .product-id-badge {
@@ -223,27 +222,31 @@
         .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 12px;
         }
 
         .info-item {
             background: var(--light);
-            padding: 16px;
+            padding: 10px 12px;
             border-radius: var(--radius-sm);
             border: 1px solid var(--border);
         }
 
         .info-label {
-            font-size: 13px;
+            font-size: 11px;
             color: var(--text-light);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             font-weight: 500;
         }
 
         .info-value {
-            font-size: 15px;
+            font-size: 13px;
             color: var(--text);
             font-weight: 500;
+        }
+
+        .info-item[style*="margin-top"] {
+            margin-top: 12px;
         }
 
         .variants-table {
@@ -339,6 +342,18 @@
             border-color: var(--primary);
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+        }
+
+        /* Export button specific styles */
+        #exportBtn {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        #exportBtn i {
+            font-size: 14px;
+            margin-right: 6px;
         }
     </style>
 </head>
@@ -512,7 +527,6 @@
         async function loadProducts() {
             try {
                 const response = await getAllProducts();
-                console.log('API Response:', response); // Debug log
                 
                 const productGrid = document.getElementById('productGrid');
                 productGrid.innerHTML = '';
@@ -577,15 +591,145 @@
         document.addEventListener('DOMContentLoaded', loadProducts);
 
         // Modal functions
-        function viewProduct(id) {
+        async function viewProduct(id) {
             const modal = document.getElementById('productModal');
             modal.style.display = 'block';
             
-            // For demo purposes, we'll just show the ID
-            document.getElementById('modal-product-id').textContent = id;
-            
-            // Fetch product details from the server
-            
+            try {
+                console.log('Fetching product with ID:', id);
+                // Get product details
+                let response = await getProductById(id);
+                console.log('Product API Response:', response);
+                
+                if (!response || !response.data) {
+                    throw new Error('No product data received');
+                }
+
+                const product = response.data;
+                console.log('Product Data:', product);
+
+                // Debug: Check if modal elements exist
+                const modalElements = {
+                    id: document.getElementById('modal-product-id'),
+                    name: document.getElementById('modal-product-name'),
+                    markup: document.getElementById('modal-product-markup'),
+                    rating: document.getElementById('modal-product-rating'),
+                    stock: document.getElementById('modal-product-stock'),
+                    status: document.getElementById('modal-product-status'),
+                    description: document.getElementById('modal-product-description'),
+                    category: document.getElementById('modal-product-category'),
+                    brand: document.getElementById('modal-product-brand')
+                };
+
+                console.log('Modal Elements:', modalElements);
+
+                // Update modal with product details
+                if (modalElements.id) {
+                    modalElements.id.textContent = product.ID || '-';
+                    console.log('Setting product ID to:', product.ID);
+                } else {
+                    console.error('Product ID element not found');
+                }
+
+                if (modalElements.name) {
+                    modalElements.name.textContent = product.name || '-';
+                    console.log('Setting product name to:', product.name);
+                }
+
+                if (modalElements.markup) {
+                    modalElements.markup.textContent = (product.markup_percentage || '0') + '%';
+                    console.log('Setting markup to:', product.markup_percentage);
+                }
+
+                if (modalElements.rating) {
+                    modalElements.rating.innerHTML = renderStars(product.rating);
+                    console.log('Setting rating to:', product.rating);
+                }
+
+                if (modalElements.stock) {
+                    modalElements.stock.textContent = product.stock || '0';
+                    console.log('Setting stock to:', product.stock);
+                }
+
+                if (modalElements.status) {
+                    modalElements.status.textContent = product.status === 'in_stock' ? 'In Stock' : 'Out of Stock';
+                    console.log('Setting status to:', product.status);
+                }
+
+                if (modalElements.description) {
+                    modalElements.description.textContent = product.description || 'No description available';
+                    console.log('Setting description to:', product.description);
+                }
+
+                // Get and display category name
+                if (product.categoryID) {
+                    console.log('Fetching category with ID:', product.categoryID);
+                    response = await getCategoryById(product.categoryID);
+                    category = response.data;
+                    console.log('Category API Response:', category);
+                    if (modalElements.category) {
+                        modalElements.category.textContent = category ? category.name : 'Unknown Category';
+                        console.log('Setting category to:', category ? category.name : 'Unknown Category');
+                    }
+                } else {
+                    if (modalElements.category) {
+                        modalElements.category.textContent = 'No category';
+                    }
+                }
+
+                // Get and display brand name
+                if (product.brandID) {
+                    console.log('Fetching brand with ID:', product.brandID);
+                    response = await getBrandById(product.brandID);
+                    brand = response.data;
+                    console.log('Brand API Response:', brand);
+                    if (modalElements.brand) {
+                        modalElements.brand.textContent = brand ? brand.name : 'Unknown Brand';
+                        console.log('Setting brand to:', brand ? brand.name : 'Unknown Brand');
+                    }
+                } else {
+                    if (modalElements.brand) {
+                        modalElements.brand.textContent = 'No brand';
+                    }
+                }
+
+                // Get and display variants
+                console.log('Fetching variants for product ID:', id);
+                const variants = await getProductVariants(id);
+                console.log('Variants API Response:', variants);
+                const variantsList = document.getElementById('modal-variants-list');
+                
+                if (variantsList) {
+                    variantsList.innerHTML = '';
+                    console.log('Variants list element found');
+
+                    if (variants && variants.length > 0) {
+                        variants.forEach(variant => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${variant.Code || '-'}</td>
+                                <td>${variant.fullName || '-'}</td>
+                                <td>${variant.color || '-'}</td>
+                                <td>${variant.size || '-'}</td>
+                                <td>${variant.weight || '-'}</td>
+                                <td>${variant.quantity || '0'}</td>
+                                <td>${variant.price || '0'}</td>
+                                <td>${variant.status || '-'}</td>
+                            `;
+                            variantsList.appendChild(row);
+                        });
+                        console.log('Added variants to table');
+                    } else {
+                        variantsList.innerHTML = '<tr><td colspan="8" class="text-center">No variants found</td></tr>';
+                        console.log('No variants found');
+                    }
+                } else {
+                    console.error('Variants list element not found');
+                }
+            } catch (error) {
+                console.error('Error loading product details:', error);
+                alert('Error loading product details: ' + error.message);
+            }
         }
 
         function closeModal() {
