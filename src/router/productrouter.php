@@ -51,4 +51,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         echo json_encode(['error' => 'Invalid DELETE request']);
     }
 }
-?> 
