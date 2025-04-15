@@ -16,6 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $userController->getAllUsers();
     }else if (isset($_GET['action']) && $_GET['action'] === 'getAllRoles') {
         $userController->getAllRoles();
+    }else if (isset($_GET['action']) && $_GET['action'] === 'exportFile') {
+        $userController->exportExcel();
     } else {
         echo "Invalid GET request.";
     }
@@ -29,7 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $gender = $_POST['gender'] ?? '';
         $roleID = $_POST['roleID'] ?? '';
         $userController->defaultAccount($name, $email, $phone, $gender, $roleID);
-    } else {
+    } else if (isset($_GET['action']) && $_GET['action'] === 'uploadFile'){
+        $file = $_FILES['excel_file']['tmp_name'];
+        $userController->importExcel($file);
+    }
+    else {
         echo "Invalid POST request.";
     }
 }

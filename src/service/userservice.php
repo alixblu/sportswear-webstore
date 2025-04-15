@@ -1,13 +1,15 @@
 <?php
     include dirname(__FILE__) . '/../repository/userrepository.php';
-    require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
-    
+    include dirname(__FILE__) . '/../utils/ExcelUtils.php';
+
     class UserService{
         private $userRepository;
+        private $excelUtils;
     
         public function __construct()
         {
             $this->userRepository = new UserRepository();
+            $this->excelUtils = new ExcelUtils();
         }
 
         public function login($userName, $passWord) {
@@ -112,6 +114,75 @@
                 throw new Exception($e->getMessage(), $e->getCode() ?: 400);
             }
         }
+        public function importExcel($file) {
+            try {
+                $rows = $this->excelUtils->readExcelRows($file);
         
+                $first = true;
+                $dataToInsert = [];
+        
+                foreach ($rows as $row) {
+                    if ($first) { 
+                        $first = false; 
+                        continue; 
+                    }
+        
+                    $fullName    = $row[0] ?? '';
+                    $dateOfBirth = $row[1] ?? '';
+                    $email       = $row[2] ?? '';
+                    $phone       = $row[3] ?? '';
+                    $address     = $row[4] ?? '';
+                    $gender      = $row[5] ?? '';
+                    $roleID      = $row[6] ?? '';
+                    $createdAt   = $row[7] ?? '';
+        
+                    $dataToInsert[] = [
+                        'full_name'     => $fullName,
+                        'date_of_birth' => $dateOfBirth,
+                        'email'         => $email,
+                        'phone'         => $phone,
+                        'address'       => $address,
+                        'gender'        => $gender,
+                        'role_id'       => $roleID,
+                        'created_at'    => $createdAt
+                    ];
+                }
+        
+                $this->userRepository->bulkInsertWithNPlus1($dataToInsert);
+        
+            } catch (Exception $e) {
+                throw new Exception("Lỗi import Excel: " . $e->getMessage(), $e->getCode() ?: 400);
+            }
+        }
+        public function exportExcel()
+        {
+            try {
+                $users = $this->userRepository->findAllUsers();
+
+                $dataToExport = [];
+                foreach ($users as $user) {
+                    $dataToExport[] = [
+                        'full_name'    => $user['fullname'] ?? '',
+                        'date_of_birth' => $user['dateOfBirth'] ?? '',
+                        'email'        => $user['email'] ?? '',
+                        'phone'        => $user['phone'] ?? '',
+                        'address'      => $user['address'] ?? '',
+                        'gender'       => $user['gender'] ?? '',
+                        'role_id'      => $user['roleID'] ?? '',
+                        'created_at'   => $user['createdAt'] ?? ''
+                    ];
+                }
+
+                $headers = [
+                    'Họ và tên', 'Ngày sinh', 'Email', 'SĐT', 'Địa chỉ', 'Giới tính', 'Role ID', 'Ngày tạo'
+                ];
+
+                $excelUtils = new ExcelUtils();
+                $excelUtils->exportExcel($dataToExport, $headers, 'user_list.xlsx');
+            } catch (Exception $e) {
+                throw new Exception("Lỗi export Excel: " . $e->getMessage(), $e->getCode() ?: 400);
+            }
+        }
+
     }
 ?>
