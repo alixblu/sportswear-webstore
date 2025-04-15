@@ -1,9 +1,10 @@
-const API_URL = 'http://localhost/sportwear/src/router/productRouter.php';
+const API_URL = 'http://localhost:3000/sportwear-webstore/src/router/productRouter.php';
 
 const getAllProducts = async () => {
     try {
         const response = await fetch(`${API_URL}?action=getAllProducts`, {
             method: 'GET',
+            mode: 'cors',
             headers: {
                 'Content-Type': 'application/json',
             },

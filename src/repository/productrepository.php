@@ -386,4 +386,17 @@ class ProductRepository
             throw new Exception("Failed to get brand");
         }
     }
+
+    public function deleteProduct($id)
+    {
+        try {
+            $query = "DELETE FROM product WHERE ID = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $id);
+            return $stmt->execute();
+        } catch (Exception $e) {
+            error_log("Error in deleteProduct: " . $e->getMessage());
+            throw new Exception("Failed to delete product");
+        }
+    }
 }
