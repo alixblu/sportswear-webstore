@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../service/productservice.php';
+include dirname(__FILE__) . '/../config/response/apiresponse.php';
 
 class ProductController {
     private $productService;
@@ -12,17 +13,13 @@ class ProductController {
      * Handle GET request to get all products
      */
     public function getAllProducts() {
+        $products = null;
         try {
             $products = $this->productService->getAllProducts();
-            $this->sendJsonResponse(200, [
-                'success' => true,
-                'data' => $products
-            ]);
+            ApiResponse::customApiResponse($products, 200);
+            return $products;
         } catch (Exception $e) {
-            $this->sendJsonResponse(500, [
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
+            ApiResponse::customResponse($products, 500, $e->getMessage());
         }
     }
 
@@ -34,22 +31,12 @@ class ProductController {
         try {
             $product = $this->productService->getProductById($id);
             if (!$product) {
-                $this->sendJsonResponse(404, [
-                    'success' => false,
-                    'message' => 'Product not found'
-                ]);
+                ApiResponse::customResponse($product, 404, 'Product not found');
                 return;
             }
-            
-            $this->sendJsonResponse(200, [
-                'success' => true,
-                'data' => $product
-            ]);
+            ApiResponse::customResponse($product, 200);
         } catch (Exception $e) {
-            $this->sendJsonResponse(500, [
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
+            ApiResponse::customResponse($product, 500, $e->getMessage());
         }
     }
 
@@ -61,10 +48,7 @@ class ProductController {
     public function updateProduct($id, $data) {
         try {
             if (!isset($id) || !is_numeric($id)) {
-                $this->sendJsonResponse(400, [
-                    'success' => false,
-                    'message' => 'Invalid product ID'
-                ]);
+                ApiResponse::customResponse($data, 400, 'Invalid product ID');
                 return;
             }
 
@@ -79,21 +63,12 @@ class ProductController {
             $result = $this->productService->updateProduct($id, $data);
             
             if ($result) {
-                $this->sendJsonResponse(200, [
-                    'success' => true,
-                    'message' => 'Product updated successfully'
-                ]);
+                ApiResponse::customResponse($data, 200, 'Product updated successfully');
             } else {
-                $this->sendJsonResponse(500, [
-                    'success' => false,
-                    'message' => 'Failed to update product'
-                ]);
+                ApiResponse::customResponse($data, 500, 'Failed to update product');
             }
         } catch (Exception $e) {
-            $this->sendJsonResponse(500, [
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
+            ApiResponse::customResponse($data, 500, $e->getMessage());
         }
     }
 
@@ -104,31 +79,19 @@ class ProductController {
     public function deleteProduct($id) {
         try {
             if (!isset($id) || !is_numeric($id)) {
-                $this->sendJsonResponse(400, [
-                    'success' => false,
-                    'message' => 'Invalid product ID'
-                ]);
+                ApiResponse::customResponse($id, 400, 'Invalid product ID');
                 return;
             }
 
             $result = $this->productService->deleteProduct($id);
             
             if ($result) {
-                $this->sendJsonResponse(200, [
-                    'success' => true,
-                    'message' => 'Product deleted successfully'
-                ]);
+                ApiResponse::customResponse($id, 200, 'Product deleted successfully');
             } else {
-                $this->sendJsonResponse(500, [
-                    'success' => false,
-                    'message' => 'Failed to delete product'
-                ]);
+                ApiResponse::customResponse($id, 500, 'Failed to delete product');
             }
         } catch (Exception $e) {
-            $this->sendJsonResponse(500, [
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
+            ApiResponse::customResponse($id, 500, $e->getMessage());
         }
     }
 
@@ -139,66 +102,86 @@ class ProductController {
     public function updateProductStock($productId) {
         try {
             if (!isset($productId) || !is_numeric($productId)) {
-                $this->sendJsonResponse(400, [
-                    'success' => false,
-                    'message' => 'Invalid product ID'
-                ]);
+                ApiResponse::customResponse($productId, 400, 'Invalid product ID');
                 return;
             }
 
             $result = $this->productService->updateProductStock($productId);
             
             if ($result) {
-                $this->sendJsonResponse(200, [
-                    'success' => true,
-                    'message' => 'Product stock updated successfully'
-                ]);
+                ApiResponse::customResponse($productId, 200, 'Product stock updated successfully');
             } else {
-                $this->sendJsonResponse(500, [
-                    'success' => false,
-                    'message' => 'Failed to update product stock'
-                ]);
+                ApiResponse::customResponse($productId, 500, 'Failed to update product stock');
             }
         } catch (Exception $e) {
-            $this->sendJsonResponse(500, [
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
+           ApiResponse::customResponse($productId, 500, $e->getMessage());
         }
     }
 
-    /**
-     * Send JSON response with appropriate headers
-     * @param int $statusCode HTTP status code
-     * @param array $data Response data
-     */
-    private function sendJsonResponse($statusCode, $data) {
-        http_response_code($statusCode);
-        header('Content-Type: application/json');
-        echo json_encode($data);
-    }
+    // private function sendJsonResponse($statusCode, $data) {
+    //     http_response_code($statusCode);
+    //     header('Content-Type: application/json');
+    //     echo json_encode($data);
+    // }
 
     public function getProductVariants($productId) {
         try {
             if (!isset($productId)) {
-                return json_encode([
-                    'success' => false,
-                    'message' => 'Product ID is required'
-                ]);
+                return ApiResponse::customResponse($productId, 400, 'Invalid product ID');
             }
 
             $variants = $this->productService->getProductVariants($productId);
 
-            return json_encode([
-                'success' => true,
-                'data' => $variants
-            ]);
+            return ApiResponse::customResponse($variants, 200, 'Product variants fetched successfully');
         } catch (Exception $e) {
             error_log("Error in getProductVariants controller: " . $e->getMessage());
-            return json_encode([
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
+            return ApiResponse::customResponse($productId, 500, 'Failed to fetch product variants: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Handle GET request to get a category by ID
+     * @param int $id Category ID
+     */
+    public function getCategoryById($id) {
+        try {
+            if (!isset($id) || !is_numeric($id)) {
+                ApiResponse::customResponse($id, 400, 'Invalid category ID');
+                return;
+            }
+
+            $category = $this->productService->getCategoryById($id);
+            if (!$category) {
+                ApiResponse::customResponse($category, 404, 'Category not found');
+                return;
+            }
+
+            ApiResponse::customResponse($category, 200);
+        } catch (Exception $e) {
+            ApiResponse::customResponse($id, 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Handle GET request to get a brand by ID
+     * @param int $id Brand ID
+     */
+    public function getBrandById($id) {
+        try {
+            if (!isset($id) || !is_numeric($id)) {
+                ApiResponse::customResponse($id, 400, 'Invalid brand ID');
+                return;
+            }
+
+            $brand = $this->productService->getBrandById($id);
+            if (!$brand) {
+                ApiResponse::customResponse($brand, 404, 'Brand not found');
+                return;
+            }
+
+            ApiResponse::customResponse($brand, 200);
+        } catch (Exception $e) {
+            ApiResponse::customResponse($id, 500, $e->getMessage());
         }
     }
 }

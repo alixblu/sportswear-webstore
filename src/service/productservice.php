@@ -150,5 +150,44 @@ class ProductService {
             throw new Exception("Failed to get product variants: " . $e->getMessage());
         }
     }
+
+    /**
+     * Get category by ID
+     * @param int $id Category ID
+     * @return array|null Category data if found, null otherwise
+     * @throws Exception If database error occurs
+     */
+    public function getCategoryById($id) {
+        try {
+            if (!is_numeric($id) || $id <= 0) {
+                throw new Exception("Invalid category ID");
+            }
+            
+            return $this->productRepository->getCategoryById($id);
+        } catch (Exception $e) {
+            error_log("Error in getCategoryById service: " . $e->getMessage());
+            throw new Exception("Failed to get category: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get brand by ID
+     * @param int $id Brand ID
+     * @return array|null Brand data if found, null otherwise
+     * @throws Exception If database error occurs
+     */
+    public function getBrandById($id) {
+        try {
+            if (!is_numeric($id) || $id <= 0) {
+                throw new Exception("Invalid brand ID");
+            }
+            
+            return $this->productRepository->getBrandById($id);
+        } catch (Exception $e) {
+            error_log("Error in getBrandById service: " . $e->getMessage());
+            throw new Exception("Failed to get brand: " . $e->getMessage());
+        }
+    }
 }
 ?> 
+ 
