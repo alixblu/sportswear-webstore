@@ -183,6 +183,13 @@
                 throw new Exception("Lỗi export Excel: " . $e->getMessage(), $e->getCode() ?: 400);
             }
         }
-
+        public function search($keyword, $fields) {
+            try {
+                return $this->userRepository->search($keyword, $fields);
+        
+            } catch (Exception $e) {
+                throw new Exception("Lỗi import Excel: " . $e->getMessage(), $e->getCode() ?: 400);
+            }
+        }
     }
 ?>

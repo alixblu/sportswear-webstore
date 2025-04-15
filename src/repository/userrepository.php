@@ -296,23 +296,7 @@
             }
         }
 
-        public function findUserById($id) {
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
 
-            $stmt = $conn->prepare("SELECT * FROM users WHERE id = ? LIMIT 1");
-            $stmt->bind_param("s", $id);
-            $stmt->execute();
-
-            $result = $stmt->get_result();
-            $user = $result->fetch_assoc();
-
-            $stmt->close(); 
-            $conn->close();
-
-            return $user;
-
-        }
         public function userUpdate($id, $name, $phone, $gender, $roleID) {
             $conn = null;
             $stmt = null;
@@ -350,62 +334,6 @@
             }
         }
         
-        public function userFindAll(){
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
-
-            $sql = "SELECT id, username ,password ,address ,gender ,status FROM users";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-
-            $result = $stmt->get_result();
-            $users = [];
-            while ($row = $result->fetch_assoc()) {
-                $userId = $row['id'];
-                
-                if (!isset($users[$userId])) {
-                    $users[$userId] = [
-                        'id' => $row['id'],
-                        'username' => $row['username'],
-                        'password' => $row['password'],
-                        'address' => $row['address'],
-                        'gender' => $row['gender'],
-                        'status' => $row['status'],
-                    ];
-                }
-            }
-
-            $stmt->close();
-            $conn->close();
-
-            return array_values($users); 
-        }
-        public function changePassword($userId,$newPassWord){
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
-        
-            $sql = "UPDATE users 
-                    SET password = ?
-                    WHERE id = ?";
-            
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("si", $newPassWord,$userId);
-        
-            $stmt->execute();
-            $user = null;
-            if ($stmt->affected_rows > 0) {
-                $user = [
-                    'id' => $userId,
-                    'newPassWord' => $newPassWord,
-                ];
-            }
-
-            $stmt->close(); 
-            $conn->close();
-
-            return $user;
-        }
         public function bulkInsertWithNPlus1($data) {
             $mysql = new configMysqli();
             $conn = $mysql->connectDatabase();
@@ -460,6 +388,49 @@
             }
         }
         
-    
+        public function search($keyword, $fields) {
+            $conn = null;
+            $stmt = null;
+        
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+        
+                if (empty($fields)) return [];
+        
+                $conditions = [];
+                foreach ($fields as $field) {
+                    $conditions[] = "$field LIKE ?";
+                }
+        
+                $whereClause = implode(" OR ", $conditions);
+                $sql = "SELECT * FROM user WHERE $whereClause";
+        
+                $stmt = $conn->prepare($sql);
+        
+                $paramTypes = str_repeat("s", count($fields));
+                $params = array_fill(0, count($fields), '%' . $keyword . '%');
+        
+                $stmt->bind_param($paramTypes, ...$params);
+        
+                $stmt->execute();
+                $result = $stmt->get_result();
+        
+                $users = [];
+                while ($row = $result->fetch_assoc()) {
+                    $users[] = $row;
+                }
+                return $users;
+        
+            } catch (Exception $e) {
+                error_log("Database error in search: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
+        }
     }
+        
+
 ?>
