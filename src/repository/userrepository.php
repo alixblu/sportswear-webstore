@@ -1,7 +1,7 @@
 <?php
     require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
     require_once dirname(__FILE__) . '/../enums/UserStatus.php';
-
+    include dirname(__FILE__) . '/../../src/config/exception/exceptionHandler.php';
     class UserRepository{
         /**
          * Find a user by their username (email)
@@ -84,7 +84,8 @@
                         r.name AS roleName,
                         u.createdAt,
                         u.dateOfBirth,
-                        d.status
+                        d.status,
+                        u.roleID
                     FROM user u
                     INNER JOIN useraccount d ON u.id = d.id
                     INNER JOIN role r ON u.roleID = r.id
@@ -405,6 +406,60 @@
 
             return $user;
         }
+        public function bulkInsertWithNPlus1($data) {
+            $mysql = new configMysqli();
+            $conn = $mysql->connectDatabase();
+        
+            if (empty($data)) return;
+        
+            $duplicatedEmails = [];
+        
+            foreach ($data as $row) {
+                $fullName    = $conn->real_escape_string($row['full_name']);
+                $dateOfBirth = $conn->real_escape_string($row['date_of_birth']);
+                $email       = $conn->real_escape_string($row['email']);
+                $phone       = $conn->real_escape_string($row['phone']);
+                $address     = $conn->real_escape_string($row['address']);
+                $gender      = $conn->real_escape_string($row['gender']);
+                $roleID      = (int) $row['role_id'];
+                $createdAt   = $conn->real_escape_string($row['created_at']);
+        
+                $checkEmailQuery = "SELECT id FROM user WHERE email = '$email' LIMIT 1";
+                $result = $conn->query($checkEmailQuery);
+        
+                if ($result && $result->num_rows > 0) {
+                    $duplicatedEmails[] = $email;
+                    continue; 
+                }
+        
+                $sqlUser = "
+                    INSERT INTO user (fullname, dateOfBirth, email, phone, address, gender, roleID , createdAt)
+                    VALUES ('$fullName', '$dateOfBirth', '$email', '$phone', '$address', '$gender', $roleID, '$createdAt')
+                ";
+        
+                if (!$conn->query($sqlUser)) {
+                    throw new Exception("Lỗi khi chèn user: " . $conn->error);
+                }
+        
+                $userId = $conn->insert_id;
+                $passwordDefault = '123456';
+                $sqlAccount = "
+                    INSERT INTO useraccount (userID, username, password)
+                    VALUES ($userId, '$email', '$passwordDefault')
+                ";
+        
+                if (!$conn->query($sqlAccount)) {
+                    throw new Exception("Lỗi khi chèn account: " . $conn->error);
+                }
+            }
+        
+            $conn->close();
+        
+            if (!empty($duplicatedEmails)) {
+                throw new Exception("Email đã tồn tại: " . implode(', ', $duplicatedEmails));
+            }
+        }
+        
+    
     }
-
 ?>

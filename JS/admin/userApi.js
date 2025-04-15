@@ -99,3 +99,46 @@ export const getAllRoles = async () => {
 
     return await response.json();
 };
+
+export const uploadFile = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append("excel_file", file);
+        const response = await fetch(`${API_URL}?action=uploadFile`, {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.text();
+        alert("Kết quả: " + result);
+    } catch (err) {
+        console.error("Lỗi:", err);
+    }
+};
+
+export const exportFile = async (file) => {
+    try {
+        const response = await fetch(`${API_URL}?action=exportFile`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob); 
+            const a = document.createElement("a"); 
+            a.style.display = "none";
+            a.href = url;
+            a.download = "user_list.xlsx"; 
+            document.body.appendChild(a);
+            a.click(); 
+            window.URL.revokeObjectURL(url); 
+        } else {
+            const errorMessage = await response.text();
+            alert("Lỗi khi tải file: " + errorMessage);
+        }
+    } catch (err) {
+        console.error("Lỗi:", err);
+    }
+};
