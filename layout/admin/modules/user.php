@@ -208,7 +208,7 @@
                     <div class="wrapperFilter">
                         <div class="search-box" >
                             <i class="ri-search-line"></i>
-                        <input type="text"placeholder="Tìm Kiếm Theo Số Điện Thoại">
+                        <input id="searchPhone" type="text"placeholder="Tìm Kiếm Theo Số Điện Thoại">
                     </div>
                     <button class="btn btn-outline btn-sm" onclick="showFormFilter()">
                         <i class="fa-solid fa-filter"></i>Bộ Lọc
@@ -634,24 +634,128 @@
             const portalRoot = document.createElement('div');
             portalRoot.id = 'portal-root';
             portalRoot.innerHTML=`
-            <div class="wrapperFilterCss">
-                <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
-                <div class="wrapperInputCss">
-                    <input class="inputUserCss" type="text" id="search" placeholder="Nội Dung Tìm Kiếm">
+                <div class="wrapperFilterCss">
+                    <div class="CloseCss">
+                        <i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i>
+                    </div>
+                    <div class="wrapperInputCss">
+                        <input class="inputUserCss" type="text" id="search" placeholder="Nội Dung Tìm Kiếm">
+                    </div>
+                    <input type="checkbox" id="nameUser" name="nameUser" value="name">
+                    <label for="nameUser">Họ Và Tên</label><br>
+                    <input type="checkbox" id="emailUser" name="emailUser" value="email">
+                    <label for="emailUser">Email</label><br>
+                    <input type="checkbox" id="phoneUser" name="phoneUser" value="phone">
+                    <label for="phoneUser">Số Điện Thoại</label><br>
+                    <div class="wrapperButton">
+                        <input class="buttonUserCss" type="submit" value="Áp Dụng" onclick="applySearchFilter()">
+                    </div>
                 </div>
-                <input type="checkbox" id="nameUser" name="nameUser" value="name">
-                <label for="nameUser">Họ Và Tên</label><br>
-                <input type="checkbox" id="vehicle2" name="emailUser" value="email">
-                <label for="emailUser">Email</label><br>
-                <input type="checkbox" id="phone" name="phone" value="phone">
-                <label for="phone">Số Điện Thoại</label><br>
-                 <div class="wrapperButton">
-                    <input class="buttonUserCss" type="submit" value="Áp Dụng">
-                </div>
-            </div>
             `;
             document.body.appendChild(portalRoot);
         }
+        function applySearchFilter() {
+            const keyword = document.getElementById('search').value;
+
+            const fields = [];
+            if (document.getElementById('nameUser').checked) fields.push('fullname');
+            if (document.getElementById('emailUser').checked) fields.push('email');
+            if (document.getElementById('phoneUser').checked) fields.push('phone');
+
+            if (!keyword || fields.length === 0) {
+                alert("Vui lòng nhập từ khóa và chọn ít nhất 1 tiêu chí.");
+                return;
+            }
+
+            searchUsers(keyword, fields).then(result => {
+                const users = result.data;
+                const tbody = document.querySelector(".data-table tbody");
+                tbody.innerHTML = ""; 
+                users.forEach(user => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.fullname}</td>
+                        <td>${user.dateOfBirth}</td>
+                        <td>${user.email}</td>
+                        <td>${user.phone}</td>
+                        <td>${user.address}</td>
+                        <td>${user.gender == 0 ? 'Nam' : 'Nữ'}</td>
+                        <td>${user.roleName}</td>
+                        <td>${user.createdAt}</td>
+                        <td>
+                            <button class="btn btn-outline btn-sm" onclick="infoAccount(${user.id})">
+                                <i class="fas fa-eye"></i> Xem
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="showFormEditUser(this, ${user.id})">
+                                <i class="fa-solid fa-pen"></i> Sửa
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="deleteUser(${user.id})">
+                                <i class="fa-solid fa-user-xmark"></i> Xóa
+                            </button>
+                        </td>
+                    `;
+
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy danh sách người dùng:', error.message);
+            });
+
+            closeFormAddUser();
+        }
+
+        document.getElementById("searchPhone").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                const keyword = document.getElementById('searchPhone').value;
+
+                const fields = ['phone'];
+
+                if (!keyword || fields.length === 0) {
+                    alert("Vui lòng nhập số điện thoại cần tìm");
+                    return;
+                }
+
+                searchUsers(keyword, fields).then(result => {
+                    const users = result.data;
+                    const tbody = document.querySelector(".data-table tbody");
+                    tbody.innerHTML = ""; 
+                    users.forEach(user => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td>${user.id}</td>
+                            <td>${user.fullname}</td>
+                            <td>${user.dateOfBirth}</td>
+                            <td>${user.email}</td>
+                            <td>${user.phone}</td>
+                            <td>${user.address}</td>
+                            <td>${user.gender == 0 ? 'Nam' : 'Nữ'}</td>
+                            <td>${user.roleName}</td>
+                            <td>${user.createdAt}</td>
+                            <td>
+                                <button class="btn btn-outline btn-sm" onclick="infoAccount(${user.id})">
+                                    <i class="fas fa-eye"></i> Xem
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="showFormEditUser(this, ${user.id})">
+                                    <i class="fa-solid fa-pen"></i> Sửa
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="deleteUser(${user.id})">
+                                    <i class="fa-solid fa-user-xmark"></i> Xóa
+                                </button>
+                            </td>
+                        `;
+
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy danh sách người dùng:', error.message);
+                });
+
+                closeFormAddUser();
+            }
+        });
 
     </script>
 </body>

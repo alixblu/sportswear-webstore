@@ -404,15 +404,13 @@
                 }
         
                 $whereClause = implode(" OR ", $conditions);
-                $sql = "SELECT * FROM users WHERE $whereClause";
+                $sql = "SELECT * FROM user WHERE $whereClause";
         
                 $stmt = $conn->prepare($sql);
         
-                // Tạo mảng chứa tất cả các tham số là "%keyword%"
                 $paramTypes = str_repeat("s", count($fields));
                 $params = array_fill(0, count($fields), '%' . $keyword . '%');
         
-                // Gọi bind_param động
                 $stmt->bind_param($paramTypes, ...$params);
         
                 $stmt->execute();

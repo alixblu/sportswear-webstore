@@ -142,3 +142,30 @@ const exportFileUser = async (file) => {
         console.error("Lỗi:", err);
     }
 };
+
+const searchUsers = async (keyword, fields) => {
+    try {
+        let query = `?action=search&keyword=${encodeURIComponent(keyword)}`;
+        fields.forEach(field => {
+            query += `&fields[]=${encodeURIComponent(field)}`;
+        });
+
+        const response = await fetch(`${API_URL}${query}`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Kết quả tìm kiếm:", data);
+            return data;
+        } else {
+            const errorMessage = await response.text();
+            alert("Lỗi khi tìm kiếm: " + errorMessage);
+        }
+    } catch (err) {
+        console.error("Lỗi:", err);
+    }
+};

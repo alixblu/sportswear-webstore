@@ -49,6 +49,10 @@
             $result = $this->userService->exportExcel();
             ApiResponse::customApiResponse($result,200);
         }
+        public function search($keyword, $fields){
+            $result = $this->userService->search($keyword, $fields);
+            ApiResponse::customApiResponse($result,200);
+        }
     }
 
 ?>
