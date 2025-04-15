@@ -260,12 +260,11 @@
             </div>
         </div>
     </div>
-    <script type="module">
-        import * as userApi from '/JS/admin/userApi.js';
-
+    <script src="../../JS/admin/userApi.js"></script>
+    <script>
         showAllUsers();
         function showAllUsers() {
-            userApi.getAllUsers()
+            getAllUsers()
             .then(result => {
                 const users = result.data;
                 const tbody = document.querySelector(".data-table tbody");
@@ -359,7 +358,7 @@
 
             try {
                 const select = portalRoot.querySelector('#role');
-                userApi.getAllRoles()
+                getAllRoles()
                     .then(result => {
                         const roles = result.data;
 
@@ -414,7 +413,7 @@
                 return;
             }
             try {
-                userApi.createDefaultAccount(name, email,phone, genderValue, role);
+                createDefaultAccount(name, email,phone, genderValue, role);
                 alert('Thêm Thành Công.');
                 closeFormAddUser();
                 showAllUsers();
@@ -496,7 +495,7 @@
 
             try {
                 const select = portalRoot.querySelector('#role');
-                userApi.getAllRoles()
+                getAllRoles()
                     .then(result => {
                         const roles = result.data;
 
@@ -556,7 +555,7 @@
             const gender = genderEl.value;
 
             try {
-                userApi.updateUser(id,name, phone, genderValue, role);
+                updateUser(id,name, phone, genderValue, role);
                 alert('Cập nhật người dùng thành công!');
                 closeFormAddUser();
                 showAllUsers();
@@ -568,7 +567,7 @@
 
         function exportFile(){
             try {
-                userApi.exportFile();
+                exportFileUser();
             } catch (error) {
                 console.error(error);
                 alert('Có lỗi xảy ra khi cập nhật người dùng.');
@@ -580,10 +579,10 @@
         function handleFileChange(event) {
             const file = event.target.files[0];
             if (!file) return;
-            userApi.uploadFile(file);
+            uploadFileUser(file);
         }
         function infoAccount(id){
-            userApi.getAccountByUserId(id).then(result => {
+            getAccountByUserId(id).then(result => {
                 const user = result.data;
                 const portalRoot = document.createElement('div');
                 portalRoot.id = 'portal-root';
@@ -621,7 +620,7 @@
 
 
             document.getElementById('confirmDelete').addEventListener('click', function () {
-                userApi.deleteUser(id)
+                deleteUserApi(id)
                 closeFormAddUser();
                 showAllUsers();
             });
@@ -653,16 +652,7 @@
             `;
             document.body.appendChild(portalRoot);
         }
-        window.infoAccount = infoAccount;
-        window.closeFormAddUser = closeFormAddUser;
-        window.editUser = editUser;
-        window.showFormEditUser = showFormEditUser;
-        window.deleteUser = deleteUser;
-        window.showFormAddUser = showFormAddUser;
-        window.addUser = addUser;
-        window.uploadFile = uploadFile;
-        window.handleFileChange = handleFileChange;
-        window.exportFile = exportFile;
+
     </script>
 </body>
 </html>

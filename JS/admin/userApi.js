@@ -1,6 +1,6 @@
 const API_URL = '../../src/router/userRouter.php';
 
-export const getAccountByUserId = async (userId) => {
+const getAccountByUserId = async (userId) => {
     const response = await fetch(`${API_URL}?action=getAccountByUserId&userId=${userId}`, {
         method: 'GET',
     });
@@ -12,7 +12,7 @@ export const getAccountByUserId = async (userId) => {
     return await response.json();
 };
 
-export const getAllUsers = async () => {
+const getAllUsers = async () => {
     const response = await fetch(`${API_URL}?action=getAllUsers`, {
         method: 'GET',
         headers: {
@@ -27,7 +27,7 @@ export const getAllUsers = async () => {
     return await response.json();
 };
 
-export const createDefaultAccount = async (name, email, phone, gender, roleID) => {
+const createDefaultAccount = async (name, email, phone, gender, roleID) => {
     const formData = new URLSearchParams();
     formData.append('action', 'defaultAccount');
     formData.append('name', name);
@@ -51,7 +51,7 @@ export const createDefaultAccount = async (name, email, phone, gender, roleID) =
     return await response.json();
 };
 
-export const deleteUser = async (userId) => {
+const deleteUserApi = async (userId) => {
     const response = await fetch(`${API_URL}?action=deleteUsers&userId=${userId}`, {
         method: 'DELETE',
     });
@@ -63,7 +63,7 @@ export const deleteUser = async (userId) => {
     return await response.json();
 };
 
-export const updateUser = async (id, name, email, passWord, phone, gender, roleID) => {
+const updateUser = async (id, name, email, passWord, phone, gender, roleID) => {
     const formData = new URLSearchParams();
     formData.append('action', 'updateUsers');
     formData.append('userId', id);
@@ -85,7 +85,7 @@ export const updateUser = async (id, name, email, passWord, phone, gender, roleI
 
     return await response.json();
 };
-export const getAllRoles = async () => {
+const getAllRoles = async () => {
     const response = await fetch(`${API_URL}?action=getAllRoles`, {
         method: 'GET',
         headers: {
@@ -100,7 +100,7 @@ export const getAllRoles = async () => {
     return await response.json();
 };
 
-export const uploadFile = async (file) => {
+const uploadFileUser = async (file) => {
     try {
         const formData = new FormData();
         formData.append("excel_file", file);
@@ -116,7 +116,7 @@ export const uploadFile = async (file) => {
     }
 };
 
-export const exportFile = async (file) => {
+const exportFileUser = async (file) => {
     try {
         const response = await fetch(`${API_URL}?action=exportFile`, {
             method: "GET",
