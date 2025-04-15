@@ -1,9 +1,16 @@
 <?php
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    // Handle preflight request
+    header('HTTP/1.1 204 No Content');
+    exit();
+}
+
 include __DIR__ . '/../controller/productcontroller.php';
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
 
 $productController = new ProductController();
 
@@ -55,4 +62,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         echo json_encode(['error' => 'Invalid DELETE request']);
     }
 }
-?> 

@@ -18,9 +18,12 @@
       0 10px 10px -5px rgba(0, 0, 0, 0.04);
     --radius: 10px;
     --radius-sm: 6px;
-    --sidebar-width: 260px;
+    --sidebar-width: 210px;
     --header-height: 70px;
     --transition: all 0.3s ease;
+    --font-small:11px;
+    --font-regular:13px;
+    --font-large:15px;
   }
   
   * {
@@ -73,7 +76,9 @@
     transition: var(--transition);
     box-shadow: var(--shadow);
     z-index: 1000;
-    position: relative;
+    position: fixed;
+    height: 100vh;
+    width: var(--sidebar-width);
   }
 
   .sidebar::before {
@@ -118,7 +123,7 @@
 
   .menu-heading {
     padding: 16px 25px 8px;
-    font-size: 11px;
+    font-size: var(--font-small);
     text-transform: uppercase;
     letter-spacing: 1.2px;
     color: rgba(255, 255, 255, 0.5);
@@ -126,7 +131,7 @@
   }
 
   .nav-item {
-    padding: 12px 25px;
+    padding: 12px 15px;
     display: flex;
     align-items: center;
     cursor: pointer;
@@ -174,7 +179,7 @@
   .nav-item i {
     width: 24px;
     margin-right: 12px;
-    font-size: 18px;
+    font-size: var(--font-regular);
     text-align: center;
     transition: var(--transition);
   }
@@ -719,17 +724,18 @@
   }
   
   /* Media Queries */
-  @media (max-width: 1200px) {
-    .stats-cards {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  
-  @media (max-width: 992px) {
+  @media (max-width: 1100px) {
     .container {
       grid-template-columns: 0 1fr;
     }
+
+    .stats-cards {
+      grid-template-columns: 1fr;
+    }
   
+    .search-bar{
+      margin-left: 50px;
+    }
     .sidebar {
       transform: translateX(-100%);
       position: fixed;

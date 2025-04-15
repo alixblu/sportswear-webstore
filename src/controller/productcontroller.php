@@ -2,17 +2,20 @@
 require_once dirname(__FILE__) . '/../service/productservice.php';
 include dirname(__FILE__) . '/../config/response/apiresponse.php';
 
-class ProductController {
+class ProductController
+{
     private $productService;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->productService = new ProductService();
     }
 
     /**
      * Handle GET request to get all products
      */
-    public function getAllProducts() {
+    public function getAllProducts()
+    {
         $products = null;
         try {
             $products = $this->productService->getAllProducts();
@@ -27,7 +30,8 @@ class ProductController {
      * Handle GET request to get a product by ID
      * @param int $id Product ID
      */
-    public function getProductById($id) {
+    public function getProductById($id)
+    {
         try {
             $product = $this->productService->getProductById($id);
             if (!$product) {
@@ -45,7 +49,8 @@ class ProductController {
      * @param int $id Product ID
      * @param array $data Product data to update
      */
-    public function updateProduct($id, $data) {
+    public function updateProduct($id, $data)
+    {
         try {
             if (!isset($id) || !is_numeric($id)) {
                 ApiResponse::customResponse($data, 400, 'Invalid product ID');
@@ -53,15 +58,18 @@ class ProductController {
             }
 
             if (empty($data)) {
+                /*
                 $this->sendJsonResponse(400, [
                     'success' => false,
                     'message' => 'No data provided for update'
                 ]);
+                */
+                ApiResponse::customResponse(null, 400, 'No data provided for update');
                 return;
             }
 
             $result = $this->productService->updateProduct($id, $data);
-            
+
             if ($result) {
                 ApiResponse::customResponse($data, 200, 'Product updated successfully');
             } else {
@@ -76,15 +84,22 @@ class ProductController {
      * Handle DELETE request to delete a product
      * @param int $id Product ID
      */
-    public function deleteProduct($id) {
+    public function deleteProduct($id)
+    {
         try {
             if (!isset($id) || !is_numeric($id)) {
                 ApiResponse::customResponse($id, 400, 'Invalid product ID');
                 return;
             }
 
+            $product = $this->productService->getProductById($id);
+            if (!$product) {
+                ApiResponse::customResponse($id, 404, 'Product not found');
+                return;
+            }
+
             $result = $this->productService->deleteProduct($id);
-            
+
             if ($result) {
                 ApiResponse::customResponse($id, 200, 'Product deleted successfully');
             } else {
@@ -99,7 +114,8 @@ class ProductController {
      * Handle PUT request to update product stock
      * @param int $productId Product ID
      */
-    public function updateProductStock($productId) {
+    public function updateProductStock($productId)
+    {
         try {
             if (!isset($productId) || !is_numeric($productId)) {
                 ApiResponse::customResponse($productId, 400, 'Invalid product ID');
@@ -107,14 +123,14 @@ class ProductController {
             }
 
             $result = $this->productService->updateProductStock($productId);
-            
+
             if ($result) {
                 ApiResponse::customResponse($productId, 200, 'Product stock updated successfully');
             } else {
                 ApiResponse::customResponse($productId, 500, 'Failed to update product stock');
             }
         } catch (Exception $e) {
-           ApiResponse::customResponse($productId, 500, $e->getMessage());
+            ApiResponse::customResponse($productId, 500, $e->getMessage());
         }
     }
 
@@ -124,7 +140,8 @@ class ProductController {
     //     echo json_encode($data);
     // }
 
-    public function getProductVariants($productId) {
+    public function getProductVariants($productId)
+    {
         try {
             if (!isset($productId)) {
                 return ApiResponse::customResponse($productId, 400, 'Invalid product ID');
@@ -143,7 +160,8 @@ class ProductController {
      * Handle GET request to get a category by ID
      * @param int $id Category ID
      */
-    public function getCategoryById($id) {
+    public function getCategoryById($id)
+    {
         try {
             if (!isset($id) || !is_numeric($id)) {
                 ApiResponse::customResponse($id, 400, 'Invalid category ID');
@@ -166,7 +184,8 @@ class ProductController {
      * Handle GET request to get a brand by ID
      * @param int $id Brand ID
      */
-    public function getBrandById($id) {
+    public function getBrandById($id)
+    {
         try {
             if (!isset($id) || !is_numeric($id)) {
                 ApiResponse::customResponse($id, 400, 'Invalid brand ID');
@@ -185,4 +204,3 @@ class ProductController {
         }
     }
 }
-?> 

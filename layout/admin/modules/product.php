@@ -1,12 +1,367 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin/product.css">
+
+    <script src="../../../JS/admin/product.js"></script>
+    <style>
+        .product-id-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background-color: #fff;
+            color: #333;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid #000;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-image {
+            position: relative;
+        }
+
+        /* Product Card Styles */
+        .product-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .product-info {
+            padding: 12px;
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stars {
+            color: var(--warning);
+            margin-right: 6px;
+            font-size: 12px;
+        }
+
+        .rating-count {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .product-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow: hidden;
+            z-index: 1001;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            background-color: rgba(248, 249, 250, 0.5);
+        }
+
+        .modal-header h2 {
+            font-size: 19px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: row;
+            height: calc(90vh - 120px);
+        }
+
+        .product-image-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: var(--light);
+            border-right: 1px solid var(--border);
+            width: 240px;
+        }
+
+        .product-image-large {
+            width: 160px;
+            height: 160px;
+            background: white;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .product-image-large i {
+            font-size: 80px;
+            color: var(--border);
+        }
+
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .product-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .product-info-section {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .info-item {
+            background: var(--light);
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 13px;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .info-item[style*="margin-top"] {
+            margin-top: 12px;
+        }
+
+        .variants-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 14px;
+        }
+
+        .variants-table th {
+            background: var(--light);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .variants-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .variants-table tr:hover {
+            background-color: rgba(67, 97, 238, 0.03);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        #variants-tab {
+            overflow-x: auto;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .status-badge i {
+            margin-right: 6px;
+            font-size: 12px;
+        }
+
+        .status-in_stock {
+            background-color: rgba(76, 201, 240, 0.15);
+            color: #0891b2;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+
+        .status-out_of_stock {
+            background-color: rgba(247, 37, 133, 0.15);
+            color: #db2777;
+            border: 1px solid rgba(247, 37, 133, 0.3);
+        }
+
+        .btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn i {
+            font-size: 12px;
+            margin-right: 4px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-light);
+            color: var(--primary);
+            background-color: transparent;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+        }
+
+        /* Export button specific styles */
+        #exportBtn {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        #exportBtn i {
+            font-size: 14px;
+            margin-right: 6px;
+        }
+    </style>
 </head>
+
 <body>
     <div class="main-content">
         <div id="pageTitle" class="page-title">
@@ -197,28 +552,28 @@
         // Function to render stars based on rating
         function renderStars(rating) {
             if (!rating) return '<div class="stars"><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div>';
-            
+
             const fullStars = Math.floor(rating);
             const halfStar = rating % 1 >= 0.5;
             const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-            
+
             let starsHTML = '<div class="stars">';
-            
+
             // Add full stars
             for (let i = 0; i < fullStars; i++) {
                 starsHTML += '<i class="fas fa-star"></i>';
             }
-            
+
             // Add half star if needed
             if (halfStar) {
                 starsHTML += '<i class="fas fa-star-half-alt"></i>';
             }
-            
+
             // Add empty stars
             for (let i = 0; i < emptyStars; i++) {
                 starsHTML += '<i class="far fa-star"></i>';
             }
-            
+
             starsHTML += '</div>';
             return starsHTML;
         }
@@ -227,6 +582,7 @@
         async function loadProducts() {
             try {
                 const response = await getAllProducts();
+
                 const productGrid = document.getElementById('productGrid');
                 productGrid.innerHTML = '';
 
@@ -242,7 +598,7 @@
                 response.forEach(product => {
                     const productCard = document.createElement('div');
                     productCard.className = 'product-card';
-                    
+
                     productCard.innerHTML = `
                         <div class="product-image">
                             <span class="product-id-badge">#${product.ID}</span>
@@ -268,7 +624,7 @@
                             </div>
                         </div>
                     `;
-                    
+
                     productGrid.appendChild(productCard);
                 });
             } catch (error) {
@@ -291,10 +647,13 @@
         async function viewProduct(id) {
             const modal = document.getElementById('productModal');
             modal.style.display = 'block';
-            
+
             try {
                 // Get product details
                 let response = await getProductById(id);
+
+                console.log('Product API Response:', response);
+
                 if (!response || !response.data) {
                     throw new Error('No product data received');
                 }
@@ -347,7 +706,7 @@
                 const res = await getProductVariants(id);
                 const variants = res.data || [];
                 const variantsList = document.getElementById('modal-variants-list');
-                
+
                 if (variantsList) {
                     variantsList.innerHTML = '';
                     if (variants && variants.length > 0) {
@@ -383,6 +742,14 @@
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
+
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content and mark tab as active
             
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
@@ -401,4 +768,5 @@
         }
     </script>
 </body>
-</html> 
+
+</html>
