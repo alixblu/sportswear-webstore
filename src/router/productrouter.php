@@ -18,6 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $productController->getCategoryById($_GET['id']);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getBrandById' && isset($_GET['id'])) {
         $productController->getBrandById($_GET['id']);
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getAllCategories') {
+        $productController->getAllCategories();
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getAllBrands') {
+        $productController->getAllBrands();
     } else {
         echo json_encode(['error' => 'Invalid GET request']);
     }

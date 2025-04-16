@@ -9,13 +9,13 @@
 </head>
 <body>
     <div class="main-content">
-        <div id="pageTitle" class="page-title">
-            <div class="title">Products</div>
-            <div class="action-buttons">
-                <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
-                <button id="exportBtn" class="btn btn-outline">
-                    <i class="fas fa-download"></i> Export
-                </button>
+<div id="pageTitle" class="page-title">
+        <div class="title">Products</div>
+        <div class="action-buttons">
+            <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+            <button id="exportBtn" class="btn btn-outline">
+                <i class="fas fa-download"></i> Export
+            </button>
             </div>
         </div>
 
@@ -27,24 +27,16 @@
             <div class="filter-group">
                 <select id="category" class="filter-select">
                     <option value="">All Categories</option>
-                    <option value="1">T-Shirts</option>
-                    <option value="2">Shoes</option>
-                    <option value="3">Accessories</option>
                 </select>
             </div>
             <div class="filter-group">
                 <select id="brand" class="filter-select">
                     <option value="">All Brands</option>
-                    <option value="1">Nike</option>
-                    <option value="2">Adidas</option>
-                    <option value="3">Puma</option>
                 </select>
             </div>
             <div class="filter-group">
                 <select id="status" class="filter-select">
                     <option value="">All Status</option>
-                    <option value="in_stock">In Stock</option>
-                    <option value="out_of_stock">Out of Stock</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -68,8 +60,8 @@
         <!-- Product Grid -->
         <div class="product-grid" id="productGrid">
             <!-- Products will be loaded here dynamically -->
-        </div>
-    </div>
+                    </div>
+                </div>
 
     <!-- Modal Structure -->
     <div class="modal-overlay" id="productModal">
@@ -89,6 +81,11 @@
                         </button>
                         <button class="btn btn-outline">
                             <i class="fas fa-image"></i> Change Image
+                        </button>
+                        </div>
+                    <div class="discontinued-action">
+                        <button class="btn btn-discontinued">
+                            <i class="fas fa-ban"></i> Mark as Discontinued
                         </button>
                     </div>
                 </div>
@@ -147,26 +144,26 @@
                                     <i class="fas fa-star"></i> Rating
                                 </div>
                                 <div class="info-value" id="modal-product-rating">-</div>
-                            </div>
+                        </div>
                             <div class="info-item">
                                 <div class="info-label">
                                     <i class="fas fa-box"></i> Stock
-                                </div>
+                    </div>
                                 <div class="info-value" id="modal-product-stock">-</div>
-                            </div>
+                </div>
                             <div class="info-item">
                                 <div class="info-label">
                                     <i class="fas fa-info-circle"></i> Status
-                                </div>
+            </div>
                                 <div class="info-value" id="modal-product-status">-</div>
-                            </div>
+                    </div>
                         </div>
                         <div class="info-item description">
                             <div class="info-label">
                                 <i class="fas fa-align-left"></i> Description
-                            </div>
+                    </div>
                             <div class="info-value" id="modal-product-description">-</div>
-                        </div>
+            </div>
                     </div>
 
                     <div id="variants-tab" class="tab-content">

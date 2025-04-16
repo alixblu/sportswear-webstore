@@ -184,5 +184,31 @@ class ProductController {
             ApiResponse::customResponse($id, 500, $e->getMessage());
         }
     }
+
+    /**
+     * Get all categories
+     * @return void
+     */
+    public function getAllCategories() {
+        try {
+            $categories = $this->productService->getAllCategories();
+            ApiResponse::customResponse($categories, 200);
+        } catch (Exception $e) {
+            ApiResponse::customResponse(null, 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Get all brands
+     * @return void
+     */
+    public function getAllBrands() {
+        try {
+            $brands = $this->productService->getAllBrands();
+            ApiResponse::customResponse($brands, 200);
+        } catch (Exception $e) {
+            ApiResponse::customResponse(null, 500, $e->getMessage());
+        }
+    }
 }
 ?> 
