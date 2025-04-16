@@ -18,6 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $userController->getAllRoles();
     }else if (isset($_GET['action']) && $_GET['action'] === 'exportFile') {
         $userController->exportExcel();
+    }else if (isset($_GET['action']) && $_GET['action'] === 'search') {
+        $keyword = $_GET['keyword'];
+        $fields = $_GET['fields'];
+        $results = $userController->search($keyword, $fields);
     } else {
         echo "Invalid GET request.";
     }

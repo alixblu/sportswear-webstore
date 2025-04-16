@@ -12,9 +12,11 @@ require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
  * - updateProduct($id, $data) - Update a product's information
  * - updateProductStock($productId) - Update product stock based on variant quantities
  */
-class ProductRepository {
-    
-    public function __construct() {
+class ProductRepository
+{
+
+    public function __construct()
+    {
         $this->conn = ConfigMysqli::connectDatabase();
     }
     /**
@@ -22,13 +24,14 @@ class ProductRepository {
      * @return array Products with their variants
      * @throws Exception If database error occurs
      */
-    public function findAll() {
+    public function findAll()
+    {
         $conn = null;
         $stmt = null;
         try {
             $mysql = new configMysqli();
             $conn = $mysql->connectDatabase();
-            
+
             $stmt = $conn->prepare("
                 SELECT 
                     p.ID as productID,
@@ -55,14 +58,14 @@ class ProductRepository {
                 LEFT JOIN productvariant pv ON p.ID = pv.productID
                 ORDER BY p.ID, pv.Code
             ");
-            
+
             if (!$stmt) {
                 throw new Exception("Database error: " . $conn->error);
             }
-            
+
             $stmt->execute();
             $result = $stmt->get_result();
-            
+
             $products = [];
             while ($row = $result->fetch_assoc()) {
                 $productId = $row['productID'];
@@ -82,7 +85,7 @@ class ProductRepository {
                         'variants' => []
                     ];
                 }
-                
+
                 if ($row['variantID']) {
                     $products[$productId]['variants'][] = [
                         'id' => $row['variantID'],
@@ -97,7 +100,7 @@ class ProductRepository {
                     ];
                 }
             }
-            
+
             return array_values($products);
         } catch (Exception $e) {
             error_log("Database error in findAll: " . $e->getMessage());
@@ -107,16 +110,16 @@ class ProductRepository {
             if ($conn) $conn->close();
         }
     }
-    
+
     /**checked
      * Find a product by ID with its variants
      * @param int $id Product ID
      * @return array|null Product with variants if found, null otherwise
      * @throws Exception If database error occurs
      */
-    public function findById($id) {
+    public function findById($id)
+    {
         try {
-
             $stmt = $this->conn->prepare("
                 SELECT 
                     p.ID as productID,
@@ -144,15 +147,15 @@ class ProductRepository {
                 WHERE p.ID = ?
                 ORDER BY pv.Code
             ");
-            
+
             if (!$stmt) {
-                throw new Exception("Database error: " . $conn->error);
+                throw new Exception("Database error: " . $this->conn->error);
             }
-            
+
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
-            
+
             $product = null;
             while ($row = $result->fetch_assoc()) {
                 if (!$product) {
@@ -171,7 +174,7 @@ class ProductRepository {
                         'variants' => []
                     ];
                 }
-                
+
                 if ($row['variantID']) {
                     $product['variants'][] = [
                         'id' => $row['variantID'],
@@ -186,21 +189,22 @@ class ProductRepository {
                     ];
                 }
             }
-            
+
             return $product;
         } catch (Exception $e) {
             error_log("Database error in findById: " . $e->getMessage());
             throw new Exception("Database error: " . $e->getMessage());
         } finally {
             if ($stmt) $stmt->close();
-            if ($conn) $conn->close();
+            if ($this->conn) $this->conn->close();
         }
     }
 
     private $conn;
 
     //checked
-    public function getProductVariants($productId) { 
+    public function getProductVariants($productId)
+    {
         try {
             $query = "SELECT v.*
                       FROM productvariant v
@@ -230,7 +234,8 @@ class ProductRepository {
      * @return array List of products
      * @throws Exception If database error occurs
      */
-    public function getAllProducts() {
+    public function getAllProducts()
+    {
         try {
             $query = "SELECT * FROM product ORDER BY ID";
             $stmt = $this->conn->prepare($query);
@@ -255,7 +260,8 @@ class ProductRepository {
      * @return array|null Product data if found, null otherwise
      * @throws Exception If database error occurs
      */
-    public function getProductById($id) {
+    public function getProductById($id)
+    {
         try {
             $query = "SELECT * FROM product WHERE ID = ?";
             $stmt = $this->conn->prepare($query);
@@ -277,7 +283,8 @@ class ProductRepository {
      * @return bool True if successful, false otherwise
      * @throws Exception If database error occurs
      */
-    public function updateProduct($id, $data) {
+    public function updateProduct($id, $data)
+    {
         try {
             $fields = [];
             $types = "";
@@ -295,7 +302,7 @@ class ProductRepository {
 
             $stmt = $this->conn->prepare($query);
             $stmt->bind_param($types, ...$values);
-            
+
             return $stmt->execute();
         } catch (Exception $e) {
             error_log("Error in updateProduct: " . $e->getMessage());
@@ -309,14 +316,15 @@ class ProductRepository {
      * @return bool True if successful, false otherwise
      * @throws Exception If database error occurs
      */
-    public function updateProductStock($productId) {
+    public function updateProductStock($productId)
+    {
         try {
             // Get all variants for the product
             $variants = $this->getProductVariants($productId);
             if (empty($variants)) {
                 throw new Exception("No variants found for product ID: $productId");
             }
-            
+
             // Calculate total stock from variants
             $totalStock = 0;
             foreach ($variants as $variant) {
@@ -327,7 +335,7 @@ class ProductRepository {
             $query = "UPDATE product SET stock = ? WHERE ID = ?";
             $stmt = $this->conn->prepare($query);
             $stmt->bind_param("ii", $totalStock, $productId);
-            
+
             return $stmt->execute();
         } catch (Exception $e) {
             error_log("Error in updateProductStock: " . $e->getMessage());
@@ -341,7 +349,8 @@ class ProductRepository {
      * @return array|null Category data if found, null otherwise
      * @throws Exception If database error occurs
      */
-    public function getCategoryById($id) {
+    public function getCategoryById($id)
+    {
         try {
             $query = "SELECT * FROM category WHERE ID = ?";
             $stmt = $this->conn->prepare($query);
@@ -362,7 +371,8 @@ class ProductRepository {
      * @return array|null Brand data if found, null otherwise
      * @throws Exception If database error occurs
      */
-    public function getBrandById($id) {
+    public function getBrandById($id)
+    {
         try {
             $query = "SELECT * FROM brand WHERE ID = ?";
             $stmt = $this->conn->prepare($query);
@@ -426,5 +436,3 @@ class ProductRepository {
     }
 
 }
-?> 
- 

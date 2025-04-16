@@ -9,10 +9,12 @@ require_once dirname(__FILE__) . '/../repository/productrepository.php';
  * - updateAllProductStock() - Update stock for all products
  * - getProductVariants($productId) - Get all variants of a specific product
  */
-class ProductService {
+class ProductService
+{
     private $productRepository;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->productRepository = new ProductRepository();
     }
 
@@ -21,7 +23,8 @@ class ProductService {
      * @return array List of products
      * @throws Exception If database error occurs
      */
-    public function getAllProducts() {
+    public function getAllProducts()
+    {
         try {
             return $this->productRepository->getAllProducts();
         } catch (Exception $e) {
@@ -36,12 +39,13 @@ class ProductService {
      * @return array|null Product data if found, null otherwise
      * @throws Exception If database error occurs
      */
-    public function getProductById($id) {
+    public function getProductById($id)
+    {
         try {
             if (!is_numeric($id) || $id <= 0) {
                 throw new Exception("Invalid product ID");
             }
-            
+
             return $this->productRepository->getProductById($id);
         } catch (Exception $e) {
             error_log("Error in getProductById service: " . $e->getMessage());
@@ -56,7 +60,8 @@ class ProductService {
      * @return bool True if successful, false otherwise
      * @throws Exception If database error occurs
      */
-    public function updateProduct($id, $data) {
+    public function updateProduct($id, $data)
+    {
         try {
             if (!is_numeric($id) || $id <= 0) {
                 throw new Exception("Invalid product ID");
@@ -87,7 +92,8 @@ class ProductService {
      * @return bool True if successful, false otherwise
      * @throws Exception If database error occurs
      */
-    public function updateProductStock($productId) {
+    public function updateProductStock($productId)
+    {
         try {
             if (!is_numeric($productId) || $productId <= 0) {
                 throw new Exception("Invalid product ID");
@@ -101,7 +107,7 @@ class ProductService {
 
             // Update stock
             $result = $this->productRepository->updateProductStock($productId);
-            
+
             if (!$result) {
                 throw new Exception("Failed to update product stock");
             }
@@ -114,7 +120,8 @@ class ProductService {
     }
 
     //checked
-    public function updateAllProductStock() {
+    public function updateAllProductStock()
+    {
         try {
             $products = $this->productRepository->getAllProducts();
             if (empty($products)) {
@@ -132,14 +139,15 @@ class ProductService {
         }
     }
     //checked
-    public function getProductVariants($productId) {
+    public function getProductVariants($productId)
+    {
         try {
             if (!is_numeric($productId) || $productId <= 0) {
                 throw new Exception("Invalid product ID");
             }
 
             $variants = $this->productRepository->getProductVariants($productId);
-            
+
             if (empty($variants)) {
                 throw new Exception("No variants found for this product");
             }
@@ -157,12 +165,13 @@ class ProductService {
      * @return array|null Category data if found, null otherwise
      * @throws Exception If database error occurs
      */
-    public function getCategoryById($id) {
+    public function getCategoryById($id)
+    {
         try {
             if (!is_numeric($id) || $id <= 0) {
                 throw new Exception("Invalid category ID");
             }
-            
+
             return $this->productRepository->getCategoryById($id);
         } catch (Exception $e) {
             error_log("Error in getCategoryById service: " . $e->getMessage());
@@ -176,12 +185,13 @@ class ProductService {
      * @return array|null Brand data if found, null otherwise
      * @throws Exception If database error occurs
      */
-    public function getBrandById($id) {
+    public function getBrandById($id)
+    {
         try {
             if (!is_numeric($id) || $id <= 0) {
                 throw new Exception("Invalid brand ID");
             }
-            
+
             return $this->productRepository->getBrandById($id);
         } catch (Exception $e) {
             error_log("Error in getBrandById service: " . $e->getMessage());
@@ -217,5 +227,3 @@ class ProductService {
         }
     }
 }
-?> 
- 
