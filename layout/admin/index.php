@@ -23,9 +23,16 @@
   </head>
   <body>
     <div class="container">
+<<<<<<< Updated upstream
         <?php include './includes/header.php'; ?>
         <?php include './includes/sidebar.php'; ?>
         <?php include './modules/user.php'; ?>
+=======
+      <?php include './includes/header.php'; ?>
+      <?php include './includes/sidebar.php'; ?>
+      <?php include './modules/dathang.php'; ?>
+      </div>
+>>>>>>> Stashed changes
     </div>
 
 </body>
