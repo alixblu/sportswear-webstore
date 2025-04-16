@@ -8,369 +8,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin/product.css">
 
-    <script src="../../../JS/admin/product.js"></script>
-    <style>
-        .product-id-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background-color: #fff;
-            color: #333;
-            padding: 1px 4px;
-            border-radius: 3px;
-            font-size: 10px;
-            font-weight: bold;
-            border: 1px solid #000;
-            box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .product-image {
-            position: relative;
-        }
-
-        /* Product Card Styles */
-        .product-card {
-            background: white;
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow);
-        }
-
-        .product-info {
-            padding: 12px;
-        }
-
-        .product-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text);
-            line-height: 1.3;
-        }
-
-        .product-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 12px;
-            color: var(--text-light);
-        }
-
-        .product-rating {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .stars {
-            color: var(--warning);
-            margin-right: 6px;
-            font-size: 12px;
-        }
-
-        .rating-count {
-            font-size: 11px;
-            color: var(--text-light);
-        }
-
-        .product-actions {
-            display: flex;
-            justify-content: center;
-            margin-top: 12px;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-
-        .modal-content {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            border-radius: var(--radius);
-            width: 90%;
-            max-width: 1000px;
-            max-height: 90vh;
-            overflow: hidden;
-            z-index: 1001;
-            box-shadow: var(--shadow);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 24px;
-            border-bottom: 1px solid var(--border);
-            background-color: rgba(248, 249, 250, 0.5);
-        }
-
-        .modal-header h2 {
-            font-size: 19px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            color: var(--dark);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-light);
-            transition: var(--transition);
-        }
-
-        .modal-close:hover {
-            color: var(--danger);
-            transform: rotate(90deg);
-        }
-
-        .modal-body {
-            display: flex;
-            flex-direction: row;
-            height: calc(90vh - 120px);
-        }
-
-        .product-image-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            background: var(--light);
-            border-right: 1px solid var(--border);
-            width: 240px;
-        }
-
-        .product-image-large {
-            width: 160px;
-            height: 160px;
-            background: white;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .product-image-large i {
-            font-size: 80px;
-            color: var(--border);
-        }
-
-        .product-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-        }
-
-        .product-actions .btn {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .product-info-section {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-        }
-
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 24px;
-        }
-
-        .tab {
-            padding: 12px 24px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: var(--transition);
-            color: var(--text-light);
-            font-weight: 500;
-        }
-
-        .tab.active {
-            border-bottom: 2px solid var(--primary);
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .info-item {
-            background: var(--light);
-            padding: 10px 12px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-        }
-
-        .info-label {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-bottom: 4px;
-            font-weight: 500;
-        }
-
-        .info-value {
-            font-size: 13px;
-            color: var(--text);
-            font-weight: 500;
-        }
-
-        .info-item[style*="margin-top"] {
-            margin-top: 12px;
-        }
-
-        .variants-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: 14px;
-        }
-
-        .variants-table th {
-            background: var(--light);
-            padding: 12px 16px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text);
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-
-        .variants-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-
-        .variants-table tr:hover {
-            background-color: rgba(67, 97, 238, 0.03);
-            transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-        }
-
-        #variants-tab {
-            overflow-x: auto;
-        }
-
-        .status-badge {
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            line-height: 1;
-        }
-
-        .status-badge i {
-            margin-right: 6px;
-            font-size: 12px;
-        }
-
-        .status-in_stock {
-            background-color: rgba(76, 201, 240, 0.15);
-            color: #0891b2;
-            border: 1px solid rgba(76, 201, 240, 0.3);
-        }
-
-        .status-out_of_stock {
-            background-color: rgba(247, 37, 133, 0.15);
-            color: #db2777;
-            border: 1px solid rgba(247, 37, 133, 0.3);
-        }
-
-        .btn {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-
-        .btn i {
-            font-size: 12px;
-            margin-right: 4px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
-        }
-
-        .btn-outline {
-            border: 2px solid var(--primary-light);
-            color: var(--primary);
-            background-color: transparent;
-        }
-
-        .btn-outline:hover {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
-        }
-
-        /* Export button specific styles */
-        #exportBtn {
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        #exportBtn i {
-            font-size: 14px;
-            margin-right: 6px;
-        }
-    </style>
+    <script src="../../JS/admin/product.js"></script>
+    <link rel="stylesheet" href="../../css/admin/product.css">
 </head>
 
 <body>
     <div class="main-content">
-        <div id="pageTitle" class="page-title">
-            <div class="title">Products</div>
-            <div class="action-buttons">
-                <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
-                <button id="exportBtn" class="btn btn-outline">
-                    <i class="fas fa-download"></i> Export
-                </button>
+<div id="pageTitle" class="page-title">
+        <div class="title">Products</div>
+        <div class="action-buttons">
+            <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+            <button id="exportBtn" class="btn btn-outline">
+                <i class="fas fa-download"></i> Export
+            </button>
             </div>
         </div>
 
@@ -382,24 +32,16 @@
             <div class="filter-group">
                 <select id="category" class="filter-select">
                     <option value="">All Categories</option>
-                    <option value="1">T-Shirts</option>
-                    <option value="2">Shoes</option>
-                    <option value="3">Accessories</option>
                 </select>
             </div>
             <div class="filter-group">
                 <select id="brand" class="filter-select">
                     <option value="">All Brands</option>
-                    <option value="1">Nike</option>
-                    <option value="2">Adidas</option>
-                    <option value="3">Puma</option>
                 </select>
             </div>
             <div class="filter-group">
                 <select id="status" class="filter-select">
                     <option value="">All Status</option>
-                    <option value="in_stock">In Stock</option>
-                    <option value="out_of_stock">Out of Stock</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -423,8 +65,8 @@
         <!-- Product Grid -->
         <div class="product-grid" id="productGrid">
             <!-- Products will be loaded here dynamically -->
-        </div>
-    </div>
+                    </div>
+                </div>
 
     <!-- Modal Structure -->
     <div class="modal-overlay" id="productModal">
@@ -444,6 +86,11 @@
                         </button>
                         <button class="btn btn-outline">
                             <i class="fas fa-image"></i> Change Image
+                        </button>
+                        </div>
+                    <div class="discontinued-action">
+                        <button class="btn btn-discontinued">
+                            <i class="fas fa-ban"></i> Mark as Discontinued
                         </button>
                     </div>
                 </div>
@@ -502,26 +149,26 @@
                                     <i class="fas fa-star"></i> Rating
                                 </div>
                                 <div class="info-value" id="modal-product-rating">-</div>
-                            </div>
+                        </div>
                             <div class="info-item">
                                 <div class="info-label">
                                     <i class="fas fa-box"></i> Stock
-                                </div>
+                    </div>
                                 <div class="info-value" id="modal-product-stock">-</div>
-                            </div>
+                </div>
                             <div class="info-item">
                                 <div class="info-label">
                                     <i class="fas fa-info-circle"></i> Status
-                                </div>
+            </div>
                                 <div class="info-value" id="modal-product-status">-</div>
-                            </div>
+                    </div>
                         </div>
                         <div class="info-item description">
                             <div class="info-label">
                                 <i class="fas fa-align-left"></i> Description
-                            </div>
+                    </div>
                             <div class="info-value" id="modal-product-description">-</div>
-                        </div>
+            </div>
                     </div>
 
                     <div id="variants-tab" class="tab-content">
@@ -547,7 +194,6 @@
         </div>
     </div>
 
-    <script src="../../JS/admin/product.js"></script>
     <script>
         // Function to render stars based on rating
         function renderStars(rating) {

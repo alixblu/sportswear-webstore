@@ -199,18 +199,31 @@ class ProductService
         }
     }
 
-
-    public function deleteProduct($id)
-    {
+    /**
+     * Get all categories
+     * @return array List of categories
+     * @throws Exception If database error occurs
+     */
+    public function getAllCategories() {
         try {
-            if (!is_numeric($id) || $id <= 0) {
-                throw new Exception("Invalid product ID");
-            }
-
-            return $this->productRepository->deleteProduct($id);
+            return $this->productRepository->getAllCategories();
         } catch (Exception $e) {
-            error_log("Error in deleteProduct service: " . $e->getMessage());
-            throw new Exception("Failed to delete product: " . $e->getMessage());
+            error_log("Error in getAllCategories service: " . $e->getMessage());
+            throw new Exception("Failed to get categories: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get all brands
+     * @return array List of brands
+     * @throws Exception If database error occurs
+     */
+    public function getAllBrands() {
+        try {
+            return $this->productRepository->getAllBrands();
+        } catch (Exception $e) {
+            error_log("Error in getAllBrands service: " . $e->getMessage());
+            throw new Exception("Failed to get brands: " . $e->getMessage());
         }
     }
 }

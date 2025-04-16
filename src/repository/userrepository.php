@@ -301,30 +301,30 @@
             $conn = null;
             $stmt = null;
             try {
-                $mysql = new configMysqli();
-                $conn = $mysql->connectDatabase();
-                
+            $mysql = new configMysqli();
+            $conn = $mysql->connectDatabase();
+            
                 $sql = "UPDATE user 
                         SET fullname = ?, phone = ?, gender = ?, roleID = ?
                         WHERE id = ?";
-        
-                $stmt = $conn->prepare($sql);
+            
+            $stmt = $conn->prepare($sql);
                 $stmt->bind_param("ssssi", $name,  $phone, $gender, $roleID, $id);
         
-                $stmt->execute();
+            $stmt->execute();
         
-                $user = null;
-                if ($stmt->affected_rows > 0) {
-                    $user = [
-                        'id' => $id,
+            $user = null;
+            if ($stmt->affected_rows > 0) {
+                $user = [
+                    'id' => $id,
                         'name' => $name,
                         'phone' => $phone,
                         'gender' => $gender,
                         'roleID' => $roleID
-                    ];
-                }
-        
-                return $user;
+                ];
+            }
+
+            return $user;
             } catch (Exception $e) {
                 error_log("Database error in userUpdate: " . $e->getMessage());
                 throw new Exception("Database error: " . $e->getMessage());

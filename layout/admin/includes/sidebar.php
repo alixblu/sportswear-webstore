@@ -1,8 +1,8 @@
   <!-- Sidebar -->
   <div class="sidebar">
-      <div class="logo">
+      <!-- <div class="logo">
           <h1>Admin<span>Panel</span></h1>
-      </div>
+      </div> -->
       <div class="nav-menu">
           <div class="menu-heading">Main</div>
           <div class="nav-item active">

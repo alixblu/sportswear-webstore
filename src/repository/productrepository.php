@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
-/**=======src of product include VARIANT and CATEGORY AND BRAND====
+/**============src of products include VARIANT and CATEGORY AND BRAND ====
  * 
  * 
  * Functions in ProductRepository:
@@ -387,16 +387,52 @@ class ProductRepository
         }
     }
 
-    public function deleteProduct($id)
-    {
+    /**
+     * Get all categories
+     * @return array List of categories
+     * @throws Exception If database error occurs
+     */
+    public function getAllCategories() {
         try {
-            $query = "DELETE FROM product WHERE ID = ?";
+            $query = "SELECT * FROM category ORDER BY name";
             $stmt = $this->conn->prepare($query);
-            $stmt->bind_param("i", $id);
-            return $stmt->execute();
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            $categories = [];
+            while ($row = $result->fetch_assoc()) {
+                $categories[] = $row;
+            }
+
+            return $categories;
         } catch (Exception $e) {
-            error_log("Error in deleteProduct: " . $e->getMessage());
-            throw new Exception("Failed to delete product");
+            error_log("Error in getAllCategories: " . $e->getMessage());
+            throw new Exception("Failed to get categories");
         }
     }
+
+    /**
+     * Get all brands
+     * @return array List of brands
+     * @throws Exception If database error occurs
+     */
+    public function getAllBrands() {
+        try {
+            $query = "SELECT * FROM brand ORDER BY name";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            $brands = [];
+            while ($row = $result->fetch_assoc()) {
+                $brands[] = $row;
+            }
+
+            return $brands;
+        } catch (Exception $e) {
+            error_log("Error in getAllBrands: " . $e->getMessage());
+            throw new Exception("Failed to get brands");
+        }
+    }
+
 }
