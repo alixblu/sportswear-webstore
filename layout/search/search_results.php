@@ -142,7 +142,7 @@ try {
 }
 
 // Pagination settings
-$items_per_page = 8;
+$items_per_page = 10; // Set to 10 products per page
 $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $items_per_page;
 
@@ -190,18 +190,34 @@ if (!empty($_GET['sort']) && in_array($_GET['sort'], ['price_asc', 'price_desc']
 // Construct WHERE clause
 $where_clause = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
 
-// Select clause with calculated price
-$select_clause = "p.*, (100 * (1 + p.markup_percentage/100)) AS calculated_price";
+// Select clause with calculated price from productvariant
+$select_clause = "
+    p.ID, p.name, p.image, p.rating, p.status, p.brandID, p.categoryID, p.markup_percentage,
+    MIN(pv.price + (pv.price * p.markup_percentage / 100)) AS calculated_price
+";
 
 // Count total items
-$total_query = "SELECT COUNT(*) FROM product p $where_clause";
+$total_query = "
+    SELECT COUNT(DISTINCT p.ID)
+    FROM product p
+    LEFT JOIN productvariant pv ON p.ID = pv.productID
+    $where_clause
+";
 $stmt = $conn->prepare($total_query);
 $stmt->execute($params);
 $total_items = $stmt->fetchColumn();
 $total_pages = ceil($total_items / $items_per_page);
 
 // Fetch products
-$query = "SELECT $select_clause FROM product p $where_clause $order_by LIMIT :offset, :items_per_page";
+$query = "
+    SELECT $select_clause
+    FROM product p
+    LEFT JOIN productvariant pv ON p.ID = pv.productID
+    $where_clause
+    GROUP BY p.ID, p.name, p.image, p.rating, p.status, p.brandID, p.categoryID, p.markup_percentage
+    $order_by
+    LIMIT :offset, :items_per_page
+";
 $stmt = $conn->prepare($query);
 foreach ($params as $key => $value) {
     $stmt->bindValue($key, $value);
