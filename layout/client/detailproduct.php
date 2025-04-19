@@ -390,7 +390,7 @@
 
                <div class="rating-stock">
                   <span class="stars">★★★★☆</span>
-                  <span class="reviews">(150 Reviews)</span> |
+                  <span class="reviews">(Reviews)</span> |
                   <span class="in-stock">In Stock</span>
                </div>
 
@@ -442,6 +442,8 @@
         </main>
     </body>
       <script src="../../JS/admin/product.js"></script>
+      <script src="../../JS/client/reviewApi.js"></script>
+
       <script>
       let selectedColor = null;
       let selectedSize = null;
@@ -491,7 +493,49 @@
                })
                .catch(error => console.error('Lỗi khi lấy biến thể sản phẩm:', error));
 
-            
+               const showBtn = document.querySelector(".reviews");
+
+               showBtn.addEventListener("click", function (e) {
+                  getReviewsByProductId(id)
+                     .then(reviews => {
+                        const portalRoot = document.createElement("div");
+                        portalRoot.id = "portal-root";
+
+                        const reviewItems = reviews.data.map(review => {
+                           return `
+                              <li>
+                                 <strong>Người dùng #${review.userAccID}</strong>
+                                 <p>⭐ Đánh giá: ${review.rating} sao</p>
+                                 <p>${review.commentContent ? review.commentContent : "Không có nhận xét."}</p>
+                                 <small>${review.createdAt}</small>
+                              </li>
+                           `;
+                        }).join("");
+
+                        portalRoot.innerHTML = `
+                           <div class="overlay">
+                              <div class="review-box">
+                                 <h2>Đánh Giá Khách Hàng</h2>
+                                 <ul class="review-list">
+                                    ${reviewItems || "<li>Chưa có đánh giá nào cho sản phẩm này.</li>"}
+                                 </ul>
+                                 <button class="close-review">Đóng</button>
+                              </div>
+                           </div>
+                        `;
+
+                        document.body.appendChild(portalRoot);
+
+                        portalRoot.querySelector(".close-review").addEventListener("click", () => {
+                           portalRoot.remove();
+                        });
+                     })
+                     .catch(error => {
+                        console.error('Lỗi khi lấy đánh giá:', error.message);
+                     });
+               });
+
+
       }
 
       function renderColors(variants) {
@@ -586,41 +630,6 @@
                });
          });
       });
-      const showBtn = document.querySelector(".reviews");
-
-      showBtn.addEventListener("click", function (e) {
-         const portalRoot = document.createElement("div");
-         portalRoot.id = "portal-root";
-
-         portalRoot.innerHTML = `
-            <div class="overlay">
-               <div class="review-box">
-                  <h2>Đánh Giá Khách Hàng</h2>
-                  <ul class="review-list">
-                     <li>
-                        <strong>Nguyễn Văn A</strong>
-                        <p>Hàng tốt, giao nhanh. Sẽ ủng hộ lần sau!</p>
-                     </li>
-                     <li>
-                        <strong>Trần Thị B</strong>
-                        <p>Chất lượng ổn, đúng mô tả.</p>
-                     </li>
-                     <li>
-                        <strong>Lê Văn C</strong>
-                        <p>Đóng gói cẩn thận, nhân viên hỗ trợ nhiệt tình.</p>
-                     </li>
-                  </ul>
-                  <button class="close-review">Đóng</button>
-               </div>
-            </div>
-         `;
-
-         document.body.appendChild(portalRoot);
-
-         portalRoot.querySelector(".close-review").addEventListener("click", () => {
-            portalRoot.remove();
-         });
-      });
-
+      
    </script>
 </html>

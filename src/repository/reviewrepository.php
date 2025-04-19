@@ -132,6 +132,39 @@
             }
         }
 
+        public function getReviewByProductId($productId) {
+            try {
+                $stmt = $this->conn->prepare("
+                    SELECT r.*, c.content AS commentContent 
+                    FROM review r
+                    LEFT JOIN comment c ON r.commentID = c.ID
+                    WHERE r.productID = ?
+                    ORDER BY r.createdAt DESC
+                ");
+        
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare statement: " . $this->conn->error);
+                }
+        
+                $stmt->bind_param("i", $productId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+        
+                $reviews = [];
+                while ($row = $result->fetch_assoc()) {
+                    $reviews[] = $row;
+                }
+        
+                $stmt->close();
+                $this->conn->close();
+                return $reviews;
+        
+            } catch (Exception $e) {
+                error_log("getReviewByProductId failed: " . $e->getMessage());
+                return [];
+            }
+        }
+        
         public function delete($reviewID) {
             try {
                 $this->conn->begin_transaction();

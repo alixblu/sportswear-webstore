@@ -39,6 +39,14 @@ class ReviewService
         }
     }
 
+    public function getReviewByProductId($productId) {
+        try {
+            return $this->reviewRepository->getReviewByProductId($productId);
+        } catch (Exception $e) {
+            throw new Exception("Failed to get reviews: " . $e->getMessage());
+        }
+    }
+
     public function updateReview($id, $rating, $commentContent = null)
     {
         try {

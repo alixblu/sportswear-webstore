@@ -34,5 +34,9 @@ class ReviewController
         $result = $this->reviewService->deleteReview($id);
         ApiResponse::customApiResponse($result, 200);
     }
-
+    public function getReviewByProductId($productId) {
+        $result = $this->reviewService->getReviewByProductId($productId);
+        ApiResponse::customApiResponse($result, 200);
+    }
+    
 }

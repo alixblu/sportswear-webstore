@@ -8,12 +8,29 @@ header('Access-Control-Allow-Headers: Content-Type, Authorization');
 $reviewController = new ReviewController();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    if (isset($_GET['action']) && $_GET['action'] === 'getAllReviews') {
-        $reviewController->getAllReviews();
-    }  else {
+    if (isset($_GET['action'])) {
+        switch ($_GET['action']) {
+            case 'getAllReviews':
+                $reviewController->getAllReviews();
+                break;
+
+            case 'getReviewByProductId':
+                $productId = $_GET['productId'] ?? null;
+                if ($productId !== null) {
+                    $reviewController->getReviewByProductId($productId);
+                } else {
+                    echo "Thiếu productId.";
+                }
+                break;
+
+            default:
+                echo "Invalid GET action.";
+        }
+    } else {
         echo "Invalid GET request.";
     }
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'createReview') {
