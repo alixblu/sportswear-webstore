@@ -81,7 +81,7 @@
                         <i class="fas fa-tshirt"></i>
                     </div>
                     <div class="product-actions">
-                        <button class="btn btn-primary">
+                        <button class="btn btn-primary" onclick="showEditForm()">
                             <i class="fas fa-edit"></i> Edit Product
                         </button>
                         <button class="btn btn-outline">
@@ -94,7 +94,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="product-info-section">
+                <div class="product-info-section" id="product-info-section">
                     <div class="tabs">
                         <div class="tab active" onclick="switchTab('details')">Details</div>
                         <div class="tab" onclick="switchTab('variants')">Variants</div>
@@ -149,26 +149,26 @@
                                     <i class="fas fa-star"></i> Rating
                                 </div>
                                 <div class="info-value" id="modal-product-rating">-</div>
-                        </div>
+                            </div>
                             <div class="info-item">
                                 <div class="info-label">
                                     <i class="fas fa-box"></i> Stock
-                    </div>
+                                </div>
                                 <div class="info-value" id="modal-product-stock">-</div>
-                </div>
+                            </div>
                             <div class="info-item">
                                 <div class="info-label">
                                     <i class="fas fa-info-circle"></i> Status
-            </div>
+                                </div>
                                 <div class="info-value" id="modal-product-status">-</div>
-                    </div>
+                            </div>
                         </div>
                         <div class="info-item description">
                             <div class="info-label">
                                 <i class="fas fa-align-left"></i> Description
-                    </div>
+                            </div>
                             <div class="info-value" id="modal-product-description">-</div>
-            </div>
+                        </div>
                     </div>
 
                     <div id="variants-tab" class="tab-content">
@@ -190,6 +190,49 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Edit Form Section (hidden by default) -->
+<div id="edit-form-section" class="edit-form">
+    <form id="productEditForm">
+        <div class="form-group">
+            <label for="editName">Name</label>
+            <input type="text" id="editName" name="name">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="editCategory">Category</label>
+                <select id="editCategory" name="category">
+                    <!-- Categories populated dynamically -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editBrand">Brand</label>
+                <select id="editBrand" name="brand">
+                    <!-- Brands populated dynamically -->
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="editMarkup">Markup Percentage</label>
+                <input type="number" id="editMarkup" name="markup" min="0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label for="editDiscount">Discount ID</label>
+                <input type="text" id="editDiscount" name="discount">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="editDescription">Description</label>
+            <textarea id="editDescription" name="description"></textarea>
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn btn-outline" onclick="cancelEdit()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
+</div>
+
             </div>
         </div>
     </div>
@@ -289,11 +332,12 @@
         // Load products when the page loads
         document.addEventListener('DOMContentLoaded', loadProducts);
 
+        let currentProductId = null;
         // Modal functions
         async function viewProduct(id) {
             const modal = document.getElementById('productModal');
             modal.style.display = 'block';
-
+            currentProductId = id; // Store the current product ID
             try {
                 // Get product details
                 let response = await getProductById(id);
@@ -378,6 +422,91 @@
                 alert('Error loading product details: ' + error.message);
             }
         }
+
+        // Show edit form
+        async function showEditForm() {
+            if (!currentProductId) return;
+            
+            // Hide product info and show edit form
+            document.getElementById('product-info-section').style.display = 'none';
+            document.getElementById('edit-form-section').style.display = 'block';
+            
+            try {
+                // Get product details
+                const response = await getProductById(currentProductId);
+                const product = response.data;
+                
+                // Populate form fields
+                document.getElementById('editName').value = product.name || '';
+                document.getElementById('editMarkup').value = product.markup_percentage || '0';
+                document.getElementById('editDiscount').value = product.discountID || '';
+                document.getElementById('editDescription').value = product.description || '';
+                
+                // Load categories
+                const categoriesResponse = await getAllCategories();
+                const categorySelect = document.getElementById('editCategory');
+                categorySelect.innerHTML = '<option value="">Select Category</option>';
+                categoriesResponse.data.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.ID;
+                    option.textContent = category.name;
+                    option.selected = category.ID === product.categoryID;
+                    categorySelect.appendChild(option);
+                });
+                
+                // Load brands
+                const brandsResponse = await getAllBrands();
+                const brandSelect = document.getElementById('editBrand');
+                brandSelect.innerHTML = '<option value="">Select Brand</option>';
+                brandsResponse.data.forEach(brand => {
+                    const option = document.createElement('option');
+                    option.value = brand.ID;
+                    option.textContent = brand.name;
+                    option.selected = brand.ID === product.brandID;
+                    brandSelect.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error loading edit form:', error);
+                alert('Error loading edit form: ' + error.message);
+            }
+        }
+
+        // Cancel editing
+        function cancelEdit() {
+            document.getElementById('product-info-section').style.display = 'block';
+            document.getElementById('edit-form-section').style.display = 'none';
+        }
+
+        // Form submission
+        document.getElementById('productEditForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const formData = {
+                    id: currentProductId,
+                    name: document.getElementById('editName').value,
+                    categoryID: document.getElementById('editCategory').value,
+                    brandID: document.getElementById('editBrand').value,
+                    markup_percentage: document.getElementById('editMarkup').value,
+                    discountID: document.getElementById('editDiscount').value,
+                    description: document.getElementById('editDescription').value
+                };
+                
+                const response = await updateProduct(formData);
+                
+                if (response.success) {
+                    alert('Product updated successfully!');
+                    viewProduct(currentProductId); // Refresh view
+                    loadProducts(); // Refresh grid
+                } else {
+                    throw new Error(response.message || 'Failed to update product');
+                }
+            } catch (error) {
+                console.error('Error updating product:', error);
+                alert('Error updating product: ' + error.message);
+            }
+        });
 
         function closeModal() {
             const modal = document.getElementById('productModal');

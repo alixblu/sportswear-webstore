@@ -642,4 +642,30 @@
     margin-right: 6px;
     font-size: 13px;
 } 
- 
+.edit-form {
+    display: none;
+    background: #fff;
+    padding: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px; /* Space between columns */
+}
+
+.form-row .form-group {
+    flex: 1; /* Adjust the columns to take equal width */
+}
+
+.edit-form input,
+.edit-form select,
+.edit-form textarea {
+    width: 100%; /* Ensure inputs within the columns expand */
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.edit-form textarea {
+    min-height: 150px; /* Increase the height */
+    resize: vertical; /* Allow manual resizing vertically if needed */
+}
