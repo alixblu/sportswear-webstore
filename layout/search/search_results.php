@@ -1,9 +1,150 @@
+<?php
+// Kết nối cơ sở dữ liệu
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "sportswear";
+
+try {
+    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    echo '<div class="error-message">Kết nối thất bại: ' . htmlspecialchars($e->getMessage()) . '</div>';
+    exit;
+}
+
+// Thiết lập phân trang
+$items_per_page = 10;
+$page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $items_per_page;
+
+// Khởi tạo điều kiện và tham số
+$conditions = [];
+$params = [];
+$order_by = "";
+
+// Hàm làm sạch đầu vào
+function sanitize_input($input) {
+    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
+}
+
+// Xây dựng điều kiện truy vấn
+if (!empty($_GET['search'])) {
+    $search = sanitize_input($_GET['search']);
+    $conditions[] = "p.name LIKE :search OR p.description LIKE :search";
+    $params[':search'] = "%$search%";
+}
+
+if (!empty($_GET['brand']) && is_numeric($_GET['brand'])) {
+    $conditions[] = "p.brandID = :brand";
+    $params[':brand'] = (int)$_GET['brand'];
+}
+
+if (!empty($_GET['status']) && in_array($_GET['status'], ['in_stock', 'out_of_stock'])) {
+    $conditions[] = "p.status = :status";
+    $params[':status'] = $_GET['status'];
+}
+
+if (!empty($_GET['category']) && is_numeric($_GET['category'])) {
+    $conditions[] = "p.categoryID = :category";
+    $params[':category'] = (int)$_GET['category'];
+}
+
+// Bộ lọc rating
+if (!empty($_GET['rating'])) {
+    $rating_range = explode('-', $_GET['rating']);
+    if (count($rating_range) === 2 && is_numeric($rating_range[0]) && is_numeric($rating_range[1])) {
+        $conditions[] = "COALESCE(r.avg_rating, 0) BETWEEN :rating_min AND :rating_max";
+        $params[':rating_min'] = (float)$rating_range[0];
+        $params[':rating_max'] = (float)$rating_range[1];
+    }
+}
+
+// Bộ lọc giá
+if (!empty($_GET['price_start']) && !empty($_GET['price_end']) && is_numeric($_GET['price_start']) && is_numeric($_GET['price_end'])) {
+    $price_start = (float)$_GET['price_start'];
+    $price_end = (float)$_GET['price_end'];
+    if ($price_start <= $price_end) {
+        $conditions[] = "calculated_price BETWEEN :price_start AND :price_end";
+        $params[':price_start'] = $price_start;
+        $params[':price_end'] = $price_end;
+    }
+}
+
+// Sắp xếp
+$valid_sorts = [
+    'price_asc' => 'calculated_price ASC',
+    'price_desc' => 'calculated_price DESC',
+    'rating_asc' => 'COALESCE(r.avg_rating, 0) ASC',
+    'rating_desc' => 'COALESCE(r.avg_rating, 0) DESC'
+];
+if (!empty($_GET['sort']) && array_key_exists($_GET['sort'], $valid_sorts)) {
+    $order_by = "ORDER BY " . $valid_sorts[$_GET['sort']];
+}
+
+// Tạo mệnh đề WHERE
+$where_clause = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
+
+// Mệnh đề SELECT với giá tính toán và rating trung bình
+$select_clause = "
+    p.ID, p.name, p.image, p.status, p.brandID, p.categoryID, p.markup_percentage,
+    MIN(pv.price + (pv.price * p.markup_percentage / 100)) AS calculated_price,
+    COALESCE(r.avg_rating, 0) AS rating
+";
+
+// Truy vấn đếm tổng số sản phẩm
+$total_query = "
+    SELECT COUNT(DISTINCT p.ID)
+    FROM product p
+    LEFT JOIN productvariant pv ON p.ID = pv.productID
+    LEFT JOIN (
+        SELECT productID, AVG(rating) AS avg_rating
+        FROM review
+        WHERE status = 'active'
+        GROUP BY productID
+    ) r ON p.ID = r.productID
+    $where_clause
+";
+$stmt = $conn->prepare($total_query);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value);
+}
+$stmt->execute();
+$total_items = $stmt->fetchColumn();
+$total_pages = max(1, ceil($total_items / $items_per_page));
+
+// Truy vấn lấy sản phẩm
+$query = "
+    SELECT $select_clause
+    FROM product p
+    LEFT JOIN productvariant pv ON p.ID = pv.productID
+    LEFT JOIN (
+        SELECT productID, AVG(rating) AS avg_rating
+        FROM review
+        WHERE status = 'active'
+        GROUP BY productID
+    ) r ON p.ID = r.productID
+    $where_clause
+    GROUP BY p.ID, p.name, p.image, p.status, p.brandID, p.categoryID, p.markup_percentage
+    $order_by
+    LIMIT :offset, :items_per_page
+";
+$stmt = $conn->prepare($query);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value);
+}
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->bindValue(':items_per_page', $items_per_page, PDO::PARAM_INT);
+$stmt->execute();
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results</title>
+    <title>Kết quả tìm kiếm</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
@@ -126,131 +267,31 @@
     </style>
 </head>
 <body>
-<?php
-// Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "sportswear";
-
-try {
-    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    echo '<div class="error-message">Connection failed: ' . htmlspecialchars($e->getMessage()) . '</div>';
-    exit;
-}
-
-// Pagination settings
-$items_per_page = 10; // Set to 10 products per page
-$page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
-$offset = ($page - 1) * $items_per_page;
-
-// Initialize query conditions and parameters
-$conditions = [];
-$params = [];
-$order_by = "";
-
-// Build query conditions based on filters
-if (!empty($_GET['search'])) {
-    $conditions[] = "p.name LIKE :search";
-    $params[':search'] = "%" . trim($_GET['search']) . "%";
-}
-if (!empty($_GET['brand']) && is_numeric($_GET['brand'])) {
-    $conditions[] = "p.brandID = :brand";
-    $params[':brand'] = (int)$_GET['brand'];
-}
-if (!empty($_GET['status']) && in_array($_GET['status'], ['in_stock', 'out_of_stock'])) {
-    $conditions[] = "p.status = :status";
-    $params[':status'] = $_GET['status'];
-}
-if (!empty($_GET['rating'])) {
-    $rating_range = explode('-', $_GET['rating']);
-    if (count($rating_range) === 2 && is_numeric($rating_range[0]) && is_numeric($rating_range[1])) {
-        $conditions[] = "p.rating BETWEEN :rating_min AND :rating_max";
-        $params[':rating_min'] = (float)$rating_range[0];
-        $params[':rating_max'] = (float)$rating_range[1];
-    }
-}
-if (!empty($_GET['category']) && is_numeric($_GET['category'])) {
-    $conditions[] = "p.categoryID = :category";
-    $params[':category'] = (int)$_GET['category'];
-}
-if (!empty($_GET['price_start']) && !empty($_GET['price_end']) && is_numeric($_GET['price_start']) && is_numeric($_GET['price_end'])) {
-    $conditions[] = "calculated_price BETWEEN :price_start AND :price_end";
-    $params[':price_start'] = (float)$_GET['price_start'];
-    $params[':price_end'] = (float)$_GET['price_end'];
-}
-
-// Sorting
-if (!empty($_GET['sort']) && in_array($_GET['sort'], ['price_asc', 'price_desc'])) {
-    $order_by = $_GET['sort'] === 'price_asc' ? "ORDER BY calculated_price ASC" : "ORDER BY calculated_price DESC";
-}
-
-// Construct WHERE clause
-$where_clause = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
-
-// Select clause with calculated price from productvariant
-$select_clause = "
-    p.ID, p.name, p.image, p.rating, p.status, p.brandID, p.categoryID, p.markup_percentage,
-    MIN(pv.price + (pv.price * p.markup_percentage / 100)) AS calculated_price
-";
-
-// Count total items
-$total_query = "
-    SELECT COUNT(DISTINCT p.ID)
-    FROM product p
-    LEFT JOIN productvariant pv ON p.ID = pv.productID
-    $where_clause
-";
-$stmt = $conn->prepare($total_query);
-$stmt->execute($params);
-$total_items = $stmt->fetchColumn();
-$total_pages = ceil($total_items / $items_per_page);
-
-// Fetch products
-$query = "
-    SELECT $select_clause
-    FROM product p
-    LEFT JOIN productvariant pv ON p.ID = pv.productID
-    $where_clause
-    GROUP BY p.ID, p.name, p.image, p.rating, p.status, p.brandID, p.categoryID, p.markup_percentage
-    $order_by
-    LIMIT :offset, :items_per_page
-";
-$stmt = $conn->prepare($query);
-foreach ($params as $key => $value) {
-    $stmt->bindValue($key, $value);
-}
-$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-$stmt->bindValue(':items_per_page', $items_per_page, PDO::PARAM_INT);
-$stmt->execute();
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-?>
-
 <div class="search-results">
     <div class="result-header">
-        <h2>Search Results</h2>
+        <h2>Kết quả tìm kiếm</h2>
     </div>
 
-    <!-- Filters Form -->
+    <!-- Form bộ lọc -->
     <div class="advanced-search">
         <form method="GET" action="">
             <div class="filter-row">
                 <select name="sort">
-                    <option value="">Sort</option>
-                    <option value="price_asc" <?= isset($_GET['sort']) && $_GET['sort'] === 'price_asc' ? 'selected' : '' ?>>Price: Low to High</option>
-                    <option value="price_desc" <?= isset($_GET['sort']) && $_GET['sort'] === 'price_desc' ? 'selected' : '' ?>>Price: High to Low</option>
+                    <option value="">Sắp xếp</option>
+                    <option value="price_asc" <?= isset($_GET['sort']) && $_GET['sort'] === 'price_asc' ? 'selected' : '' ?>>Giá: Thấp đến cao</option>
+                    <option value="price_desc" <?= isset($_GET['sort']) && $_GET['sort'] === 'price_desc' ? 'selected' : '' ?>>Giá: Cao đến thấp</option>
+                    <option value="rating_asc" <?= isset($_GET['sort']) && $_GET['sort'] === 'rating_asc' ? 'selected' : '' ?>>Đánh giá: Thấp đến cao</option>
+                    <option value="rating_desc" <?= isset($_GET['sort']) && $_GET['sort'] === 'rating_desc' ? 'selected' : '' ?>>Đánh giá: Cao đến thấp</option>
                 </select>
                 <select name="status">
-                    <option value="">All Status</option>
-                    <option value="in_stock" <?= isset($_GET['status']) && $_GET['status'] === 'in_stock' ? 'selected' : '' ?>>In Stock</option>
-                    <option value="out_of_stock" <?= isset($_GET['status']) && $_GET['status'] === 'out_of_stock' ? 'selected' : '' ?>>Out of Stock</option>
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="in_stock" <?= isset($_GET['status']) && $_GET['status'] === 'in_stock' ? 'selected' : '' ?>>Còn hàng</option>
+                    <option value="out_of_stock" <?= isset($_GET['status']) && $_GET['status'] === 'out_of_stock' ? 'selected' : '' ?>>Hết hàng</option>
                 </select>
-                <select name="brand">
-                    <option value="">All Brands</option>
+                <select name="brand  brand">
+                    <option value="">Tất cả thương hiệu</option>
                     <?php
-                    $brand_stmt = $conn->query("SELECT * FROM brand ORDER BY name");
+                    $brand_stmt = $conn->query("SELECT ID, name FROM brand ORDER BY name");
                     while ($brand = $brand_stmt->fetch(PDO::FETCH_ASSOC)) {
                         $selected = isset($_GET['brand']) && $_GET['brand'] == $brand['ID'] ? 'selected' : '';
                         echo "<option value='{$brand['ID']}' $selected>" . htmlspecialchars($brand['name']) . "</option>";
@@ -258,9 +299,9 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     ?>
                 </select>
                 <select name="category">
-                    <option value="">All Categories</option>
+                    <option value="">Tất cả danh mục</option>
                     <?php
-                    $category_stmt = $conn->query("SELECT * FROM category ORDER BY name");
+                    $category_stmt = $conn->query("SELECT ID, name FROM category ORDER BY name");
                     while ($category = $category_stmt->fetch(PDO::FETCH_ASSOC)) {
                         $selected = isset($_GET['category']) && $_GET['category'] == $category['ID'] ? 'selected' : '';
                         echo "<option value='{$category['ID']}' $selected>" . htmlspecialchars($category['name']) . "</option>";
@@ -268,13 +309,14 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     ?>
                 </select>
                 <select name="rating">
-                    <option value="">All Ratings</option>
+                    <option value="">Tất cả đánh giá</option>
                     <?php
                     $ratings = [
-                        '4-5' => '4-5 Stars',
-                        '3-4' => '3-4 Stars',
-                        '2-3' => '2-3 Stars',
-                        '1-2' => '1-2 Stars'
+                        '4-5' => '4-5 Sao',
+                        '3-4' => '3-4 Sao',
+                        '2-3' => '2-3 Sao',
+                        '1-2' => '1-2 Sao',
+                        '0-1' => '0-1 Sao'
                     ];
                     foreach ($ratings as $key => $label) {
                         $selected = isset($_GET['rating']) && $_GET['rating'] === $key ? 'selected' : '';
@@ -284,51 +326,58 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </select>
             </div>
             <div class="filter-row">
-                <input type="number" name="price_start" placeholder="Min Price" min="0" step="0.01" value="<?= isset($_GET['price_start']) ? htmlspecialchars($_GET['price_start']) : '' ?>">
+                <input type="number" name="price_start" placeholder="Giá tối thiểu" min="0" step="0.01" value="<?= isset($_GET['price_start']) ? htmlspecialchars($_GET['price_start']) : '' ?>">
                 <span>-</span>
-                <input type="number" name="price_end" placeholder="Max Price" min="0" step="0.01" value="<?= isset($_GET['price_end']) ? htmlspecialchars($_GET['price_end']) : '' ?>">
-                <input type="text" name="search" placeholder="Search products..." value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>">
-                <button type="submit" style="padding: 8px 15px; background-color: #333; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Apply Filters</button>
+                <input type="number" name="price_end" placeholder="Giá tối đa" min="0" step="0.01" value="<?= isset($_GET['price_end']) ? htmlspecialchars($_GET['price_end']) : '' ?>">
+                <input type="text" name="search" placeholder="Tìm kiếm sản phẩm..." value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>">
+                <button type="submit" style="padding: 8px 15px; background-color: #333; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Áp dụng bộ lọc</button>
             </div>
         </form>
-        <div class="found"><?= $total_items ?> style<?= $total_items !== 1 ? 's' : '' ?> found</div>
+        <div class="found"><?= $total_items ?> sản phẩm được tìm thấy</div>
     </div>
 
-    <!-- Product Grid -->
+    <!-- Lưới sản phẩm -->
     <div class="product-grid">
         <?php if (!empty($products)): ?>
             <?php foreach ($products as $product): ?>
                 <div class="product-card">
-                    <img src="<?= htmlspecialchars($product['image'] ?? 'default.jpg') ?>" alt="<?= htmlspecialchars($product['name'] ?? 'Product') ?>">
-                    <h3><?= htmlspecialchars($product['name'] ?? 'Unnamed Product') ?></h3>
+                    <img src="<?= htmlspecialchars($product['image'] ?? 'default.jpg') ?>" alt="<?= htmlspecialchars($product['name'] ?? 'Sản phẩm') ?>">
+                    <h3><?= htmlspecialchars($product['name'] ?? 'Sản phẩm không tên') ?></h3>
                     <div class="price">
                         $<?= number_format($product['calculated_price'] ?? 0, 2) ?>
                     </div>
                     <div class="stars">
                         <?php
-                        $rating = isset($product['rating']) ? (float)$product['rating'] : 0;
-                        $fullStars = floor($rating);
+                        $rating = (float)($product['rating'] ?? 0);
+                        $full_stars = floor($rating);
+                        $has_half_star = $rating - $full_stars >= 0.5;
                         for ($i = 1; $i <= 5; $i++) {
-                            echo $i <= $fullStars ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+                            if ($i <= $full_stars) {
+                                echo '<i class="fas fa-star"></i>';
+                            } elseif ($has_half_star && $i == $full_stars + 1) {
+                                echo '<i class="fas fa-star-half-alt"></i>';
+                            } else {
+                                echo '<i class="far fa-star"></i>';
+                            }
                         }
                         ?>
                     </div>
                     <div class="status">
-                        <?= isset($product['status']) && $product['status'] === 'in_stock' ? 'In Stock' : 'Out of Stock' ?>
+                        <?= $product['status'] === 'in_stock' ? 'Còn hàng' : 'Hết hàng' ?>
                     </div>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <p style="grid-column: 1 / -1; text-align: center; color: #666;">No products found matching your criteria.</p>
+            <p style="grid-column: 1 / -1; text-align: center; color: #666;">Không tìm thấy sản phẩm phù hợp với tiêu chí của bạn.</p>
         <?php endif; ?>
     </div>
 
-    <!-- Pagination -->
+    <!-- Phân trang -->
     <div class="pagination">
         <?php if ($total_pages > 1): ?>
             <?php
             $query_params = $_GET;
-            for ($i = 1; $i <= $total_pages; $i++):
+            for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++):
                 $query_params['page'] = $i;
                 $url = '?' . http_build_query($query_params);
             ?>
