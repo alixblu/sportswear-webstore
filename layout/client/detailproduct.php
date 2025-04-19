@@ -180,7 +180,73 @@
             .color-option.selected {
                border: 2px solid orange;
             }
+            #portal-root .overlay {
+               position: fixed;
+               top: 0;
+               left: 0;
+               right: 0;
+               bottom: 0;
+               background-color: rgba(0, 0, 0, 0.5);
+               display: flex;
+               justify-content: center;
+               align-items: center;
+               z-index: 1000;
+            }
 
+            .review-box {
+               background: white;
+               padding: 20px;
+               border-radius: 12px;
+               width: 450px;
+               max-width: 90%;
+               max-height: 80%;
+               overflow-y: auto;
+               box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+               animation: fadeIn 0.3s ease-in-out;
+            }
+
+            .review-box h2 {
+               margin-top: 0;
+               text-align: center;
+            }
+
+            .review-list {
+               list-style: none;
+               padding: 0;
+            }
+
+            .review-list li {
+               margin-bottom: 15px;
+               padding-bottom: 10px;
+               border-bottom: 1px solid #ddd;
+            }
+
+            .review-list strong {
+               display: block;
+               margin-bottom: 4px;
+               color: #333;
+            }
+
+            .review-list p {
+               margin: 0;
+               color: #555;
+            }
+
+            .close-review {
+               margin-top: 20px;
+               background-color: #f44336;
+               color: white;
+               border: none;
+               padding: 8px 16px;
+               border-radius: 6px;
+               cursor: pointer;
+               float: right;
+            }
+
+            @keyframes fadeIn {
+               from { opacity: 0; transform: scale(0.95); }
+               to { opacity: 1; transform: scale(1); }
+            }
         </style>
     </head>
 
@@ -520,19 +586,41 @@
                });
          });
       });
-
       const showBtn = document.querySelector(".reviews");
-      showBtn.addEventListener("click", function(e) {
-         const portalRoot = document.createElement('div');
-            portalRoot.id = 'portal-root';
 
-            portalRoot.innerHTML = `
-               <div>
-                 12333
+      showBtn.addEventListener("click", function (e) {
+         const portalRoot = document.createElement("div");
+         portalRoot.id = "portal-root";
+
+         portalRoot.innerHTML = `
+            <div class="overlay">
+               <div class="review-box">
+                  <h2>Đánh Giá Khách Hàng</h2>
+                  <ul class="review-list">
+                     <li>
+                        <strong>Nguyễn Văn A</strong>
+                        <p>Hàng tốt, giao nhanh. Sẽ ủng hộ lần sau!</p>
+                     </li>
+                     <li>
+                        <strong>Trần Thị B</strong>
+                        <p>Chất lượng ổn, đúng mô tả.</p>
+                     </li>
+                     <li>
+                        <strong>Lê Văn C</strong>
+                        <p>Đóng gói cẩn thận, nhân viên hỗ trợ nhiệt tình.</p>
+                     </li>
+                  </ul>
+                  <button class="close-review">Đóng</button>
                </div>
+            </div>
          `;
 
          document.body.appendChild(portalRoot);
+
+         portalRoot.querySelector(".close-review").addEventListener("click", () => {
+            portalRoot.remove();
+         });
       });
+
    </script>
 </html>
