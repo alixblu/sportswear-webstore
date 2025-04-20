@@ -30,11 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'defaultAccount') {
         $name = $_POST['name'] ?? '';
+        $birthday = $_POST['birthday'] ?? '';
         $email = $_POST['email'] ?? '';
         $phone = $_POST['phone'] ?? '';
         $gender = $_POST['gender'] ?? '';
         $roleID = $_POST['roleID'] ?? '';
-        $userController->defaultAccount($name, $email, $phone, $gender, $roleID);
+        $userController->defaultAccount($name, $email, $phone, $gender, $roleID,$birthday);
     } else if (isset($_GET['action']) && $_GET['action'] === 'uploadFile'){
         $file = $_FILES['excel_file']['tmp_name'];
         $userController->importExcel($file);
@@ -57,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     if (isset($putData['action']) && $putData['action'] === 'updateUsers') {
         $id = $putData['userId'] ?? null;
         $name = $putData['name'] ?? '';
+        $address = $putData['address'] ?? '';
         $email = $putData['email'] ?? '';
         $passWord = $putData['passWord'] ?? '';
         $phone = $putData['phone'] ?? '';
@@ -64,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $roleID = $putData['roleID'] ?? '';
 
         if ($id !== null) {
-            $userController->updateUsers($id, $name, $email, $passWord, $phone, $gender, $roleID);
+            $userController->updateUsers($id, $name, $address,$email, $passWord, $phone, $gender, $roleID);
         } else {
             echo "Thiếu userId.";
         }

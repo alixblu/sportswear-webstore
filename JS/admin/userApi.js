@@ -27,10 +27,11 @@ const getAllUsers = async () => {
     return await response.json();
 };
 
-const createDefaultAccount = async (name, email, phone, gender, roleID) => {
+const createDefaultAccount = async (name, birthday,email, phone, gender, roleID) => {
     const formData = new URLSearchParams();
     formData.append('action', 'defaultAccount');
     formData.append('name', name);
+    formData.append('birthday', birthday);
     formData.append('email', email);
     formData.append('phone', phone);
     formData.append('gender', gender);
@@ -63,11 +64,12 @@ const deleteUserApi = async (userId) => {
     return await response.json();
 };
 
-const updateUser = async (id, name, email, passWord, phone, gender, roleID) => {
+const updateUser = async (id, name,address, email, passWord, phone, gender, roleID) => {
     const formData = new URLSearchParams();
     formData.append('action', 'updateUsers');
     formData.append('userId', id);
     formData.append('name', name);
+    formData.append('address', address);
     formData.append('email', email);
     formData.append('passWord', passWord);
     formData.append('phone', phone);
@@ -109,8 +111,7 @@ const uploadFileUser = async (file) => {
             body: formData
         });
 
-        const result = await response.text();
-        alert("Kết quả: " + result);
+        return await response.json();
     } catch (err) {
         console.error("Lỗi:", err);
     }
