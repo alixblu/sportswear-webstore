@@ -179,7 +179,36 @@ class ProductController
             ApiResponse::customResponse($id, 500, $e->getMessage());
         }
     }
+    public function getBrandByName($name)
+    {
+        try {
+            if (!isset($name)) {
+                return ApiResponse::customResponse($name, 400, 'Invalid brand name');
+            }
 
+            $brand = $this->productService->getBrandByName($name);
+
+            return ApiResponse::customResponse($brand, 200, 'Brand fetched successfully');
+        } catch (Exception $e) {
+            error_log("Error in getBrandByName controller: " . $e->getMessage());
+            return ApiResponse::customResponse($name, 500, 'Failed to fetch brand: ' . $e->getMessage());
+        }
+    }
+    public function getCategoryByName($name)
+    {
+        try {
+            if (!isset($name)) {
+                return ApiResponse::customResponse($name, 400, 'Invalid category name');
+            }
+
+            $category = $this->productService->getCategoryByName($name);
+
+            return ApiResponse::customResponse($category, 200, 'Category fetched successfully');
+        } catch (Exception $e) {
+            error_log("Error in getCategoryByName controller: " . $e->getMessage());
+            return ApiResponse::customResponse($name, 500, 'Failed to fetch category: ' . $e->getMessage());
+        }
+    }
     /**
      * Handle GET request to get a brand by ID
      * @param int $id Brand ID

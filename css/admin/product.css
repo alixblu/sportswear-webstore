@@ -287,15 +287,15 @@
 }
 
 .product-image-large {
-    width: 160px;
-    height: 160px;
-    background: white;
-    border-radius: var(--radius);
+    width: 220px;   /* or your preferred width */
+    height: 220px;  /* or your preferred height */
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    background: #f8f8f8;
+    border-radius: 8px;
+    border: 1px solid #eee;
 }
 
 .product-image-large i {
@@ -308,7 +308,7 @@
     flex-direction: column;
     gap: 12px;
     width: 100%;
-    margin-bottom: auto;
+    margin-top: 15px;
 }
 
 .product-actions .btn {
@@ -642,4 +642,36 @@
     margin-right: 6px;
     font-size: 13px;
 } 
- 
+.edit-form {
+    display: none;
+    background: #fff;
+    padding: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px; /* Space between columns */
+}
+
+.form-row .form-group {
+    flex: 1; /* Adjust the columns to take equal width */
+}
+
+.edit-form input,
+.edit-form select,
+.edit-form textarea {
+    width: 100%; /* Ensure inputs within the columns expand */
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.edit-form textarea {
+    min-height: 150px; /* Increase the height */
+    resize: vertical; /* Allow manual resizing vertically if needed */
+}
+.product-image-large img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* or 'cover' if you want to crop */
+    display: block;
+}
