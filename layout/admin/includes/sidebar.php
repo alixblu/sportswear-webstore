@@ -5,49 +5,53 @@
       </div> -->
       <div class="nav-menu">
           <div class="menu-heading">Main</div>
-          <div class="nav-item active">
+          <div class="nav-item active" onclick="window.location.href='index.php?page=dashboard'">
               <i class="fas fa-chart-pie"></i>
-              <span class="link" onclick="window.location.href='index.php?page=dashboard'">Dashboard</span>
+              <span class="link" >Dashboard</span>
           </div>
-          <div class="nav-item">
+          <div class="nav-item" onclick="window.location.href='index.php?page=user'">
               <i class="fas fa-users"></i>
-              <span class="link" onclick="window.location.href='index.php?page=user'">Nhân viên</span></a>
+              <span class="link">Nhân viên</span>
           </div>
-          <div class="nav-item">
+          <div class="nav-item" onclick="window.location.href='index.php?page=product'">
               <i class="fas fa-box"></i>
-              <span class="link" onclick="window.location.href='index.php?page=product'">Sản phẩm</span></a>
+              <span class="link">Sản phẩm</span>
           </div>
-          <div class="nav-item">
-              <i class="fas fa-shopping-cart"></i>
-              <span class="link" onclick="window.location.href='index.php?page=dathang'">Đặt hàng</span></a>
+          <div class="nav-item" onclick="window.location.href='index.php?page=coupon'">
+              <i class="fas fa-ticket"></i>
+              <span class="link">Mã Giảm</span>
           </div>
-          <div class="nav-item">
+          <div class="nav-item" onclick="window.location.href='index.php?page=dathang'">
               <i class="fas fa-shopping-cart"></i>
-              <span class="link" onclick="window.location.href='index.php?page=account'">Tài khoản</span></a>
+              <span class="link">Đặt hàng</span>
+          </div>
+          <div class="nav-item" onclick="window.location.href='index.php?page=account'">
+              <i class="fas fa-shopping-cart"></i>
+              <span class="link">Tài khoản</span>
           </div>
 
           <div class="menu-heading">Reports</div>
-          <div class="nav-item">
+          <div class="nav-item" onclick="window.location.href='index.php?page='">
               <i class="fas fa-chart-line"></i>
-              <span class="link" onclick="window.location.href='index.php?page='">Analytics</span></a>
+              <span class="link">Analytics</span>
           </div>
-          <div class="nav-item">
+          <div class="nav-item" onclick="window.location.href='index.php?page='">
               <i class="fas fa-coins"></i>
-              <span class="link" onclick="window.location.href='index.php?page='">Sales</span></a>
+              <span class="link">Sales</span>
           </div>
 
           <div class="menu-heading">Admin</div>
-          <div class="nav-item">
+          <div class="nav-item" onclick="window.location.href='index.php?page='">
               <i class="fas fa-cog"></i>
-              <span class="link" onclick="window.location.href='index.php?page='">Settings</span></a>
+              <span class="link">Settings</span>
           </div>
-          <div class="nav-item">
+          <div class="nav-item" onclick="window.location.href='index.php?page='">
               <i class="fas fa-bell"></i>
-              <span class="link" onclick="window.location.href='index.php?page='">Notifications</span></a>
+              <span class="link">Notifications</span>
           </div>
-          <div class="nav-item">
+          <div class="nav-item" onclick="window.location.href='index.php?page='">
               <i class="fas fa-shield-alt"></i>
-              <span class="link" onclick="window.location.href='index.php?page='">Security</span></a>
+              <span class="link">Security</span>
           </div>
       </div>
   </div>

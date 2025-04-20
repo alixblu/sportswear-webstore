@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+      <!--=============== REMIXICONS ===============-->
+      <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+
+
+  <title>Dashboard</title>
+    <style>
+
+        .search-box input {
+        flex: 1;
+        border: none;          /* Remove all borders */
+        background-color: transparent; /* Make the background transparent */
+        outline: none;         /* Remove outline when focused */
+        color:#2d3748
+        }
+        .search-box {
+        display: flex;
+        align-items: center;
+        justify-content:space-around;
+        column-gap: .3rem;
+        border: 1px solid #ccc;
+        border-radius: 100px;
+        height: 1.8rem;
+        padding-left: 7px;
+        max-width: 500px;
+        width: 70%;
+        padding: 20px;
+        }
+        .search-box:focus-within {
+        box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+        border-color: rgba(67, 97, 238, 0.3);
+    }
+
+
+
+    .formUserCss{
+        background-color:white;
+        max-width: 500px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .birthdayGenderCss{
+        display: flex;
+        gap: 100px;
+    }
+    .wrapperCss{
+        padding: 0 30px;
+        padding-bottom: 30px;
+        display: flex;
+        flex-direction: column;
+        gap:10px
+    }
+    .genderCss{
+        display: flex;
+        margin: 10px 0px;
+        gap:5px
+    }
+    .inputUserCss{
+        border: none;
+        outline: none;
+        color: #2d3748;
+        font-size: 17px;
+    }
+    .wrapperInputCss{
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.1);
+        transition: border-bottom 0.3s ease;
+        border-bottom: 1px solid silver;
+        padding: 5px 3px;
+    }
+    .wrapperInputCss:focus-within {
+        border-bottom: 1px solid #00e5ff;
+    }
+    .wrapperBirthday{
+        margin: 10px 0px;
+    }
+    .selectUser {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d1d1;
+        border-radius: 6px;
+        outline: none;
+    }
+    .buttonUserCss {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+    .buttonUserCss:hover {
+        background: linear-gradient(135deg, var(--secondary), var(--primary));
+        box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+    }
+    .wrapperButton{
+        display: flex;
+        gap: 10px
+    }
+    .CloseCss{
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px;
+    }
+    #portal-root {
+        position: fixed;
+        top: 0;
+        left: 130px;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999; 
+    }
+    .infoCss{
+        margin-bottom: 15px;
+        font-weight: bold; 
+    }
+    .status.active {
+        background-color: rgba(76, 201, 240, 0.15);
+        color: #0891b2;
+        border: 1px solid rgba(76, 201, 240, 0.3);
+    }
+    .deleteUserCss{
+        display: flex;
+        justify-content: center;
+        gap:30px;
+        margin: 10px;
+    }
+    .titleDeleteUserCss{
+        margin: 10px;
+        font-size: 17px
+    }
+    #cancelDelete{
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, var(--secondary), var(--primary));
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+    #confirmDelete{
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, var(--secondary), var(--primary));
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+    .wrapperFilterCss{
+        background-color:white;
+        max-width: 500px;
+        border-radius: 10px;
+        font-family: 'Poppins', sans-serif;
+        padding-left: 10px;
+        padding-bottom: 10px;
+        padding-right: 10px;
+    }
+    #toast-portal {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 9999;
+    }
+
+    .toast {
+        min-width: 250px;
+        padding: 12px 18px;
+        color: #fff;
+        border-radius: 8px;
+        font-size: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInOut 3s ease forwards;
+    }
+
+    .toast.success {
+        background-color: #4caf50;
+    }
+
+    .toast.error {
+        background-color: #f44336;
+    }
+
+    @keyframes fadeInOut {
+        0%   { opacity: 0; transform: translateY(20px); }
+        10%  { opacity: 1; transform: translateY(0); }
+        90%  { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(20px); }
+    }
+
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div id="pageTitle" class="page-title">
+            <div class="title">User</div>
+            <div class="action-buttons">
+                <button id="addBtn" class="btn btn-primary" onclick="showFormAdd()">
+                    <i class="fas fa-plus"></i> Add New
+                </button>
+            </div>
+        </div>
+        <div class="stats-cards">
+            <div class="table-card">
+                <div class="card-title">
+                    <h3><i class="fa-solid fa-user"></i>Mã Giảm</h3>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                        <th>STT</th>
+                        <th>Tên Mã</th>
+                        <th>Phần Trăm Giảm</th>
+                        <th>Hiệu Lực</th>
+                        <th>Trạng Thái</th>
+                        <th>Chức Năng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Giảm 5% cho khách hàng mới</td>
+                            <td>5%</td>
+                            <td>12</td>
+                            <td><span class="status active"><i class="fas fa-check-circle"></i>Hoạt Động</span></td>
+                            <td >
+                                <button class="btn btn-outline btn-sm" onclick="infoAccount()">
+                                <i class="fas fa-eye"></i> Xem
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="showFormEditUser(this)">
+                                <i class="fa-solid fa-pen"></i> Sửa
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="deleteUser()">
+                                <i class="fa-solid fa-user-xmark"></i> Xóa
+                                </button>
+                            </td>
+                            </td>
+                            </td>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+   
+</script>
+</html>
+

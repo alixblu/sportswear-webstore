@@ -119,7 +119,6 @@
         display: flex;
         justify-content: flex-end;
         padding: 10px;
-        cursor:pointer;
     }
     #portal-root {
         position: fixed;
@@ -346,7 +345,7 @@
             portalRoot.id = 'portal-root';
             portalRoot.innerHTML=`
                 <div class="formUserCss">
-                    <div class="CloseCss" ><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
+                    <div class="CloseCss" ><i class="fa-solid fa-xmark" onclick="closeFormAddUser()" style="cursor: pointer;"></i></div>
                     <div class="wrapperCss">
                         <label for="name">Họ và tên</label>
                         <div class="wrapperInputCss">
@@ -489,7 +488,7 @@
 
             portalRoot.innerHTML = `
                 <div class="formUserCss">
-                    <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
+                    <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()" style="cursor: pointer;"></i></div>
                     <div class="wrapperCss">
                         <label for="name">Họ và tên</label>
                         <div class="wrapperInputCss">
