@@ -217,7 +217,7 @@
 <body>
     <div class="main-content">
         <div id="pageTitle" class="page-title">
-            <div class="title">User</div>
+            <div class="title">Coupon </div>
             <div class="action-buttons">
                 <button id="addBtn" class="btn btn-primary" onclick="showFormAdd()">
                     <i class="fas fa-plus"></i> Add New
