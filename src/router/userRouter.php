@@ -58,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     if (isset($putData['action']) && $putData['action'] === 'updateUsers') {
         $id = $putData['userId'] ?? null;
         $name = $putData['name'] ?? '';
+        $address = $putData['address'] ?? '';
         $email = $putData['email'] ?? '';
         $passWord = $putData['passWord'] ?? '';
         $phone = $putData['phone'] ?? '';
@@ -65,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $roleID = $putData['roleID'] ?? '';
 
         if ($id !== null) {
-            $userController->updateUsers($id, $name, $email, $passWord, $phone, $gender, $roleID);
+            $userController->updateUsers($id, $name, $address,$email, $passWord, $phone, $gender, $roleID);
         } else {
             echo "Thiếu userId.";
         }

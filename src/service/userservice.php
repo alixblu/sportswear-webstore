@@ -42,11 +42,11 @@
             }
         }
 
-        public function updateUser($id, $name,  $phone, $gender, $roleID) {
+        public function updateUser($id, $name, $address, $phone, $gender, $roleID) {
             try {
-                $user = $this->userRepository->userUpdate($id, $name,  $phone, $gender, $roleID);
+                $user = $this->userRepository->userUpdate($id, $name, $address, $phone, $gender, $roleID);
                 if (!$user) {
-                    throw new Exception("Failed to create user", 500);
+                    throw new Exception("Failed to update user", 500);
                 }
                 return $user;
             } catch (Exception $e) {
@@ -151,7 +151,7 @@
                 $this->userRepository->bulkInsertWithNPlus1($dataToInsert);
         
             } catch (Exception $e) {
-                throw new Exception("Lỗi import Excel: " . $e->getMessage(), $e->getCode() ?: 400);
+                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
             }
         }
         public function exportExcel()

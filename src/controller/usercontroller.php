@@ -26,8 +26,8 @@
             ApiResponse::customApiResponse($users,200);
         }
 
-        public function updateUsers($id, $name, $phone, $gender, $roleID){
-            $users = $this->userService->updateUser($id, $name, $phone, $gender, $roleID);
+        public function updateUsers($id, $name,$address, $phone, $gender, $roleID){
+            $users = $this->userService->updateUser($id, $name,$address, $phone, $gender, $roleID);
             ApiResponse::customApiResponse($users,200);
         }
 

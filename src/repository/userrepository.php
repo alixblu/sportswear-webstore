@@ -298,7 +298,7 @@
         }
 
 
-        public function userUpdate($id, $name, $phone, $gender, $roleID) {
+        public function userUpdate($id, $name,$address, $phone, $gender, $roleID) {
             $conn = null;
             $stmt = null;
             try {
@@ -306,15 +306,19 @@
             $conn = $mysql->connectDatabase();
             
                 $sql = "UPDATE user 
-                        SET fullname = ?, phone = ?, gender = ?, roleID = ?
+                        SET fullname = ?, address = ? ,phone = ?, gender = ?, roleID = ?
                         WHERE id = ?";
             
             $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssssi", $name,  $phone, $gender, $roleID, $id);
+                $stmt->bind_param("sssssi", $name, $address, $phone, $gender, $roleID, $id);
         
             $stmt->execute();
         
             $user = null;
+            if ($stmt->affected_rows === 0) {
+                throw new Exception("No changes detected, user not updated.", 500);
+            }
+
             if ($stmt->affected_rows > 0) {
                 $user = [
                     'id' => $id,
