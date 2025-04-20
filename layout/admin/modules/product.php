@@ -77,14 +77,16 @@
             </div>
             <div class="modal-body">
                 <div class="product-image-section">
-                    <div class="product-image-large">
-                        <i class="fas fa-tshirt"></i>
-                    </div>
+                <div class="product-image-large">
+                    <img id="modal-product-image" src="" alt="Product Image" />
+                </div>
                     <div class="product-actions">
                         <button class="btn btn-primary" onclick="showEditForm()">
                             <i class="fas fa-edit"></i> Edit Product
                         </button>
-                        <button class="btn btn-outline">
+            
+                        <input type="file" id="changeImageInput" accept="image/*" style="display:none;">
+                        <button class="btn btn-outline" onclick="triggerImageUpload()">
                             <i class="fas fa-image"></i> Change Image
                         </button>
                         </div>
@@ -180,7 +182,7 @@
                                     <th>Color</th>
                                     <th>Size</th>
                                     <th>Quantity</th>
-                                    <th>Price</th>
+                                    <th>Base Price</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -192,52 +194,57 @@
                 </div>
 
                 <!-- Edit Form Section (hidden by default) -->
-<div id="edit-form-section" class="edit-form">
-    <form id="productEditForm">
-        <div class="form-group">
-            <label for="editName">Name</label>
-            <input type="text" id="editName" name="name">
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label for="editCategory">Category</label>
-                <select id="editCategory" name="category">
-                    <!-- Categories populated dynamically -->
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="editBrand">Brand</label>
-                <select id="editBrand" name="brand">
-                    <!-- Brands populated dynamically -->
-                </select>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label for="editMarkup">Markup Percentage</label>
-                <input type="number" id="editMarkup" name="markup" min="0" step="0.1">
-            </div>
-            <div class="form-group">
-                <label for="editDiscount">Discount ID</label>
-                <input type="text" id="editDiscount" name="discount">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="editDescription">Description</label>
-            <textarea id="editDescription" name="description"></textarea>
-        </div>
-        <div class="form-actions">
-            <button type="button" class="btn btn-outline" onclick="cancelEdit()">Cancel</button>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-        </div>
-    </form>
-</div>
+                <div id="edit-form-section" class="edit-form">
+                    <form id="productEditForm">
+                        <div class="form-group">
+                            <label for="editName">Name</label>
+                            <input type="text" id="editName" name="name">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editCategory">Category</label>
+                                <select id="editCategory" name="category">
+                                    <!-- Categories populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editBrand">Brand</label>
+                                <select id="editBrand" name="brand">
+                                    <!-- Brands populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editMarkup">Markup Percentage</label>
+                                <input type="number" id="editMarkup" name="markup" min="0" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="editDiscount">Discount ID</label>
+                                <input type="text" id="editDiscount" name="discount">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editDescription">Description</label>
+                            <textarea id="editDescription" name="description"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" onclick="cancelEdit()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
 
             </div>
         </div>
     </div>
 
     <script>
+        function triggerImageUpload() {
+    document.getElementById('changeImageInput').click();
+}
+
+
         // Function to render stars based on rating
         function renderStars(rating) {
             if (!rating) return '<div class="stars"><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div>';
@@ -332,12 +339,11 @@
         // Load products when the page loads
         document.addEventListener('DOMContentLoaded', loadProducts);
 
-        let currentProductId = null;
+        var product = null; 
         // Modal functions
         async function viewProduct(id) {
             const modal = document.getElementById('productModal');
             modal.style.display = 'block';
-            currentProductId = id; // Store the current product ID
             try {
                 // Get product details
                 let response = await getProductById(id);
@@ -348,7 +354,19 @@
                     throw new Error('No product data received');
                 }
 
-                const product = response.data;
+
+                product = response.data;
+                const imgElement = document.getElementById('modal-product-image');
+
+                // Set the image source and handle errors using the 'error' event listener
+                imgElement.onerror = function() {
+                    this.src = '../../img/products/default.png';
+                };
+
+                // Assign the image source
+                imgElement.src = `../../img/products/product_${product.ID}.png`;
+
+
                 const modalElements = {
                     id: document.getElementById('modal-product-id'),
                     name: document.getElementById('modal-product-name'),
@@ -425,16 +443,16 @@
 
         // Show edit form
         async function showEditForm() {
-            if (!currentProductId) return;
-            
+            if (!product) return;
+            console.log('Product Data:', product.ID);
+
             // Hide product info and show edit form
             document.getElementById('product-info-section').style.display = 'none';
             document.getElementById('edit-form-section').style.display = 'block';
             
             try {
                 // Get product details
-                const response = await getProductById(currentProductId);
-                const product = response.data;
+
                 
                 // Populate form fields
                 document.getElementById('editName').value = product.name || '';
@@ -481,24 +499,31 @@
         // Form submission
         document.getElementById('productEditForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             try {
-                const formData = {
-                    id: currentProductId,
-                    name: document.getElementById('editName').value,
-                    categoryID: document.getElementById('editCategory').value,
-                    brandID: document.getElementById('editBrand').value,
-                    markup_percentage: document.getElementById('editMarkup').value,
-                    discountID: document.getElementById('editDiscount').value,
-                    description: document.getElementById('editDescription').value
-                };
+
+            const formData = {
+                id: product.ID,
+                name: document.getElementById('editName').value,
+                categoryID: document.getElementById('editCategory').value,
+                brandID: document.getElementById('editBrand').value,
+                markup_percentage: document.getElementById('editMarkup').value,
+                discountID: document.getElementById('editDiscount').value,
+                description: document.getElementById('editDescription').value,
+                rating: product.rating,
+                image: product.image,
+                stock: product.stock,
+                status: product.status
+            };
+
+            // Call updateProduct with the formData object
+            const response = await updateProduct(formData);
                 
-                const response = await updateProduct(formData);
-                
-                if (response.success) {
+                if (response.status === 200) {
                     alert('Product updated successfully!');
-                    viewProduct(currentProductId); // Refresh view
+                    viewProduct(product.ID); // Refresh view
                     loadProducts(); // Refresh grid
+                    cancelEdit(); // Close edit form
                 } else {
                     throw new Error(response.message || 'Failed to update product');
                 }
@@ -509,6 +534,7 @@
         });
 
         function closeModal() {
+            cancelEdit();
             const modal = document.getElementById('productModal');
             modal.style.display = 'none';
         }
@@ -517,7 +543,6 @@
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
-
 
             // Remove active class from all tabs
             document.querySelectorAll('.tab').forEach(tab => {

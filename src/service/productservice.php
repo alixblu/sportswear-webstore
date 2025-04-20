@@ -198,7 +198,19 @@ class ProductService
             throw new Exception("Failed to get brand: " . $e->getMessage());
         }
     }
+    public function getBrandByName($name)
+    {
+        try {
+            if (empty($name)) {
+                throw new Exception("Invalid brand name");
+            }
 
+            return $this->productRepository->getBrandByName($name);
+        } catch (Exception $e) {
+            error_log("Error in getBrandByName service: " . $e->getMessage());
+            throw new Exception("Failed to get brand: " . $e->getMessage());
+        }
+    }
     /**
      * Get all categories
      * @return array List of categories
@@ -212,7 +224,19 @@ class ProductService
             throw new Exception("Failed to get categories: " . $e->getMessage());
         }
     }
+    public function getCategoryByName($name)
+    {
+        try {
+            if (empty($name)) {
+                throw new Exception("Invalid category name");
+            }
 
+            return $this->productRepository->getCategoryByName($name);
+        } catch (Exception $e) {
+            error_log("Error in getCategoryByName service: " . $e->getMessage());
+            throw new Exception("Failed to get category: " . $e->getMessage());
+        }
+    }
     /**
      * Get all brands
      * @return array List of brands
