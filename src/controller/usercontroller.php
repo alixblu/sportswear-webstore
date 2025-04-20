@@ -11,8 +11,8 @@
             $this->userService = new UserService();
         }
 
-        public function defaultAccount($name, $email, $phone, $gender, $roleID){
-            $user = $this->userService->defaultAccount($name, $email, $phone, $gender, $roleID);
+        public function defaultAccount($name, $email, $phone, $gender, $roleID,$birthday){
+            $user = $this->userService->defaultAccount($name, $email, $phone, $gender, $roleID,$birthday);
             ApiResponse::customApiResponse($user,200);
         }
         

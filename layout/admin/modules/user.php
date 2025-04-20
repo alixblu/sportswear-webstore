@@ -218,7 +218,7 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                        <th>User ID</th>
+                        <th>STT</th>
                         <th>Họ Và Tên</th>
                         <th>Ngày Sinh</th>
                         <th>Email</th>
@@ -266,18 +266,19 @@
         function showAllUsers() {
             getAllUsers()
             .then(result => {
+                let stt =1;
                 const users = result.data;
                 const tbody = document.querySelector(".data-table tbody");
                 tbody.innerHTML = ""; 
                 users.forEach(user => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-                        <td>${user.id}</td>
+                        <td>${stt}</td>
                         <td>${user.fullname}</td>
-                        <td>${user.dateOfBirth}</td>
-                        <td>${user.email}</td>
+                        <td>${user.dateOfBirth == undefined ? '':user.dateOfBirth}</td>
+                        <td>${user.email == undefined ? '':user.email}</td>
                         <td>${user.phone}</td>
-                        <td>${user.address}</td>
+                        <td>${user.address  == undefined ? '':user.address}</td>
                         <td>${user.gender == 0 ? 'Nam' : 'Nữ'}</td>
                         <td>${user.roleName}</td>
                         <td>${user.createdAt}</td>
@@ -295,6 +296,7 @@
                     `;
 
                     tbody.appendChild(tr);
+                    stt=stt+1
                 });
             })
             .catch(error => {
@@ -413,7 +415,7 @@
                 return;
             }
             try {
-                createDefaultAccount(name, email,phone, genderValue, role);
+                createDefaultAccount(name,birthday, email,phone, genderValue, role);
                 alert('Thêm Thành Công.');
                 closeFormAddUser();
                 showAllUsers();

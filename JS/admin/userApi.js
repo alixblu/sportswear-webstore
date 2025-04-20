@@ -27,10 +27,11 @@ const getAllUsers = async () => {
     return await response.json();
 };
 
-const createDefaultAccount = async (name, email, phone, gender, roleID) => {
+const createDefaultAccount = async (name, birthday,email, phone, gender, roleID) => {
     const formData = new URLSearchParams();
     formData.append('action', 'defaultAccount');
     formData.append('name', name);
+    formData.append('birthday', birthday);
     formData.append('email', email);
     formData.append('phone', phone);
     formData.append('gender', gender);
