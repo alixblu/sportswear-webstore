@@ -1,4 +1,5 @@
 const API_URL = 'http://localhost/sportwear/src/router/productrouter.php';
+
 const getAllProducts = async () => {
     try {
         const response = await fetch(`${API_URL}?action=getAllProducts`, {
@@ -222,41 +223,47 @@ const populateBrandFilter = async () => {
     }
 };
 
-// Initialize filters when page loads
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        
-        // Populate category filter
-        await populateCategoryFilter();
-        
-        // Populate brand filter
-        await populateBrandFilter();
-        
-        // Set status filter options
-        const statusSelect = document.getElementById('status');
-        
-        // Keep the first "All Status" option
-        while (statusSelect.options.length > 1) {
-            statusSelect.remove(1);
-        }
-        
-        const statusOptions = [
-            { value: 'in_stock', text: 'In Stock' },
-            { value: 'out_of_stock', text: 'Out of Stock' },
-            { value: 'discontinued', text: 'Discontinued' }
-        ];
-        
-        statusOptions.forEach(status => {
-            const option = document.createElement('option');
-            option.value = status.value;
-            option.textContent = status.text;
-            statusSelect.appendChild(option);
-        });
 
-        // Load products after filters are set
-        loadProducts();
-    } catch (error) {
-        console.error('Error initializing filters:', error);
-    }
-});
+// // Initialize filters when page loads
+// document.addEventListener('DOMContentLoaded', async () => {
+//     try {
+//         console.log('Initializing filters...');
+        
+//         // Populate category filter
+//         await populateCategoryFilter();
+        
+//         // Populate brand filter
+//         await populateBrandFilter();
+        
+
+//         // Set status filter options
+//         const statusSelect = document.getElementById('status');
+//         console.log('Status select element:', statusSelect);
+        
+//         // Keep the first "All Status" option
+//         while (statusSelect.options.length > 1) {
+//             statusSelect.remove(1);
+//         }
+        
+//         const statusOptions = [
+//             { value: 'in_stock', text: 'In Stock' },
+//             { value: 'out_of_stock', text: 'Out of Stock' },
+//             { value: 'discontinued', text: 'Discontinued' }
+//         ];
+        
+
+//         statusOptions.forEach(status => {
+//             console.log('Adding status:', status);
+//             const option = document.createElement('option');
+//             option.value = status.value;
+//             option.textContent = status.text;
+//             statusSelect.appendChild(option);
+//         });
+
+//         // Load products after filters are set
+//         loadProducts();
+//     } catch (error) {
+//         console.error('Error initializing filters:', error);
+//     }
+// });
 

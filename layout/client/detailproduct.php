@@ -73,6 +73,7 @@
 
             .reviews {
                color: gray;
+               cursor: pointer;
             }
 
             .in-stock {
@@ -152,6 +153,12 @@
                width: 40px;
                text-align: center;
                font-size: 16px;
+
+            }
+            .qty-input::-webkit-outer-spin-button,
+            .qty-input::-webkit-inner-spin-button {
+               -webkit-appearance: none;
+               margin: 0;
             }
 
             .add-to-cart {
@@ -173,7 +180,73 @@
             .color-option.selected {
                border: 2px solid orange;
             }
+            #portal-root .overlay {
+               position: fixed;
+               top: 0;
+               left: 0;
+               right: 0;
+               bottom: 0;
+               background-color: rgba(0, 0, 0, 0.5);
+               display: flex;
+               justify-content: center;
+               align-items: center;
+               z-index: 1000;
+            }
 
+            .review-box {
+               background: white;
+               padding: 20px;
+               border-radius: 12px;
+               width: 450px;
+               max-width: 90%;
+               max-height: 80%;
+               overflow-y: auto;
+               box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+               animation: fadeIn 0.3s ease-in-out;
+            }
+
+            .review-box h2 {
+               margin-top: 0;
+               text-align: center;
+            }
+
+            .review-list {
+               list-style: none;
+               padding: 0;
+            }
+
+            .review-list li {
+               margin-bottom: 15px;
+               padding-bottom: 10px;
+               border-bottom: 1px solid #ddd;
+            }
+
+            .review-list strong {
+               display: block;
+               margin-bottom: 4px;
+               color: #333;
+            }
+
+            .review-list p {
+               margin: 0;
+               color: #555;
+            }
+
+            .close-review {
+               margin-top: 20px;
+               background-color: #f44336;
+               color: white;
+               border: none;
+               padding: 8px 16px;
+               border-radius: 6px;
+               cursor: pointer;
+               float: right;
+            }
+
+            @keyframes fadeIn {
+               from { opacity: 0; transform: scale(0.95); }
+               to { opacity: 1; transform: scale(1); }
+            }
         </style>
     </head>
 
@@ -317,7 +390,7 @@
 
                <div class="rating-stock">
                   <span class="stars">★★★★☆</span>
-                  <span class="reviews">(150 Reviews)</span> |
+                  <span class="reviews">(Reviews)</span> |
                   <span class="in-stock">In Stock</span>
                </div>
 
@@ -350,68 +423,190 @@
 
                <div class="section quantity-cart">
                   <button class="qty-btn">−</button>
-                  <input type="number" value="2" class="qty-input" />
+                  <input type="number" value="1" class="qty-input" />
                   <button class="qty-btn">+</button>
                   <button class="add-to-cart">Add To Cart</button>
                </div>
-
                <div class="delivery-box">
-                  <strong>🚚 Free Delivery</strong><br>
-                  <small><a href="#">Enter your postal code for Delivery Availability</a></small>
+                  <strong>🚚 Giao hàng miễn phí</strong><br>
+                  <small>Nhập mã bưu chính để kiểm tra khu vực giao hàng</small>
                </div>
 
                <div class="delivery-box">
-                  <strong>🔁 Return Delivery</strong><br>
-                  <small>Free 30 Days Delivery Returns. <a href="#">Details</a></small>
+                  <strong>🔁 Trả hàng miễn phí</strong><br>
+                  <small>Trả hàng miễn phí trong 30 ngày. </small>
                </div>
+
             </div>
 
         </main>
-    <!-- <footer class="footer">
-  	 <div class="footer-container">
-  	 	<div class="row">
-  	 		<div class="footer-col">
-  	 			<h4>company</h4>
-  	 			<ul>
-  	 				<li><a href="#">about us</a></li>
-  	 				<li><a href="#">our services</a></li>
-  	 				<li><a href="#">privacy policy</a></li>
-  	 				<li><a href="#">affiliate program</a></li>
-  	 			</ul>
-  	 		</div>
-  	 		<div class="footer-col">
-  	 			<h4>get help</h4>
-  	 			<ul>
-  	 				<li><a href="#">FAQ</a></li>
-  	 				<li><a href="#">shipping</a></li>
-  	 				<li><a href="#">returns</a></li>
-  	 				<li><a href="#">order status</a></li>
-  	 				<li><a href="#">payment options</a></li>
-  	 			</ul>
-  	 		</div>
-  	 		<div class="footer-col">
-  	 			<h4>online shop</h4>
-  	 			<ul>
-  	 				<li><a href="#">watch</a></li>
-  	 				<li><a href="#">bag</a></li>
-  	 				<li><a href="#">shoes</a></li>
-  	 				<li><a href="#">dress</a></li>
-  	 			</ul>
-  	 		</div>
-  	 		<div class="footer-col">
-  	 			<h4>follow us</h4>
-  	 			<div class="social-links">
-  	 				<a href="#"><i class="fab fa-facebook-f"></i></a>
-  	 				<a href="#"><i class="fab fa-twitter"></i></a>
-  	 				<a href="#"><i class="fab fa-instagram"></i></a>
-  	 				<a href="#"><i class="fab fa-linkedin-in"></i></a>
-  	 			</div>
-  	 		</div>
-  	 	</div>
-  	 </div>
-  </footer> -->
     </body>
+      <script src="../../JS/admin/product.js"></script>
+      <script src="../../JS/client/reviewApi.js"></script>
+
       <script>
+      let selectedColor = null;
+      let selectedSize = null;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      if (id) {
+         getProductById(id)
+            .then(res => {
+               const product = res.data;
+
+               document.querySelector(".product-title").innerText = product.name;
+
+               document.querySelector(".description").innerText = product.description;
+
+               document.querySelector(".price").innerText = `${product.markup_percentage}% markup`;
+
+               const stockStatus = document.querySelector(".in-stock");
+               if (product.status === "in_stock" && product.stock > 0) {
+                  stockStatus.innerText = "Còn hàng";
+                  stockStatus.classList.remove("out-of-stock");
+               } else {
+                  stockStatus.innerText = "Hết hàng";
+                  stockStatus.classList.add("out-of-stock");
+               }
+
+               const mainImg = document.querySelector(".mainImage img");
+               if (product.image && product.image !== "null") {
+                  mainImg.src = product.image;
+               }
+
+               if (product.rating) {
+                  document.querySelector(".stars").innerText = "★".repeat(product.rating) + "☆".repeat(5 - product.rating);
+               }
+
+            })
+            .catch(error => console.error('Lỗi khi lấy dữ liệu sản phẩm:', error));
+
+            getProductVariants(id)
+               .then(res => {
+                  if (res.status === 200) {
+                     const variants = res.data;
+                     renderColors(variants);
+                     renderSizes(variants);
+                     updatePriceStock(variants);
+                  }
+               })
+               .catch(error => console.error('Lỗi khi lấy biến thể sản phẩm:', error));
+
+               const showBtn = document.querySelector(".reviews");
+
+               showBtn.addEventListener("click", function (e) {
+                  getReviewsByProductId(id)
+                     .then(reviews => {
+                        const portalRoot = document.createElement("div");
+                        portalRoot.id = "portal-root";
+
+                        const reviewItems = reviews.data.map(review => {
+                           return `
+                              <li>
+                                 <strong>Người dùng #${review.userAccID}</strong>
+                                 <p>⭐ Đánh giá: ${review.rating} sao</p>
+                                 <p>${review.commentContent ? review.commentContent : "Không có nhận xét."}</p>
+                                 <small>${review.createdAt}</small>
+                              </li>
+                           `;
+                        }).join("");
+
+                        portalRoot.innerHTML = `
+                           <div class="overlay">
+                              <div class="review-box">
+                                 <h2>Đánh Giá Khách Hàng</h2>
+                                 <ul class="review-list">
+                                    ${reviewItems || "<li>Chưa có đánh giá nào cho sản phẩm này.</li>"}
+                                 </ul>
+                                 <button class="close-review">Đóng</button>
+                              </div>
+                           </div>
+                        `;
+
+                        document.body.appendChild(portalRoot);
+
+                        portalRoot.querySelector(".close-review").addEventListener("click", () => {
+                           portalRoot.remove();
+                        });
+                     })
+                     .catch(error => {
+                        console.error('Lỗi khi lấy đánh giá:', error.message);
+                     });
+               });
+
+
+      }
+
+      function renderColors(variants) {
+         const colorContainer = document.querySelector('.colors');
+         const colors = [...new Set(variants.map(v => v.color))];
+         colorContainer.innerHTML = '';
+
+         colors.forEach(color => {
+            const span = document.createElement('span');
+            span.className = 'color-option';
+            span.dataset.color = color;
+            span.style.backgroundColor = getColorCSS(color);
+            span.addEventListener('click', () => {
+               selectedColor = color;
+               document.querySelectorAll('.color-option').forEach(option => option.classList.remove('selected'));
+               span.classList.add('selected');
+               renderSizes(variants);
+               updatePriceStock(variants);
+            });
+            colorContainer.appendChild(span);
+         });
+      }
+
+
+      function renderSizes(variants) {
+         const sizeContainer = document.querySelector('.sizes');
+         const filtered = selectedColor
+            ? variants.filter(v => v.color === selectedColor)
+            : variants;
+         const sizes = [...new Set(filtered.map(v => v.size))];
+
+         sizeContainer.innerHTML = '';
+         sizes.forEach(size => {
+            const btn = document.createElement('button');
+            btn.className = 'size-btn';
+            btn.textContent = size;
+            btn.dataset.size = size;
+            btn.addEventListener('click', () => {
+               selectedSize = size;
+               updatePriceStock(variants);
+               document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+               btn.classList.add('active');
+            });
+            sizeContainer.appendChild(btn);
+         });
+      }
+
+      function updatePriceStock(variants) {
+         const priceEl = document.querySelector('.price');
+         const stockEl = document.querySelector('.in-stock');
+
+         const match = variants.find(v =>
+            (!selectedColor || v.color === selectedColor) &&
+            (!selectedSize || v.size === selectedSize)
+         );
+
+         if (match) {
+            priceEl.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(match.price);
+            stockEl.textContent = match.quantity > 0 ? `Còn ${match.quantity} sản phẩm` : 'Hết hàng';
+         }
+      }
+
+      function getColorCSS(colorName) {
+         switch (colorName.toLowerCase()) {
+            case 'trắng': return '#fff';
+            case 'đen': return '#000';
+            default: return '#ccc';
+         }
+      }
+
+
       document.addEventListener("DOMContentLoaded", function () {
          const qtyInput = document.querySelector(".qty-input");
          const minusBtn = document.querySelectorAll(".qty-btn")[0];
@@ -435,17 +630,6 @@
                });
          });
       });
-
-      document.addEventListener("DOMContentLoaded", function () {
-        const colorOptions = document.querySelectorAll(".color-option");
-
-        colorOptions.forEach(option => {
-            option.addEventListener("click", () => {
-                colorOptions.forEach(opt => opt.classList.remove("selected"));
-                option.classList.add("selected");
-            });
-        });
-    });
+      
    </script>
-
 </html>

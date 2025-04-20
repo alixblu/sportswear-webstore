@@ -42,11 +42,11 @@
             }
         }
 
-        public function updateUser($id, $name,  $phone, $gender, $roleID) {
+        public function updateUser($id, $name, $address, $phone, $gender, $roleID) {
             try {
-                $user = $this->userRepository->userUpdate($id, $name,  $phone, $gender, $roleID);
+                $user = $this->userRepository->userUpdate($id, $name, $address, $phone, $gender, $roleID);
                 if (!$user) {
-                    throw new Exception("Failed to create user", 500);
+                    throw new Exception("Failed to update user", 500);
                 }
                 return $user;
             } catch (Exception $e) {
@@ -54,14 +54,14 @@
             }
         }
 
-        public function defaultAccount($name, $email, $phone, $gender, $roleID) {
+        public function defaultAccount($name, $email, $phone, $gender, $roleID,$birthday) {
             try {
                 $passWordDefault ='123456';
 
                 if ($this->isEmailExists($email)) {
                     throw new Exception("Email already exists", 400);
                 }
-                $this->userRepository->save($name, $email, $passWordDefault, $phone, $gender, $roleID);
+                return $this->userRepository->save($name,$email, $passWordDefault, $phone, $gender, $roleID,$birthday);
 
             } catch (Exception $e) {
                 throw new Exception($e->getMessage(), $e->getCode() ?: 400);
@@ -151,7 +151,7 @@
                 $this->userRepository->bulkInsertWithNPlus1($dataToInsert);
         
             } catch (Exception $e) {
-                throw new Exception("Lỗi import Excel: " . $e->getMessage(), $e->getCode() ?: 400);
+                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
             }
         }
         public function exportExcel()
