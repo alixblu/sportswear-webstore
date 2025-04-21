@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/sportwear-webstore/src/router/productRouter.php';
+const API_URL = '../../src/router/productRouter.php';
 
 const getAllProducts = async () => {
     try {
