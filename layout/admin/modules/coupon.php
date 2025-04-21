@@ -292,7 +292,7 @@
                         <button class="btn btn-outline btn-sm" onclick="showFormEdit(this, ${coupon.ID})">
                             <i class="fa-solid fa-pen"></i> Sửa
                         </button>
-                        <button class="btn btn-outline btn-sm" onclick="delete(${coupon.ID})">
+                        <button class="btn btn-outline btn-sm" onclick="deletecoupon(${coupon.ID})">
                             <i class="fa-solid fa-user-xmark"></i> Xóa
                         </button>
                     </td>
@@ -449,27 +449,66 @@
 
     }
     function showToast(text, type = 'success') {
-            let portalRoot = document.getElementById('toast-portal');
+        let portalRoot = document.getElementById('toast-portal');
 
-            if (!portalRoot) {
-                portalRoot = document.createElement('div');
-                portalRoot.id = 'toast-portal';
-                document.body.appendChild(portalRoot);
-            }
-
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerText = text;
-
-            portalRoot.appendChild(toast);
-
-            setTimeout(() => {
-                toast.remove();
-                if (portalRoot.children.length === 0) {
-                    portalRoot.remove();
-                }
-            }, 3000);
+        if (!portalRoot) {
+            portalRoot = document.createElement('div');
+            portalRoot.id = 'toast-portal';
+            document.body.appendChild(portalRoot);
         }
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerText = text;
+
+        portalRoot.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+            if (portalRoot.children.length === 0) {
+                portalRoot.remove();
+            }
+        }, 3000);
+    }
+
+    function deletecoupon(id){
+        const portalRoot = document.createElement('div');
+        portalRoot.id = 'portal-root';
+        portalRoot.innerHTML=`
+            <div class="formUserCss">
+                <div class="titleDeleteUserCss">Bạn có chắc chắn muốn xóa không?</div>
+                <div class="deleteUserCss">
+                    <button id="cancelDelete">Hủy</button>
+                    <button id="confirmDelete">Xác nhận</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(portalRoot);
+
+
+        document.getElementById('confirmDelete').addEventListener('click', function () {
+            deleteCoupon(id)
+            .then(response => {
+                if (response.status === 200) {
+                    showToast('Xóa thành công!', 'success');
+                    closeFormAdd();
+                    showAll();
+                } else {
+                    showToast(response.data, 'error');
+                    closeFormAdd();
+                }
+            })
+            .catch(error => {
+                showToast('Có lỗi xảy ra.', 'error');
+                closeFormAdd();
+            });
+            showAll();
+        });
+
+        document.getElementById('cancelDelete').addEventListener('click', function () {
+            closeFormAdd();
+        });
+    }
 </script>
 </html>
 
