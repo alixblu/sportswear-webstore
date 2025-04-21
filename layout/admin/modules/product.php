@@ -7,6 +7,7 @@
     <title>Products</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin/product.css">
+
     <script src="../../../JS/admin/product.js"></script>
     <style>
         .product-id-badge {
@@ -375,8 +376,10 @@
 
         <!-- Product Filters -->
         <div class="product-filters">
+            <div class="filter-group search-group">
+                <input type="text" id="search" class="filter-input" placeholder="Search products...">
+            </div>
             <div class="filter-group">
-                <label for="category">Category:</label>
                 <select id="category" class="filter-select">
                     <option value="">All Categories</option>
                     <option value="1">T-Shirts</option>
@@ -385,7 +388,14 @@
                 </select>
             </div>
             <div class="filter-group">
-                <label for="status">Status:</label>
+                <select id="brand" class="filter-select">
+                    <option value="">All Brands</option>
+                    <option value="1">Nike</option>
+                    <option value="2">Adidas</option>
+                    <option value="3">Puma</option>
+                </select>
+            </div>
+            <div class="filter-group">
                 <select id="status" class="filter-select">
                     <option value="">All Status</option>
                     <option value="in_stock">In Stock</option>
@@ -393,8 +403,20 @@
                 </select>
             </div>
             <div class="filter-group">
-                <label for="search">Search:</label>
-                <input type="text" id="search" class="filter-input" placeholder="Search products...">
+                <select id="rating" class="filter-select">
+                    <option value="">All Ratings</option>
+                    <option value="4-5">4-5 Stars</option>
+                    <option value="3-4">3-4 Stars</option>
+                    <option value="2-3">2-3 Stars</option>
+                    <option value="1-2">1-2 Stars</option>
+                </select>
+            </div>
+            <div class="filter-group price-range-group">
+                <div class="price-range-inputs">
+                    <input type="number" id="priceStart" class="filter-input" placeholder="Min Price" min="0">
+                    <span class="price-range-separator">-</span>
+                    <input type="number" id="priceEnd" class="filter-input" placeholder="Max Price" min="0">
+                </div>
             </div>
         </div>
 
@@ -433,41 +455,71 @@
 
                     <div id="details-tab" class="tab-content active">
                         <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">Product ID</div>
+                            <div class="info-item feature">
+                                <div class="info-label">
+                                    <i class="fas fa-barcode"></i> Product ID
+                                </div>
                                 <div class="info-value" id="modal-product-id">-</div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">Name</div>
+                            <div class="info-item feature">
+                                <div class="info-label">
+                                    <i class="fas fa-tag"></i> Name
+                                </div>
                                 <div class="info-value" id="modal-product-name">-</div>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Category</div>
+                                <div class="info-label">
+                                    <i class="fas fa-layer-group"></i> Category
+                                </div>
                                 <div class="info-value" id="modal-product-category">-</div>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Brand</div>
+                                <div class="info-label">
+                                    <i class="fas fa-copyright"></i> Brand
+                                </div>
                                 <div class="info-value" id="modal-product-brand">-</div>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Markup Percentage</div>
+                                <div class="info-label">
+                                    <i class="fas fa-percentage"></i> Markup Percentage
+                                </div>
                                 <div class="info-value" id="modal-product-markup">-</div>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Rating</div>
+                                <div class="info-label">
+                                    <i class="fas fa-tags"></i> Discount ID
+                                </div>
+                                <div class="info-value" id="modal-product-discount-id">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-dollar-sign"></i> Base Price
+                                </div>
+                                <div class="info-value" id="modal-product-base-price">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-star"></i> Rating
+                                </div>
                                 <div class="info-value" id="modal-product-rating">-</div>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Stock</div>
+                                <div class="info-label">
+                                    <i class="fas fa-box"></i> Stock
+                                </div>
                                 <div class="info-value" id="modal-product-stock">-</div>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Status</div>
+                                <div class="info-label">
+                                    <i class="fas fa-info-circle"></i> Status
+                                </div>
                                 <div class="info-value" id="modal-product-status">-</div>
                             </div>
                         </div>
-                        <div class="info-item" style="margin-top: 15px;">
-                            <div class="info-label">Description</div>
+                        <div class="info-item description">
+                            <div class="info-label">
+                                <i class="fas fa-align-left"></i> Description
+                            </div>
                             <div class="info-value" id="modal-product-description">-</div>
                         </div>
                     </div>
@@ -480,7 +532,6 @@
                                     <th>Full Name</th>
                                     <th>Color</th>
                                     <th>Size</th>
-                                    <th>Weight</th>
                                     <th>Quantity</th>
                                     <th>Price</th>
                                     <th>Status</th>
@@ -535,9 +586,7 @@
                 const productGrid = document.getElementById('productGrid');
                 productGrid.innerHTML = '';
 
-                // Check if response is an array
                 if (!Array.isArray(response)) {
-                    console.error('Expected an array of products, got:', response);
                     throw new Error('Invalid response format from server');
                 }
 
@@ -600,9 +649,9 @@
             modal.style.display = 'block';
 
             try {
-                console.log('Fetching product with ID:', id);
                 // Get product details
                 let response = await getProductById(id);
+
                 console.log('Product API Response:', response);
 
                 if (!response || !response.data) {
@@ -610,9 +659,6 @@
                 }
 
                 const product = response.data;
-                console.log('Product Data:', product);
-
-                // Debug: Check if modal elements exist
                 const modalElements = {
                     id: document.getElementById('modal-product-id'),
                     name: document.getElementById('modal-product-name'),
@@ -622,91 +668,47 @@
                     status: document.getElementById('modal-product-status'),
                     description: document.getElementById('modal-product-description'),
                     category: document.getElementById('modal-product-category'),
-                    brand: document.getElementById('modal-product-brand')
+                    brand: document.getElementById('modal-product-brand'),
+                    discountId: document.getElementById('modal-product-discount-id'),
+                    basePrice: document.getElementById('modal-product-base-price')
                 };
 
-                console.log('Modal Elements:', modalElements);
-
                 // Update modal with product details
-                if (modalElements.id) {
-                    modalElements.id.textContent = product.ID || '-';
-                    console.log('Setting product ID to:', product.ID);
-                } else {
-                    console.error('Product ID element not found');
-                }
-
-                if (modalElements.name) {
-                    modalElements.name.textContent = product.name || '-';
-                    console.log('Setting product name to:', product.name);
-                }
-
-                if (modalElements.markup) {
-                    modalElements.markup.textContent = (product.markup_percentage || '0') + '%';
-                    console.log('Setting markup to:', product.markup_percentage);
-                }
-
-                if (modalElements.rating) {
-                    modalElements.rating.innerHTML = renderStars(product.rating);
-                    console.log('Setting rating to:', product.rating);
-                }
-
-                if (modalElements.stock) {
-                    modalElements.stock.textContent = product.stock || '0';
-                    console.log('Setting stock to:', product.stock);
-                }
-
-                if (modalElements.status) {
-                    modalElements.status.textContent = product.status === 'in_stock' ? 'In Stock' : 'Out of Stock';
-                    console.log('Setting status to:', product.status);
-                }
-
-                if (modalElements.description) {
-                    modalElements.description.textContent = product.description || 'No description available';
-                    console.log('Setting description to:', product.description);
-                }
+                modalElements.id.textContent = product.ID || '-';
+                modalElements.name.textContent = product.name || '-';
+                modalElements.markup.textContent = (product.markup_percentage || '0') + '%';
+                modalElements.rating.innerHTML = renderStars(product.rating);
+                modalElements.stock.textContent = product.stock || '0';
+                modalElements.status.textContent = product.status === 'in_stock' ? 'In Stock' : 'Out of Stock';
+                modalElements.description.textContent = product.description || 'No description available';
+                modalElements.discountId.textContent = product.discountID || '-';
+                modalElements.basePrice.textContent = product.price || '-';
 
                 // Get and display category name
                 if (product.categoryID) {
-                    console.log('Fetching category with ID:', product.categoryID);
                     response = await getCategoryById(product.categoryID);
-                    category = response.data;
-                    console.log('Category API Response:', category);
-                    if (modalElements.category) {
-                        modalElements.category.textContent = category ? category.name : 'Unknown Category';
-                        console.log('Setting category to:', category ? category.name : 'Unknown Category');
-                    }
+                    const category = response.data;
+                    modalElements.category.textContent = category ? category.name : 'Unknown Category';
                 } else {
-                    if (modalElements.category) {
-                        modalElements.category.textContent = 'No category';
-                    }
+                    modalElements.category.textContent = 'No category';
                 }
 
                 // Get and display brand name
                 if (product.brandID) {
-                    console.log('Fetching brand with ID:', product.brandID);
                     response = await getBrandById(product.brandID);
-                    brand = response.data;
-                    console.log('Brand API Response:', brand);
-                    if (modalElements.brand) {
-                        modalElements.brand.textContent = brand ? brand.name : 'Unknown Brand';
-                        console.log('Setting brand to:', brand ? brand.name : 'Unknown Brand');
-                    }
+                    const brand = response.data;
+                    modalElements.brand.textContent = brand ? brand.name : 'Unknown Brand';
                 } else {
-                    if (modalElements.brand) {
-                        modalElements.brand.textContent = 'No brand';
-                    }
+                    modalElements.brand.textContent = 'No brand';
                 }
 
                 // Get and display variants
-                console.log('Fetching variants for product ID:', id);
-                const variants = await getProductVariants(id);
-                console.log('Variants API Response:', variants);
+                const res = await getProductVariants(id);
+                const variants = res.data || [];
                 const variantsList = document.getElementById('modal-variants-list');
 
                 if (variantsList) {
                     variantsList.innerHTML = '';
-                    console.log('Variants list element found');
-
                     if (variants && variants.length > 0) {
                         variants.forEach(variant => {
                             const row = document.createElement('tr');
@@ -715,20 +717,15 @@
                                 <td>${variant.fullName || '-'}</td>
                                 <td>${variant.color || '-'}</td>
                                 <td>${variant.size || '-'}</td>
-                                <td>${variant.weight || '-'}</td>
                                 <td>${variant.quantity || '0'}</td>
                                 <td>${variant.price || '0'}</td>
                                 <td>${variant.status || '-'}</td>
                             `;
                             variantsList.appendChild(row);
                         });
-                        console.log('Added variants to table');
                     } else {
                         variantsList.innerHTML = '<tr><td colspan="8" class="text-center">No variants found</td></tr>';
-                        console.log('No variants found');
                     }
-                } else {
-                    console.error('Variants list element not found');
                 }
             } catch (error) {
                 console.error('Error loading product details:', error);
@@ -742,10 +739,10 @@
         }
 
         function switchTab(tabName) {
-            // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
+
 
             // Remove active class from all tabs
             document.querySelectorAll('.tab').forEach(tab => {
@@ -753,6 +750,11 @@
             });
 
             // Show selected tab content and mark tab as active
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
             document.getElementById(`${tabName}-tab`).classList.add('active');
             document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
         }
