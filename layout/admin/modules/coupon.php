@@ -275,7 +275,6 @@
         getAllCoupons()
         .then(result => {
             let stt =1;
-            console.log(result)
             const coupons = result;
             const tbody = document.querySelector(".data-table tbody");
             tbody.innerHTML = ""; 
@@ -290,13 +289,10 @@
                             '<span class="status cancelled"><i class="fas fa-check-circle"></i>Đã Dừng</span>' 
                     }</td>
                     <td>
-                        <button class="btn btn-outline btn-sm" onclick="infoAccount(${coupon.id})">
-                            <i class="fas fa-eye"></i> Xem
-                        </button>
-                        <button class="btn btn-outline btn-sm" onclick="showFormEditUser(this, ${coupon.id})">
+                        <button class="btn btn-outline btn-sm" onclick="showFormEdit(this, ${coupon.ID})">
                             <i class="fa-solid fa-pen"></i> Sửa
                         </button>
-                        <button class="btn btn-outline btn-sm" onclick="deleteUser(${coupon.id})">
+                        <button class="btn btn-outline btn-sm" onclick="delete(${coupon.ID})">
                             <i class="fa-solid fa-user-xmark"></i> Xóa
                         </button>
                     </td>
@@ -378,6 +374,80 @@
         });
     }
 
+
+    function showFormEdit(button,id){
+        const row = button.closest('tr');
+        const couponInfo = {
+            name: row.children[1].innerText.trim(),
+            percent: row.children[2].innerText.trim(),
+            duration: row.children[3].innerText.trim(),
+            status: row.children[4].innerText.trim(),
+        };
+        const portalRoot = document.createElement('div');
+        portalRoot.id = 'portal-root';
+        portalRoot.innerHTML = `
+            <div class="formUserCss">
+                <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAdd()" style="cursor: pointer;"></i></div>
+                <div class="wrapperCss">
+                    <label for="name">Tên Mã</label>
+                    <div class="wrapperInputCss">
+                        <input class="inputUserCss" type="text" id="name" value="${couponInfo.name}">
+                    </div>
+                    
+                    <label for="percent">Phần Trăm Giảm</label>
+                    <div class="wrapperInputCss">
+                        <input class="inputUserCss" type="text" id="percent" value="${couponInfo.percent}">
+                    </div>
+
+                    <label for="duration">Hiệu Lực</label>
+                    <div class="wrapperInputCss">
+                        <input type="text" class="inputUserCss" id="duration" value="${couponInfo.duration}">
+                    </div>
+
+                    <label for="status">Trạng Thái</label>
+                    <div class="wrapperInputCss">
+                        <select class="inputUserCss" id="status">
+                            <option value="active" ${couponInfo.status === 'Hoạt Động' ? 'selected' : ''}>Hoạt Động</option>
+                            <option value="inactive" ${couponInfo.status !== 'Hoạt Động' ? 'selected' : ''}>Không Hoạt Động</option>
+                        </select>
+                    </div>
+
+                    <div class="wrapperButton">
+                        <input class="buttonUserCss" type="submit" value="Thêm Mã" onclick="edit(${id})">
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(portalRoot);
+    }
+    function edit(id){
+        const name = document.getElementById('name').value.trim();
+        const percent = document.getElementById('percent').value.trim();
+        const duration = document.getElementById('duration').value.trim();
+        const status = document.getElementById('status').value.trim();
+
+        if (!name || !percent || !duration || !status) {
+            alert('Vui lòng điền đầy đủ thông tin.');
+            return;
+        }
+
+        updateCoupon(id, name, percent, duration, status)
+        .then(response => {
+            if (response.status === 200) {
+                showToast('Cập nhật thành công!', 'success');
+                closeFormAdd();
+                showAll();
+            } else {
+                showToast(response.data, 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+        });
+
+
+    }
     function showToast(text, type = 'success') {
             let portalRoot = document.getElementById('toast-portal');
 
