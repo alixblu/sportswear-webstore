@@ -230,7 +230,7 @@
          * @return array User data
          * @throws Exception If database error occurs
          */
-        public function save($name, $email, $passWord, $phone, $gender, $roleID) {
+        public function save($name,$email, $passWord, $phone, $gender, $roleID, $birthday = null) {
             $conn = null;
             $stmt = null;
             try {
@@ -247,12 +247,12 @@
                 }
                 
                 // Insert into user table first
-                $stmt = $conn->prepare("INSERT INTO user (fullname, email, phone, gender, roleID) VALUES (?, ?, ?, ?, ?)");
+                $stmt = $conn->prepare("INSERT INTO user (fullname, email, phone, gender, roleID,dateOfBirth) VALUES (?, ?, ?, ?, ?,?)");
                 if (!$stmt) {
                     throw new Exception("Failed to prepare user insert: " . $conn->error);
                 }
                 
-                $stmt->bind_param("sssii", $name, $email, $phone, $gender, $roleID);
+                $stmt->bind_param("sssiis", $name, $email, $phone, $gender, $roleID,$birthday);
                 if (!$stmt->execute()) {
                     throw new Exception("Failed to insert user: " . $stmt->error);
                 }
@@ -281,7 +281,8 @@
                     'email' => $email,
                     'phone' => $phone,
                     'gender' => $gender,
-                    'roleID' => $roleID
+                    'roleID' => $roleID,
+                    'birthday' => $birthday
                 ];
             } catch (Exception $e) {
                 // Rollback transaction on error
@@ -297,7 +298,7 @@
         }
 
 
-        public function userUpdate($id, $name, $phone, $gender, $roleID) {
+        public function userUpdate($id, $name,$address, $phone, $gender, $roleID) {
             $conn = null;
             $stmt = null;
             try {
@@ -305,15 +306,19 @@
             $conn = $mysql->connectDatabase();
             
                 $sql = "UPDATE user 
-                        SET fullname = ?, phone = ?, gender = ?, roleID = ?
+                        SET fullname = ?, address = ? ,phone = ?, gender = ?, roleID = ?
                         WHERE id = ?";
             
             $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssssi", $name,  $phone, $gender, $roleID, $id);
+                $stmt->bind_param("sssssi", $name, $address, $phone, $gender, $roleID, $id);
         
             $stmt->execute();
         
             $user = null;
+            if ($stmt->affected_rows === 0) {
+                throw new Exception("No changes detected, user not updated.", 500);
+            }
+
             if ($stmt->affected_rows > 0) {
                 $user = [
                     'id' => $id,

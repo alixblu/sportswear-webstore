@@ -119,7 +119,6 @@
         display: flex;
         justify-content: flex-end;
         padding: 10px;
-        cursor:pointer;
     }
     #portal-root {
         position: fixed;
@@ -181,6 +180,43 @@
         padding-bottom: 10px;
         padding-right: 10px;
     }
+    #toast-portal {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 9999;
+    }
+
+    .toast {
+        min-width: 250px;
+        padding: 12px 18px;
+        color: #fff;
+        border-radius: 8px;
+        font-size: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInOut 3s ease forwards;
+    }
+
+    .toast.success {
+        background-color: #4caf50;
+    }
+
+    .toast.error {
+        background-color: #f44336;
+    }
+
+    @keyframes fadeInOut {
+        0%   { opacity: 0; transform: translateY(20px); }
+        10%  { opacity: 1; transform: translateY(0); }
+        90%  { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(20px); }
+    }
+
     </style>
 </head>
 <body>
@@ -218,7 +254,7 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                        <th>User ID</th>
+                        <th>STT</th>
                         <th>Họ Và Tên</th>
                         <th>Ngày Sinh</th>
                         <th>Email</th>
@@ -266,18 +302,19 @@
         function showAllUsers() {
             getAllUsers()
             .then(result => {
+                let stt =1;
                 const users = result.data;
                 const tbody = document.querySelector(".data-table tbody");
                 tbody.innerHTML = ""; 
                 users.forEach(user => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-                        <td>${user.id}</td>
+                        <td>${stt}</td>
                         <td>${user.fullname}</td>
-                        <td>${user.dateOfBirth}</td>
-                        <td>${user.email}</td>
+                        <td>${user.dateOfBirth == undefined ? '':user.dateOfBirth}</td>
+                        <td>${user.email == undefined ? '':user.email}</td>
                         <td>${user.phone}</td>
-                        <td>${user.address}</td>
+                        <td>${user.address  == undefined ? '':user.address}</td>
                         <td>${user.gender == 0 ? 'Nam' : 'Nữ'}</td>
                         <td>${user.roleName}</td>
                         <td>${user.createdAt}</td>
@@ -295,6 +332,7 @@
                     `;
 
                     tbody.appendChild(tr);
+                    stt=stt+1
                 });
             })
             .catch(error => {
@@ -307,7 +345,7 @@
             portalRoot.id = 'portal-root';
             portalRoot.innerHTML=`
                 <div class="formUserCss">
-                    <div class="CloseCss" ><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
+                    <div class="CloseCss" ><i class="fa-solid fa-xmark" onclick="closeFormAddUser()" style="cursor: pointer;"></i></div>
                     <div class="wrapperCss">
                         <label for="name">Họ và tên</label>
                         <div class="wrapperInputCss">
@@ -412,16 +450,21 @@
                 alert('Số điện thoại phải gồm 10 chữ số.');
                 return;
             }
-            try {
-                createDefaultAccount(name, email,phone, genderValue, role);
-                alert('Thêm Thành Công.');
-                closeFormAddUser();
-                showAllUsers();
-            } catch (error) {
-                console.error(error);
-                alert('Có lỗi xảy ra.');
-            }
-            closeFormAddUser()
+            createDefaultAccount(name,birthday, email,phone, genderValue, role)
+            .then(response => {
+                if (response.status === 200) {
+                    showToast('Thêm người dùng thành công!', 'success');
+                    closeFormAddUser();
+                    showAllUsers();
+                } 
+                else {
+                    showToast(response.data, 'error');
+                }
+            })
+            .catch(error => {
+                showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+            });
+
         }
         function validateEmail(email) {
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -445,7 +488,7 @@
 
             portalRoot.innerHTML = `
                 <div class="formUserCss">
-                    <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
+                    <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()" style="cursor: pointer;"></i></div>
                     <div class="wrapperCss">
                         <label for="name">Họ và tên</label>
                         <div class="wrapperInputCss">
@@ -554,24 +597,26 @@
 
             const gender = genderEl.value;
 
-            try {
-                updateUser(id,name, phone, genderValue, role);
-                alert('Cập nhật người dùng thành công!');
-                closeFormAddUser();
-                showAllUsers();
-            } catch (error) {
-                console.error(error);
-                alert('Có lỗi xảy ra khi cập nhật người dùng.');
-            }
+            updateUser(id, name,address, phone, genderValue, role)
+            .then(response => {
+                if (response.status === 200) {
+                    showToast('Cập nhật người dùng thành công!', 'success');
+                    closeFormAddUser();
+                    showAllUsers();
+                } else {
+                    showToast(response.data, 'error');
+                }
+            })
+            .catch(error => {
+                showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+            });
+
+
         }
 
         function exportFile(){
-            try {
-                exportFileUser();
-            } catch (error) {
-                console.error(error);
-                alert('Có lỗi xảy ra khi cập nhật người dùng.');
-            }
+            exportFileUser()
+            showToast('export thành công!', 'success');
         }
         function uploadFile(){
             document.getElementById('fileInput').click()
@@ -579,7 +624,17 @@
         function handleFileChange(event) {
             const file = event.target.files[0];
             if (!file) return;
-            uploadFileUser(file);
+            uploadFileUser(file)
+            .then(response => {
+                if (response.status === 200) {
+                    showToast('import thành công!', 'success');
+                } else {
+                    showToast('Email Đã Tồn Tại Không Được Thêm Vào \n'+response.data, 'error');
+                }
+            })
+            .catch(error => {
+                showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+            });
         }
         function infoAccount(id){
             getAccountByUserId(id).then(result => {
@@ -621,7 +676,20 @@
 
             document.getElementById('confirmDelete').addEventListener('click', function () {
                 deleteUserApi(id)
-                closeFormAddUser();
+                .then(response => {
+                    if (response.status === 200) {
+                        showToast('Xóa người dùng thành công!', 'success');
+                        closeFormAddUser();
+                        showAllUsers();
+                    } else {
+                        showToast(response.data, 'error');
+                        closeFormAddUser();
+                    }
+                })
+                .catch(error => {
+                    showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+                    closeFormAddUser();
+                });
                 showAllUsers();
             });
 
@@ -629,7 +697,30 @@
                 closeFormAddUser();
             });
         }
+        function showToast(text, type = 'success') {
+            let portalRoot = document.getElementById('toast-portal');
 
+            if (!portalRoot) {
+                portalRoot = document.createElement('div');
+                portalRoot.id = 'toast-portal';
+                document.body.appendChild(portalRoot);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerText = text;
+
+            portalRoot.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+                if (portalRoot.children.length === 0) {
+                    portalRoot.remove();
+                }
+            }, 3000);
+        }
+
+        
         function showFormFilter(){
             const portalRoot = document.createElement('div');
             portalRoot.id = 'portal-root';
