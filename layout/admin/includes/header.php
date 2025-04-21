@@ -1,11 +1,13 @@
 <!-- Header -->
 <div class="header">
-  <div class="dashboard_open">
-    <i class="fas fa-bars fa-2xl"></i>
-  </div>
-  <div class="search-bar">
-    <i class="fas fa-search"></i>
-    <input type="text" placeholder="Search..." />
+  <div class="header-left">
+    <div class="dashboard_open" id="dashboard_switch">
+      <i class="fas fa-bars fa-xl"></i>
+    </div>
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Search..." />
+    </div>
   </div>
   <div class="header-actions">
     <div class="notification">
