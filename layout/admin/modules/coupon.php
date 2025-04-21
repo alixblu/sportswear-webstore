@@ -219,7 +219,7 @@
         <div id="pageTitle" class="page-title">
             <div class="title">Coupon </div>
             <div class="action-buttons">
-                <button id="addBtn" class="btn btn-primary" onclick="showFormAdd()">
+                <button id="addBtn" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Add New
                 </button>
             </div>
@@ -268,9 +268,138 @@
         </div>
     </div>
 </body>
-
+<script src="../../JS/admin/coupon.js"></script>
 <script>
-   
+    showAll();
+    function showAll() {
+        getAllCoupons()
+        .then(result => {
+            let stt =1;
+            console.log(result)
+            const coupons = result;
+            const tbody = document.querySelector(".data-table tbody");
+            tbody.innerHTML = ""; 
+            coupons.forEach(coupon => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${stt}</td>
+                    <td>${coupon.name}</td>
+                    <td>${coupon.percent}</td>
+                    <td>${coupon.duration}</td>
+                    <td>${coupon.status == 'active' ? '<span class="status active"><i class="fas fa-check-circle"></i>Hoạt Động</span>'  :
+                            '<span class="status cancelled"><i class="fas fa-check-circle"></i>Đã Dừng</span>' 
+                    }</td>
+                    <td>
+                        <button class="btn btn-outline btn-sm" onclick="infoAccount(${coupon.id})">
+                            <i class="fas fa-eye"></i> Xem
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="showFormEditUser(this, ${coupon.id})">
+                            <i class="fa-solid fa-pen"></i> Sửa
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="deleteUser(${coupon.id})">
+                            <i class="fa-solid fa-user-xmark"></i> Xóa
+                        </button>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+                stt=stt+1
+            });
+        })
+        .catch(error => {
+            console.error('Lỗi khi lấy danh sách người dùng:', error.message);
+        });
+    }
+
+    const addnewbtn = document.getElementById("addBtn")
+    addnewbtn.onclick = () =>{
+        const portalRoot = document.createElement('div');
+        portalRoot.id = 'portal-root';
+        portalRoot.innerHTML=`
+            <div class="formUserCss">
+                <div class="CloseCss" ><i class="fa-solid fa-xmark" onclick="closeFormAdd()" style="cursor: pointer;"></i></div>
+                <div class="wrapperCss">
+                    <label for="name">Tên Mã</label>
+                    <div class="wrapperInputCss">
+                        <input class="inputUserCss" placeholder="NHập Tên Mã" type="text" id="name">
+                    </div>
+                    
+                    <label for="percent">Phần Trăm Giảm</label>
+
+                    <div class="wrapperInputCss">
+                        <input class="inputUserCss" placeholder="VD: 5" type="text" id="percent">
+                    </div>
+
+                    
+                    <label for="duration">Hiệu Lực	</label>
+                    
+                    <div class="wrapperInputCss">
+                        <input type="text" placeholder="VD: 12" class="inputUserCss" id="duration">
+                    </div>
+
+                    <div class="wrapperButton">
+                        <input class="buttonUserCss" type="submit" value="Thêm Mã" onclick="add()">
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(portalRoot);
+    }
+    function closeFormAdd(){
+        const portalRoot = document.getElementById('portal-root');
+        if (portalRoot) {
+            portalRoot.remove();
+        }
+    }
+    function add(){
+        const name = document.getElementById('name').value.trim();
+        const percent = document.getElementById('percent').value.trim();
+        const duration = document.getElementById('duration').value.trim();
+
+
+        if (!name || !percent || !duration) {
+            alert('Vui lòng điền đầy đủ thông tin.');
+            return;
+        }
+
+        createCoupon(name,percent, duration)
+        .then(response => {
+            if (response.status === 200) {
+                showToast('Thêm Mã thành công!', 'success');
+                closeFormAdd();
+                showAll();
+            } 
+            else {
+                showToast(response.data, 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+        });
+    }
+
+    function showToast(text, type = 'success') {
+            let portalRoot = document.getElementById('toast-portal');
+
+            if (!portalRoot) {
+                portalRoot = document.createElement('div');
+                portalRoot.id = 'toast-portal';
+                document.body.appendChild(portalRoot);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerText = text;
+
+            portalRoot.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+                if (portalRoot.children.length === 0) {
+                    portalRoot.remove();
+                }
+            }, 3000);
+        }
 </script>
 </html>
 
