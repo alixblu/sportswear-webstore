@@ -199,6 +199,12 @@ class ProductService
         }
     }
 
+    /**
+     * Delete a product by ID
+     * @param int $id Product ID
+     * @return bool True if successful, false otherwise
+     * @throws Exception If database error occurs
+     */
 
     public function deleteProduct($id)
     {
