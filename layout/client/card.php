@@ -13,26 +13,30 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <style>
             body{
-                background-color: white;
+                background-color: #F5F5FA;
             }
     
             .cart-container {
-                max-width: 1000px;
-                margin: 0 auto;
-                padding-top: 90px; 
+               max-width: 1200px;
+               margin: 0 auto;
+               padding-top: 90px; 
+               display: flex;
+               justify-content: space-between;
+               gap:40px;
             }
 
             .cart-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+               width: 100%;
+               border-collapse: collapse;
+               margin-bottom: 20px;
+               background-color: white;
             }
 
             .cart-table th,
             .cart-table td {
-            text-align: left;
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
+               text-align: left;
+               padding: 15px;
+               border-bottom: 1px solid #ddd;
             }
 
             .product-info {
@@ -46,71 +50,82 @@
             height: 40px;
             object-fit: cover;
             }
-
-            .coupon-checkout {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 20px;
+            .containerLeft{
+               display: flex;
+               flex-direction: column;
+               gap: 20px;
+               width: 25%;
             }
-
-            .coupon-section {
-                border: 1px solid #ddd;
-                padding: 20px;
-                width: 300px;
+            .containerRight{
+               width: 75%;
             }
-
-            .coupon-section input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
+            .couponCss{
+               background-color:white;
+               padding: 16px;
+               border-radius: 10px;
+               display: flex;
+               flex-direction: column;
+               gap:10px;
             }
-
-            .apply-btn {
-                margin-top: 15px;
-                width: 100%;
-                padding: 10px;
-                background-color: rgb(1, 127, 255);
-                color: white;
-                border: none;
-                cursor: pointer;
+            .discount{
+               background-color:white;
+               padding: 16px;
+               border-radius: 10px;
+               display: flex;
+               flex-direction: column;
+               gap:10px;
             }
-
-            .cart-total {
-            border: 1px solid #ddd;
-            padding: 20px;
-            width: 300px;
+            .freeship-note img {
+               vertical-align: middle;
+               margin-right: 6px;
             }
-
-            .cart-total h3 {
-            margin-top: 0;
+            .freeship-note {
+               color: rgb(10, 104, 255);
+               cursor: pointer;
             }
-
-            .cart-total p {
-            display: flex;
-            justify-content: space-between;
-            margin: 8px 0;
+            .section-title{
+               font-weight: bold;
             }
+            .voucherItem{
+               display: flex;
+               gap:10px;
+               align-items: center;
+               border-radius: 10px;
+               padding: 10px 14px;
+               background-color: white;
+               box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+               justify-content: space-between;
 
-            .total {
-            font-weight: bold;
-            font-size: 1.1em;
             }
-
-            .checkout-btn {
-            margin-top: 15px;
-            width: 100%;
-            padding: 10px;
-            background-color: #e53935;
-            color: white;
-            border: none;
-            cursor: pointer;
+            .voucher{
+               display: flex;
+               flex-direction: column;
+               gap: 10px;
             }
-
+            .apply-btn{
+               background-color: #0074e8;
+               color: white;
+               border: none;
+               border-radius: 6px;
+               padding: 6px 12px;
+               cursor: pointer;
+               white-space: nowrap; 
+            }
+            .btn-buy {
+               width: 100%;
+               background: #ff424e;
+               color: white;
+               padding: 12px;
+               font-size: 16px;
+               border: none;
+               border-radius: 8px;
+               cursor: pointer;
+            }
+   
         </style>
     </head>
 
-    <body>
+      <body>
         <header class="header">
          <nav class="nav container">
             <div class="nav__data">
@@ -232,64 +247,81 @@
             </nav>
         </header>
 
-        <div class="cart-container">
-            <table class="cart-table">
-                <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Subtotal</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>
-                    <div class="product-info">
-                        <img src="/img/adidas.svg" alt="Backpack NH Arpenaz 100">
-                        <span>Backpack NH Arpenaz 100</span>
-                    </div>
-                    </td>
-                    <td>$650</td>
-                    <td>
-                    01
-                    </td>
-                    <td>$650</td>
-                </tr>
-                <tr>
-                    <td>
-                    <div class="product-info">
-                        <img src="/img/adidas.svg" alt="Tennis Shirt Mens Dri Fit">
-                        <span>Tennis Shirt Mens Dri Fit</span>
-                    </div>
-                    </td>
-                    <td>$550</td>
-                    <td>
-                    02
-                    </td>
-                    <td>$1100</td>
-                </tr>
-                </tbody>
-            </table>
-
-            <div class="coupon-checkout">
-                <div class="coupon-section">
-                    <h3>Khuyến Mãi</h3>
-                    <p>Giảm 5% đơn đầu</p>
-                    <p>Miễn Phí Vận Chuyển</p>
-                <button class="apply-btn">Chọn Mã Giảm Giá</button>
-                </div>
-
-                <div class="cart-total">
-                    <h3>Cart Total</h3>
-                    <p>Subtotal: <span>$1750</span></p>
-                    <p>Shipping: <span>Free</span></p>
-                    <p class="total">Total: <span>$1750</span></p>
-                    <button class="checkout-btn">Process to checkout</button>
-                </div>
+         <div class="cart-container">
+            <div class="containerRight">
+               <table class="cart-table">
+                  <thead>
+                  <tr>
+                     <th>Product</th>
+                     <th>Price</th>
+                     <th>Quantity</th>
+                     <th>Subtotal</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                     <td>
+                     <div class="product-info">
+                           <img src="/img/adidas.svg" alt="Backpack NH Arpenaz 100">
+                           <span>Backpack NH Arpenaz 100</span>
+                     </div>
+                     </td>
+                     <td>$650</td>
+                     <td>
+                     01
+                     </td>
+                     <td>$650</td>
+                  </tr>
+                  <tr>
+                     <td>
+                     <div class="product-info">
+                           <img src="/img/adidas.svg" alt="Tennis Shirt Mens Dri Fit">
+                           <span>Tennis Shirt Mens Dri Fit</span>
+                     </div>
+                     </td>
+                     <td>$550</td>
+                     <td>
+                     02
+                     </td>
+                     <td>$1100</td>
+                  </tr>
+                  </tbody>
+               </table>
             </div>
-        </div>
-    </body>
+            <div class="containerLeft">
+               <div class="couponCss">
+                  <div class="section-title">Khuyến Mãi</div>
+                  <div class="voucher">
+                     <div class="voucherItem">
+                        <span>Giảm 15% tối đa 70K</span>
+                        <button class="apply-btn">Áp Dụng</button>
+                     </div>
+                  </div>
+                  <div class="freeship-note">
+                   <img src="/img/coupon.svg" alt=""> Xem Thêm Mã Giảm
+                  </div>
+               </div>
+               <div class="discount">
+                  <div class="info-line">
+                     <span>Tổng tiền hàng</span>
+                     <span>429.000₫</span>
+                  </div>
+                  <div class="info-line">
+                     <span>Giảm giá trực tiếp</span>
+                     <span>-110.000₫</span>
+                  </div>
+                  <div class="info-line">
+                     <span>Mã khuyến mãi</span>
+                     <span>-20.000₫</span>
+                  </div>
+                  <br>
+                  <div class="total">Tổng tiền thanh toán: 299.000₫</div>
+
+                  <button class="btn-buy">Mua Hàng</button>
+               </div>
+            </div>
+         </div>
+      </body>
     <script>
     </script>
 </html>
