@@ -307,6 +307,9 @@
                 const tbody = document.querySelector(".data-table tbody");
                 tbody.innerHTML = ""; 
                 users.forEach(user => {
+                    if(user.roleName=='Customer'){
+                        return;
+                    }
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td>${stt}</td>
@@ -358,7 +361,12 @@
                             <input class="inputUserCss" type="text" id="email">
                         </div>
 
-                        
+                        <label for="address">Địa Chỉ</label>
+
+                        <div class="wrapperInputCss">
+                            <input class="inputUserCss" type="text" id="address">
+                        </div>
+
                         <label for="phone">Số điện thoại</label>
                         
                         <div class="wrapperInputCss">
@@ -399,8 +407,11 @@
                 getAllRoles()
                     .then(result => {
                         const roles = result.data;
-
+                        
                         roles.forEach(role => {
+                            if(role.name=='Customer'){
+                                return;
+                            }
                             const option = document.createElement('option');
                             option.value = role.id;
                             option.textContent = role.name;
@@ -424,6 +435,7 @@
         function addUser(){
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
+            const address = document.getElementById('address').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const birthday = document.getElementById('birthday').value.trim();
             const genderEl = document.querySelector('input[name="gender"]:checked');
@@ -436,7 +448,7 @@
             const role = document.getElementById('role').value;
 
 
-            if (!name || !email || !phone || !birthday || !genderValue || !role) {
+            if (!name || !email || !phone || !birthday || !genderValue || !role||!address) {
                 alert('Vui lòng điền đầy đủ thông tin.');
                 return;
             }
@@ -450,7 +462,7 @@
                 alert('Số điện thoại phải gồm 10 chữ số.');
                 return;
             }
-            createDefaultAccount(name,birthday, email,phone, genderValue, role)
+            createDefaultAccount(name,birthday, address,email,phone, genderValue, role)
             .then(response => {
                 if (response.status === 200) {
                     showToast('Thêm người dùng thành công!', 'success');
