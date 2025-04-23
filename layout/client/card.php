@@ -97,10 +97,15 @@
                justify-content: space-between;
 
             }
+            .voucherItem.active {
+               outline: 2px solid  rgb(10, 104, 255);
+
+            }
             .voucher{
                display: flex;
                flex-direction: column;
                gap: 10px;
+               box-sizing: border-box;
             }
             .apply-btn{
                background-color: #0074e8;
@@ -121,8 +126,53 @@
                border-radius: 8px;
                cursor: pointer;
             }
-   
-        </style>
+            .delete-icon {
+               width: 20px;
+               height: 20px;
+               cursor: pointer;
+               transition: transform 0.2s ease;
+            }
+            .popup-overlay {
+               position: fixed;
+               top: 0;
+               left: 0;
+               width: 100%;
+               height: 100%;
+               background-color: rgba(0,0,0,0.4);
+               display: flex;
+               justify-content: center;
+               align-items: center;
+               z-index: 9999;
+            }
+
+            .popup-content {
+               background: white;
+               padding: 20px 30px;
+               border-radius: 10px;
+               box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+               max-width: 400px;
+               width: 90%;
+               text-align: center;
+            }
+            .titlePopup{
+               display: flex;
+               justify-content: space-between;
+            }
+            .btn-xong {
+               background-color: #007bff; 
+               color: white;
+               border: none;
+               padding: 10px 0;
+               width: 100%;
+               border-radius: 6px;
+               font-size: 16px;
+               font-weight: 500;
+               cursor: pointer;
+               box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+               transition: background-color 0.2s ease;
+               margin-top: 15px;
+            }
+        </style>  
     </head>
 
       <body>
@@ -256,6 +306,7 @@
                      <th>Price</th>
                      <th>Quantity</th>
                      <th>Subtotal</th>
+                     <th><image src="/img/trash.svg"/></th> 
                   </tr>
                   </thead>
                   <tbody>
@@ -271,6 +322,7 @@
                      01
                      </td>
                      <td>$650</td>
+                     <td><img class="delete-icon" src="/img/trash.svg" alt="Xoá"></td>
                   </tr>
                   <tr>
                      <td>
@@ -284,6 +336,7 @@
                      02
                      </td>
                      <td>$1100</td>
+                     <td><img class="delete-icon" src="/img/trash.svg" alt="Xoá"></td>
                   </tr>
                   </tbody>
                </table>
@@ -294,10 +347,10 @@
                   <div class="voucher">
                      <div class="voucherItem">
                         <span>Giảm 15% tối đa 70K</span>
-                        <button class="apply-btn">Áp Dụng</button>
+                        <button class="apply-btn" onclick="toggleApply(this)">Áp Dụng</button>
                      </div>
                   </div>
-                  <div class="freeship-note">
+                  <div class="freeship-note" onclick="showPopup()">
                    <img src="/img/coupon.svg" alt=""> Xem Thêm Mã Giảm
                   </div>
                </div>
@@ -323,5 +376,63 @@
          </div>
       </body>
     <script>
+      function toggleApply(button) {
+         const voucherItem = button.closest('.voucherItem');
+         const isActive = voucherItem.classList.toggle('active');
+
+         button.textContent = isActive ? 'Bỏ Chọn' : 'Áp Dụng';
+      }
+      function showPopup() {
+         const overlay = document.createElement('div');
+         overlay.classList.add('popup-overlay');
+
+         const popup = document.createElement('div');
+         popup.classList.add('popup-content');
+         popup.innerHTML = `
+            <div class="titlePopup">
+               <div>Khuyến Mãi</div>
+               <div onclick="closePopup()" style="cursor: pointer;">X</div>
+            </div>
+            <div class="section-title">Khuyến Mãi</div>
+            <div class="voucher">
+               <div class="voucherItem">
+                  <span>Giảm 15% tối đa 70K</span>
+                  <button class="apply-btn" onclick="toggleApplyForm(this)">Áp Dụng</button>
+               </div>
+            </div>
+            <button class="btn-xong" onclick="closePopup()">Xong</button>
+         `;
+         overlay.appendChild(popup);
+         document.body.appendChild(overlay);
+         }
+
+      function closePopup() {
+         const overlay = document.querySelector('.popup-overlay');
+         if (overlay) overlay.remove();
+      }
+      function toggleApplyForm(button) {
+         const voucher = document.querySelector('.voucher');
+         const voucherItem = button.closest('.voucherItem');
+         const isActive = voucherItem.classList.toggle('active');
+
+         if(isActive==true){
+            button.textContent = 'Bỏ Chọn';
+            voucher.innerHTML = `
+            <div class="voucherItem active">
+               <span>Giảm 15% tối đa 70K</span>
+               <button class="apply-btn" onclick="toggleApplyForm(this)">Bỏ Chọn</button>
+            </div>`;
+         }
+         if(isActive==false){
+            button.textContent = 'Áp Dụng';
+            voucher.innerHTML = `
+            <div class="voucherItem">
+               <span>Giảm 15% tối đa 70K</span>
+               <button class="apply-btn" onclick="toggleApplyForm(this)">Áp Dụng</button>
+            </div>`;
+         }
+
+        
+      }
     </script>
 </html>
