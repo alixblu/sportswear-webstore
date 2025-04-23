@@ -54,14 +54,14 @@
             }
         }
 
-        public function defaultAccount($name, $email, $phone, $gender, $roleID,$birthday) {
+        public function defaultAccount($name, $email, $address,$phone, $gender, $roleID,$birthday) {
             try {
                 $passWordDefault ='123456';
 
                 if ($this->isEmailExists($email)) {
                     throw new Exception("Email already exists", 400);
                 }
-                return $this->userRepository->save($name,$email, $passWordDefault, $phone, $gender, $roleID,$birthday);
+                return $this->userRepository->save($name,$email, $passWordDefault, $phone, $gender, $roleID,$address,$birthday);
 
             } catch (Exception $e) {
                 throw new Exception($e->getMessage(), $e->getCode() ?: 400);

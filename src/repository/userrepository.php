@@ -230,7 +230,7 @@
          * @return array User data
          * @throws Exception If database error occurs
          */
-        public function save($name,$email, $passWord, $phone, $gender, $roleID, $birthday = null) {
+        public function save($name,$email, $passWord, $phone, $gender, $roleID,$address=null, $birthday = null) {
             $conn = null;
             $stmt = null;
             try {
@@ -247,12 +247,12 @@
                 }
                 
                 // Insert into user table first
-                $stmt = $conn->prepare("INSERT INTO user (fullname, email, phone, gender, roleID,dateOfBirth) VALUES (?, ?, ?, ?, ?,?)");
+                $stmt = $conn->prepare("INSERT INTO user (fullname, email, phone, gender, roleID,dateOfBirth,address) VALUES (?, ?, ?, ?, ?,?,?)");
                 if (!$stmt) {
                     throw new Exception("Failed to prepare user insert: " . $conn->error);
                 }
                 
-                $stmt->bind_param("sssiis", $name, $email, $phone, $gender, $roleID,$birthday);
+                $stmt->bind_param("sssiiss", $name, $email, $phone, $gender, $roleID,$birthday,$address);
                 if (!$stmt->execute()) {
                     throw new Exception("Failed to insert user: " . $stmt->error);
                 }
@@ -282,7 +282,9 @@
                     'phone' => $phone,
                     'gender' => $gender,
                     'roleID' => $roleID,
-                    'birthday' => $birthday
+                    'birthday' => $birthday,
+                    'address' => $address
+
                 ];
             } catch (Exception $e) {
                 // Rollback transaction on error

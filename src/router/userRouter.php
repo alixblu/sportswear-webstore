@@ -35,7 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $phone = $_POST['phone'] ?? '';
         $gender = $_POST['gender'] ?? '';
         $roleID = $_POST['roleID'] ?? '';
-        $userController->defaultAccount($name, $email, $phone, $gender, $roleID,$birthday);
+        $address = $_POST['address'] ?? '';
+
+        $userController->defaultAccount($name, $email,$address, $phone, $gender, $roleID,$birthday);
     } else if (isset($_GET['action']) && $_GET['action'] === 'uploadFile'){
         $file = $_FILES['excel_file']['tmp_name'];
         $userController->importExcel($file);
