@@ -307,6 +307,9 @@
                 const tbody = document.querySelector(".data-table tbody");
                 tbody.innerHTML = ""; 
                 users.forEach(user => {
+                    if(user.roleName=='Customer'){
+                        return;
+                    }
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td>${stt}</td>
@@ -399,8 +402,11 @@
                 getAllRoles()
                     .then(result => {
                         const roles = result.data;
-
+                        
                         roles.forEach(role => {
+                            if(role.name=='Customer'){
+                                return;
+                            }
                             const option = document.createElement('option');
                             option.value = role.id;
                             option.textContent = role.name;
