@@ -216,7 +216,8 @@ class ProductService
      * @return array List of categories
      * @throws Exception If database error occurs
      */
-    public function getAllCategories() {
+    public function getAllCategories()
+    {
         try {
             return $this->productRepository->getAllCategories();
         } catch (Exception $e) {
@@ -242,7 +243,8 @@ class ProductService
      * @return array List of brands
      * @throws Exception If database error occurs
      */
-    public function getAllBrands() {
+    public function getAllBrands()
+    {
         try {
             return $this->productRepository->getAllBrands();
         } catch (Exception $e) {
