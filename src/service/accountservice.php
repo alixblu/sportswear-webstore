@@ -1,6 +1,5 @@
-
 <?php
-require_once dirname(__FILE__) . '/../repository/AccountRepository.php';
+require_once dirname(__FILE__) . '/../repository/accountreposity.php';
 
 class AccountService {
     private $accountRepository;
