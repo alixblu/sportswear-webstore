@@ -1,6 +1,6 @@
 const API_URL = '../../src/router/userRouter.php';
 
-export const getAccountByUserId = async (userId) => {
+const getAccountByUserId = async (userId) => {
     const response = await fetch(`${API_URL}?action=getAccountByUserId&userId=${userId}`, {
         method: 'GET',
     });
@@ -12,7 +12,7 @@ export const getAccountByUserId = async (userId) => {
     return await response.json();
 };
 
-export const getAllUsers = async () => {
+const getAllUsers = async () => {
     const response = await fetch(`${API_URL}?action=getAllUsers`, {
         method: 'GET',
         headers: {
@@ -27,10 +27,11 @@ export const getAllUsers = async () => {
     return await response.json();
 };
 
-export const createDefaultAccount = async (name, email, phone, gender, roleID) => {
+const createDefaultAccount = async (name, birthday,email, phone, gender, roleID) => {
     const formData = new URLSearchParams();
     formData.append('action', 'defaultAccount');
     formData.append('name', name);
+    formData.append('birthday', birthday);
     formData.append('email', email);
     formData.append('phone', phone);
     formData.append('gender', gender);
@@ -51,7 +52,7 @@ export const createDefaultAccount = async (name, email, phone, gender, roleID) =
     return await response.json();
 };
 
-export const deleteUser = async (userId) => {
+const deleteUserApi = async (userId) => {
     const response = await fetch(`${API_URL}?action=deleteUsers&userId=${userId}`, {
         method: 'DELETE',
     });
@@ -63,11 +64,12 @@ export const deleteUser = async (userId) => {
     return await response.json();
 };
 
-export const updateUser = async (id, name, email, passWord, phone, gender, roleID) => {
+const updateUser = async (id, name,address, email, passWord, phone, gender, roleID) => {
     const formData = new URLSearchParams();
     formData.append('action', 'updateUsers');
     formData.append('userId', id);
     formData.append('name', name);
+    formData.append('address', address);
     formData.append('email', email);
     formData.append('passWord', passWord);
     formData.append('phone', phone);
@@ -85,7 +87,7 @@ export const updateUser = async (id, name, email, passWord, phone, gender, roleI
 
     return await response.json();
 };
-export const getAllRoles = async () => {
+const getAllRoles = async () => {
     const response = await fetch(`${API_URL}?action=getAllRoles`, {
         method: 'GET',
         headers: {
@@ -100,7 +102,7 @@ export const getAllRoles = async () => {
     return await response.json();
 };
 
-export const uploadFile = async (file) => {
+const uploadFileUser = async (file) => {
     try {
         const formData = new FormData();
         formData.append("excel_file", file);
@@ -109,14 +111,13 @@ export const uploadFile = async (file) => {
             body: formData
         });
 
-        const result = await response.text();
-        alert("Kết quả: " + result);
+        return await response.json();
     } catch (err) {
         console.error("Lỗi:", err);
     }
 };
 
-export const exportFile = async (file) => {
+const exportFileUser = async (file) => {
     try {
         const response = await fetch(`${API_URL}?action=exportFile`, {
             method: "GET",
@@ -137,6 +138,33 @@ export const exportFile = async (file) => {
         } else {
             const errorMessage = await response.text();
             alert("Lỗi khi tải file: " + errorMessage);
+        }
+    } catch (err) {
+        console.error("Lỗi:", err);
+    }
+};
+
+const searchUsers = async (keyword, fields) => {
+    try {
+        let query = `?action=search&keyword=${encodeURIComponent(keyword)}`;
+        fields.forEach(field => {
+            query += `&fields[]=${encodeURIComponent(field)}`;
+        });
+
+        const response = await fetch(`${API_URL}${query}`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Kết quả tìm kiếm:", data);
+            return data;
+        } else {
+            const errorMessage = await response.text();
+            alert("Lỗi khi tìm kiếm: " + errorMessage);
         }
     } catch (err) {
         console.error("Lỗi:", err);

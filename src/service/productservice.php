@@ -198,25 +198,58 @@ class ProductService
             throw new Exception("Failed to get brand: " . $e->getMessage());
         }
     }
-
-    /**
-     * Delete a product by ID
-     * @param int $id Product ID
-     * @return bool True if successful, false otherwise
-     * @throws Exception If database error occurs
-     */
-
-    public function deleteProduct($id)
+    public function getBrandByName($name)
     {
         try {
-            if (!is_numeric($id) || $id <= 0) {
-                throw new Exception("Invalid product ID");
+            if (empty($name)) {
+                throw new Exception("Invalid brand name");
             }
 
-            return $this->productRepository->deleteProduct($id);
+            return $this->productRepository->getBrandByName($name);
         } catch (Exception $e) {
-            error_log("Error in deleteProduct service: " . $e->getMessage());
-            throw new Exception("Failed to delete product: " . $e->getMessage());
+            error_log("Error in getBrandByName service: " . $e->getMessage());
+            throw new Exception("Failed to get brand: " . $e->getMessage());
+        }
+    }
+    /**
+     * Get all categories
+     * @return array List of categories
+     * @throws Exception If database error occurs
+     */
+    public function getAllCategories()
+    {
+        try {
+            return $this->productRepository->getAllCategories();
+        } catch (Exception $e) {
+            error_log("Error in getAllCategories service: " . $e->getMessage());
+            throw new Exception("Failed to get categories: " . $e->getMessage());
+        }
+    }
+    public function getCategoryByName($name)
+    {
+        try {
+            if (empty($name)) {
+                throw new Exception("Invalid category name");
+            }
+
+            return $this->productRepository->getCategoryByName($name);
+        } catch (Exception $e) {
+            error_log("Error in getCategoryByName service: " . $e->getMessage());
+            throw new Exception("Failed to get category: " . $e->getMessage());
+        }
+    }
+    /**
+     * Get all brands
+     * @return array List of brands
+     * @throws Exception If database error occurs
+     */
+    public function getAllBrands()
+    {
+        try {
+            return $this->productRepository->getAllBrands();
+        } catch (Exception $e) {
+            error_log("Error in getAllBrands service: " . $e->getMessage());
+            throw new Exception("Failed to get brands: " . $e->getMessage());
         }
     }
 }

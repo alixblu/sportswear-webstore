@@ -230,7 +230,7 @@
          * @return array User data
          * @throws Exception If database error occurs
          */
-        public function save($name, $email, $passWord, $phone, $gender, $roleID) {
+        public function save($name,$email, $passWord, $phone, $gender, $roleID, $birthday = null) {
             $conn = null;
             $stmt = null;
             try {
@@ -247,12 +247,12 @@
                 }
                 
                 // Insert into user table first
-                $stmt = $conn->prepare("INSERT INTO user (fullname, email, phone, gender, roleID) VALUES (?, ?, ?, ?, ?)");
+                $stmt = $conn->prepare("INSERT INTO user (fullname, email, phone, gender, roleID,dateOfBirth) VALUES (?, ?, ?, ?, ?,?)");
                 if (!$stmt) {
                     throw new Exception("Failed to prepare user insert: " . $conn->error);
                 }
                 
-                $stmt->bind_param("sssii", $name, $email, $phone, $gender, $roleID);
+                $stmt->bind_param("sssiis", $name, $email, $phone, $gender, $roleID,$birthday);
                 if (!$stmt->execute()) {
                     throw new Exception("Failed to insert user: " . $stmt->error);
                 }
@@ -281,7 +281,8 @@
                     'email' => $email,
                     'phone' => $phone,
                     'gender' => $gender,
-                    'roleID' => $roleID
+                    'roleID' => $roleID,
+                    'birthday' => $birthday
                 ];
             } catch (Exception $e) {
                 // Rollback transaction on error
@@ -296,51 +297,39 @@
             }
         }
 
-        public function findUserById($id) {
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
 
-            $stmt = $conn->prepare("SELECT * FROM users WHERE id = ? LIMIT 1");
-            $stmt->bind_param("s", $id);
-            $stmt->execute();
-
-            $result = $stmt->get_result();
-            $user = $result->fetch_assoc();
-
-            $stmt->close(); 
-            $conn->close();
-
-            return $user;
-
-        }
-        public function userUpdate($id, $name, $phone, $gender, $roleID) {
+        public function userUpdate($id, $name,$address, $phone, $gender, $roleID) {
             $conn = null;
             $stmt = null;
             try {
-                $mysql = new configMysqli();
-                $conn = $mysql->connectDatabase();
-                
+            $mysql = new configMysqli();
+            $conn = $mysql->connectDatabase();
+            
                 $sql = "UPDATE user 
-                        SET fullname = ?, phone = ?, gender = ?, roleID = ?
+                        SET fullname = ?, address = ? ,phone = ?, gender = ?, roleID = ?
                         WHERE id = ?";
+            
+            $stmt = $conn->prepare($sql);
+                $stmt->bind_param("sssssi", $name, $address, $phone, $gender, $roleID, $id);
         
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssssi", $name,  $phone, $gender, $roleID, $id);
+            $stmt->execute();
         
-                $stmt->execute();
-        
-                $user = null;
-                if ($stmt->affected_rows > 0) {
-                    $user = [
-                        'id' => $id,
+            $user = null;
+            if ($stmt->affected_rows === 0) {
+                throw new Exception("No changes detected, user not updated.", 500);
+            }
+
+            if ($stmt->affected_rows > 0) {
+                $user = [
+                    'id' => $id,
                         'name' => $name,
                         'phone' => $phone,
                         'gender' => $gender,
                         'roleID' => $roleID
-                    ];
-                }
-        
-                return $user;
+                ];
+            }
+
+            return $user;
             } catch (Exception $e) {
                 error_log("Database error in userUpdate: " . $e->getMessage());
                 throw new Exception("Database error: " . $e->getMessage());
@@ -350,62 +339,6 @@
             }
         }
         
-        public function userFindAll(){
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
-
-            $sql = "SELECT id, username ,password ,address ,gender ,status FROM users";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-
-            $result = $stmt->get_result();
-            $users = [];
-            while ($row = $result->fetch_assoc()) {
-                $userId = $row['id'];
-                
-                if (!isset($users[$userId])) {
-                    $users[$userId] = [
-                        'id' => $row['id'],
-                        'username' => $row['username'],
-                        'password' => $row['password'],
-                        'address' => $row['address'],
-                        'gender' => $row['gender'],
-                        'status' => $row['status'],
-                    ];
-                }
-            }
-
-            $stmt->close();
-            $conn->close();
-
-            return array_values($users); 
-        }
-        public function changePassword($userId,$newPassWord){
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
-        
-            $sql = "UPDATE users 
-                    SET password = ?
-                    WHERE id = ?";
-            
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("si", $newPassWord,$userId);
-        
-            $stmt->execute();
-            $user = null;
-            if ($stmt->affected_rows > 0) {
-                $user = [
-                    'id' => $userId,
-                    'newPassWord' => $newPassWord,
-                ];
-            }
-
-            $stmt->close(); 
-            $conn->close();
-
-            return $user;
-        }
         public function bulkInsertWithNPlus1($data) {
             $mysql = new configMysqli();
             $conn = $mysql->connectDatabase();
@@ -460,6 +393,49 @@
             }
         }
         
-    
+        public function search($keyword, $fields) {
+            $conn = null;
+            $stmt = null;
+        
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+        
+                if (empty($fields)) return [];
+        
+                $conditions = [];
+                foreach ($fields as $field) {
+                    $conditions[] = "$field LIKE ?";
+                }
+        
+                $whereClause = implode(" OR ", $conditions);
+                $sql = "SELECT * FROM user WHERE $whereClause";
+        
+                $stmt = $conn->prepare($sql);
+        
+                $paramTypes = str_repeat("s", count($fields));
+                $params = array_fill(0, count($fields), '%' . $keyword . '%');
+        
+                $stmt->bind_param($paramTypes, ...$params);
+        
+                $stmt->execute();
+                $result = $stmt->get_result();
+        
+                $users = [];
+                while ($row = $result->fetch_assoc()) {
+                    $users[] = $row;
+                }
+                return $users;
+        
+            } catch (Exception $e) {
+                error_log("Database error in search: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
+        }
     }
+        
+
 ?>

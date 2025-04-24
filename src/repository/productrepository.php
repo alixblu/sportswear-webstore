@@ -1,16 +1,16 @@
 <?php
 require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
-/**=======src of product include VARIANT and CATEGORY AND BRAND====
+/**============src of products include VARIANT and CATEGORY AND BRAND ====
  * 
  * 
  * Functions in ProductRepository:
- * - findAll() - Get all products with their variants
- * - findById($id) - Find a product by ID with its variants
+
  * - getProductVariants($productId) - Get all variants of a specific product
  * - getAllProducts() - Get all products without variants
  * - getProductById($id) - Get a product by ID without variants
  * - updateProduct($id, $data) - Update a product's information
  * - updateProductStock($productId) - Update product stock based on variant quantities
+ * ..............
  */
 class ProductRepository
 {
@@ -19,188 +19,7 @@ class ProductRepository
     {
         $this->conn = ConfigMysqli::connectDatabase();
     }
-    /**
-     * Get all products with their variants
-     * @return array Products with their variants
-     * @throws Exception If database error occurs
-     */
-    public function findAll()
-    {
-        $conn = null;
-        $stmt = null;
-        try {
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
 
-            $stmt = $conn->prepare("
-                SELECT 
-                    p.ID as productID,
-                    p.categoryID,
-                    p.discountID,
-                    p.brandID,
-                    p.name as productName,
-                    p.markup_percentage,
-                    p.rating,
-                    p.image,
-                    p.description,
-                    p.stock,
-                    p.status as productStatus,
-                    pv.ID as variantID,
-                    pv.Code,
-                    pv.fullName,
-                    pv.quantity,
-                    pv.color,
-                    pv.size,
-                    pv.weight,
-                    pv.price,
-                    pv.status as variantStatus
-                FROM product p
-                LEFT JOIN productvariant pv ON p.ID = pv.productID
-                ORDER BY p.ID, pv.Code
-            ");
-
-            if (!$stmt) {
-                throw new Exception("Database error: " . $conn->error);
-            }
-
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            $products = [];
-            while ($row = $result->fetch_assoc()) {
-                $productId = $row['productID'];
-                if (!isset($products[$productId])) {
-                    $products[$productId] = [
-                        'id' => $row['productID'],
-                        'categoryID' => $row['categoryID'],
-                        'discountID' => $row['discountID'],
-                        'brandID' => $row['brandID'],
-                        'name' => $row['productName'],
-                        'markup_percentage' => $row['markup_percentage'],
-                        'rating' => $row['rating'],
-                        'image' => $row['image'],
-                        'description' => $row['description'],
-                        'stock' => $row['stock'],
-                        'status' => $row['productStatus'],
-                        'variants' => []
-                    ];
-                }
-
-                if ($row['variantID']) {
-                    $products[$productId]['variants'][] = [
-                        'id' => $row['variantID'],
-                        'code' => $row['Code'],
-                        'fullName' => $row['fullName'],
-                        'quantity' => $row['quantity'],
-                        'color' => $row['color'],
-                        'size' => $row['size'],
-                        'weight' => $row['weight'],
-                        'price' => $row['price'],
-                        'status' => $row['variantStatus']
-                    ];
-                }
-            }
-
-            return array_values($products);
-        } catch (Exception $e) {
-            error_log("Database error in findAll: " . $e->getMessage());
-            throw new Exception("Database error: " . $e->getMessage());
-        } finally {
-            if ($stmt) $stmt->close();
-            if ($conn) $conn->close();
-        }
-    }
-
-    /**checked
-     * Find a product by ID with its variants
-     * @param int $id Product ID
-     * @return array|null Product with variants if found, null otherwise
-     * @throws Exception If database error occurs
-     */
-    public function findById($id)
-    {
-        try {
-            $stmt = $this->conn->prepare("
-                SELECT 
-                    p.ID as productID,
-                    p.categoryID,
-                    p.discountID,
-                    p.brandID,
-                    p.name as productName,
-                    p.markup_percentage,
-                    p.rating,
-                    p.image,
-                    p.description,
-                    p.stock,
-                    p.status as productStatus,
-                    pv.ID as variantID,
-                    pv.Code,
-                    pv.fullName,
-                    pv.quantity,
-                    pv.color,
-                    pv.size,
-                    pv.weight,
-                    pv.price,
-                    pv.status as variantStatus
-                FROM product p
-                LEFT JOIN productvariant pv ON p.ID = pv.productID
-                WHERE p.ID = ?
-                ORDER BY pv.Code
-            ");
-
-            if (!$stmt) {
-                throw new Exception("Database error: " . $this->conn->error);
-            }
-
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            $product = null;
-            while ($row = $result->fetch_assoc()) {
-                if (!$product) {
-                    $product = [
-                        'id' => $row['productID'],
-                        'categoryID' => $row['categoryID'],
-                        'discountID' => $row['discountID'],
-                        'brandID' => $row['brandID'],
-                        'name' => $row['productName'],
-                        'markup_percentage' => $row['markup_percentage'],
-                        'rating' => $row['rating'],
-                        'image' => $row['image'],
-                        'description' => $row['description'],
-                        'stock' => $row['stock'],
-                        'status' => $row['productStatus'],
-                        'variants' => []
-                    ];
-                }
-
-                if ($row['variantID']) {
-                    $product['variants'][] = [
-                        'id' => $row['variantID'],
-                        'code' => $row['Code'],
-                        'fullName' => $row['fullName'],
-                        'quantity' => $row['quantity'],
-                        'color' => $row['color'],
-                        'size' => $row['size'],
-                        'weight' => $row['weight'],
-                        'price' => $row['price'],
-                        'status' => $row['variantStatus']
-                    ];
-                }
-            }
-
-            return $product;
-        } catch (Exception $e) {
-            error_log("Database error in findById: " . $e->getMessage());
-            throw new Exception("Database error: " . $e->getMessage());
-        } finally {
-            if ($stmt) $stmt->close();
-            if ($this->conn) $this->conn->close();
-        }
-    }
-
-    private $conn;
 
     //checked
     public function getProductVariants($productId)
@@ -386,17 +205,83 @@ class ProductRepository
             throw new Exception("Failed to get brand");
         }
     }
-
-    public function deleteProduct($id)
+    public function getBrandByName($name)
     {
         try {
-            $query = "DELETE FROM product WHERE ID = ?";
+            $query = "SELECT * FROM brand WHERE name = ?";
             $stmt = $this->conn->prepare($query);
-            $stmt->bind_param("i", $id);
-            return $stmt->execute();
+            $stmt->bind_param("s", $name);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            return $result->fetch_assoc();
         } catch (Exception $e) {
-            error_log("Error in deleteProduct: " . $e->getMessage());
-            throw new Exception("Failed to delete product");
+            error_log("Error in getBrandByName: " . $e->getMessage());
+            throw new Exception("Failed to get brand by name");
         }
     }
+
+    /**
+     * Get all categories
+     * @return array List of categories
+     * @throws Exception If database error occurs
+     */
+    public function getAllCategories() {
+        try {
+            $query = "SELECT * FROM category ORDER BY name";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            $categories = [];
+            while ($row = $result->fetch_assoc()) {
+                $categories[] = $row;
+            }
+
+            return $categories;
+        } catch (Exception $e) {
+            error_log("Error in getAllCategories: " . $e->getMessage());
+            throw new Exception("Failed to get categories");
+        }
+    }
+
+    public function getCategoryByName($name) {
+        try {
+            $query = "SELECT * FROM category WHERE name = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("s", $name);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            return $result->fetch_assoc();
+        } catch (Exception $e) {
+            error_log("Error in getCategoryByName: " . $e->getMessage());
+            throw new Exception("Failed to get category by name");
+        }
+    }
+    
+    /**
+     * Get all brands
+     * @return array List of brands
+     * @throws Exception If database error occurs
+     */
+    public function getAllBrands() {
+        try {
+            $query = "SELECT * FROM brand ORDER BY name";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            $brands = [];
+            while ($row = $result->fetch_assoc()) {
+                $brands[] = $row;
+            }
+
+            return $brands;
+        } catch (Exception $e) {
+            error_log("Error in getAllBrands: " . $e->getMessage());
+            throw new Exception("Failed to get brands");
+        }
+    }
+
 }

@@ -15,7 +15,6 @@ const getAllProducts = async () => {
         }
 
         const data = await response.json();
-        console.log('Raw API Response:', data); // Debug log
 
         // Check if data is an array or has a data property
         if (Array.isArray(data)) {
@@ -65,6 +64,17 @@ const getCategoryById = async (id) => {
 
     return await response.json();
 };
+const getCategoryByName = async (name) => {
+    const response = await fetch(`${API_URL}?action=getCategoryByName&name=${name}`, {
+        method: 'GET',
+    });
+
+    if (!response.ok) {
+        throw new Error('Không thể lấy phân loại sản phẩm');
+    }
+
+    return await response.json();
+}
 const getBrandById = async (id) => {
     const response = await fetch(`${API_URL}?action=getBrandById&id=${id}`, {
         method: 'GET',
@@ -76,32 +86,25 @@ const getBrandById = async (id) => {
 
     return await response.json();
 };
-const updateProduct = async (
-    id,
-    categoryID,
-    discountID,
-    brandID,
-    name,
-    markup_percentage,
-    rating,
-    image,
-    description,
-    stock,
-    status
-) => {
+const getBrandByName = async (name) => {
+    const response = await fetch(`${API_URL}?action=getBrandByName&name=${name}`, {
+        method: 'GET',
+    });
+
+    if (!response.ok) {
+        throw new Error('Không thể lấy phân loại sản phẩm');
+    }
+
+    return await response.json();
+}
+const updateProduct = async (product) => {
     const formData = new URLSearchParams();
     formData.append('action', 'updateProduct');
-    formData.append('id', id);
-    formData.append('categoryID', categoryID);
-    formData.append('discountID', discountID);
-    formData.append('brandID', brandID);
-    formData.append('name', name);
-    formData.append('markup_percentage', markup_percentage);
-    formData.append('rating', rating);
-    formData.append('image', image);
-    formData.append('description', description);
-    formData.append('stock', stock);
-    formData.append('status', status);
+
+    // Dynamically append properties from the product object
+    for (const key in product) {
+        formData.append(key, product[key]);
+    }
 
     const response = await fetch(API_URL, {
         method: 'PUT',
@@ -143,3 +146,124 @@ const deleteProduct = async (id) => {
 
     return await response.json();
 };
+
+const getAllCategories = async () => {
+    const response = await fetch(`${API_URL}?action=getAllCategories`, {
+        method: 'GET',
+    });
+
+    if (!response.ok) {
+        throw new Error('Không thể lấy danh sách phân loại');
+    }
+
+    return await response.json();
+};
+
+const getAllBrands = async () => {
+    const response = await fetch(`${API_URL}?action=getAllBrands`, {
+        method: 'GET',
+    });
+
+    if (!response.ok) {
+        throw new Error('Không thể lấy danh sách thương hiệu');
+    }
+
+    return await response.json();
+};
+
+// Function to populate category dropdown
+const populateCategoryFilter = async () => {
+    try {
+        const response = await getAllCategories();
+        
+        const categories = response.data || [];
+        
+        const categorySelect = document.getElementById('category');
+        
+        // Clear existing options except the first one
+        while (categorySelect.options.length > 1) {
+            categorySelect.remove(1);
+        }
+
+        // Add new options
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.ID;
+            option.textContent = category.name;
+            categorySelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error populating category filter:', error);
+    }
+};
+
+// Function to populate brand dropdown
+const populateBrandFilter = async () => {
+    try {
+        const response = await getAllBrands();
+        
+        const brands = response.data || [];
+        
+        const brandSelect = document.getElementById('brand');
+        
+        // Clear existing options except the first one
+        while (brandSelect.options.length > 1) {
+            brandSelect.remove(1);
+        }
+
+        // Add new options
+        brands.forEach(brand => {
+            const option = document.createElement('option');
+            option.value = brand.ID;
+            option.textContent = brand.name;
+            brandSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error populating brand filter:', error);
+    }
+};
+
+
+// // Initialize filters when page loads
+// document.addEventListener('DOMContentLoaded', async () => {
+//     try {
+//         console.log('Initializing filters...');
+        
+//         // Populate category filter
+//         await populateCategoryFilter();
+        
+//         // Populate brand filter
+//         await populateBrandFilter();
+        
+
+//         // Set status filter options
+//         const statusSelect = document.getElementById('status');
+//         console.log('Status select element:', statusSelect);
+        
+//         // Keep the first "All Status" option
+//         while (statusSelect.options.length > 1) {
+//             statusSelect.remove(1);
+//         }
+        
+//         const statusOptions = [
+//             { value: 'in_stock', text: 'In Stock' },
+//             { value: 'out_of_stock', text: 'Out of Stock' },
+//             { value: 'discontinued', text: 'Discontinued' }
+//         ];
+        
+
+//         statusOptions.forEach(status => {
+//             console.log('Adding status:', status);
+//             const option = document.createElement('option');
+//             option.value = status.value;
+//             option.textContent = status.text;
+//             statusSelect.appendChild(option);
+//         });
+
+//         // Load products after filters are set
+//         loadProducts();
+//     } catch (error) {
+//         console.error('Error initializing filters:', error);
+//     }
+// });
+

@@ -8,369 +8,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin/product.css">
 
-    <script src="../../../JS/admin/product.js"></script>
-    <style>
-        .product-id-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background-color: #fff;
-            color: #333;
-            padding: 1px 4px;
-            border-radius: 3px;
-            font-size: 10px;
-            font-weight: bold;
-            border: 1px solid #000;
-            box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .product-image {
-            position: relative;
-        }
-
-        /* Product Card Styles */
-        .product-card {
-            background: white;
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow);
-        }
-
-        .product-info {
-            padding: 12px;
-        }
-
-        .product-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text);
-            line-height: 1.3;
-        }
-
-        .product-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 12px;
-            color: var(--text-light);
-        }
-
-        .product-rating {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .stars {
-            color: var(--warning);
-            margin-right: 6px;
-            font-size: 12px;
-        }
-
-        .rating-count {
-            font-size: 11px;
-            color: var(--text-light);
-        }
-
-        .product-actions {
-            display: flex;
-            justify-content: center;
-            margin-top: 12px;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-
-        .modal-content {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            border-radius: var(--radius);
-            width: 90%;
-            max-width: 1000px;
-            max-height: 90vh;
-            overflow: hidden;
-            z-index: 1001;
-            box-shadow: var(--shadow);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 24px;
-            border-bottom: 1px solid var(--border);
-            background-color: rgba(248, 249, 250, 0.5);
-        }
-
-        .modal-header h2 {
-            font-size: 19px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            color: var(--dark);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-light);
-            transition: var(--transition);
-        }
-
-        .modal-close:hover {
-            color: var(--danger);
-            transform: rotate(90deg);
-        }
-
-        .modal-body {
-            display: flex;
-            flex-direction: row;
-            height: calc(90vh - 120px);
-        }
-
-        .product-image-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            background: var(--light);
-            border-right: 1px solid var(--border);
-            width: 240px;
-        }
-
-        .product-image-large {
-            width: 160px;
-            height: 160px;
-            background: white;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .product-image-large i {
-            font-size: 80px;
-            color: var(--border);
-        }
-
-        .product-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-        }
-
-        .product-actions .btn {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .product-info-section {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-        }
-
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 24px;
-        }
-
-        .tab {
-            padding: 12px 24px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: var(--transition);
-            color: var(--text-light);
-            font-weight: 500;
-        }
-
-        .tab.active {
-            border-bottom: 2px solid var(--primary);
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .info-item {
-            background: var(--light);
-            padding: 10px 12px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-        }
-
-        .info-label {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-bottom: 4px;
-            font-weight: 500;
-        }
-
-        .info-value {
-            font-size: 13px;
-            color: var(--text);
-            font-weight: 500;
-        }
-
-        .info-item[style*="margin-top"] {
-            margin-top: 12px;
-        }
-
-        .variants-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: 14px;
-        }
-
-        .variants-table th {
-            background: var(--light);
-            padding: 12px 16px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text);
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-
-        .variants-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-
-        .variants-table tr:hover {
-            background-color: rgba(67, 97, 238, 0.03);
-            transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-        }
-
-        #variants-tab {
-            overflow-x: auto;
-        }
-
-        .status-badge {
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            line-height: 1;
-        }
-
-        .status-badge i {
-            margin-right: 6px;
-            font-size: 12px;
-        }
-
-        .status-in_stock {
-            background-color: rgba(76, 201, 240, 0.15);
-            color: #0891b2;
-            border: 1px solid rgba(76, 201, 240, 0.3);
-        }
-
-        .status-out_of_stock {
-            background-color: rgba(247, 37, 133, 0.15);
-            color: #db2777;
-            border: 1px solid rgba(247, 37, 133, 0.3);
-        }
-
-        .btn {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-
-        .btn i {
-            font-size: 12px;
-            margin-right: 4px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
-        }
-
-        .btn-outline {
-            border: 2px solid var(--primary-light);
-            color: var(--primary);
-            background-color: transparent;
-        }
-
-        .btn-outline:hover {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
-        }
-
-        /* Export button specific styles */
-        #exportBtn {
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        #exportBtn i {
-            font-size: 14px;
-            margin-right: 6px;
-        }
-    </style>
+    <script src="../../JS/admin/product.js"></script>
+    <link rel="stylesheet" href="../../css/admin/product.css">
 </head>
 
 <body>
     <div class="main-content">
-        <div id="pageTitle" class="page-title">
-            <div class="title">Products</div>
-            <div class="action-buttons">
-                <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
-                <button id="exportBtn" class="btn btn-outline">
-                    <i class="fas fa-download"></i> Export
-                </button>
+<div id="pageTitle" class="page-title">
+        <div class="title">Products</div>
+        <div class="action-buttons">
+            <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+            <button id="exportBtn" class="btn btn-outline">
+                <i class="fas fa-download"></i> Export
+            </button>
             </div>
         </div>
 
@@ -382,24 +32,16 @@
             <div class="filter-group">
                 <select id="category" class="filter-select">
                     <option value="">All Categories</option>
-                    <option value="1">T-Shirts</option>
-                    <option value="2">Shoes</option>
-                    <option value="3">Accessories</option>
                 </select>
             </div>
             <div class="filter-group">
                 <select id="brand" class="filter-select">
                     <option value="">All Brands</option>
-                    <option value="1">Nike</option>
-                    <option value="2">Adidas</option>
-                    <option value="3">Puma</option>
                 </select>
             </div>
             <div class="filter-group">
                 <select id="status" class="filter-select">
                     <option value="">All Status</option>
-                    <option value="in_stock">In Stock</option>
-                    <option value="out_of_stock">Out of Stock</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -423,8 +65,8 @@
         <!-- Product Grid -->
         <div class="product-grid" id="productGrid">
             <!-- Products will be loaded here dynamically -->
-        </div>
-    </div>
+                    </div>
+                </div>
 
     <!-- Modal Structure -->
     <div class="modal-overlay" id="productModal">
@@ -435,19 +77,26 @@
             </div>
             <div class="modal-body">
                 <div class="product-image-section">
-                    <div class="product-image-large">
-                        <i class="fas fa-tshirt"></i>
-                    </div>
+                <div class="product-image-large">
+                    <img id="modal-product-image" src="" alt="Product Image" />
+                </div>
                     <div class="product-actions">
-                        <button class="btn btn-primary">
+                        <button class="btn btn-primary" onclick="showEditForm()">
                             <i class="fas fa-edit"></i> Edit Product
                         </button>
-                        <button class="btn btn-outline">
+            
+                        <input type="file" id="changeImageInput" accept="image/*" style="display:none;">
+                        <button class="btn btn-outline" onclick="triggerImageUpload()">
                             <i class="fas fa-image"></i> Change Image
+                        </button>
+                        </div>
+                    <div class="discontinued-action">
+                        <button class="btn btn-discontinued">
+                            <i class="fas fa-ban"></i> Mark as Discontinued
                         </button>
                     </div>
                 </div>
-                <div class="product-info-section">
+                <div class="product-info-section" id="product-info-section">
                     <div class="tabs">
                         <div class="tab active" onclick="switchTab('details')">Details</div>
                         <div class="tab" onclick="switchTab('variants')">Variants</div>
@@ -533,7 +182,7 @@
                                     <th>Color</th>
                                     <th>Size</th>
                                     <th>Quantity</th>
-                                    <th>Price</th>
+                                    <th>Base Price</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -543,12 +192,59 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Edit Form Section (hidden by default) -->
+                <div id="edit-form-section" class="edit-form">
+                    <form id="productEditForm">
+                        <div class="form-group">
+                            <label for="editName">Name</label>
+                            <input type="text" id="editName" name="name">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editCategory">Category</label>
+                                <select id="editCategory" name="category">
+                                    <!-- Categories populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editBrand">Brand</label>
+                                <select id="editBrand" name="brand">
+                                    <!-- Brands populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editMarkup">Markup Percentage</label>
+                                <input type="number" id="editMarkup" name="markup" min="0" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="editDiscount">Discount ID</label>
+                                <input type="text" id="editDiscount" name="discount">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editDescription">Description</label>
+                            <textarea id="editDescription" name="description"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" onclick="cancelEdit()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <script src="../../JS/admin/product.js"></script>
     <script>
+        function triggerImageUpload() {
+    document.getElementById('changeImageInput').click();
+}
+
+
         // Function to render stars based on rating
         function renderStars(rating) {
             if (!rating) return '<div class="stars"><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div>';
@@ -643,11 +339,11 @@
         // Load products when the page loads
         document.addEventListener('DOMContentLoaded', loadProducts);
 
+        var product = null; 
         // Modal functions
         async function viewProduct(id) {
             const modal = document.getElementById('productModal');
             modal.style.display = 'block';
-
             try {
                 // Get product details
                 let response = await getProductById(id);
@@ -658,7 +354,19 @@
                     throw new Error('No product data received');
                 }
 
-                const product = response.data;
+
+                product = response.data;
+                const imgElement = document.getElementById('modal-product-image');
+
+                // Set the image source and handle errors using the 'error' event listener
+                imgElement.onerror = function() {
+                    this.src = '../../img/products/default.png';
+                };
+
+                // Assign the image source
+                imgElement.src = `../../img/products/product_${product.ID}.png`;
+
+
                 const modalElements = {
                     id: document.getElementById('modal-product-id'),
                     name: document.getElementById('modal-product-name'),
@@ -733,7 +441,100 @@
             }
         }
 
+        // Show edit form
+        async function showEditForm() {
+            if (!product) return;
+            console.log('Product Data:', product.ID);
+
+            // Hide product info and show edit form
+            document.getElementById('product-info-section').style.display = 'none';
+            document.getElementById('edit-form-section').style.display = 'block';
+            
+            try {
+                // Get product details
+
+                
+                // Populate form fields
+                document.getElementById('editName').value = product.name || '';
+                document.getElementById('editMarkup').value = product.markup_percentage || '0';
+                document.getElementById('editDiscount').value = product.discountID || '';
+                document.getElementById('editDescription').value = product.description || '';
+                
+                // Load categories
+                const categoriesResponse = await getAllCategories();
+                const categorySelect = document.getElementById('editCategory');
+                categorySelect.innerHTML = '<option value="">Select Category</option>';
+                categoriesResponse.data.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.ID;
+                    option.textContent = category.name;
+                    option.selected = category.ID === product.categoryID;
+                    categorySelect.appendChild(option);
+                });
+                
+                // Load brands
+                const brandsResponse = await getAllBrands();
+                const brandSelect = document.getElementById('editBrand');
+                brandSelect.innerHTML = '<option value="">Select Brand</option>';
+                brandsResponse.data.forEach(brand => {
+                    const option = document.createElement('option');
+                    option.value = brand.ID;
+                    option.textContent = brand.name;
+                    option.selected = brand.ID === product.brandID;
+                    brandSelect.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error loading edit form:', error);
+                alert('Error loading edit form: ' + error.message);
+            }
+        }
+
+        // Cancel editing
+        function cancelEdit() {
+            document.getElementById('product-info-section').style.display = 'block';
+            document.getElementById('edit-form-section').style.display = 'none';
+        }
+
+        // Form submission
+        document.getElementById('productEditForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            try {
+
+            const formData = {
+                id: product.ID,
+                name: document.getElementById('editName').value,
+                categoryID: document.getElementById('editCategory').value,
+                brandID: document.getElementById('editBrand').value,
+                markup_percentage: document.getElementById('editMarkup').value,
+                discountID: document.getElementById('editDiscount').value,
+                description: document.getElementById('editDescription').value,
+                rating: product.rating,
+                image: product.image,
+                stock: product.stock,
+                status: product.status
+            };
+
+            // Call updateProduct with the formData object
+            const response = await updateProduct(formData);
+                
+                if (response.status === 200) {
+                    alert('Product updated successfully!');
+                    viewProduct(product.ID); // Refresh view
+                    loadProducts(); // Refresh grid
+                    cancelEdit(); // Close edit form
+                } else {
+                    throw new Error(response.message || 'Failed to update product');
+                }
+            } catch (error) {
+                console.error('Error updating product:', error);
+                alert('Error updating product: ' + error.message);
+            }
+        });
+
         function closeModal() {
+            cancelEdit();
             const modal = document.getElementById('productModal');
             modal.style.display = 'none';
         }
@@ -742,7 +543,6 @@
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
-
 
             // Remove active class from all tabs
             document.querySelectorAll('.tab').forEach(tab => {

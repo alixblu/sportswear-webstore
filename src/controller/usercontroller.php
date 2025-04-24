@@ -11,8 +11,8 @@
             $this->userService = new UserService();
         }
 
-        public function defaultAccount($name, $email, $phone, $gender, $roleID){
-            $user = $this->userService->defaultAccount($name, $email, $phone, $gender, $roleID);
+        public function defaultAccount($name, $email, $phone, $gender, $roleID,$birthday){
+            $user = $this->userService->defaultAccount($name, $email, $phone, $gender, $roleID,$birthday);
             ApiResponse::customApiResponse($user,200);
         }
         
@@ -26,8 +26,8 @@
             ApiResponse::customApiResponse($users,200);
         }
 
-        public function updateUsers($id, $name, $phone, $gender, $roleID){
-            $users = $this->userService->updateUser($id, $name, $phone, $gender, $roleID);
+        public function updateUsers($id, $name,$address, $phone, $gender, $roleID){
+            $users = $this->userService->updateUser($id, $name,$address, $phone, $gender, $roleID);
             ApiResponse::customApiResponse($users,200);
         }
 
@@ -47,6 +47,10 @@
         }
         public function exportExcel(){
             $result = $this->userService->exportExcel();
+            ApiResponse::customApiResponse($result,200);
+        }
+        public function search($keyword, $fields){
+            $result = $this->userService->search($keyword, $fields);
             ApiResponse::customApiResponse($result,200);
         }
     }

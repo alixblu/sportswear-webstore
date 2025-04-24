@@ -25,11 +25,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $productController->getCategoryById($_GET['id']);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getBrandById' && isset($_GET['id'])) {
         $productController->getBrandById($_GET['id']);
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getAllCategories') {
+        $productController->getAllCategories();
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getAllBrands') {
+        $productController->getAllBrands();
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getBrandByName' && isset($_GET['name'])) {
+        $productController->getBrandByName($_GET['name']);
+    }else if (isset($_GET['action']) && $_GET['action'] === 'getCategoryByName' && isset($_GET['name'])) {
+        $productController->getCategoryByName($_GET['name']);
     } else {
         echo json_encode(['error' => 'Invalid GET request']);
     }
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProductImage') {
+    $productId = $_POST['product_id'];
+    if (isset($_FILES['image']) && $productId) {
+        $targetDir = $_SERVER['DOCUMENT_ROOT'] . "/sportwear/img/products/";
+        $targetFile = $targetDir . "product_" . $productId . ".png";
 
+        // Remove old file if exists
+        if (file_exists($targetFile)) {
+            unlink($targetFile);
+        }
+
+        // Move uploaded file (force .png extension)
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
+            echo json_encode([
+                "status" => 200,
+                "message" => "Image uploaded successfully"
+            ]);
+        } else {
+            echo json_encode([
+                "status" => 500,
+                "message" => "Failed to move uploaded file"
+            ]);
+        }
+    } else {
+        echo json_encode([
+            "status" => 400,
+            "message" => "No image or product ID provided"
+        ]);
+    }
+    exit;
+}
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     parse_str(file_get_contents("php://input"), $putData);
 
