@@ -27,7 +27,7 @@ const getAllUsers = async () => {
     return await response.json();
 };
 
-const createDefaultAccount = async (name, birthday,email, phone, gender, roleID) => {
+const createDefaultAccount = async (name, birthday,address,email, phone, gender, roleID) => {
     const formData = new URLSearchParams();
     formData.append('action', 'defaultAccount');
     formData.append('name', name);
@@ -36,6 +36,7 @@ const createDefaultAccount = async (name, birthday,email, phone, gender, roleID)
     formData.append('phone', phone);
     formData.append('gender', gender);
     formData.append('roleID', roleID);
+    formData.append('address', address);
 
     const response = await fetch(API_URL, {
         method: 'POST',

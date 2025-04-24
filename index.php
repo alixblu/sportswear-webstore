@@ -18,9 +18,10 @@
 
     <body>
         <?php
-        include './layout/header.php';
-        include './layout/content.php';
-        include './layout/footer.php';
+         include './layout/header.php';
+         include './layout/slider.php';
+         include './layout/content.php';
+         include './layout/footer.php';
         ?>
     </body>
 </html>
