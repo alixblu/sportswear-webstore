@@ -375,7 +375,53 @@
             </div>
          </div>
       </body>
+   <script src="../../JS/client/cartApi.js"></script>
     <script>
+      loadCart()
+      function loadCart(){
+         getCartByUserId(10)
+            .then(res => {
+               if (res.status === 200) {
+                  const cartItems = res.data; 
+                  const cartTableBody = document.querySelector(".cart-table tbody"); 
+                  cartTableBody.innerHTML = "";
+
+                  cartItems.forEach(item => {
+                     const row = document.createElement("tr");
+
+                     const productCell = document.createElement("td");
+                     productCell.innerHTML = `
+                        <div class="product-info">
+                           <img src="/img/adidas.svg" alt="${item.productName}">
+                           <span>${item.productName}</span>
+                        </div>
+                     `;
+
+                     const priceCell = document.createElement("td");
+                     priceCell.innerHTML = item.productPrice;
+
+                     const quantityCell = document.createElement("td");
+                     quantityCell.innerHTML = item.quantity < 10 ? `0${item.quantity}` : item.quantity;
+
+                     const subtotalCell = document.createElement("td");
+                     subtotalCell.innerHTML = `$${650 * item.quantity}`; 
+
+                     const deleteCell = document.createElement("td");
+                     deleteCell.innerHTML = `<img class="delete-icon" src="/img/trash.svg" alt="Xoá">`;
+
+                     row.appendChild(productCell);
+                     row.appendChild(priceCell);
+                     row.appendChild(quantityCell);
+                     row.appendChild(subtotalCell);
+                     row.appendChild(deleteCell);
+
+                     cartTableBody.appendChild(row);
+                  });
+               }
+            })
+            .catch(error => console.error('Lỗi khi lấy biến thể sản phẩm:', error));
+
+      }
       function toggleApply(button) {
          const voucherItem = button.closest('.voucherItem');
          const isActive = voucherItem.classList.toggle('active');

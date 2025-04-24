@@ -54,16 +54,30 @@ class CartRepository {
 
     public function findByUserAccId($userAccID) {
         try {
-            $stmt = $this->conn->prepare("SELECT * FROM cart WHERE userAccID = ?");
+            $stmt = $this->conn->prepare("
+                SELECT 
+                    cart.ID as cartID,
+                    cart.userAccID,
+                    cartdetail.ID as detailID,
+                    cartdetail.productID,
+                    cartdetail.quantity,
+                    productvariant.fullName as productName,
+                    productvariant.price as productPrice
+
+                FROM cart
+                INNER JOIN cartdetail ON cart.ID = cartdetail.cartID
+                INNER JOIN productvariant ON cartdetail.productID = productvariant.ID
+                WHERE cart.userAccID = ?
+            ");
             $stmt->bind_param("i", $userAccID);
             $stmt->execute();
             $result = $stmt->get_result();
-
+    
             $carts = [];
             while ($row = $result->fetch_assoc()) {
                 $carts[] = $row;
             }
-
+    
             $stmt->close();
             $this->conn->close();
             return $carts;
@@ -72,6 +86,8 @@ class CartRepository {
             return [];
         }
     }
+    
+    
 
     public function update($cartID, $totalPrice) {
         try {
