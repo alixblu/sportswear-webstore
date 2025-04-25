@@ -6,7 +6,6 @@ header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 $couponController = new CouponController();
-
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['action'])) {
         switch ($_GET['action']) {
@@ -23,6 +22,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 }
                 break;
 
+            case 'getCouponByUserId':
+                $userId = $_GET['id'] ?? null;
+                if ($userId !== null) {
+                    $couponController->getCouponByUserId($userId);
+                } else {
+                    echo "Thiếu userId.";
+                }
+                break;
+
             default:
                 echo "Invalid GET action.";
         }
@@ -30,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo "Invalid GET request.";
     }
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'createCoupon') {
