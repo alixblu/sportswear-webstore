@@ -522,5 +522,9 @@
 
         
       }
+
+      document.querySelector('.btn-buy').addEventListener('click', function () {
+         window.location.href = 'billDetail.php';
+      });
     </script>
 </html>
