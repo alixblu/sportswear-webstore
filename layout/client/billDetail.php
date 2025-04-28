@@ -124,7 +124,6 @@
     }
     .couponCss{
       background-color:white;
-      padding: 16px;
       border-radius: 10px;
       display: flex;
       flex-direction: column;
@@ -171,6 +170,12 @@
                cursor: pointer;
                white-space: nowrap; 
             }
+
+    .order-summary{
+      display: flex;
+      flex-direction: column;
+      gap:10px;
+    }
   </style>
 </head>
 <body>
@@ -201,16 +206,8 @@
     
     </div>
     <div class="order-summary">
-    <div class="couponCss">
-        <div class="section-title freeship-note"><img src="/img/coupon.svg" alt="">Khuyến Mãi</div>
-        <div class="voucher">
-            <div class="voucherItem active">
-              <span>Giảm 15% tối đa 70K</span>
-            </div>
-        </div>
-        
-      </div>
       <div class="order-items">
+        <div class="section-title freeship-note">Sản Phẩm</div>
         <div class="item">
           <img src="/img/adidas.svg"  alt="Backpack" />
           <span>Backpack NH Arpenaz</span>
@@ -222,8 +219,16 @@
           <span class="price">$1100</span>
         </div>
       </div>
-  
+      <div class="couponCss">
+        <div class="section-title freeship-note">Khuyến Mãi</div>
+        <div class="voucher">
+          <div class="voucherItem active">
+            <span>Giảm 15% tối đa 70K</span>
+          </div>
+        </div>
+      </div>
       <div class="order-total">
+      <div class="section-title freeship-note">Tổng</div>
         <div class="row">
           <span>Subtotal:</span><span>$1750</span>
         </div>
