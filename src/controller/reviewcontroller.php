@@ -19,7 +19,6 @@ class ReviewController
 
     public function createReview($userId, $productId, $rating, $commentContent)
     {
-        //Todo: get id from session
         $result = $this->reviewService->createReview($userId, $productId, $rating, $commentContent);
         ApiResponse::customApiResponse($result, 200);
     }
