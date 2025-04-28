@@ -106,5 +106,39 @@ class CouponRepository {
             if ($this->conn) $this->conn->close();
         }
     }
+    public function getCouponByUserId($userID) {
+        try {
+            $stmt = $this->conn->prepare("
+                SELECT c.*, uc.assignedDate, uc.status AS userCouponStatus
+                FROM user_coupon uc
+                INNER JOIN coupon c ON uc.couponID = c.ID
+                WHERE uc.userID = ?
+                ORDER BY uc.assignedDate DESC
+            ");
+    
+            if (!$stmt) {
+                throw new Exception("Failed to prepare query: " . $this->conn->error);
+            }
+    
+            $stmt->bind_param("i", $userID);
+            $stmt->execute();
+            $result = $stmt->get_result();
+    
+            $coupons = [];
+            while ($row = $result->fetch_assoc()) {
+                $coupons[] = $row;
+            }
+    
+            $stmt->close();
+            return $coupons;
+    
+        } catch (Exception $e) {
+            error_log("Get coupons by userID failed: " . $e->getMessage());
+            return [];
+        } finally {
+            if ($this->conn) $this->conn->close();
+        }
+    }
+    
 }
 ?>

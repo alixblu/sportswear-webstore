@@ -310,77 +310,165 @@
                   </tr>
                   </thead>
                   <tbody>
-                  <tr>
-                     <td>
-                     <div class="product-info">
-                           <img src="/img/adidas.svg" alt="Backpack NH Arpenaz 100">
-                           <span>Backpack NH Arpenaz 100</span>
-                     </div>
-                     </td>
-                     <td>$650</td>
-                     <td>
-                     01
-                     </td>
-                     <td>$650</td>
-                     <td><img class="delete-icon" src="/img/trash.svg" alt="Xoá"></td>
-                  </tr>
-                  <tr>
-                     <td>
-                     <div class="product-info">
-                           <img src="/img/adidas.svg" alt="Tennis Shirt Mens Dri Fit">
-                           <span>Tennis Shirt Mens Dri Fit</span>
-                     </div>
-                     </td>
-                     <td>$550</td>
-                     <td>
-                     02
-                     </td>
-                     <td>$1100</td>
-                     <td><img class="delete-icon" src="/img/trash.svg" alt="Xoá"></td>
-                  </tr>
+                  
                   </tbody>
                </table>
             </div>
             <div class="containerLeft">
                <div class="couponCss">
-                  <div class="section-title">Khuyến Mãi</div>
+                  <div class="section-title freeship-note"><img src="/img/coupon.svg" alt="">Khuyến Mãi</div>
                   <div class="voucher">
                      <div class="voucherItem">
                         <span>Giảm 15% tối đa 70K</span>
                         <button class="apply-btn" onclick="toggleApply(this)">Áp Dụng</button>
                      </div>
                   </div>
-                  <div class="freeship-note" onclick="showPopup()">
+                  <!-- <div class="freeship-note" onclick="showPopup()">
                    <img src="/img/coupon.svg" alt=""> Xem Thêm Mã Giảm
-                  </div>
+                  </div> -->
                </div>
                <div class="discount">
                   <div class="info-line">
                      <span>Tổng tiền hàng</span>
-                     <span>429.000₫</span>
+                     <span class="summary-price">429.000₫</span>
                   </div>
                   <div class="info-line">
                      <span>Giảm giá trực tiếp</span>
-                     <span>-110.000₫</span>
+                     <span>-0.000₫</span>
                   </div>
                   <div class="info-line">
                      <span>Mã khuyến mãi</span>
-                     <span>-20.000₫</span>
+                     <span class="summary-coupon">-0.000₫</span>
                   </div>
                   <br>
-                  <div class="total">Tổng tiền thanh toán: 299.000₫</div>
+                  <div class="summary-total">Tổng tiền thanh toán: 299.000₫</div>
 
                   <button class="btn-buy">Mua Hàng</button>
                </div>
             </div>
          </div>
       </body>
+   <script src="../../JS/client/cartApi.js"></script>
+   <script src="../../JS/client/cartdetail.js"></script>
+   <script src="../../JS/admin/coupon.js"></script>
+
+
     <script>
-      function toggleApply(button) {
+      loadCart()
+      function loadCart(){
+         let total = 0;
+         getCartByUserId(10)
+            .then(res => {
+               if (res.status === 200) {
+                  const cartItems = res.data; 
+                  const cartTableBody = document.querySelector(".cart-table tbody"); 
+                  cartTableBody.innerHTML = "";
+
+                  cartItems.forEach(item => {
+                     const row = document.createElement("tr");
+
+                     const productCell = document.createElement("td");
+                     productCell.innerHTML = `
+                        <div class="product-info">
+                           <img src="/img/adidas.svg" alt="${item.productName}">
+                           <span>${item.productName}</span>
+                        </div>
+                     `;
+
+                     const priceCell = document.createElement("td");
+                     priceCell.innerHTML = item.productPrice;
+
+                     const quantityCell = document.createElement("td");
+                     quantityCell.innerHTML = item.quantity < 10 ? `0${item.quantity}` : item.quantity;
+
+                     const subtotalCell = document.createElement("td");
+                     subtotalCell.innerHTML = `${item.quantity * item.productPrice}`; 
+
+                     const deleteCell = document.createElement("td");
+                     deleteCell.innerHTML = `<img class="delete-icon" src="/img/trash.svg" alt="Xoá" onclick="deleteProduct(${item.detailID})">`;
+
+                     row.appendChild(productCell);
+                     row.appendChild(priceCell);
+                     row.appendChild(quantityCell);
+                     row.appendChild(subtotalCell);
+                     row.appendChild(deleteCell);
+
+                     cartTableBody.appendChild(row);
+                  });
+                  
+                  cartItems.forEach(item => {
+                        total += Number(item.productPrice) * Number(item.quantity);
+                  });
+
+                  const priceElement = document.querySelector(".summary-price");
+                  priceElement.innerText = formatCurrency(total);
+
+
+                  const summaryElement = document.querySelector(".summary-total");
+                  summaryElement.innerText = 'Tổng tiền thanh toán ' +formatCurrency(total);
+
+               }
+            })
+            .catch(error => console.error('Lỗi khi lấy biến thể sản phẩm:', error));
+
+         getCouponByUserId(10)
+            .then(result => {
+            const coupons = result.data; 
+            const container = document.querySelector(".voucher");
+            container.innerHTML = ""; 
+
+            if (!coupons || coupons.length === 0) {
+                  container.innerHTML = "<div class='voucherItem'>Không có mã khuyến mãi</div>";
+                  return;
+            }
+
+            coupons.forEach(coupon => {
+                  const div = document.createElement("div");
+                  div.className = "voucherItem";
+                  div.innerHTML = `
+                     <span>${coupon.name}   </span>
+                     <button class="apply-btn" onclick="toggleApply(this, ${total},${coupon.percent})">Áp Dụng</button>
+                  `;
+                  container.appendChild(div);
+            });
+            })
+            .catch(error => {
+               console.error('Lỗi khi gọi API:', error);
+            });
+
+        
+      }
+      const formatCurrency = (value) => {
+         return Number(value).toLocaleString('vi-VN') + '₫';
+      };
+      function deleteProduct($id){
+         deleteCartDetail($id)
+         loadCart()
+      }
+      function toggleApply(button,total,percent) {
          const voucherItem = button.closest('.voucherItem');
          const isActive = voucherItem.classList.toggle('active');
 
-         button.textContent = isActive ? 'Bỏ Chọn' : 'Áp Dụng';
+
+         if(isActive==true){
+            button.textContent = 'Bỏ Chọn';
+            const couponElement = document.querySelector(".summary-coupon");
+            couponElement.innerText = formatCurrency(- total * percent/100 );
+
+            const summaryElement = document.querySelector(".summary-total");
+            summaryElement.innerText = 'Tổng tiền thanh toán ' +formatCurrency(total - (total * percent/100));
+         }
+         if(isActive==false){
+            button.textContent = 'Áp Dụng';
+            const couponElement = document.querySelector(".summary-coupon");
+            couponElement.innerText = '-0.000₫';
+
+
+            const summaryElement = document.querySelector(".summary-total");
+            summaryElement.innerText = 'Tổng tiền thanh toán ' +formatCurrency(total);
+         }
+
+       
       }
       function showPopup() {
          const overlay = document.createElement('div');
@@ -434,5 +522,9 @@
 
         
       }
+
+      document.querySelector('.btn-buy').addEventListener('click', function () {
+         window.location.href = 'billDetail.php';
+      });
     </script>
 </html>

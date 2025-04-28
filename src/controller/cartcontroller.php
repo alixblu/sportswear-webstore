@@ -2,7 +2,7 @@
 include dirname(__FILE__) . '/../service/cartservice.php';
 include dirname(__FILE__) . '/../config/response/apiresponse.php';
 
-class ReviewController
+class CartController
 {
     private $cartService;
 

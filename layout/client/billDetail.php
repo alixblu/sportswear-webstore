@@ -12,10 +12,11 @@
 
     .container {
       display: flex;
-      flex-direction: column;
       gap: 50px;
       max-width: 1000px;
       margin: auto;
+      align-items: center;
+
     }
 
     .billing, .summary {
@@ -51,12 +52,15 @@
 
     .order-items {
       margin-bottom: 20px;
+ 
+
     }
 
     .order-items div {
       display: flex;
       justify-content: space-between;
       margin-bottom: 10px;
+
     }
 
     .totals {
@@ -111,13 +115,66 @@
     }
 
     .order-items img {
-      height: 40px;
       margin-right: 10px;
     }
 
     .item {
       display: flex;
       align-items: center;
+    }
+    .couponCss{
+      background-color:white;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap:10px;
+    }
+    .freeship-note img {
+        vertical-align: middle;
+        margin-right: 6px;
+    }
+    .freeship-note {
+        color: rgb(10, 104, 255);
+        cursor: pointer;
+    }
+    .section-title{
+        font-weight: bold;
+    }
+    .voucherItem{
+        display: flex;
+        gap:10px;
+        align-items: center;
+        border-radius: 10px;
+        padding: 10px 14px;
+        background-color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        justify-content: space-between;
+
+    }
+    .voucherItem.active {
+        outline: 2px solid  rgb(10, 104, 255);
+
+    }
+    .voucher{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-sizing: border-box;
+    }
+    .apply-btn{
+               background-color: #0074e8;
+               color: white;
+               border: none;
+               border-radius: 6px;
+               padding: 6px 12px;
+               cursor: pointer;
+               white-space: nowrap; 
+            }
+
+    .order-summary{
+      display: flex;
+      flex-direction: column;
+      gap:10px;
     }
   </style>
 </head>
@@ -148,8 +205,43 @@
 
     
     </div>
-    <button class="place-order">Place Order</button>
+    <div class="order-summary">
+      <div class="order-items">
+        <div class="section-title freeship-note">Sản Phẩm</div>
+        <div class="item">
+          <img src="/img/adidas.svg"  alt="Backpack" />
+          <span>Backpack NH Arpenaz</span>
+          <span class="price">$650</span>
+        </div>
+        <div class="item">
+          <img src="/img/adidas.svg"  alt="Tennis Shirt" />
+          <span>Tennis Shirt Mens Dri Fit</span>
+          <span class="price">$1100</span>
+        </div>
+      </div>
+      <div class="couponCss">
+        <div class="section-title freeship-note">Khuyến Mãi</div>
+        <div class="voucher">
+          <div class="voucherItem active">
+            <span>Giảm 15% tối đa 70K</span>
+          </div>
+        </div>
+      </div>
+      <div class="order-total">
+      <div class="section-title freeship-note">Tổng</div>
+        <div class="row">
+          <span>Subtotal:</span><span>$1750</span>
+        </div>
+        <div class="row">
+          <span>Shipping:</span><span>Free</span>
+        </div>
+        <div class="row total">
+          <span>Total:</span><span>$1750</span>
+        </div>
+        <button class="place-order">Place Order</button>
 
+      </div>
+    </div>
   </div>
 </body>
 </html>
