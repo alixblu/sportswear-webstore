@@ -19,6 +19,10 @@
               <i class="fas fa-box"></i>
               <span class="link">Sản phẩm</span></a>
           </div>
+          <div class="nav-item" onclick="window.location.href='index.php?page=coupon'">
+              <i class="fas fa-ticket"></i>
+              <span class="link">Mã Giảm</span>
+          </div>
           <div class="nav-item" data-page="dathang" onclick="navigate(this)">
               <i class="fas fa-shopping-cart"></i>
               <span class="link">Đặt hàng</span></a>

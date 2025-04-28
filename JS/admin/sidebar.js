@@ -1,13 +1,5 @@
 var dashboard_swtitch = document.getElementById('dashboard_switch');
 
-dashboard_swtitch.addEventListener('click', function() {
-    var sideBar = document.getElementsByClassName('sidebar');
-    var container = document.getElementsByClassName('container');
-
-    sideBar.item(0).classList.toggle('collapsed');
-    container.item(0).classList.toggle('sidebar-collapsed');
-});
-
 function navigate(ele){
     const page = ele.getAttribute('data-page');
     window.location.href = `index.php?page=${page}`;
