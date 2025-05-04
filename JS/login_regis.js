@@ -11,8 +11,12 @@ function handleLogin(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
-            window.location.reload(); 
+            if(data.user.roleID === 5) {
+                window.location.reload(); 
+            } else {
+                // Redirect non-customers
+                window.location.href = './layout/admin/index.php';
+            }
         } else {
             alert('Login failed: ' + data.message);
         }
