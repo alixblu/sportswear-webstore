@@ -1,0 +1,15 @@
+{
+    "name": "admin/sportswear-webstore",
+    "autoload": {
+        "psr-4": {
+            "Admin\\SportswearWebstore\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "camdao",
+            "email": "luongcamdao@gmail.com"
+        }
+    ],
+    "require": {}
+}

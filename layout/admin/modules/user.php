@@ -11,11 +11,6 @@
   <title>Dashboard</title>
     <style>
 
-        .actionUser {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
         .search-box input {
         flex: 1;
         border: none;          /* Remove all borders */
@@ -47,11 +42,6 @@
         gap: 20px;
     }
 
-    .actionUser {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-    }
 
     .formUserCss{
         background-color:white;
@@ -129,7 +119,6 @@
         display: flex;
         justify-content: flex-end;
         padding: 10px;
-        cursor:pointer;
     }
     #portal-root {
         position: fixed;
@@ -191,6 +180,43 @@
         padding-bottom: 10px;
         padding-right: 10px;
     }
+    #toast-portal {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 9999;
+    }
+
+    .toast {
+        min-width: 250px;
+        padding: 12px 18px;
+        color: #fff;
+        border-radius: 8px;
+        font-size: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInOut 3s ease forwards;
+    }
+
+    .toast.success {
+        background-color: #4caf50;
+    }
+
+    .toast.error {
+        background-color: #f44336;
+    }
+
+    @keyframes fadeInOut {
+        0%   { opacity: 0; transform: translateY(20px); }
+        10%  { opacity: 1; transform: translateY(0); }
+        90%  { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(20px); }
+    }
+
     </style>
 </head>
 <body>
@@ -201,8 +227,8 @@
                 <button id="importBtn" class="btn btn-outline" onclick="uploadFile()">
                     <i class="fa-solid fa-upload"></i> Import
                 </button>
-                <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
-                <button id="exportBtn" class="btn btn-outline">
+                <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleFileChange(event)">
+                <button id="exportBtn" class="btn btn-outline" onclick="exportFile()">
                     <i class="fas fa-download"></i> Export
                 </button>
 
@@ -218,7 +244,7 @@
                     <div class="wrapperFilter">
                         <div class="search-box" >
                             <i class="ri-search-line"></i>
-                        <input type="text"placeholder="Tìm Kiếm Theo Số Điện Thoại">
+                        <input id="searchPhone" type="text"placeholder="Tìm Kiếm Theo Số Điện Thoại">
                     </div>
                     <button class="btn btn-outline btn-sm" onclick="showFormFilter()">
                         <i class="fa-solid fa-filter"></i>Bộ Lọc
@@ -228,15 +254,16 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                        <th>User ID</th>
+                        <th>STT</th>
                         <th>Họ Và Tên</th>
                         <th>Ngày Sinh</th>
                         <th>Email</th>
                         <th>Số Điện Thoại</th>
+                        <th>Địa Chỉ</th>
                         <th>Giới Tính</th>
                         <th>Vai Trò</th>
                         <th>Ngày Tạo</th>
-                        <th class="actionUser">Chức Năng</th>
+                        <th>Chức Năng</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -269,13 +296,59 @@
             </div>
         </div>
     </div>
+    <script src="../../JS/admin/userApi.js"></script>
     <script>
+        showAllUsers();
+        function showAllUsers() {
+            getAllUsers()
+            .then(result => {
+                let stt =1;
+                const users = result.data;
+                const tbody = document.querySelector(".data-table tbody");
+                tbody.innerHTML = ""; 
+                users.forEach(user => {
+                    if(user.roleName=='Customer'){
+                        return;
+                    }
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${stt}</td>
+                        <td>${user.fullname}</td>
+                        <td>${user.dateOfBirth == undefined ? '':user.dateOfBirth}</td>
+                        <td>${user.email == undefined ? '':user.email}</td>
+                        <td>${user.phone}</td>
+                        <td>${user.address  == undefined ? '':user.address}</td>
+                        <td>${user.gender == 0 ? 'Nam' : 'Nữ'}</td>
+                        <td>${user.roleName}</td>
+                        <td>${user.createdAt}</td>
+                        <td>
+                            <button class="btn btn-outline btn-sm" onclick="infoAccount(${user.id})">
+                                <i class="fas fa-eye"></i> Xem
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="showFormEditUser(this, ${user.id})">
+                                <i class="fa-solid fa-pen"></i> Sửa
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="deleteUser(${user.id})">
+                                <i class="fa-solid fa-user-xmark"></i> Xóa
+                            </button>
+                        </td>
+                    `;
+
+                    tbody.appendChild(tr);
+                    stt=stt+1
+                });
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy danh sách người dùng:', error.message);
+            });
+        }
+
         function showFormAddUser(){
             const portalRoot = document.createElement('div');
             portalRoot.id = 'portal-root';
             portalRoot.innerHTML=`
                 <div class="formUserCss">
-                    <div class="CloseCss" ><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
+                    <div class="CloseCss" ><i class="fa-solid fa-xmark" onclick="closeFormAddUser()" style="cursor: pointer;"></i></div>
                     <div class="wrapperCss">
                         <label for="name">Họ và tên</label>
                         <div class="wrapperInputCss">
@@ -288,7 +361,12 @@
                             <input class="inputUserCss" type="text" id="email">
                         </div>
 
-                        
+                        <label for="address">Địa Chỉ</label>
+
+                        <div class="wrapperInputCss">
+                            <input class="inputUserCss" type="text" id="address">
+                        </div>
+
                         <label for="phone">Số điện thoại</label>
                         
                         <div class="wrapperInputCss">
@@ -312,11 +390,9 @@
                         <label for="role">Vai Trò:</label>
 
                         <select class="selectUser" type="role" id="role">
-                            <option value="admin">Admin</option>
-                            <option value="user">User</option>
                         </select>
                         <div>
-                            <p>*Tài khoản nhân viên được thêm tự động,Tên Tài khoản là số điện thoại, mật khẩu: 123456</p>
+                            <p>*Tài khoản nhân viên được thêm tự động,Tên Tài khoản là Email, mật khẩu: 123456</p>
                         </div>
                         <div class="wrapperButton">
                             <input class="buttonUserCss" type="submit" value="Thêm Nhân Viên" onclick="addUser()">
@@ -325,6 +401,29 @@
                 </div>
             `;
             document.body.appendChild(portalRoot);
+
+            try {
+                const select = portalRoot.querySelector('#role');
+                getAllRoles()
+                    .then(result => {
+                        const roles = result.data;
+                        
+                        roles.forEach(role => {
+                            if(role.name=='Customer'){
+                                return;
+                            }
+                            const option = document.createElement('option');
+                            option.value = role.id;
+                            option.textContent = role.name;
+                            select.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Không thể load roles:', error);
+                    });
+            } catch (error) {
+                console.error('Lỗi xảy ra:', error);
+            }
         }
         function closeFormAddUser(){
             const portalRoot = document.getElementById('portal-root');
@@ -336,12 +435,20 @@
         function addUser(){
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
+            const address = document.getElementById('address').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const birthday = document.getElementById('birthday').value.trim();
-            const gender = document.querySelector('input[name="gender"]:checked');
+            const genderEl = document.querySelector('input[name="gender"]:checked');
+            let genderValue = null;
+            if (genderEl) {
+                genderValue = genderEl.value === 'nam' ? 0 : 1;
+            } else {
+                console.log('Chưa chọn giới tính');
+            }
             const role = document.getElementById('role').value;
 
-            if (!name || !email || !phone || !birthday || !gender || !role) {
+
+            if (!name || !email || !phone || !birthday || !genderValue || !role||!address) {
                 alert('Vui lòng điền đầy đủ thông tin.');
                 return;
             }
@@ -355,79 +462,119 @@
                 alert('Số điện thoại phải gồm 10 chữ số.');
                 return;
             }
+            createDefaultAccount(name,birthday, address,email,phone, genderValue, role)
+            .then(response => {
+                if (response.status === 200) {
+                    showToast('Thêm người dùng thành công!', 'success');
+                    closeFormAddUser();
+                    showAllUsers();
+                } 
+                else {
+                    showToast(response.data, 'error');
+                }
+            })
+            .catch(error => {
+                showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+            });
+
         }
         function validateEmail(email) {
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);
         }
 
-        function showFormEditUser(button){
+        function showFormEditUser(button, id) {
             const row = button.closest('tr');
             const userInfo = {
                 userId: row.children[0].innerText.trim(),
                 fullName: row.children[1].innerText.trim(),
                 birthDate: row.children[2].innerText.trim(),
-                email: row.children[3].innerText.trim(),
+                address: row.children[5].innerText.trim(),
                 phone: row.children[4].innerText.trim(),
-                gender: row.children[5].innerText.trim(),
-                role: row.children[6].innerText.trim(),
+                gender: row.children[6].innerText.trim(),
+                role: row.children[7].innerText.trim(),
             };
-            
+
             const portalRoot = document.createElement('div');
             portalRoot.id = 'portal-root';
-            portalRoot.innerHTML=`
+
+            portalRoot.innerHTML = `
                 <div class="formUserCss">
-                    <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
+                    <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()" style="cursor: pointer;"></i></div>
                     <div class="wrapperCss">
                         <label for="name">Họ và tên</label>
                         <div class="wrapperInputCss">
                             <input class="inputUserCss" type="text" id="name" value="${userInfo.fullName}">
                         </div>
                         
-                        <label for="email">Email</label>
-
+                        <label for="address">Địa Chỉ</label>
                         <div class="wrapperInputCss">
-                            <input class="inputUserCss" type="text" id="email" value="${userInfo.email}">
+                            <input class="inputUserCss" type="text" id="address" value="${userInfo.address}">
                         </div>
 
-                        
                         <label for="phone">Số điện thoại</label>
-                        
                         <div class="wrapperInputCss">
                             <input type="text" class="inputUserCss" id="phone" value="${userInfo.phone}">
                         </div>
+
                         <div class="birthdayGenderCss">
-                            <div >
+                            <div>
                                 <label for="birthday">Ngày Sinh</label><br>
-                                    <input class="wrapperBirthday" type="date" id="birthday" value="${formatDateForInput(userInfo.birthDate)}">     
+                                <input class="wrapperBirthday" type="date" id="birthday" value="${userInfo.birthDate}">     
                             </div>
                             <div class="wrapperGender">
-                                <label for="" >Giới Tính</label>
+                                <label for="">Giới Tính</label>
                                 <div class="genderCss">
                                     <input type="radio" id="male" name="gender" ${userInfo.gender === 'Nam' ? 'checked' : ''}>
                                     <label for="male">Nam</label><br>
                                     <input type="radio" id="female" name="gender" ${userInfo.gender === 'Nữ' ? 'checked' : ''}>
-                                    <label for="female" >Nữ</label><br>
+                                    <label for="female">Nữ</label><br>
                                 </div>
                             </div>
                         </div>
+
                         <label for="role">Vai Trò:</label>
-                        <select class="selectUser" id="role">
-                            <option value="admin" ${userInfo.role === 'Admin' ? 'selected' : ''}>Admin</option>
-                            <option value="user" ${userInfo.role === 'User' ? 'selected' : ''}>User</option>
-                        </select>
+                        <select class="selectUser" id="role"></select>
 
                         <div>
-                            <p>*Tài khoản nhân viên được thêm tự động,Tên Tài khoản là số điện thoại, mật khẩu: 123456</p>
+                            <p>*Tài khoản nhân viên được thêm tự động, Tên Tài khoản là số điện thoại, mật khẩu: 123456</p>
                         </div>
                         <div class="wrapperButton">
-                            <input class="buttonUserCss" type="submit" value="Sửa Thông Tin" onclick="editUser()">
+                            <input class="buttonUserCss" type="submit" value="Sửa Thông Tin" onclick="editUser(${id})">
                         </div>
                     </div>
                 </div>
             `;
+
             document.body.appendChild(portalRoot);
+
+            try {
+                const select = portalRoot.querySelector('#role');
+                getAllRoles()
+                    .then(result => {
+                        const roles = result.data;
+
+                        roles.forEach(role => {
+                            const option = document.createElement('option');
+                            option.value = role.id;
+                            option.textContent = role.name;
+
+                            if (userInfo.role.toLowerCase() === role.name.toLowerCase()) {
+                                option.selected = true;
+                            }
+
+                            select.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Không thể load roles:', error);
+                    });
+            } catch (error) {
+                console.error('Lỗi xảy ra:', error);
+            }
+
         }
+
         function formatDateForInput(dateString) {
             const parts = dateString.split('/');
             if (parts.length === 3) {
@@ -436,21 +583,22 @@
             }
             return ''; 
         }
-        function editUser(){
+        function editUser(id) {
             const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
+            const address = document.getElementById('address').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const birthday = document.getElementById('birthday').value.trim();
-            const gender = document.querySelector('input[name="gender"]:checked');
+            const genderEl = document.querySelector('input[name="gender"]:checked');
+            let genderValue = null;
+            if (genderEl) {
+                genderValue = genderEl.value === 'nam' ? 0 : 1;
+            } else {
+                console.log('Chưa chọn giới tính');
+            }
             const role = document.getElementById('role').value;
 
-            if (!name || !email || !phone || !birthday || !gender || !role) {
+            if (!name || !phone || !birthday || !genderEl || !role) {
                 alert('Vui lòng điền đầy đủ thông tin.');
-                return;
-            }
-
-            if (!validateEmail(email)) {
-                alert('Email không hợp lệ.');
                 return;
             }
 
@@ -458,30 +606,72 @@
                 alert('Số điện thoại phải gồm 10 chữ số.');
                 return;
             }
+
+            const gender = genderEl.value;
+
+            updateUser(id, name,address, phone, genderValue, role)
+            .then(response => {
+                if (response.status === 200) {
+                    showToast('Cập nhật người dùng thành công!', 'success');
+                    closeFormAddUser();
+                    showAllUsers();
+                } else {
+                    showToast(response.data, 'error');
+                }
+            })
+            .catch(error => {
+                showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+            });
+
+
         }
 
+        function exportFile(){
+            exportFileUser()
+            showToast('export thành công!', 'success');
+        }
         function uploadFile(){
             document.getElementById('fileInput').click()
-
         }
-
-        function infoAccount(){
-            const portalRoot = document.createElement('div');
-            portalRoot.id = 'portal-root';
-            portalRoot.innerHTML=`
-                <div class="formUserCss">
-                    <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
-                    <div class="wrapperCss">
-                        <div class="infoCss">Thông Tin Tài Khoản</div>
-                        <div>Tài Khoản: leminh0001</div>
-                        <div>Mật Khẩu: *********</div>
-                        <div>Trạng Thái: <span class="status active"><i class="fas fa-check-circle"></i>Hoạt Động</span> </div>
+        function handleFileChange(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            uploadFileUser(file)
+            .then(response => {
+                if (response.status === 200) {
+                    showToast('import thành công!', 'success');
+                } else {
+                    showToast('Email Đã Tồn Tại Không Được Thêm Vào \n'+response.data, 'error');
+                }
+            })
+            .catch(error => {
+                showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+            });
+        }
+        function infoAccount(id){
+            getAccountByUserId(id).then(result => {
+                const user = result.data;
+                const portalRoot = document.createElement('div');
+                portalRoot.id = 'portal-root';
+                portalRoot.innerHTML=`
+                    <div class="formUserCss">
+                        <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
+                        <div class="wrapperCss">
+                            <div class="infoCss">Thông Tin Tài Khoản</div>
+                            <div>Tài Khoản: ${user.username}</div>
+                            <div>Mật Khẩu: *********</div>
+                            <div>Trạng Thái: <span class="status active"><i class="fas fa-check-circle"></i>Hoạt Động</span> </div>
+                        </div>
                     </div>
-                </div>
-            `;
-            document.body.appendChild(portalRoot);
+                `;
+                document.body.appendChild(portalRoot);
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy danh sách người dùng:', error.message);
+            });
+
         }
-        function deleteUser(){
+        function deleteUser(id){
             const portalRoot = document.createElement('div');
             portalRoot.id = 'portal-root';
             portalRoot.innerHTML=`
@@ -497,36 +687,179 @@
 
 
             document.getElementById('confirmDelete').addEventListener('click', function () {
-                closeFormAddUser();
+                deleteUserApi(id)
+                .then(response => {
+                    if (response.status === 200) {
+                        showToast('Xóa người dùng thành công!', 'success');
+                        closeFormAddUser();
+                        showAllUsers();
+                    } else {
+                        showToast(response.data, 'error');
+                        closeFormAddUser();
+                    }
+                })
+                .catch(error => {
+                    showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+                    closeFormAddUser();
+                });
+                showAllUsers();
             });
 
             document.getElementById('cancelDelete').addEventListener('click', function () {
                 closeFormAddUser();
             });
         }
+        function showToast(text, type = 'success') {
+            let portalRoot = document.getElementById('toast-portal');
 
+            if (!portalRoot) {
+                portalRoot = document.createElement('div');
+                portalRoot.id = 'toast-portal';
+                document.body.appendChild(portalRoot);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerText = text;
+
+            portalRoot.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+                if (portalRoot.children.length === 0) {
+                    portalRoot.remove();
+                }
+            }, 3000);
+        }
+
+        
         function showFormFilter(){
             const portalRoot = document.createElement('div');
             portalRoot.id = 'portal-root';
             portalRoot.innerHTML=`
-            <div class="wrapperFilterCss">
-                <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
-                <div class="wrapperInputCss">
-                    <input class="inputUserCss" type="text" id="search" placeholder="Nội Dung Tìm Kiếm">
+                <div class="wrapperFilterCss">
+                    <div class="CloseCss">
+                        <i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i>
+                    </div>
+                    <div class="wrapperInputCss">
+                        <input class="inputUserCss" type="text" id="search" placeholder="Nội Dung Tìm Kiếm">
+                    </div>
+                    <input type="checkbox" id="nameUser" name="nameUser" value="name">
+                    <label for="nameUser">Họ Và Tên</label><br>
+                    <input type="checkbox" id="emailUser" name="emailUser" value="email">
+                    <label for="emailUser">Email</label><br>
+                    <input type="checkbox" id="phoneUser" name="phoneUser" value="phone">
+                    <label for="phoneUser">Số Điện Thoại</label><br>
+                    <div class="wrapperButton">
+                        <input class="buttonUserCss" type="submit" value="Áp Dụng" onclick="applySearchFilter()">
+                    </div>
                 </div>
-                <input type="checkbox" id="nameUser" name="nameUser" value="name">
-                <label for="nameUser">Họ Và Tên</label><br>
-                <input type="checkbox" id="vehicle2" name="emailUser" value="email">
-                <label for="emailUser">Email</label><br>
-                <input type="checkbox" id="phone" name="phone" value="phone">
-                <label for="phone">Số Điện Thoại</label><br>
-                 <div class="wrapperButton">
-                    <input class="buttonUserCss" type="submit" value="Áp Dụng">
-                </div>
-            </div>
             `;
             document.body.appendChild(portalRoot);
         }
+        function applySearchFilter() {
+            const keyword = document.getElementById('search').value;
+
+            const fields = [];
+            if (document.getElementById('nameUser').checked) fields.push('fullname');
+            if (document.getElementById('emailUser').checked) fields.push('email');
+            if (document.getElementById('phoneUser').checked) fields.push('phone');
+
+            if (!keyword || fields.length === 0) {
+                alert("Vui lòng nhập từ khóa và chọn ít nhất 1 tiêu chí.");
+                return;
+            }
+
+            searchUsers(keyword, fields).then(result => {
+                const users = result.data;
+                const tbody = document.querySelector(".data-table tbody");
+                tbody.innerHTML = ""; 
+                users.forEach(user => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.fullname}</td>
+                        <td>${user.dateOfBirth}</td>
+                        <td>${user.email}</td>
+                        <td>${user.phone}</td>
+                        <td>${user.address}</td>
+                        <td>${user.gender == 0 ? 'Nam' : 'Nữ'}</td>
+                        <td>${user.roleName}</td>
+                        <td>${user.createdAt}</td>
+                        <td>
+                            <button class="btn btn-outline btn-sm" onclick="infoAccount(${user.id})">
+                                <i class="fas fa-eye"></i> Xem
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="showFormEditUser(this, ${user.id})">
+                                <i class="fa-solid fa-pen"></i> Sửa
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="deleteUser(${user.id})">
+                                <i class="fa-solid fa-user-xmark"></i> Xóa
+                            </button>
+                        </td>
+                    `;
+
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy danh sách người dùng:', error.message);
+            });
+
+            closeFormAddUser();
+        }
+
+        document.getElementById("searchPhone").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                const keyword = document.getElementById('searchPhone').value;
+
+                const fields = ['phone'];
+
+                if (!keyword || fields.length === 0) {
+                    alert("Vui lòng nhập số điện thoại cần tìm");
+                    return;
+                }
+
+                searchUsers(keyword, fields).then(result => {
+                    const users = result.data;
+                    const tbody = document.querySelector(".data-table tbody");
+                    tbody.innerHTML = ""; 
+                    users.forEach(user => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td>${user.id}</td>
+                            <td>${user.fullname}</td>
+                            <td>${user.dateOfBirth}</td>
+                            <td>${user.email}</td>
+                            <td>${user.phone}</td>
+                            <td>${user.address}</td>
+                            <td>${user.gender == 0 ? 'Nam' : 'Nữ'}</td>
+                            <td>${user.roleName}</td>
+                            <td>${user.createdAt}</td>
+                            <td>
+                                <button class="btn btn-outline btn-sm" onclick="infoAccount(${user.id})">
+                                    <i class="fas fa-eye"></i> Xem
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="showFormEditUser(this, ${user.id})">
+                                    <i class="fa-solid fa-pen"></i> Sửa
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="deleteUser(${user.id})">
+                                    <i class="fa-solid fa-user-xmark"></i> Xóa
+                                </button>
+                            </td>
+                        `;
+
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy danh sách người dùng:', error.message);
+                });
+
+                closeFormAddUser();
+            }
+        });
+
     </script>
 </body>
 </html>

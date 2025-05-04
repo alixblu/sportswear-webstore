@@ -19,13 +19,12 @@ body{
 ul{
 	list-style: none;
 }
-.footer{
-	background-color: #24262b;
+.footer {
+    background-color: #24262b;
     padding: 70px 0;
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	width: 100%;
+    position: relative; /* Thay đổi từ fixed sang relative */
+    width: 100%;
+    margin-top: 20px; /* Thêm khoảng cách trên footer */
 }
 .footer-col{
    width: 25%;

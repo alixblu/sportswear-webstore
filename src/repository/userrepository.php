@@ -1,6 +1,7 @@
 <?php
     require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
-
+    require_once dirname(__FILE__) . '/../enums/UserStatus.php';
+    include dirname(__FILE__) . '/../../src/config/exception/exceptionHandler.php';
     class UserRepository{
         /**
          * Find a user by their username (email)
@@ -35,22 +36,155 @@
                 if ($conn) $conn->close();
             }
         }
-        public function findUserById($id) {
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
 
-            $stmt = $conn->prepare("SELECT * FROM users WHERE id = ? LIMIT 1");
-            $stmt->bind_param("s", $id);
-            $stmt->execute();
+        public function findAccountByUserId($id) {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+            
+                $stmt = $conn->prepare("SELECT * FROM useraccount WHERE id = ? LIMIT 1");
 
-            $result = $stmt->get_result();
-            $user = $result->fetch_assoc();
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+                
+                $stmt->bind_param("s", $id);
+                $stmt->execute();
+            
+                $result = $stmt->get_result();
+                return $result->fetch_assoc();
+            } catch (Exception $e) {
+                error_log("Database error in findUserByUsername: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
+        }
 
-            $stmt->close(); 
-            $conn->close();
+        public function findAllUsers() {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+        
+                $status = UserStatus::Active->value;
+        
+                $stmt = $conn->prepare("
+                    SELECT 
+                        u.id, 
+                        u.fullname, 
+                        u.email, 
+                        u.phone,
+                        u.address,
+                        u.gender,
+                        r.name AS roleName,
+                        u.createdAt,
+                        u.dateOfBirth,
+                        d.status,
+                        u.roleID
+                    FROM user u
+                    INNER JOIN useraccount d ON u.id = d.id
+                    INNER JOIN role r ON u.roleID = r.id
+                    WHERE d.status = ?
+                ");
+            
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+        
+                $stmt->bind_param("s", $status);
+                $stmt->execute();
+        
+                $result = $stmt->get_result();
+        
+                $users = [];
+                while ($row = $result->fetch_assoc()) {
+                    $users[] = $row;
+                }
+        
+                return $users;
+            } catch (Exception $e) {
+                error_log("Database error in findAllUsers: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
+        }
+        public function getAllRoles() {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+        
+                $status = UserStatus::Active->value;
+        
+                $stmt = $conn->prepare("
+                    SELECT id,name
+                    FROM role
+                ");
+            
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+        
+                $stmt->execute();
+        
+                $result = $stmt->get_result();
+        
+                $users = [];
+                while ($row = $result->fetch_assoc()) {
+                    $users[] = $row;
+                }
+        
+                return $users;
+            } catch (Exception $e) {
+                error_log("Database error in findAllUsers: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
+        }
+        
+        public function deleteByUserID($id){
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+                
+                $status = UserStatus::Banned->value;
 
-            return $user;
+                $stmt = $conn->prepare("UPDATE useraccount d
+                    JOIN user u ON u.id = d.id
+                    SET d.status = ?
+                    WHERE u.id = ?");
 
+                $stmt->bind_param("si", $status, $id);
+            
+                $stmt->execute();
+                
+                $user = null;
+                if ($stmt->affected_rows > 0) {
+                    $user = [
+                        'id' => $id,
+                    ];
+                }
+                return $user;
+            } catch (Exception $e) {
+                error_log("Database error in findAllUsers: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            }
+            finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
         }
         /**
          * Find a user by their email
@@ -96,7 +230,7 @@
          * @return array User data
          * @throws Exception If database error occurs
          */
-        public function save($name, $email, $passWord, $phone, $gender, $roleID) {
+        public function save($name,$email, $passWord, $phone, $gender, $roleID,$address=null, $birthday = null) {
             $conn = null;
             $stmt = null;
             try {
@@ -113,12 +247,12 @@
                 }
                 
                 // Insert into user table first
-                $stmt = $conn->prepare("INSERT INTO user (fullname, email, phone, gender, roleID) VALUES (?, ?, ?, ?, ?)");
+                $stmt = $conn->prepare("INSERT INTO user (fullname, email, phone, gender, roleID,dateOfBirth,address) VALUES (?, ?, ?, ?, ?,?,?)");
                 if (!$stmt) {
                     throw new Exception("Failed to prepare user insert: " . $conn->error);
                 }
                 
-                $stmt->bind_param("sssii", $name, $email, $phone, $gender, $roleID);
+                $stmt->bind_param("sssiiss", $name, $email, $phone, $gender, $roleID,$birthday,$address);
                 if (!$stmt->execute()) {
                     throw new Exception("Failed to insert user: " . $stmt->error);
                 }
@@ -147,7 +281,10 @@
                     'email' => $email,
                     'phone' => $phone,
                     'gender' => $gender,
-                    'roleID' => $roleID
+                    'roleID' => $roleID,
+                    'birthday' => $birthday,
+                    'address' => $address
+
                 ];
             } catch (Exception $e) {
                 // Rollback transaction on error
@@ -161,109 +298,177 @@
                 if ($conn) $conn->close();
             }
         }
-        public function userUpdate($id,$address){
+
+
+        public function userUpdate($id, $name,$address, $phone, $gender, $roleID) {
+            $conn = null;
+            $stmt = null;
+            try {
             $mysql = new configMysqli();
             $conn = $mysql->connectDatabase();
-        
-            $sql = "UPDATE users 
-                    SET address = ?
-                    WHERE id = ?";
+            
+                $sql = "UPDATE user 
+                        SET fullname = ?, address = ? ,phone = ?, gender = ?, roleID = ?
+                        WHERE id = ?";
             
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("si", $address,$id);
+                $stmt->bind_param("sssssi", $name, $address, $phone, $gender, $roleID, $id);
         
             $stmt->execute();
+        
             $user = null;
+            if ($stmt->affected_rows === 0) {
+                throw new Exception("No changes detected, user not updated.", 500);
+            }
+
             if ($stmt->affected_rows > 0) {
                 $user = [
                     'id' => $id,
-                    'address' => $address,
+                        'name' => $name,
+                        'phone' => $phone,
+                        'gender' => $gender,
+                        'roleID' => $roleID
                 ];
             }
 
-            $stmt->close(); 
-            $conn->close();
-
             return $user;
-           
-        }
-        public function userDelete($id){
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
-        
-            $sql = "DELETE FROM users WHERE id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $id);
-        
-            $stmt->execute();
-            $user = null;
-            if ($stmt->affected_rows > 0) {
-                $user = [
-                    'id' => $id,
-                ];
+            } catch (Exception $e) {
+                error_log("Database error in userUpdate: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
             }
-
-            $stmt->close(); 
-            $conn->close();
-
-            return $user;
         }
-        public function userFindAll(){
+        
+        public function bulkInsertWithNPlus1($data) {
             $mysql = new configMysqli();
             $conn = $mysql->connectDatabase();
-
-            $sql = "SELECT id, username ,password ,address ,gender ,status FROM users";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-
-            $result = $stmt->get_result();
-            $users = [];
-            while ($row = $result->fetch_assoc()) {
-                $userId = $row['id'];
-                
-                if (!isset($users[$userId])) {
-                    $users[$userId] = [
-                        'id' => $row['id'],
-                        'username' => $row['username'],
-                        'password' => $row['password'],
-                        'address' => $row['address'],
-                        'gender' => $row['gender'],
-                        'status' => $row['status'],
-                    ];
+        
+            if (empty($data)) return;
+        
+            $duplicatedEmails = [];
+        
+            foreach ($data as $row) {
+                $fullName    = $conn->real_escape_string($row['full_name']);
+                $dateOfBirth = $conn->real_escape_string($row['date_of_birth']);
+                $email       = $conn->real_escape_string($row['email']);
+                $phone       = $conn->real_escape_string($row['phone']);
+                $address     = $conn->real_escape_string($row['address']);
+                $gender      = $conn->real_escape_string($row['gender']);
+                $roleID      = (int) $row['role_id'];
+                $createdAt   = $conn->real_escape_string($row['created_at']);
+        
+                $checkEmailQuery = "SELECT id FROM user WHERE email = '$email' LIMIT 1";
+                $result = $conn->query($checkEmailQuery);
+        
+                if ($result && $result->num_rows > 0) {
+                    $duplicatedEmails[] = $email;
+                    continue; 
+                }
+        
+                $sqlUser = "
+                    INSERT INTO user (fullname, dateOfBirth, email, phone, address, gender, roleID , createdAt)
+                    VALUES ('$fullName', '$dateOfBirth', '$email', '$phone', '$address', '$gender', $roleID, '$createdAt')
+                ";
+        
+                if (!$conn->query($sqlUser)) {
+                    throw new Exception("Lỗi khi chèn user: " . $conn->error);
+                }
+        
+                $userId = $conn->insert_id;
+                $passwordDefault = '123456';
+                $sqlAccount = "
+                    INSERT INTO useraccount (userID, username, password)
+                    VALUES ($userId, '$email', '$passwordDefault')
+                ";
+        
+                if (!$conn->query($sqlAccount)) {
+                    throw new Exception("Lỗi khi chèn account: " . $conn->error);
                 }
             }
-
-            $stmt->close();
+        
             $conn->close();
-
-            return array_values($users); 
-        }
-        public function changePassword($userId,$newPassWord){
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
         
-            $sql = "UPDATE users 
-                    SET password = ?
-                    WHERE id = ?";
-            
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("si", $newPassWord,$userId);
-        
-            $stmt->execute();
-            $user = null;
-            if ($stmt->affected_rows > 0) {
-                $user = [
-                    'id' => $userId,
-                    'newPassWord' => $newPassWord,
-                ];
+            if (!empty($duplicatedEmails)) {
+                throw new Exception("Email đã tồn tại: " . implode(', ', $duplicatedEmails));
             }
+        }
+        
+        public function search($keyword, $fields) {
+            $conn = null;
+            $stmt = null;
+        
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+        
+                if (empty($fields)) return [];
+        
+                $conditions = [];
+                foreach ($fields as $field) {
+                    $conditions[] = "$field LIKE ?";
+                }
+        
+                $whereClause = implode(" OR ", $conditions);
+                $sql = "SELECT * FROM user WHERE $whereClause";
+        
+                $stmt = $conn->prepare($sql);
+        
+                $paramTypes = str_repeat("s", count($fields));
+                $params = array_fill(0, count($fields), '%' . $keyword . '%');
+        
+                $stmt->bind_param($paramTypes, ...$params);
+        
+                $stmt->execute();
+                $result = $stmt->get_result();
+        
+                $users = [];
+                while ($row = $result->fetch_assoc()) {
+                    $users[] = $row;
+                }
+                return $users;
+        
+            } catch (Exception $e) {
+                error_log("Database error in search: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
+        }
 
-            $stmt->close(); 
-            $conn->close();
-
-            return $user;
+        public function getAccessModulesByRoleId($roleID) {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+        
+                $stmt = $conn->prepare("SELECT moduleid FROM access WHERE roleid = ?");
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+        
+                $stmt->bind_param("i", $roleID);
+                $stmt->execute();
+        
+                $result = $stmt->get_result();
+                $modules = [];
+                while ($row = $result->fetch_assoc()) {
+                    $modules[] = $row['moduleid'];
+                }
+        
+                return $modules;
+            } catch (Exception $e) {
+                error_log("Database error in getAccessModulesByRoleId: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
         }
     }
-
+        
+    
 ?>

@@ -11,53 +11,63 @@
             $this->userService = new UserService();
         }
 
-        public function login($userName, $passWord){
-            try {
-                if (empty($userName) || empty($passWord)) {
-                    throw new Exception("Please enter complete information to login", 400);
-                }
-                
-                $user = $this->userService->login($userName, $passWord);
-                
-                if (!$user) {
-                    throw new Exception("Invalid username or password", 401);
-                }
-                
-                $_SESSION['user'] =  [
-                    'id' => $user['userID'],
-                    'username' => $user['username'],
-                    'roleid' => $user['roleID']
-                ];        
-                
-                http_response_code(200);
-                echo json_encode(['success' => true, 'message' => 'Login successful', 'user' => $user]);
-                exit;
-            } catch (Exception $e) {
-                http_response_code($e->getCode() ?: 400);
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-                exit;
-            }
+        public function defaultAccount($name, $email,$address, $phone, $gender, $roleID,$birthday){
+            $user = $this->userService->defaultAccount($name, $email, $address,$phone, $gender, $roleID,$birthday);
+            ApiResponse::customApiResponse($user,200);
+        }
+        
+        public function getAccountByUserId($userId){
+            $user = $this->userService->getAccountByUserId($userId);
+            ApiResponse::customApiResponse($user,200);
         }
 
-        public function signup($name, $email, $passWord, $phone, $gender, $roleID){
-            try {
-                if (empty($name) || empty($email) || empty($passWord) || empty($phone) || empty($gender)) {
-                    throw new Exception("Please enter complete information to sign up", 400);
-                }
-
-                $user = $this->userService->signup($name, $email, $passWord, $phone, $gender, $roleID);
-                return ['success' => true, 'message' => 'Signup successful', 'user' => $user];
-            } catch (Exception $e) {
-                throw $e;
-            }
+        public function getAllUsers(){
+            $users = $this->userService->getAllUsers();
+            ApiResponse::customApiResponse($users,200);
         }
 
-        public function logout(){
+        public function updateUsers($id, $name,$address, $phone, $gender, $roleID){
+            $users = $this->userService->updateUser($id, $name,$address, $phone, $gender, $roleID);
+            ApiResponse::customApiResponse($users,200);
+        }
+
+        public function deleteUsers($userId){
+            $users = $this->userService->deleteUsers($userId);
+            ApiResponse::customApiResponse($users,200);
+        }
+
+        public function getAllRoles(){
+            $users = $this->userService->getAllRoles();
+            ApiResponse::customApiResponse($users,200);
+        }
+
+        public function importExcel($file){
+            $result = $this->userService->importExcel($file);
+            ApiResponse::customApiResponse($result,200);
+        }
+        public function exportExcel(){
+            $result = $this->userService->exportExcel();
+            ApiResponse::customApiResponse($result,200);
+        }
+        public function search($keyword, $fields){
+            $result = $this->userService->search($keyword, $fields);
+            ApiResponse::customApiResponse($result,200);
+        }
+
+        public function getAccessModulesByRoleId($roleID) {
             try {
-                $_SESSION = [];            
-                return ['success' => true, 'message' => 'Logout successful'];
+                // Create an instance of UserService
+                $userService = new UserService();
+                
+                // Call the service method to get access modules
+                $modules = $userService->getAccessModulesByRoleId($roleID);
+                
+                // Return the modules
+                return $modules;
             } catch (Exception $e) {
-                throw $e;
+                // Handle exceptions and return an error response if needed
+                error_log("Error fetching access modules: " . $e->getMessage());
+                throw new Exception("Unable to fetch access modules", 500);
             }
         }
     }

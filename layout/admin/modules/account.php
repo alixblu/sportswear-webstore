@@ -1,99 +1,549 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!--=============== REMIXICONS ===============-->
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Remixicons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Quản lý tài khoản</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
 
-  <title>Account Management</title>
-  <style>
-    :root {
-      --primary: #4361ee;
-      --secondary: #3f37c9;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--dark);
+            background-color: #f5f7fa;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
 
-    /* Giữ nguyên toàn bộ CSS từ user.php */
-    .actionUser {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-    }
-    .search-box input {
-        flex: 1;
-        border: none;
-        background-color: transparent;
-        outline: none;
-        color:#2d3748
-    }
-    .search-box {
-        display: flex;
-        align-items: center;
-        justify-content:space-around;
-        column-gap: .3rem;
-        border: 1px solid #ccc;
-        border-radius: 100px;
-        height: 1.8rem;
-        padding-left: 7px;
-        max-width: 500px;
-        width: 70%;
-        padding: 20px;
-    }
-    .search-box:focus-within {
-        box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
-        border-color: rgba(67, 97, 238, 0.3);
-    }
-    .wrapperFilter{
-        max-width: 400px;
-        width: 70%;
-        display: flex;
-        gap: 20px;
-    }
+        .main-content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-    /* Thêm CSS cho tab */
-    .tab-container {
-        display: flex;
-        margin-bottom: 20px;
-        border-bottom: 1px solid #ddd;
-    }
-    .tab {
-        padding: 10px 20px;
-        cursor: pointer;
-        border-bottom: 2px solid transparent;
-    }
-    .tab.active {
-        border-bottom: 2px solid var(--primary);
-        color: var(--primary);
-        font-weight: bold;
-    }
-    .tab-content {
-        display: none;
-    }
-    .tab-content.active {
-        display: block;
-    }
-    
-    /* Giữ nguyên các style khác từ user.php */
-    /* ... */
-    
-  </style>
+        .page-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 0 15px;
+        }
+
+        .page-title .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 0 15px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin: 0 15px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        .card-title {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .card-title h3 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+            word-wrap: break-word;
+        }
+
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--dark);
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: capitalize;
+            display: inline-block;
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .status.active {
+            background-color: rgba(76, 201, 240, 0.15);
+            color: #0891b2;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+
+        .status.inactive {
+            background-color: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+
+        .status.banned {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .actionUser {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .wrapperFilter {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            padding: 8px 15px;
+            width: 100%;
+            max-width: 400px;
+            transition: var(--transition);
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            padding: 0 10px;
+            font-size: 14px;
+            color: #2d3748;
+        }
+
+        .search-box:focus-within {
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+            border-color: rgba(67, 97, 238, 0.3);
+        }
+
+        .wrapperInputCss.password-display {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .wrapperInputCss.password-display .inputUserCss {
+            flex: 1;
+            padding-right: 35px;
+        }
+
+        .wrapperInputCss.password-display .show-password {
+            position: absolute;
+            right: 10px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .wrapperInputCss.password-display .show-password:hover {
+            color: var(--primary);
+        }
+
+        .formUserCss {
+            background-color: white;
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .wrapperCss {
+            padding: 0 30px;
+            padding-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .genderCss {
+            display: flex;
+            margin: 10px 0;
+            gap: 5px;
+        }
+
+        .inputUserCss {
+            border: none;
+            outline: none;
+            color: #2d3748;
+            font-size: 17px;
+        }
+
+        .wrapperInputCss {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.1);
+            transition: border-bottom 0.3s ease;
+            border-bottom: 1px solid silver;
+            padding: 5px 3px;
+        }
+
+        .wrapperInputCss:focus-within {
+            border-bottom: 1px solid #00e5ff;
+        }
+
+        .selectUser {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d1d1;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .buttonUserCss {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .buttonUserCss:hover {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+        }
+
+        .wrapperButton {
+            display: flex;
+            gap: 10px;
+        }
+
+        .CloseCss {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px;
+        }
+
+        #portal-root {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .infoCss {
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .deleteUserCss {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 10px;
+        }
+
+        .titleDeleteUserCss {
+            margin: 10px;
+            font-size: 17px;
+        }
+
+        #cancelDelete,
+        #confirmDelete {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .wrapperFilterCss {
+            background-color: white;
+            max-width: 500px;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            padding: 10px;
+        }
+
+        .permission-group {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+        }
+
+        .permission-group-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .permission-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .permission-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        #toast-portal {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9999;
+        }
+
+        .toast {
+            min-width: 250px;
+            padding: 12px 18px;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInOut 3s ease forwards;
+        }
+
+        .toast.success {
+            background-color: #4caf50;
+        }
+
+        .toast.error {
+            background-color: #f44336;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .card-title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .wrapperFilter {
+                width: 100%;
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .actionUser {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .btn-sm {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .tab {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            .genderCss {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="main-content">
         <div id="pageTitle" class="page-title">
-            <div class="title">Account Management</div>
+            <div class="title">Quản lý tài khoản</div>
             <div class="action-buttons">
-                <button id="exportBtn" class="btn btn-outline">
-                    <i class="fas fa-download"></i> Export
+                <button id="exportBtn" class="btn btn-primary" onclick="exportData()">
+                    <i class="fas fa-download"></i> Xuất dữ liệu
+                </button>
+                <button id="addBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Thêm mới
                 </button>
             </div>
         </div>
-        
         <div class="tab-container">
-            <div class="tab active" onclick="switchTab('staff')">Staff Accounts</div>
-            <div class="tab" onclick="switchTab('customer')">Customer Accounts</div>
+            <div class="tab active" onclick="switchTab('staff')">Tài khoản nhân viên</div>
+            <div class="tab" onclick="switchTab('customer')">Tài khoản khách hàng</div>
         </div>
 
         <!-- Staff Accounts -->
@@ -101,48 +551,31 @@
             <div class="stats-cards">
                 <div class="table-card">
                     <div class="card-title">
-                        <h3><i class="fa-solid fa-user-tie"></i> Staff Account Information</h3>
+                        <h3><i class="fa-solid fa-user-tie"></i> Thông tin tài khoản nhân viên</h3>
                         <div class="wrapperFilter">
                             <div class="search-box">
                                 <i class="ri-search-line"></i>
-                                <input type="text" placeholder="Search by username or phone">
+                                <input type="text" placeholder="Tìm kiếm theo tên, số điện thoại..." oninput="searchAccounts('staff', this)">
                             </div>
                             <button class="btn btn-outline btn-sm" onclick="showFormFilter('staff')">
-                                <i class="fa-solid fa-filter"></i> Filter
+                                <i class="fa-solid fa-filter"></i> Lọc
                             </button>
                         </div>
                     </div>
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Username</th>
-                                <th>Full Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Created At</th>
-                                <th class="actionUser">Actions</th>
+                                <th>Tên đăng nhập</th>
+                                <th>Họ và tên</th>
+                                <th>Số điện thoại</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Chức năng</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>admin01</td>
-                                <td>Nguyen Van A</td>
-                                <td>admin@example.com</td>
-                                <td>0912345678</td>
-                                <td>Administrator</td>
-                                <td><span class="status active">Active</span></td>
-                                <td>01/01/2023</td>
-                                <td>
-                                    <button class="btn btn-outline btn-sm" onclick="showPermissionsModal(this)">
-                                        <i class="fas fa-user-shield"></i> Permissions
-                                    </button>
-                                    <button class="btn btn-outline btn-sm" onclick="editStaffAccount(this)">
-                                        <i class="fa-solid fa-pen"></i> Edit
-                                    </button>
-                                </td>
-                            </tr>
+                        <tbody id="staff-tbody">
+                            <!-- Data will be populated by JavaScript -->
                         </tbody>
                     </table>
                 </div>
@@ -154,43 +587,30 @@
             <div class="stats-cards">
                 <div class="table-card">
                     <div class="card-title">
-                        <h3><i class="fa-solid fa-users"></i> Customer Account Information</h3>
+                        <h3><i class="fa-solid fa-users"></i> Thông tin tài khoản khách hàng</h3>
                         <div class="wrapperFilter">
                             <div class="search-box">
                                 <i class="ri-search-line"></i>
-                                <input type="text" placeholder="Search by email or phone">
+                                <input type="text" placeholder="Tìm kiếm theo tên, số điện thoại..." oninput="searchAccounts('customer', this)">
                             </div>
                             <button class="btn btn-outline btn-sm" onclick="showFormFilter('customer')">
-                                <i class="fa-solid fa-filter"></i> Filter
+                                <i class="fa-solid fa-filter"></i> Lọc
                             </button>
                         </div>
                     </div>
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Username</th>
-                                <th>Full Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Status</th>
-                                <th>Registered At</th>
-                                <th class="actionUser">Actions</th>
+                                <th>Tên đăng nhập</th>
+                                <th>Họ và tên</th>
+                                <th>Số điện thoại</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày đăng ký</th>
+                                <th>Chức năng</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>customer01</td>
-                                <td>Le Van B</td>
-                                <td>customer@example.com</td>
-                                <td>0987654321</td>
-                                <td><span class="status active">Active</span></td>
-                                <td>15/02/2023</td>
-                                <td>
-                                    <button class="btn btn-outline btn-sm" onclick="editCustomerAccount(this)">
-                                        <i class="fa-solid fa-pen"></i> Edit
-                                    </button>
-                                </td>
-                            </tr>
+                        <tbody id="customer-tbody">
+                            <!-- Data will be populated by JavaScript -->
                         </tbody>
                     </table>
                 </div>
@@ -199,237 +619,17 @@
     </div>
 
     <!-- Modal Portal -->
-    <div id="portal-root"></div>
+    <div id="portal-root" style="display: none;"></div>
 
+    <!-- Toast Portal -->
+    <div id="toast-portal"></div>
+
+    <script src="../../JS/admin/account.js"></script>
     <script>
-        // Tab switching
-        function switchTab(tabName) {
-            // Update tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
-            
-            // Update content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-        }
-
-        // Show permissions modal
-        function showPermissionsModal(button) {
-            const row = button.closest('tr');
-            const cells = row.querySelectorAll('td');
-            
-            const accountInfo = {
-                username: cells[0].innerText,
-                fullName: cells[1].innerText,
-                role: cells[4].innerText
-            };
-
-            // Sample permissions (in a real app, these would come from the server)
-            const permissions = {
-                "Dashboard": ["view", "export"],
-                "User Management": ["view", "create", "edit", "delete"],
-                "Product Management": ["view", "create", "edit", "delete"],
-                "Order Management": ["view", "create", "edit", "cancel"],
-                "Reports": ["view", "generate", "export"]
-            };
-
-            let permissionHTML = '';
-            for (const [module, actions] of Object.entries(permissions)) {
-                permissionHTML += `
-                    <div class="permission-group">
-                        <div class="permission-group-title">${module}</div>
-                        <div class="permission-checkboxes">
-                `;
-                
-                for (const action of actions) {
-                    // Random checked state for demo (replace with actual permission check)
-                    const isChecked = Math.random() > 0.5;
-                    permissionHTML += `
-                        <div class="permission-option">
-                            <input type="checkbox" id="perm-${module}-${action}" ${isChecked ? 'checked' : ''}>
-                            <label for="perm-${module}-${action}">${action.charAt(0).toUpperCase() + action.slice(1)}</label>
-                        </div>
-                    `;
-                }
-                
-                permissionHTML += `</div></div>`;
-            }
-
-            const portalRoot = document.getElementById('portal-root');
-            portalRoot.innerHTML = `
-                <div class="formUserCss">
-                    <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeModal()"></i></div>
-                    <div class="wrapperCss">
-                        <div class="infoCss">Permission Management</div>
-                        <div><strong>Account:</strong> ${accountInfo.username}</div>
-                        <div><strong>Name:</strong> ${accountInfo.fullName}</div>
-                        <div><strong>Current Role:</strong> ${accountInfo.role}</div>
-                        
-                        ${permissionHTML}
-                        
-                        <div class="wrapperButton">
-                            <button class="buttonUserCss" onclick="savePermissions()">
-                                <i class="fas fa-save"></i> Save Permissions
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            portalRoot.style.display = 'flex';
-        }
-
-        // Edit staff account
-        function editStaffAccount(button) {
-            const row = button.closest('tr');
-            const cells = row.querySelectorAll('td');
-            
-            const accountInfo = {
-                username: cells[0].innerText,
-                fullName: cells[1].innerText,
-                email: cells[2].innerText,
-                phone: cells[3].innerText,
-                role: cells[4].innerText,
-                status: cells[5].querySelector('.status').innerText.trim() === 'Active' ? 'active' : 'inactive',
-                date: cells[6].innerText
-            };
-
-            const portalRoot = document.getElementById('portal-root');
-            portalRoot.innerHTML = `
-                <div class="formUserCss">
-                    <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeModal()"></i></div>
-                    <div class="wrapperCss">
-                        <div class="infoCss">Edit Staff Account</div>
-                        
-                        <label for="staff-username">Username</label>
-                        <div class="wrapperInputCss">
-                            <input class="inputUserCss" type="text" id="staff-username" value="${accountInfo.username}" readonly>
-                        </div>
-                        
-                        <label for="staff-fullname">Full Name</label>
-                        <div class="wrapperInputCss">
-                            <input class="inputUserCss" type="text" id="staff-fullname" value="${accountInfo.fullName}">
-                        </div>
-                        
-                        <label for="staff-email">Email</label>
-                        <div class="wrapperInputCss">
-                            <input class="inputUserCss" type="text" id="staff-email" value="${accountInfo.email}">
-                        </div>
-                        
-                        <label for="staff-phone">Phone</label>
-                        <div class="wrapperInputCss">
-                            <input class="inputUserCss" type="text" id="staff-phone" value="${accountInfo.phone}">
-                        </div>
-                        
-                        <label for="staff-role">Role</label>
-                        <select class="selectUser" id="staff-role">
-                            <option value="Administrator" ${accountInfo.role === 'Administrator' ? 'selected' : ''}>Administrator</option>
-                            <option value="Manager" ${accountInfo.role === 'Manager' ? 'selected' : ''}>Manager</option>
-                            <option value="Staff" ${accountInfo.role === 'Staff' ? 'selected' : ''}>Staff</option>
-                        </select>
-                        
-                        <label>Status</label>
-                        <div class="genderCss">
-                            <input type="radio" id="staff-active" name="staff-status" ${accountInfo.status === 'active' ? 'checked' : ''}>
-                            <label for="staff-active">Active</label>
-                            <input type="radio" id="staff-inactive" name="staff-status" ${accountInfo.status === 'inactive' ? 'checked' : ''}>
-                            <label for="staff-inactive">Inactive</label>
-                        </div>
-                        
-                        <div class="wrapperButton">
-                            <button class="buttonUserCss" onclick="saveStaffAccount()">
-                                <i class="fas fa-save"></i> Save Changes
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            portalRoot.style.display = 'flex';
-        }
-
-        // Edit customer account
-        function editCustomerAccount(button) {
-            const row = button.closest('tr');
-            const cells = row.querySelectorAll('td');
-            
-            const accountInfo = {
-                username: cells[0].innerText,
-                fullName: cells[1].innerText,
-                email: cells[2].innerText,
-                phone: cells[3].innerText,
-                status: cells[4].querySelector('.status').innerText.trim() === 'Active' ? 'active' : 'inactive',
-                date: cells[5].innerText
-            };
-
-            const portalRoot = document.getElementById('portal-root');
-            portalRoot.innerHTML = `
-                <div class="formUserCss">
-                    <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeModal()"></i></div>
-                    <div class="wrapperCss">
-                        <div class="infoCss">Edit Customer Account</div>
-                        
-                        <label for="customer-username">Username</label>
-                        <div class="wrapperInputCss">
-                            <input class="inputUserCss" type="text" id="customer-username" value="${accountInfo.username}" readonly>
-                        </div>
-                        
-                        <label for="customer-fullname">Full Name</label>
-                        <div class="wrapperInputCss">
-                            <input class="inputUserCss" type="text" id="customer-fullname" value="${accountInfo.fullName}">
-                        </div>
-                        
-                        <label for="customer-email">Email</label>
-                        <div class="wrapperInputCss">
-                            <input class="inputUserCss" type="text" id="customer-email" value="${accountInfo.email}">
-                        </div>
-                        
-                        <label for="customer-phone">Phone</label>
-                        <div class="wrapperInputCss">
-                            <input class="inputUserCss" type="text" id="customer-phone" value="${accountInfo.phone}">
-                        </div>
-                        
-                        <label>Status</label>
-                        <div class="genderCss">
-                            <input type="radio" id="customer-active" name="customer-status" ${accountInfo.status === 'active' ? 'checked' : ''}>
-                            <label for="customer-active">Active</label>
-                            <input type="radio" id="customer-inactive" name="customer-status" ${accountInfo.status === 'inactive' ? 'checked' : ''}>
-                            <label for="customer-inactive">Inactive</label>
-                        </div>
-                        
-                        <div class="wrapperButton">
-                            <button class="buttonUserCss" onclick="saveCustomerAccount()">
-                                <i class="fas fa-save"></i> Save Changes
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            portalRoot.style.display = 'flex';
-        }
-
-        // Close modal
-        function closeModal() {
-            document.getElementById('portal-root').style.display = 'none';
-        }
-
-        // Save functions (to be integrated with backend)
-        function savePermissions() {
-            alert('Permissions saved successfully!');
-            closeModal();
-        }
-
-        function saveStaffAccount() {
-            alert('Staff account changes saved!');
-            closeModal();
-        }
-
-        function saveCustomerAccount() {
-            alert('Customer account changes saved!');
-            closeModal();
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            showAll();
+            switchTab('staff');
+        });
     </script>
 </body>
 </html>
