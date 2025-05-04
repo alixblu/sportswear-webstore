@@ -81,8 +81,13 @@
     box-shadow: var(--shadow);
     z-index: 1000;
     position: sticky;
-    height: 100vh;
+
     width: var(--sidebar-width);
+    top: 0; /* Align to the top */
+    left: 0; /* Align to the left */
+
+    height: 100%; /* Full height */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   }
 
   .sidebar::before {
@@ -218,7 +223,7 @@
   .main-content {
     grid-column: 2;
     padding: 25px 30px;
-    overflow-y: auto;
+    height: 100%;
     transition: var(--transition);
   }
   

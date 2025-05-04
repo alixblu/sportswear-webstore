@@ -24,16 +24,7 @@
         <?php include './includes/sidebar.php'; ?>
         <div class="main-content-area">
             <?php include './includes/header.php'; ?>
-            <?php
-            $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
-            $allowed_pages = ['dashboard', 'user', 'coupon','dathang', 'product', 'account'];
-
-            if (in_array($page, $allowed_pages)) {
-              include "./modules/$page.php";
-            } else {
-                echo "<h2>404 - Page not found</h2>";
-            }
-            ?>
+            <?php include './modules/dashboard.php'; ?>
         </div>
     </div>
 </body>

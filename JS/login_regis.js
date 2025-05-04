@@ -11,6 +11,7 @@ function handleLogin(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // alert(JSON.stringify(data, null, 2));
             if(data.user.roleID === 5) {
                 window.location.reload(); 
             } else {
