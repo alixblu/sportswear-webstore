@@ -89,5 +89,6 @@ class AccountController {
             ApiResponse::customApiResponse(['error' => $e->getMessage()], 500);
         }
     }
+    
 }
 ?>

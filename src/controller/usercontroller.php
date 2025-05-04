@@ -53,6 +53,23 @@
             $result = $this->userService->search($keyword, $fields);
             ApiResponse::customApiResponse($result,200);
         }
+
+        public function getAccessModulesByRoleId($roleID) {
+            try {
+                // Create an instance of UserService
+                $userService = new UserService();
+                
+                // Call the service method to get access modules
+                $modules = $userService->getAccessModulesByRoleId($roleID);
+                
+                // Return the modules
+                return $modules;
+            } catch (Exception $e) {
+                // Handle exceptions and return an error response if needed
+                error_log("Error fetching access modules: " . $e->getMessage());
+                throw new Exception("Unable to fetch access modules", 500);
+            }
+        }
     }
 
 ?>

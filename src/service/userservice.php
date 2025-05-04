@@ -25,6 +25,15 @@
                 throw new Exception($e->getMessage(), $e->getCode() ?: 400);
             }
         }        
+        public function getAccessModulesByRoleId($roleID) {
+            try {
+                // Call the repository method to get access modules
+                $modules = $this->userRepository->getAccessModulesByRoleId($roleID);
+                return $modules;
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
+            }
+        }
         public function signup($name, $email, $passWord, $phone, $gender, $roleID) {
             try {
                 if ($this->isEmailExists($email)) {
