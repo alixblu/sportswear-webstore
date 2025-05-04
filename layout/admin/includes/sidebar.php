@@ -71,25 +71,23 @@ $sidebarItems = [
     });
 
     function navigate(element) {
-        const page = element.getAttribute('data-page'); // Get the page from the clicked item
-        const mainContentArea = document.querySelector('.main-content-area');
+    const page = element.getAttribute('data-page'); // Get the page from the clicked item
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('page', page); // Set the page parameter in the URL
+    window.history.pushState({}, '', currentUrl); // Update the URL without reloading
 
-        // Load the corresponding page
-        fetch(`./modules/${page}.php`)
-            .then(response => {
-                if (response.ok) {
-                    return response.text();
-                } else {
-                    throw new Error('Page not found');
-                }
-            })
-            .then(html => {
-                mainContentArea.innerHTML = html; // Update the main content area
-            })
-            .catch(error => {
-                mainContentArea.innerHTML = `<h2>${error.message}</h2>`; // Handle errors
-            });
-    }
+    // Load the page using PHP include
+    loadPage(page);
+}
+
+function loadPage(page) {
+    const mainContentArea = document.querySelector('.main-content-area');
+
+    // Use PHP to include the page based on the query parameter
+    // This will not work with fetch, so we will rely on the PHP include in index.php
+    // Instead, we can just trigger a page reload
+    window.location.href = `./index.php?page=${page}`;
+}
 </script>
 
   <div class="sidebar">
