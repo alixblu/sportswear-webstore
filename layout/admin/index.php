@@ -24,7 +24,6 @@
 
         <?php include './includes/header.php'; ?>
         <?php include './includes/sidebar.php'; ?>
-        <?php include './modules/user.php'; ?>
 
 
     </div>
