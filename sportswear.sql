@@ -991,7 +991,7 @@ INSERT INTO `product` (`ID`, `categoryID`, `discountID`, `brandID`, `name`, `mar
 (17, 6, 1, 1, 'Nike Dri-FIT Stride Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với công nghệ Dri-FIT giúp thoát mồ hôi nhanh chóng, giữ cơ thể khô ráo và thoải mái.', 160, 'in_stock'),
 (18, 6, NULL, 2, 'Adidas Own The Run Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với chất liệu nhẹ và thoáng khí, phù hợp cho các buổi tập luyện cường độ cao.', 160, 'in_stock'),
 (19, 6, 2, 3, 'Puma Running Core Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với thiết kế năng động, chất liệu co giãn tốt, mang lại sự thoải mái khi vận động.', 160, 'in_stock'),
-(20, 6, NULL, 4, 'Under Armour Launch 7\" Shorts', 10, NULL, 'null', 'Quần short thể thao nam với chiều dài 7 inch, chất liệu thoáng khí và khô nhanh, phù hợp cho mọi hoạt động.', 160, 'in_stock'),
+(20, 6, NULL, 4, 'Under Armour Launch 7" Shorts', 10, NULL, 'null', 'Quần short thể thao nam với chiều dài 7 inch, chất liệu thoáng khí và khô nhanh, phù hợp cho mọi hoạt động.', 160, 'in_stock'),
 (21, 6, 3, 5, 'Reebok Running Essentials Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với thiết kế đơn giản, chất liệu nhẹ và thoáng khí, mang lại sự thoải mái tối đa.', 160, 'in_stock'),
 (22, 6, NULL, 6, 'Vans Range Relaxed Elastic Shorts', 10, NULL, 'null', 'Quần short nam với thiết kế thoải mái, chất liệu bền bỉ và phong cách đường phố đặc trưng của Vans.', 160, 'in_stock'),
 (23, 6, 4, 7, 'New Balance Accelerate 5 Inch Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với thiết kế 5 inch, chất liệu thoáng khí và khô nhanh, hỗ trợ tối đa khi luyện tập.', 160, 'in_stock'),
