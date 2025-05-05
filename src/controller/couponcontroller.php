@@ -20,7 +20,7 @@ class CouponController
     public function createCoupon($name, $percent, $duration)
     {
         $result = $this->couponService->createCoupon($name, $percent, $duration);
-        ApiResponse::customApiResponse($result, 201);
+        ApiResponse::customApiResponse($result, 200);
     }
 
     public function updateCoupon($id, $name, $percent, $duration, $status)
