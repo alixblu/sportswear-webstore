@@ -1,4 +1,8 @@
 <?php
+
+session_start();
+
+
 // Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
@@ -150,11 +154,11 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #f5f5f5;
         }
         .search-results {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
         }
         .result-header {
@@ -162,12 +166,12 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             align-items: center;
             margin-bottom: 20px;
         }
-        .result-header h2 {
+        .result-header h3 {
             font-size: 24px;
             margin: 0;
             color: #333;
         }
-        .result-header h2::before {
+        .result-header h3::before {
             content: '';
             display: inline-block;
             width: 5px;
@@ -264,12 +268,16 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             text-align: center;
             margin: 20px 0;
         }
+        .search-text {
+            font-size: 0.6em;
+            color: #333;
+        }
     </style>
 </head>
 <body>
 <div class="search-results">
     <div class="result-header">
-        <h2>Kết quả tìm kiếm</h2>
+        <h3>Kết quả tìm kiếm: <span class="search-text"><?php echo htmlspecialchars($_GET['query']); ?></span></h3>
     </div>
 
     <!-- Form bộ lọc -->

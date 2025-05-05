@@ -18,12 +18,12 @@
       0 10px 10px -5px rgba(0, 0, 0, 0.04);
     --radius: 10px;
     --radius-sm: 6px;
-    --sidebar-width: 210px;
-    --header-height: 70px;
+    --sidebar-width: 180px;
+    --header-height: 60px;
     --transition: all 0.3s ease;
-    --font-small:11px;
-    --font-regular:13px;
-    --font-large:15px;
+    --font-small: 10px;
+    --font-regular: 12px;
+    --font-large: 14px;
   }
   
   * {
