@@ -1,5 +1,5 @@
 <?php
-// content.php - Product Listing Page with Pagination
+    include './layout/slider.php';
 
 // Sample product data (to be replaced with database data later)
 $all_products = [
