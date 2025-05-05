@@ -1,4 +1,8 @@
 <?php
+
+session_start();
+
+
 // Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
@@ -264,12 +268,16 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             text-align: center;
             margin: 20px 0;
         }
+        .search-text {
+            font-size: 0.8em;
+            color: #333;
+        }
     </style>
 </head>
 <body>
 <div class="search-results">
     <div class="result-header">
-        <h2>Kết quả tìm kiếm</h2>
+        <h2>Kết quả tìm kiếm: <span class="search-text"><?php echo htmlspecialchars($_GET['query']); ?></span></h2>
     </div>
 
     <!-- Form bộ lọc -->
