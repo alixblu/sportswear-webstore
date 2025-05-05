@@ -11,7 +11,6 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-
 $productController = new ProductController();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -31,43 +30,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $productController->getAllBrands();
     } else if (isset($_GET['action']) && $_GET['action'] === 'getBrandByName' && isset($_GET['name'])) {
         $productController->getBrandByName($_GET['name']);
-    }else if (isset($_GET['action']) && $_GET['action'] === 'getCategoryByName' && isset($_GET['name'])) {
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getCategoryByName' && isset($_GET['name'])) {
         $productController->getCategoryByName($_GET['name']);
     } else {
-        echo json_encode(['error' => 'Invalid GET request']);
+        echo json_encode(['error' => 'Yêu cầu GET không hợp lệ']);
     }
 }
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProductImage') {
     $productId = $_POST['product_id'];
     if (isset($_FILES['image']) && $productId) {
-        $targetDir = $_SERVER['DOCUMENT_ROOT'] . "/sportwear/img/products/";
-        $targetFile = $targetDir . "product_" . $productId . ".png";
+        $targetDir = $_SERVER['DOCUMENT_ROOT'] . "/sportswear-webstore/img/products/";
+        $targetFile = $targetDir . $productId . ".jpg"; // Sử dụng .jpg thay vì .png
 
         // Remove old file if exists
         if (file_exists($targetFile)) {
             unlink($targetFile);
         }
 
-        // Move uploaded file (force .png extension)
+        // Move uploaded file
         if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
             echo json_encode([
                 "status" => 200,
-                "message" => "Image uploaded successfully"
+                "message" => "Hình ảnh được tải lên thành công"
             ]);
         } else {
             echo json_encode([
                 "status" => 500,
-                "message" => "Failed to move uploaded file"
+                "message" => "Không thể di chuyển tệp đã tải lên"
             ]);
         }
     } else {
         echo json_encode([
             "status" => 400,
-            "message" => "No image or product ID provided"
+            "message" => "Không có hình ảnh hoặc ID sản phẩm được cung cấp"
         ]);
     }
     exit;
 }
+
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     parse_str(file_get_contents("php://input"), $putData);
 
@@ -89,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     } else if (isset($putData['action']) && $putData['action'] === 'updateProductStock' && isset($putData['id'])) {
         $productController->updateProductStock($putData['id']);
     } else {
-        echo json_encode(['error' => 'Invalid PUT request']);
+        echo json_encode(['error' => 'Yêu cầu PUT không hợp lệ']);
     }
 }
 
@@ -97,6 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     if (isset($_GET['action']) && $_GET['action'] === 'deleteProduct' && isset($_GET['id'])) {
         $productController->deleteProduct($_GET['id']);
     } else {
-        echo json_encode(['error' => 'Invalid DELETE request']);
+        echo json_encode(['error' => 'Yêu cầu DELETE không hợp lệ']);
     }
 }
