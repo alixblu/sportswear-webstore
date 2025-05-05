@@ -437,7 +437,38 @@
                 if ($conn) $conn->close();
             }
         }
+
+        public function getAccessModulesByRoleId($roleID) {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+        
+                $stmt = $conn->prepare("SELECT moduleid FROM access WHERE roleid = ?");
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+        
+                $stmt->bind_param("i", $roleID);
+                $stmt->execute();
+        
+                $result = $stmt->get_result();
+                $modules = [];
+                while ($row = $result->fetch_assoc()) {
+                    $modules[] = $row['moduleid'];
+                }
+        
+                return $modules;
+            } catch (Exception $e) {
+                error_log("Database error in getAccessModulesByRoleId: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
+            }
+        }
     }
         
-
+    
 ?>

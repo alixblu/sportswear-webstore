@@ -22,12 +22,11 @@
                 if (!$user) {
                     throw new Exception("Invalid username or password", 401);
                 }
-                
-                $_SESSION['user'] =  [
+                $_SESSION['user'] = [
                     'id' => $user['userID'],
                     'username' => $user['username'],
-                    'roleid' => $user['roleID']
-                ];        
+                    'roleid' => $user['roleID'],
+                ];
                 
                 http_response_code(200);
                 echo json_encode(['success' => true, 'message' => 'Login successful', 'user' => $user]);

@@ -73,3 +73,16 @@ const deleteCoupon = async (id) => {
 
     return await response.json();
 };
+const getCouponByUserId = async (userID) => {
+    const url = `${COUPON_API_URL}?action=getCouponByUserId&id=${userID}`;
+
+    const response = await fetch(url, {
+        method: 'GET'
+    });
+
+    if (!response.ok) {
+        throw new Error('Không thể lấy danh sách coupon của người dùng');
+    }
+
+    return await response.json();
+};

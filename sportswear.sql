@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 08, 2025 at 12:53 PM
+-- Generation Time: May 04, 2025 at 06:14 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,8 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `sportswear`
 --
-CREATE DATABASE IF NOT EXISTS `sportswear` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `sportswear`;
 
 -- --------------------------------------------------------
 
@@ -29,10 +27,9 @@ USE `sportswear`;
 -- Table structure for table `access`
 --
 
-CREATE TABLE IF NOT EXISTS `access` (
+CREATE TABLE `access` (
   `roleid` int(11) NOT NULL,
-  `moduleid` int(11) NOT NULL,
-  PRIMARY KEY (`roleid`,`moduleid`)
+  `moduleid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -73,15 +70,12 @@ INSERT INTO `access` (`roleid`, `moduleid`) VALUES
 -- Table structure for table `bankaccount`
 --
 
-CREATE TABLE IF NOT EXISTS `bankaccount` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `bankaccount` (
+  `ID` int(10) NOT NULL,
   `userAccID` int(10) NOT NULL,
   `paymentMethodID` int(10) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `content` varchar(255) NOT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `FK_PaymentMethod_Bank` (`paymentMethodID`),
-  KEY `FK_UserAcc_Bank` (`userAccID`)
+  `content` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -90,14 +84,13 @@ CREATE TABLE IF NOT EXISTS `bankaccount` (
 -- Table structure for table `billingdetail`
 --
 
-CREATE TABLE IF NOT EXISTS `billingdetail` (
+CREATE TABLE `billingdetail` (
   `ID` int(10) NOT NULL,
   `orderID` int(10) NOT NULL,
   `receiverName` varchar(50) NOT NULL,
   `address` text NOT NULL,
   `phone` varchar(10) NOT NULL,
-  `email` text DEFAULT NULL,
-  PRIMARY KEY (`ID`)
+  `email` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -138,12 +131,11 @@ INSERT INTO `billingdetail` (`ID`, `orderID`, `receiverName`, `address`, `phone`
 -- Table structure for table `brand`
 --
 
-CREATE TABLE IF NOT EXISTS `brand` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `brand` (
+  `ID` int(10) NOT NULL,
   `name` varchar(50) NOT NULL,
-  `status` enum('visible','hidden') NOT NULL DEFAULT 'visible',
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('visible','hidden') NOT NULL DEFAULT 'visible'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `brand`
@@ -172,13 +164,11 @@ INSERT INTO `brand` (`ID`, `name`, `status`) VALUES
 -- Table structure for table `cart`
 --
 
-CREATE TABLE IF NOT EXISTS `cart` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `cart` (
+  `ID` int(10) NOT NULL,
   `userAccID` int(10) NOT NULL,
-  `totalPrice` double NOT NULL DEFAULT 0,
-  PRIMARY KEY (`ID`),
-  KEY `FK_UserAcc_Cart` (`userAccID`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `totalPrice` double NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `cart`
@@ -205,14 +195,11 @@ INSERT INTO `cart` (`ID`, `userAccID`, `totalPrice`) VALUES
 -- Table structure for table `cartdetail`
 --
 
-CREATE TABLE IF NOT EXISTS `cartdetail` (
-  `ID` int(5) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `cartdetail` (
+  `ID` int(5) NOT NULL,
   `productID` int(5) NOT NULL,
   `quantity` smallint(6) DEFAULT NULL,
-  `cartID` int(11) NOT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `FK_Cart_CartDetail` (`cartID`),
-  KEY `FK_ProVariant_CartDetail` (`productID`)
+  `cartID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -221,14 +208,12 @@ CREATE TABLE IF NOT EXISTS `cartdetail` (
 -- Table structure for table `category`
 --
 
-CREATE TABLE IF NOT EXISTS `category` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `category` (
+  `ID` int(10) NOT NULL,
   `name` varchar(50) NOT NULL,
   `parent` int(10) DEFAULT NULL,
-  `status` enum('visible','hidden') NOT NULL DEFAULT 'visible',
-  PRIMARY KEY (`ID`),
-  KEY `FK_Parent` (`parent`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('visible','hidden') NOT NULL DEFAULT 'visible'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `category`
@@ -258,12 +243,11 @@ INSERT INTO `category` (`ID`, `name`, `parent`, `status`) VALUES
 -- Table structure for table `comment`
 --
 
-CREATE TABLE IF NOT EXISTS `comment` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `comment` (
+  `ID` int(10) NOT NULL,
   `content` varchar(255) NOT NULL,
-  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `createdAt` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `comment`
@@ -282,14 +266,13 @@ INSERT INTO `comment` (`ID`, `content`, `createdAt`) VALUES
 -- Table structure for table `coupon`
 --
 
-CREATE TABLE IF NOT EXISTS `coupon` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `coupon` (
+  `ID` int(10) NOT NULL,
   `name` varchar(255) NOT NULL,
   `percent` int(2) NOT NULL,
   `duration` int(2) NOT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `coupon`
@@ -310,13 +293,12 @@ INSERT INTO `coupon` (`ID`, `name`, `percent`, `duration`, `status`) VALUES
 -- Table structure for table `discount`
 --
 
-CREATE TABLE IF NOT EXISTS `discount` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `discount` (
+  `ID` int(10) NOT NULL,
   `name` varchar(50) NOT NULL,
   `discountRate` int(11) NOT NULL,
-  `status` enum('active','inactive') NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `discount`
@@ -338,15 +320,13 @@ INSERT INTO `discount` (`ID`, `name`, `discountRate`, `status`) VALUES
 -- Table structure for table `lot`
 --
 
-CREATE TABLE IF NOT EXISTS `lot` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `lot` (
+  `ID` int(10) NOT NULL,
   `purchaseOrderID` int(10) NOT NULL,
   `quantity` smallint(6) DEFAULT NULL,
   `totalPrice` decimal(10,0) NOT NULL DEFAULT 0,
-  `status` enum('pending','approved','defective') NOT NULL DEFAULT 'pending',
-  PRIMARY KEY (`ID`),
-  KEY `FK_PurOrder_Lot` (`purchaseOrderID`)
-) ENGINE=InnoDB AUTO_INCREMENT=451 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('pending','approved','defective') NOT NULL DEFAULT 'pending'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `lot`
@@ -807,53 +787,18 @@ INSERT INTO `lot` (`ID`, `purchaseOrderID`, `quantity`, `totalPrice`, `status`) 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `module`
---
-
-CREATE TABLE IF NOT EXISTS `module` (
-  `ID` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `icon` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `module`
---
-
-INSERT INTO `module` (`ID`, `name`, `icon`) VALUES
-(1, 'Dashboard', '<i class=\"ri-dashboard-line\"></i>'),
-(2, 'Employees', '<i class=\"ri-user-line\"></i>'),
-(3, 'Products', '<i class=\"ri-shopping-bag-line\"></i>'),
-(4, 'Warehouse', '<i class=\"ri-warehouse-line\"></i>'),
-(5, 'Orders', '<i class=\"ri-file-list-line\"></i>'),
-(6, 'Coupon & Discount', '<i class=\"ri-price-tag-line\"></i>'),
-(7, 'Warranty', '<i class=\"ri-shield-line\"></i>'),
-(8, 'Account & Access', '<i class=\"ri-lock-line\"></i>'),
-(9, 'Analytics', '<i class=\"ri-bar-chart-line\"></i>'),
-(10, 'Sales', '<i class=\"ri-money-dollar-circle-line\"></i>'),
-(11, 'Notifications', '<i class=\"ri-notification-line\"></i>'),
-(12, 'Settings', '<i class=\"ri-settings-line\"></i>');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `order`
 --
 
-CREATE TABLE IF NOT EXISTS `order` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `order` (
+  `ID` int(10) NOT NULL,
   `customer` int(5) NOT NULL,
   `approver` int(5) NOT NULL,
   `couponID` int(5) NOT NULL,
   `totalPrice` double NOT NULL DEFAULT 0,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('pending','approved','canceled','delivered') NOT NULL DEFAULT 'pending',
-  PRIMARY KEY (`ID`),
-  KEY `FK_approver_Order` (`approver`),
-  KEY `FK_Coupon_Order` (`couponID`),
-  KEY `FK_customer_Order` (`customer`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('pending','approved','canceled','delivered') NOT NULL DEFAULT 'pending'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `order`
@@ -893,16 +838,13 @@ INSERT INTO `order` (`ID`, `customer`, `approver`, `couponID`, `totalPrice`, `cr
 -- Table structure for table `orderdetail`
 --
 
-CREATE TABLE IF NOT EXISTS `orderdetail` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `orderdetail` (
+  `ID` int(10) NOT NULL,
   `orderID` int(10) NOT NULL,
   `productID` int(10) NOT NULL,
   `quantity` smallint(6) DEFAULT NULL,
-  `totalPrice` decimal(10,0) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`ID`),
-  KEY `FK_Order_Orderdetail` (`orderID`),
-  KEY `FK_Product_Orderdetail` (`productID`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `totalPrice` decimal(10,0) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `orderdetail`
@@ -942,18 +884,14 @@ INSERT INTO `orderdetail` (`ID`, `orderID`, `productID`, `quantity`, `totalPrice
 -- Table structure for table `payment`
 --
 
-CREATE TABLE IF NOT EXISTS `payment` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `payment` (
+  `ID` int(11) NOT NULL,
   `paymentMethodID` int(11) NOT NULL,
   `orderID` int(11) NOT NULL,
   `bankAccountID` int(11) DEFAULT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('pending','completed','failed') NOT NULL DEFAULT 'pending',
-  PRIMARY KEY (`ID`),
-  KEY `FK_Order_Payment` (`orderID`),
-  KEY `FK_PaymentMethod_Payment` (`paymentMethodID`),
-  KEY `FK_Bank_Payment` (`bankAccountID`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('pending','completed','failed') NOT NULL DEFAULT 'pending'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `payment`
@@ -993,14 +931,12 @@ INSERT INTO `payment` (`ID`, `paymentMethodID`, `orderID`, `bankAccountID`, `cre
 -- Table structure for table `paymentmethod`
 --
 
-CREATE TABLE IF NOT EXISTS `paymentmethod` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `paymentmethod` (
+  `ID` int(10) NOT NULL,
   `name` varchar(50) NOT NULL,
   `description` varchar(50) DEFAULT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `name` (`name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `paymentmethod`
@@ -1017,8 +953,8 @@ INSERT INTO `paymentmethod` (`ID`, `name`, `description`, `status`) VALUES
 -- Table structure for table `product`
 --
 
-CREATE TABLE IF NOT EXISTS `product` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `product` (
+  `ID` int(10) NOT NULL,
   `categoryID` int(11) NOT NULL,
   `discountID` int(11) DEFAULT NULL,
   `brandID` int(11) NOT NULL,
@@ -1028,101 +964,97 @@ CREATE TABLE IF NOT EXISTS `product` (
   `image` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL,
   `stock` smallint(6) DEFAULT NULL,
-  `status` enum('in_stock','out_of_stock') NOT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `FK_Category_Product` (`categoryID`),
-  KEY `FK_Discount_Product` (`discountID`),
-  KEY `FK_Brand_Product` (`brandID`)
-) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('in_stock','out_of_stock') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `product`
 --
 
 INSERT INTO `product` (`ID`, `categoryID`, `discountID`, `brandID`, `name`, `markup_percentage`, `rating`, `image`, `description`, `stock`, `status`) VALUES
-(1, 5, NULL, 1, 'Nike Dri-FIT Polo', 10, NULL, 'null', 'Chiếc áo polo thể thao nam Nike Dri-FIT với chất liệu thoáng khí, hút ẩm tốt, phù hợp cho các hoạt động thể thao.', 0, 'in_stock'),
-(2, 5, NULL, 2, 'Adidas Training T-Shirt', 10, NULL, 'null', 'Áo thể thao nam Adidas với thiết kế đơn giản, công nghệ Aeroready giúp giữ cơ thể khô thoáng.', 0, 'in_stock'),
-(3, 5, 1, 3, 'Puma Performance Tee', 10, NULL, 'null', 'Áo thun thể thao Puma với kiểu dáng trẻ trung, năng động, phù hợp cho việc luyện tập hàng ngày.', 0, 'in_stock'),
-(4, 5, NULL, 4, 'Reebok Speedwick Tee', 10, NULL, 'null', 'Chiếc áo Reebok Speedwick giúp thấm hút mồ hôi nhanh chóng, giữ cơ thể khô thoáng.', 0, 'in_stock'),
-(5, 5, 2, 5, 'Under Armour HeatGear Tank', 10, NULL, 'null', 'Áo tank top nam Under Armour HeatGear với thiết kế ôm sát, hỗ trợ vận động linh hoạt.', 0, 'in_stock'),
-(6, 5, NULL, 6, 'Vans Classic Hoodie', 10, NULL, 'null', 'Áo hoodie Vans Classic với phong cách đường phố, chất vải mềm mại và giữ ấm tốt.', 0, 'in_stock'),
-(7, 5, NULL, 7, 'New Balance Training Tee', 10, NULL, 'null', 'Áo thể thao nam New Balance với chất liệu co giãn, hỗ trợ vận động tối đa.', 0, 'in_stock'),
-(8, 5, 3, 8, 'Converse Sport Tee', 10, NULL, 'null', 'Chiếc áo thun thể thao Converse mang lại phong cách năng động, cá tính.', 0, 'in_stock'),
-(9, 8, NULL, 1, 'Nike Dri-FIT Women Tee', 10, NULL, 'null', 'Áo thể thao nữ Nike với công nghệ Dri-FIT giúp thấm hút mồ hôi nhanh, giữ cơ thể khô ráo.', 0, 'in_stock'),
-(10, 8, 1, 2, 'Adidas Aeroready Tank Top', 10, NULL, 'null', 'Áo tank top nữ Adidas với thiết kế thoáng mát, co giãn tốt, phù hợp cho các hoạt động thể thao.', 0, 'in_stock'),
-(11, 8, NULL, 3, 'Puma Women Hoodie', 10, NULL, 'null', 'Áo hoodie nữ Puma với kiểu dáng trẻ trung, phù hợp cho các hoạt động ngoài trời.', 0, 'in_stock'),
-(12, 8, NULL, 4, 'Reebok Yoga Long Sleeve', 10, NULL, 'null', 'Áo dài tay Reebok dành cho yoga, với chất liệu co giãn và mềm mại.', 0, 'in_stock'),
-(13, 8, 2, 5, 'Under Armour Training Tee', 10, NULL, 'null', 'Chiếc áo thun thể thao Under Armour giúp bạn tập luyện thoải mái với công nghệ chống thấm mồ hôi.', 0, 'in_stock'),
-(14, 8, NULL, 6, 'Vans Cropped Hoodie', 10, NULL, 'null', 'Áo hoodie nữ Vans dáng crop hiện đại, mang lại phong cách trẻ trung.', 0, 'in_stock'),
-(15, 8, 3, 7, 'New Balance Sport Tank', 10, NULL, 'null', 'Áo tank top thể thao nữ New Balance, phù hợp cho các hoạt động thể dục thể thao.', 0, 'in_stock'),
-(16, 8, NULL, 8, 'Converse Women Training Tee', 10, NULL, 'null', 'Áo thun thể thao nữ Converse với thiết kế thoải mái, phong cách.', 0, 'in_stock'),
-(17, 6, 1, 1, 'Nike Dri-FIT Stride Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với công nghệ Dri-FIT giúp thoát mồ hôi nhanh chóng, giữ cơ thể khô ráo và thoải mái.', 0, 'in_stock'),
-(18, 6, NULL, 2, 'Adidas Own The Run Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với chất liệu nhẹ và thoáng khí, phù hợp cho các buổi tập luyện cường độ cao.', 0, 'in_stock'),
-(19, 6, 2, 3, 'Puma Running Core Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với thiết kế năng động, chất liệu co giãn tốt, mang lại sự thoải mái khi vận động.', 0, 'in_stock'),
-(20, 6, NULL, 4, 'Under Armour Launch 7\" Shorts', 10, NULL, 'null', 'Quần short thể thao nam với chiều dài 7 inch, chất liệu thoáng khí và khô nhanh, phù hợp cho mọi hoạt động.', 0, 'in_stock'),
-(21, 6, 3, 5, 'Reebok Running Essentials Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với thiết kế đơn giản, chất liệu nhẹ và thoáng khí, mang lại sự thoải mái tối đa.', 0, 'in_stock'),
-(22, 6, NULL, 6, 'Vans Range Relaxed Elastic Shorts', 10, NULL, 'null', 'Quần short nam với thiết kế thoải mái, chất liệu bền bỉ và phong cách đường phố đặc trưng của Vans.', 0, 'in_stock'),
-(23, 6, 4, 7, 'New Balance Accelerate 5 Inch Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với thiết kế 5 inch, chất liệu thoáng khí và khô nhanh, hỗ trợ tối đa khi luyện tập.', 0, 'in_stock'),
-(24, 6, NULL, 8, 'Converse Star Chevron Shorts', 10, NULL, 'null', 'Quần short nam với logo Star Chevron đặc trưng, chất liệu mềm mại và thoải mái cho hoạt động hàng ngày.', 0, 'in_stock'),
-(25, 6, 1, 1, 'Nike Flex Training Pants', 10, NULL, 'null', 'Quần dài tập luyện nam với chất liệu co giãn và thoáng khí, phù hợp cho mọi bài tập.', 0, 'in_stock'),
-(26, 6, NULL, 2, 'Adidas Tiro 21 Training Pants', 10, NULL, 'null', 'Quần dài tập luyện nam với thiết kế thể thao, chất liệu thoáng khí và co giãn tốt.', 0, 'in_stock'),
-(27, 9, 2, 1, 'Nike Tempo Running Shorts', 10, NULL, 'null', 'Quần chạy bộ nữ với thiết kế nhẹ nhàng, chất liệu thoáng khí và khô nhanh.', 0, 'in_stock'),
-(28, 9, NULL, 2, 'Adidas Marathon 20 Shorts', 10, NULL, 'null', 'Quần short chạy bộ nữ với thiết kế năng động, chất liệu co giãn và thoải mái.', 0, 'in_stock'),
-(29, 9, 3, 3, 'Puma Women\'s Running Shorts', 10, NULL, 'null', 'Quần chạy bộ nữ với thiết kế thể thao, chất liệu nhẹ và thoáng khí.', 0, 'in_stock'),
-(30, 9, NULL, 4, 'Under Armour Fly-By Shorts', 10, NULL, 'null', 'Quần short nữ với thiết kế hiện đại, chất liệu thoáng khí và co giãn tốt.', 0, 'in_stock'),
-(31, 9, 4, 5, 'Reebok Running Essentials Shorts', 10, NULL, 'null', 'Quần short chạy bộ nữ với thiết kế đơn giản, chất liệu nhẹ và thoáng khí, mang lại sự thoải mái tối đa.', 0, 'in_stock'),
-(32, 9, NULL, 6, 'Vans Range Relaxed Elastic Shorts', 10, NULL, 'null', 'Quần short nữ với thiết kế thoải mái, chất liệu bền bỉ và phong cách đường phố đặc trưng của Vans.', 0, 'in_stock'),
-(33, 9, 1, 7, 'New Balance Accelerate 2.5 Inch Shorts', 10, NULL, 'null', 'Quần short chạy bộ nữ với thiết kế 2.5 inch, chất liệu thoáng khí và khô nhanh, hỗ trợ tối đa khi luyện tập.', 0, 'in_stock'),
-(34, 9, NULL, 8, 'Converse Star Chevron Shorts', 10, NULL, 'null', 'Quần short nữ với logo Star Chevron đặc trưng, chất liệu mềm mại và thoải mái cho hoạt động hàng ngày.', 0, 'in_stock'),
-(35, 9, 2, 1, 'Nike One Tights', 10, NULL, 'null', 'Quần legging nữ với chất liệu co giãn và thoáng khí, phù hợp cho mọi hoạt động thể thao.', 0, 'in_stock'),
-(36, 9, NULL, 2, 'Adidas Believe This 2.0 Tights', 10, NULL, 'null', 'Quần legging nữ với thiết kế ôm sát, chất liệu thoáng khí và hỗ trợ vận động.', 0, 'in_stock'),
-(37, 7, NULL, 1, 'Nike Air Zoom Pegasus', 10, NULL, 'null', 'Giày chạy bộ hiệu suất cao từ Nike', NULL, 'in_stock'),
-(38, 7, NULL, 2, 'Adidas Ultraboost', 10, NULL, 'null', 'Giày chạy bộ êm ái với công nghệ Boost', NULL, 'in_stock'),
-(39, 7, 2, 3, 'Puma Deviate Nitro', 10, NULL, 'null', 'Giày chạy bộ với đệm Nitro tiên tiến', NULL, 'in_stock'),
-(40, 7, NULL, 4, 'Under Armour HOVR Phantom', 10, NULL, 'null', 'Giày chạy bộ với công nghệ HOVR', NULL, 'in_stock'),
-(41, 7, NULL, 5, 'Reebok Floatride Energy', 10, NULL, 'null', 'Giày chạy bộ nhẹ, phản hồi tốt', NULL, 'in_stock'),
-(42, 7, 4, 6, 'New Balance Fresh Foam 1080', 10, NULL, 'null', 'Giày chạy bộ tối ưu đệm Fresh Foam', NULL, 'in_stock'),
-(43, 10, NULL, 1, 'Nike React Infinity Run', 10, NULL, 'null', 'Giày chạy bộ giảm chấn thương hiệu quả', NULL, 'in_stock'),
-(44, 10, NULL, 2, 'Adidas Solar Glide', 10, NULL, 'null', 'Giày chạy bộ đa năng', NULL, 'in_stock'),
-(45, 10, NULL, 3, 'Puma Velocity Nitro', 10, NULL, 'null', 'Giày chạy bộ nhẹ, phản hồi nhanh', NULL, 'in_stock'),
-(46, 10, 1, 4, 'Under Armour Flow Velociti Wind', 10, NULL, 'null', 'Giày chạy bộ không đế cao su', NULL, 'in_stock'),
-(47, 10, NULL, 5, 'Reebok Forever Floatride', 10, NULL, 'null', 'Giày chạy bộ với đệm Floatride', NULL, 'in_stock'),
-(48, 10, NULL, 6, 'New Balance FuelCell Propel', 10, NULL, 'null', 'Giày chạy bộ với công nghệ FuelCell', NULL, 'in_stock'),
-(49, 7, NULL, 1, 'Nike Metcon', 10, NULL, 'null', 'Giày tập gym, CrossFit chuyên dụng', NULL, 'in_stock'),
-(50, 7, 3, 2, 'Adidas Powerlift', 10, NULL, 'null', 'Giày tập tạ với đế cứng ổn định', NULL, 'in_stock'),
-(51, 7, NULL, 5, 'Reebok Nano X', 10, NULL, 'null', 'Giày CrossFit đa năng', NULL, 'in_stock'),
-(52, 7, NULL, 4, 'Under Armour Project Rock', 10, NULL, 'null', 'Giày tập gym dòng Project Rock', NULL, 'in_stock'),
-(53, 7, NULL, 3, 'Puma Fuse Trainer', 10, NULL, 'null', 'Giày tập gym nhẹ, ổn định', NULL, 'in_stock'),
-(54, 10, NULL, 1, 'Nike Free TR', 10, NULL, 'null', 'Giày tập gym linh hoạt', NULL, 'in_stock'),
-(55, 10, NULL, 2, 'Adidas Dropset Trainer', 10, NULL, 'null', 'Giày tập gym đa năng', NULL, 'in_stock'),
-(56, 10, NULL, 5, 'Reebok Legacy Lifter', 10, NULL, 'null', 'Giày tập tạ chuyên dụng', NULL, 'in_stock'),
-(57, 10, 2, 4, 'Under Armour Tribase Reign', 10, NULL, 'null', 'Giày tập gym ổn định', NULL, 'in_stock'),
-(58, 10, NULL, 3, 'Puma Fuse Trainer', 10, NULL, 'null', 'Giày tập gym nhẹ, ổn định', NULL, 'in_stock'),
-(59, 14, NULL, 9, 'Yonex Nanoflare 1000Z', 10, NULL, 'null', 'Vợt cầu lông cao cấp của Yonex', NULL, 'in_stock'),
-(60, 14, 2, 9, 'Yonex Astrox 88D Pro', 10, NULL, 'null', 'Vợt dành cho người chơi tấn công', NULL, 'in_stock'),
-(61, 14, NULL, 10, 'Li-Ning Aeronaut 9000', 10, NULL, 'null', 'Vợt cầu lông chuyên nghiệp của Li-Ning', NULL, 'in_stock'),
-(62, 14, NULL, 10, 'Li-Ning Windstorm 72', 10, NULL, 'null', 'Vợt nhẹ, phù hợp với người mới chơi', NULL, 'in_stock'),
-(63, 14, 3, 11, 'Wilson Blade CV', 10, NULL, 'null', 'Vợt tennis với công nghệ giảm chấn động', NULL, 'in_stock'),
-(64, 15, NULL, 12, 'Molten GG7X', 10, NULL, 'null', 'Bóng rổ tiêu chuẩn thi đấu', NULL, 'in_stock'),
-(65, 15, NULL, 12, 'Molten F5G5000', 10, NULL, 'null', 'Bóng đá chất lượng cao', NULL, 'in_stock'),
-(66, 15, 1, 13, 'Spalding TF-1000', 10, NULL, 'null', 'Bóng rổ sử dụng trong giải NBA', NULL, 'in_stock'),
-(67, 15, NULL, 13, 'Spalding Street Outdoor', 10, NULL, 'null', 'Bóng rổ chuyên dùng cho sân ngoài trời', NULL, 'in_stock'),
-(68, 15, 1, 11, 'Wilson Evolution', 10, NULL, 'null', 'Bám tay tốt và mang lại cảm giác mềm mại. Công nghệ Cushion Core kết hợp cao su tổng hợp và bọt khí giúp bóng có độ nảy ổn định, dễ kiểm soát. Thiết kế rãnh sâu tăng độ bám khi dẫn bóng hoặc ném rổ.', NULL, 'in_stock'),
-(69, 16, NULL, 15, 'Everlast Neoprene Dumbbell', 10, NULL, 'null', 'Tạ tay bọc cao su của Everlast', NULL, 'in_stock'),
-(70, 16, NULL, 15, 'Everlast Kettlebell', 10, NULL, 'null', 'Tạ ấm hỗ trợ tập luyện toàn thân', NULL, 'in_stock'),
-(71, 16, 2, 15, 'Everlast Adjustable Dumbbell', 10, NULL, 'null', 'Tạ điều chỉnh trọng lượng linh hoạt', NULL, 'in_stock'),
-(72, 11, 1, 1, 'Nike Academy Backpack', 10, NULL, 'null', 'Balo thể thao đa năng của Nike với thiết kế tiện dụng.', 0, 'in_stock'),
-(73, 11, NULL, 2, 'Adidas Tiro Backpack', 10, NULL, 'null', 'Balo Adidas phong cách thể thao, phù hợp cho tập luyện.', 0, 'in_stock'),
-(74, 11, NULL, 3, 'Puma Evercat Contender Backpack', 10, NULL, 'null', 'Balo Puma với nhiều ngăn chứa tiện lợi.', 0, 'in_stock'),
-(75, 11, NULL, 4, 'Under Armour Hustle Backpack', 10, NULL, 'null', 'Balo Under Armour chống nước, phù hợp cho mọi thời tiết.', 0, 'in_stock'),
-(76, 12, NULL, 5, 'Reebok Training Gloves', 10, NULL, 'null', 'Găng tay Reebok hỗ trợ tập luyện với độ bám tốt.', 0, 'in_stock'),
-(77, 12, 1, 6, 'Vans Grip Gloves', 10, NULL, 'null', 'Găng tay Vans phong cách đường phố với chất liệu bền.', 0, 'in_stock'),
-(78, 12, NULL, 7, 'New Balance Performance Gloves', 10, NULL, 'null', 'Găng tay New Balance nhẹ, thoáng khí, phù hợp cho tập luyện.', 0, 'in_stock'),
-(79, 12, NULL, 8, 'Converse Classic Gloves', 10, NULL, 'null', 'Găng tay Converse cổ điển, thiết kế thời trang.', 0, 'in_stock'),
-(80, 13, NULL, 14, 'Dunlop Pro Wristband', 10, NULL, 'null', 'Băng quấn cổ tay Dunlop hỗ trợ tối đa cho vận động viên.', 0, 'in_stock'),
-(81, 13, 2, 15, 'Everlast Hand Wraps', 10, NULL, 'null', 'Băng quấn tay Everlast dùng cho boxing và tập luyện.', 0, 'in_stock'),
-(82, 13, NULL, 13, 'Spalding Compression Wristband', 10, NULL, 'null', 'Băng quấn Spalding giúp cố định cổ tay khi vận động.', 0, 'in_stock'),
-(83, 13, NULL, 12, 'Molten Sports Wristband', 10, NULL, 'null', 'Băng quấn Molten hỗ trợ cổ tay khi chơi thể thao.', 0, 'in_stock');
+(1, 1, 1, 1, 'Nike Dri-FIT Polo', 15, 0.00, 'null', 'Áo Nike Dri-FIT Polo thể thao', 160, 'in_stock'),
+(2, 5, NULL, 2, 'Adidas Training T-Shirt', 10, NULL, 'null', 'Áo thể thao nam Adidas với thiết kế đơn giản, công nghệ Aeroready giúp giữ cơ thể khô thoáng.', 160, 'in_stock'),
+(3, 5, 1, 3, 'Puma Performance Tee', 10, NULL, 'null', 'Áo thun thể thao Puma với kiểu dáng trẻ trung, năng động, phù hợp cho việc luyện tập hàng ngày.', 160, 'in_stock'),
+(4, 5, NULL, 4, 'Reebok Speedwick Tee', 10, NULL, 'null', 'Chiếc áo Reebok Speedwick giúp thấm hút mồ hôi nhanh chóng, giữ cơ thể khô thoáng.', 160, 'in_stock'),
+(5, 5, 2, 5, 'Under Armour HeatGear Tank', 10, NULL, 'null', 'Áo tank top nam Under Armour HeatGear với thiết kế ôm sát, hỗ trợ vận động linh hoạt.', 160, 'in_stock'),
+(6, 5, NULL, 6, 'Vans Classic Hoodie', 10, NULL, 'null', 'Áo hoodie Vans Classic với phong cách đường phố, chất vải mềm mại và giữ ấm tốt.', 160, 'in_stock'),
+(7, 5, NULL, 7, 'New Balance Training Tee', 10, NULL, 'null', 'Áo thể thao nam New Balance với chất liệu co giãn, hỗ trợ vận động tối đa.', 160, 'in_stock'),
+(8, 5, 3, 8, 'Converse Sport Tee', 10, NULL, 'null', 'Chiếc áo thun thể thao Converse mang lại phong cách năng động, cá tính.', 160, 'in_stock'),
+(9, 8, NULL, 1, 'Nike Dri-FIT Women Tee', 10, NULL, 'null', 'Áo thể thao nữ Nike với công nghệ Dri-FIT giúp thấm hút mồ hôi nhanh, giữ cơ thể khô ráo.', 120, 'in_stock'),
+(10, 8, 1, 2, 'Adidas Aeroready Tank Top', 10, NULL, 'null', 'Áo tank top nữ Adidas với thiết kế thoáng mát, co giãn tốt, phù hợp cho các hoạt động thể thao.', 120, 'in_stock'),
+(11, 8, NULL, 3, 'Puma Women Hoodie', 10, NULL, 'null', 'Áo hoodie nữ Puma với kiểu dáng trẻ trung, phù hợp cho các hoạt động ngoài trời.', 120, 'in_stock'),
+(12, 8, NULL, 4, 'Reebok Yoga Long Sleeve', 10, NULL, 'null', 'Áo dài tay Reebok dành cho yoga, với chất liệu co giãn và mềm mại.', 120, 'in_stock'),
+(13, 8, 2, 5, 'Under Armour Training Tee', 10, NULL, 'null', 'Chiếc áo thun thể thao Under Armour giúp bạn tập luyện thoải mái với công nghệ chống thấm mồ hôi.', 120, 'in_stock'),
+(14, 8, NULL, 6, 'Vans Cropped Hoodie', 10, NULL, 'null', 'Áo hoodie nữ Vans dáng crop hiện đại, mang lại phong cách trẻ trung.', 120, 'in_stock'),
+(15, 8, 3, 7, 'New Balance Sport Tank', 10, NULL, 'null', 'Áo tank top thể thao nữ New Balance, phù hợp cho các hoạt động thể dục thể thao.', 120, 'in_stock'),
+(16, 8, NULL, 8, 'Converse Women Training Tee', 10, NULL, 'null', 'Áo thun thể thao nữ Converse với thiết kế thoải mái, phong cách.', 120, 'in_stock'),
+(17, 6, 1, 1, 'Nike Dri-FIT Stride Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với công nghệ Dri-FIT giúp thoát mồ hôi nhanh chóng, giữ cơ thể khô ráo và thoải mái.', 160, 'in_stock'),
+(18, 6, NULL, 2, 'Adidas Own The Run Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với chất liệu nhẹ và thoáng khí, phù hợp cho các buổi tập luyện cường độ cao.', 160, 'in_stock'),
+(19, 6, 2, 3, 'Puma Running Core Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với thiết kế năng động, chất liệu co giãn tốt, mang lại sự thoải mái khi vận động.', 160, 'in_stock'),
+(20, 6, NULL, 4, 'Under Armour Launch 7\" Shorts', 10, NULL, 'null', 'Quần short thể thao nam với chiều dài 7 inch, chất liệu thoáng khí và khô nhanh, phù hợp cho mọi hoạt động.', 160, 'in_stock'),
+(21, 6, 3, 5, 'Reebok Running Essentials Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với thiết kế đơn giản, chất liệu nhẹ và thoáng khí, mang lại sự thoải mái tối đa.', 160, 'in_stock'),
+(22, 6, NULL, 6, 'Vans Range Relaxed Elastic Shorts', 10, NULL, 'null', 'Quần short nam với thiết kế thoải mái, chất liệu bền bỉ và phong cách đường phố đặc trưng của Vans.', 160, 'in_stock'),
+(23, 6, 4, 7, 'New Balance Accelerate 5 Inch Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với thiết kế 5 inch, chất liệu thoáng khí và khô nhanh, hỗ trợ tối đa khi luyện tập.', 160, 'in_stock'),
+(24, 6, NULL, 8, 'Converse Star Chevron Shorts', 10, NULL, 'null', 'Quần short nam với logo Star Chevron đặc trưng, chất liệu mềm mại và thoải mái cho hoạt động hàng ngày.', 160, 'in_stock'),
+(25, 6, 1, 1, 'Nike Flex Training Pants', 10, NULL, 'null', 'Quần dài tập luyện nam với chất liệu co giãn và thoáng khí, phù hợp cho mọi bài tập.', 160, 'in_stock'),
+(26, 6, NULL, 2, 'Adidas Tiro 21 Training Pants', 10, NULL, 'null', 'Quần dài tập luyện nam với thiết kế thể thao, chất liệu thoáng khí và co giãn tốt.', 160, 'in_stock'),
+(27, 9, 2, 1, 'Nike Tempo Running Shorts', 10, NULL, 'null', 'Quần chạy bộ nữ với thiết kế nhẹ nhàng, chất liệu thoáng khí và khô nhanh.', 120, 'in_stock'),
+(28, 9, NULL, 2, 'Adidas Marathon 20 Shorts', 10, NULL, 'null', 'Quần short chạy bộ nữ với thiết kế năng động, chất liệu co giãn và thoải mái.', 120, 'in_stock'),
+(29, 9, 3, 3, 'Puma Women\'s Running Shorts', 10, NULL, 'null', 'Quần chạy bộ nữ với thiết kế thể thao, chất liệu nhẹ và thoáng khí.', 120, 'in_stock'),
+(30, 9, NULL, 4, 'Under Armour Fly-By Shorts', 10, NULL, 'null', 'Quần short nữ với thiết kế hiện đại, chất liệu thoáng khí và co giãn tốt.', 120, 'in_stock'),
+(31, 9, 4, 5, 'Reebok Running Essentials Shorts', 10, NULL, 'null', 'Quần short chạy bộ nữ với thiết kế đơn giản, chất liệu nhẹ và thoáng khí, mang lại sự thoải mái tối đa.', 120, 'in_stock'),
+(32, 9, NULL, 6, 'Vans Range Relaxed Elastic Shorts', 10, NULL, 'null', 'Quần short nữ với thiết kế thoải mái, chất liệu bền bỉ và phong cách đường phố đặc trưng của Vans.', 120, 'in_stock'),
+(33, 9, 1, 7, 'New Balance Accelerate 2.5 Inch Shorts', 10, NULL, 'null', 'Quần short chạy bộ nữ với thiết kế 2.5 inch, chất liệu thoáng khí và khô nhanh, hỗ trợ tối đa khi luyện tập.', 120, 'in_stock'),
+(34, 9, NULL, 8, 'Converse Star Chevron Shorts', 10, NULL, 'null', 'Quần short nữ với logo Star Chevron đặc trưng, chất liệu mềm mại và thoải mái cho hoạt động hàng ngày.', 120, 'in_stock'),
+(35, 9, 2, 1, 'Nike One Tights', 10, NULL, 'null', 'Quần legging nữ với chất liệu co giãn và thoáng khí, phù hợp cho mọi hoạt động thể thao.', 120, 'in_stock'),
+(36, 9, NULL, 2, 'Adidas Believe This 2.0 Tights', 10, NULL, 'null', 'Quần legging nữ với thiết kế ôm sát, chất liệu thoáng khí và hỗ trợ vận động.', 120, 'in_stock'),
+(37, 7, NULL, 1, 'Nike Air Zoom Pegasus', 10, NULL, 'null', 'Giày chạy bộ hiệu suất cao từ Nike', 120, 'in_stock'),
+(38, 7, NULL, 2, 'Adidas Ultraboost', 10, NULL, 'null', 'Giày chạy bộ êm ái với công nghệ Boost', 120, 'in_stock'),
+(39, 7, 2, 3, 'Puma Deviate Nitro', 10, NULL, 'null', 'Giày chạy bộ với đệm Nitro tiên tiến', 120, 'in_stock'),
+(40, 7, NULL, 4, 'Under Armour HOVR Phantom', 10, NULL, 'null', 'Giày chạy bộ với công nghệ HOVR', 120, 'in_stock'),
+(41, 7, NULL, 5, 'Reebok Floatride Energy', 10, NULL, 'null', 'Giày chạy bộ nhẹ, phản hồi tốt', 120, 'in_stock'),
+(42, 7, 4, 6, 'New Balance Fresh Foam 1080', 10, NULL, 'null', 'Giày chạy bộ tối ưu đệm Fresh Foam', 120, 'in_stock'),
+(43, 10, NULL, 1, 'Nike React Infinity Run', 10, NULL, 'null', 'Giày chạy bộ giảm chấn thương hiệu quả', 100, 'in_stock'),
+(44, 10, NULL, 2, 'Adidas Solar Glide', 10, NULL, 'null', 'Giày chạy bộ đa năng', 100, 'in_stock'),
+(45, 10, NULL, 3, 'Puma Velocity Nitro', 10, NULL, 'null', 'Giày chạy bộ nhẹ, phản hồi nhanh', 100, 'in_stock'),
+(46, 10, 1, 4, 'Under Armour Flow Velociti Wind', 10, NULL, 'null', 'Giày chạy bộ không đế cao su', 100, 'in_stock'),
+(47, 10, NULL, 5, 'Reebok Forever Floatride', 10, NULL, 'null', 'Giày chạy bộ với đệm Floatride', 100, 'in_stock'),
+(48, 10, NULL, 6, 'New Balance FuelCell Propel', 10, NULL, 'null', 'Giày chạy bộ với công nghệ FuelCell', 100, 'in_stock'),
+(49, 7, NULL, 1, 'Nike Metcon', 10, NULL, 'null', 'Giày tập gym, CrossFit chuyên dụng', 120, 'in_stock'),
+(50, 7, 3, 2, 'Adidas Powerlift', 10, NULL, 'null', 'Giày tập tạ với đế cứng ổn định', 120, 'in_stock'),
+(51, 7, NULL, 5, 'Reebok Nano X', 10, NULL, 'null', 'Giày CrossFit đa năng', 120, 'in_stock'),
+(52, 7, NULL, 4, 'Under Armour Project Rock', 10, NULL, 'null', 'Giày tập gym dòng Project Rock', 120, 'in_stock'),
+(53, 7, NULL, 3, 'Puma Fuse Trainer', 10, NULL, 'null', 'Giày tập gym nhẹ, ổn định', 120, 'in_stock'),
+(54, 10, NULL, 1, 'Nike Free TR', 10, NULL, 'null', 'Giày tập gym linh hoạt', 100, 'in_stock'),
+(55, 10, NULL, 2, 'Adidas Dropset Trainer', 10, NULL, 'null', 'Giày tập gym đa năng', 100, 'in_stock'),
+(56, 10, NULL, 5, 'Reebok Legacy Lifter', 10, NULL, 'null', 'Giày tập tạ chuyên dụng', 100, 'in_stock'),
+(57, 10, 2, 4, 'Under Armour Tribase Reign', 10, NULL, 'null', 'Giày tập gym ổn định', 100, 'in_stock'),
+(58, 10, NULL, 3, 'Puma Fuse Trainer', 10, NULL, 'null', 'Giày tập gym nhẹ, ổn định', 100, 'in_stock'),
+(59, 14, NULL, 9, 'Yonex Nanoflare 1000Z', 10, NULL, 'null', 'Vợt cầu lông cao cấp của Yonex', 120, 'in_stock'),
+(60, 14, 2, 9, 'Yonex Astrox 88D Pro', 10, NULL, 'null', 'Vợt dành cho người chơi tấn công', 120, 'in_stock'),
+(61, 14, NULL, 10, 'Li-Ning Aeronaut 9000', 10, NULL, 'null', 'Vợt cầu lông chuyên nghiệp của Li-Ning', 120, 'in_stock'),
+(62, 14, NULL, 10, 'Li-Ning Windstorm 72', 10, NULL, 'null', 'Vợt nhẹ, phù hợp với người mới chơi', 120, 'in_stock'),
+(63, 14, 3, 11, 'Wilson Blade CV', 10, NULL, 'null', 'Vợt tennis với công nghệ giảm chấn động', 120, 'in_stock'),
+(64, 15, NULL, 12, 'Molten GG7X', 10, NULL, 'null', 'Bóng rổ tiêu chuẩn thi đấu', 40, 'in_stock'),
+(65, 15, NULL, 12, 'Molten F5G5000', 10, NULL, 'null', 'Bóng đá chất lượng cao', 40, 'in_stock'),
+(66, 15, 1, 13, 'Spalding TF-1000', 10, NULL, 'null', 'Bóng rổ sử dụng trong giải NBA', 40, 'in_stock'),
+(67, 15, NULL, 13, 'Spalding Street Outdoor', 10, NULL, 'null', 'Bóng rổ chuyên dùng cho sân ngoài trời', 40, 'in_stock'),
+(68, 15, 1, 11, 'Wilson Evolution', 10, NULL, 'null', 'Bám tay tốt và mang lại cảm giác mềm mại. Công nghệ Cushion Core kết hợp cao su tổng hợp và bọt khí giúp bóng có độ nảy ổn định, dễ kiểm soát. Thiết kế rãnh sâu tăng độ bám khi dẫn bóng hoặc ném rổ.', 40, 'in_stock'),
+(69, 16, NULL, 15, 'Everlast Neoprene Dumbbell', 10, NULL, 'null', 'Tạ tay bọc cao su của Everlast', 60, 'in_stock'),
+(70, 16, NULL, 15, 'Everlast Kettlebell', 10, NULL, 'null', 'Tạ ấm hỗ trợ tập luyện toàn thân', 60, 'in_stock'),
+(71, 16, 2, 15, 'Everlast Adjustable Dumbbell', 10, NULL, 'null', 'Tạ điều chỉnh trọng lượng linh hoạt', 60, 'in_stock'),
+(72, 11, 1, 1, 'Nike Academy Backpack', 10, NULL, 'null', 'Balo thể thao đa năng của Nike với thiết kế tiện dụng.', 80, 'in_stock'),
+(73, 11, NULL, 2, 'Adidas Tiro Backpack', 10, NULL, 'null', 'Balo Adidas phong cách thể thao, phù hợp cho tập luyện.', 80, 'in_stock'),
+(74, 11, NULL, 3, 'Puma Evercat Contender Backpack', 10, NULL, 'null', 'Balo Puma với nhiều ngăn chứa tiện lợi.', 80, 'in_stock'),
+(75, 11, NULL, 4, 'Under Armour Hustle Backpack', 10, NULL, 'null', 'Balo Under Armour chống nước, phù hợp cho mọi thời tiết.', 80, 'in_stock'),
+(76, 12, NULL, 5, 'Reebok Training Gloves', 10, NULL, 'null', 'Găng tay Reebok hỗ trợ tập luyện với độ bám tốt.', 20, 'in_stock'),
+(77, 12, 1, 6, 'Vans Grip Gloves', 10, NULL, 'null', 'Găng tay Vans phong cách đường phố với chất liệu bền.', 20, 'in_stock'),
+(78, 12, NULL, 7, 'New Balance Performance Gloves', 10, NULL, 'null', 'Găng tay New Balance nhẹ, thoáng khí, phù hợp cho tập luyện.', 20, 'in_stock'),
+(79, 12, NULL, 8, 'Converse Classic Gloves', 10, NULL, 'null', 'Găng tay Converse cổ điển, thiết kế thời trang.', 20, 'in_stock'),
+(80, 13, NULL, 14, 'Dunlop Pro Wristband', 10, NULL, 'null', 'Băng quấn cổ tay Dunlop hỗ trợ tối đa cho vận động viên.', 40, 'in_stock'),
+(81, 13, 2, 15, 'Everlast Hand Wraps', 10, NULL, 'null', 'Băng quấn tay Everlast dùng cho boxing và tập luyện.', 40, 'in_stock'),
+(82, 13, NULL, 13, 'Spalding Compression Wristband', 10, NULL, 'null', 'Băng quấn Spalding giúp cố định cổ tay khi vận động.', 40, 'in_stock'),
+(83, 13, NULL, 12, 'Molten Sports Wristband', 10, NULL, 'null', 'Băng quấn Molten hỗ trợ cổ tay khi chơi thể thao.', 40, 'in_stock');
 
 -- --------------------------------------------------------
 
@@ -1130,15 +1062,12 @@ INSERT INTO `product` (`ID`, `categoryID`, `discountID`, `brandID`, `name`, `mar
 -- Table structure for table `productdetail`
 --
 
-CREATE TABLE IF NOT EXISTS `productdetail` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `productdetail` (
+  `ID` int(10) NOT NULL,
   `serialNumber` int(10) UNSIGNED ZEROFILL NOT NULL,
   `productVariantID` int(10) NOT NULL,
-  `status` enum('not_sold','sold','returned','exchanged') DEFAULT NULL,
-  PRIMARY KEY (`ID`) USING BTREE,
-  UNIQUE KEY `serialNumber` (`serialNumber`),
-  KEY `FK_ProVariant_ProDetail` (`productVariantID`)
-) ENGINE=InnoDB AUTO_INCREMENT=9001 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('not_sold','sold','returned','exchanged') DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `productdetail`
@@ -10158,8 +10087,8 @@ INSERT INTO `productdetail` (`ID`, `serialNumber`, `productVariantID`, `status`)
 -- Table structure for table `productvariant`
 --
 
-CREATE TABLE IF NOT EXISTS `productvariant` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `productvariant` (
+  `ID` int(10) NOT NULL,
   `Code` int(4) UNSIGNED ZEROFILL NOT NULL,
   `productID` int(11) NOT NULL,
   `lotID` int(11) NOT NULL,
@@ -10169,12 +10098,8 @@ CREATE TABLE IF NOT EXISTS `productvariant` (
   `size` varchar(2) DEFAULT NULL,
   `weight` varchar(3) DEFAULT NULL,
   `price` decimal(10,0) NOT NULL DEFAULT 0,
-  `status` enum('in_stock','out_of_stock') DEFAULT NULL,
-  PRIMARY KEY (`ID`) USING BTREE,
-  UNIQUE KEY `Code` (`Code`),
-  KEY `FK_Product_ProVariant` (`productID`),
-  KEY `FK_Lot_Provariant` (`lotID`)
-) ENGINE=InnoDB AUTO_INCREMENT=451 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('in_stock','out_of_stock') DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `productvariant`
@@ -10638,17 +10563,14 @@ INSERT INTO `productvariant` (`ID`, `Code`, `productID`, `lotID`, `fullName`, `q
 -- Table structure for table `purchaseorder`
 --
 
-CREATE TABLE IF NOT EXISTS `purchaseorder` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `purchaseorder` (
+  `ID` int(10) NOT NULL,
   `userAccID` int(10) NOT NULL,
   `suppilerID` int(10) NOT NULL,
   `totalPrice` decimal(10,0) NOT NULL DEFAULT 0,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('pending','approved','rejected','') NOT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `FK_approver_PurOrder` (`userAccID`),
-  KEY `FK_Supplier_PurOrder` (`suppilerID`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('pending','approved','rejected','') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `purchaseorder`
@@ -10678,19 +10600,15 @@ INSERT INTO `purchaseorder` (`ID`, `userAccID`, `suppilerID`, `totalPrice`, `cre
 -- Table structure for table `review`
 --
 
-CREATE TABLE IF NOT EXISTS `review` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `review` (
+  `ID` int(10) NOT NULL,
   `userAccID` int(10) NOT NULL,
   `commentID` int(10) DEFAULT NULL COMMENT 'a review could have a comment or not\r\n',
   `productID` int(10) NOT NULL,
-  `rating` int(1) NOT NULL DEFAULT 5 COMMENT 'rate 1-5 start\r\n',
+  `rating` int(1) NOT NULL DEFAULT 5 COMMENT 'rate 1-5 star\r\n',
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('active','inactive') DEFAULT 'active',
-  PRIMARY KEY (`ID`),
-  KEY `FK_UserAcc_Review` (`userAccID`),
-  KEY `FK_Comment_Review` (`commentID`),
-  KEY `FK_ProVariant_Review` (`productID`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive','discontinued') DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `review`
@@ -10711,13 +10629,11 @@ INSERT INTO `review` (`ID`, `userAccID`, `commentID`, `productID`, `rating`, `cr
 -- Table structure for table `role`
 --
 
-CREATE TABLE IF NOT EXISTS `role` (
-  `ID` tinyint(2) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT,
+CREATE TABLE `role` (
+  `ID` tinyint(2) UNSIGNED ZEROFILL NOT NULL,
   `name` varchar(200) NOT NULL,
-  `statusRole` enum('locked','deletable') NOT NULL DEFAULT 'deletable',
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `statusRole` enum('locked','deletable') NOT NULL DEFAULT 'deletable'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `role`
@@ -10736,15 +10652,13 @@ INSERT INTO `role` (`ID`, `name`, `statusRole`) VALUES
 -- Table structure for table `shipment`
 --
 
-CREATE TABLE IF NOT EXISTS `shipment` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `shipment` (
+  `ID` int(10) NOT NULL,
   `name` varchar(255) NOT NULL,
   `phone` varchar(11) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `shipment`
@@ -10762,15 +10676,13 @@ INSERT INTO `shipment` (`ID`, `name`, `phone`, `email`, `status`) VALUES
 -- Table structure for table `shipmentmethod`
 --
 
-CREATE TABLE IF NOT EXISTS `shipmentmethod` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `shipmentmethod` (
+  `ID` int(10) NOT NULL,
   `name` varchar(100) NOT NULL,
   `cost` decimal(10,0) NOT NULL,
   `estimatedTime` varchar(20) NOT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `shipmentmethod`
@@ -10788,18 +10700,13 @@ INSERT INTO `shipmentmethod` (`ID`, `name`, `cost`, `estimatedTime`, `status`) V
 -- Table structure for table `shipmenttracking`
 --
 
-CREATE TABLE IF NOT EXISTS `shipmenttracking` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `shipmenttracking` (
+  `ID` int(10) NOT NULL,
   `code` varchar(10) NOT NULL,
   `billID` int(10) NOT NULL,
   `shipmentID` int(10) NOT NULL,
   `shipmentMethodID` int(10) NOT NULL,
-  `status` enum('pending','in_trasit','failed','delivered') NOT NULL DEFAULT 'pending',
-  PRIMARY KEY (`ID`) USING BTREE,
-  UNIQUE KEY `code` (`code`),
-  KEY `FK_Order_ShipTrack` (`billID`),
-  KEY `FK_Shipment_ShipTrack` (`shipmentID`),
-  KEY `FK_ShipMethod_ShipTrack` (`shipmentMethodID`)
+  `status` enum('pending','in_trasit','failed','delivered') NOT NULL DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -10808,18 +10715,16 @@ CREATE TABLE IF NOT EXISTS `shipmenttracking` (
 -- Table structure for table `supplier`
 --
 
-CREATE TABLE IF NOT EXISTS `supplier` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `supplier` (
+  `ID` int(10) NOT NULL,
   `fullname` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `phone` varchar(11) NOT NULL,
   `address` varchar(255) NOT NULL,
   `logo` varchar(255) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('active','terminated') NOT NULL DEFAULT 'active',
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `email` (`email`,`phone`,`address`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','terminated') NOT NULL DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `supplier`
@@ -10837,8 +10742,8 @@ INSERT INTO `supplier` (`ID`, `fullname`, `email`, `phone`, `address`, `logo`, `
 -- Table structure for table `user`
 --
 
-CREATE TABLE IF NOT EXISTS `user` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `user` (
+  `ID` int(10) NOT NULL,
   `fullname` varchar(150) NOT NULL,
   `dateOfBirth` date DEFAULT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
@@ -10846,11 +10751,8 @@ CREATE TABLE IF NOT EXISTS `user` (
   `address` varchar(255) DEFAULT NULL,
   `gender` tinyint(1) NOT NULL,
   `roleID` tinyint(2) UNSIGNED ZEROFILL NOT NULL,
-  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `contact` (`email`,`phone`) USING BTREE,
-  KEY `FK_Role_User` (`roleID`)
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `createdAt` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
@@ -10899,17 +10801,14 @@ INSERT INTO `user` (`ID`, `fullname`, `dateOfBirth`, `email`, `phone`, `address`
 -- Table structure for table `useraccount`
 --
 
-CREATE TABLE IF NOT EXISTS `useraccount` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `useraccount` (
+  `ID` int(10) NOT NULL,
   `username` varchar(150) NOT NULL,
   `password` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `userID` int(10) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('active','inactive','banned','') NOT NULL DEFAULT 'active',
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `username` (`username`),
-  KEY `FK_User_Account` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive','banned','') NOT NULL DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `useraccount`
@@ -10945,13 +10844,11 @@ INSERT INTO `useraccount` (`ID`, `username`, `password`, `userID`, `createdAt`, 
 -- Table structure for table `user_coupon`
 --
 
-CREATE TABLE IF NOT EXISTS `user_coupon` (
+CREATE TABLE `user_coupon` (
   `userID` int(11) NOT NULL,
   `couponID` int(11) NOT NULL,
   `assignedDate` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('valid','used','expired') NOT NULL DEFAULT 'valid',
-  PRIMARY KEY (`userID`,`couponID`) USING BTREE,
-  KEY `FK_Coupon` (`couponID`)
+  `status` enum('valid','used','expired') NOT NULL DEFAULT 'valid'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -11001,17 +10898,14 @@ INSERT INTO `user_coupon` (`userID`, `couponID`, `assignedDate`, `status`) VALUE
 -- Table structure for table `warranty`
 --
 
-CREATE TABLE IF NOT EXISTS `warranty` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `warranty` (
+  `ID` int(10) NOT NULL,
   `warrantyPolicyID` int(11) NOT NULL,
   `orderDetailID` int(11) NOT NULL,
   `startDate` date NOT NULL DEFAULT current_timestamp(),
   `endDate` date NOT NULL,
-  `status` enum('active','expired','void') NOT NULL DEFAULT 'active',
-  PRIMARY KEY (`ID`),
-  KEY `FK_WarrPolicy_Warranty` (`warrantyPolicyID`),
-  KEY `FK_OrderDetail_Warranty` (`orderDetailID`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','expired','void') NOT NULL DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `warranty`
@@ -11051,14 +10945,11 @@ INSERT INTO `warranty` (`ID`, `warrantyPolicyID`, `orderDetailID`, `startDate`, 
 -- Table structure for table `warrantydetail`
 --
 
-CREATE TABLE IF NOT EXISTS `warrantydetail` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `warrantydetail` (
+  `ID` int(11) NOT NULL,
   `warrantyID` int(11) NOT NULL,
-  `productDetailID` int(11) NOT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `FK_Warr_Detail` (`warrantyID`),
-  KEY `FK_ProDetail_WarrantyDetail` (`productDetailID`)
-) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `productDetailID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `warrantydetail`
@@ -11107,13 +10998,12 @@ INSERT INTO `warrantydetail` (`ID`, `warrantyID`, `productDetailID`) VALUES
 -- Table structure for table `warrantypolicy`
 --
 
-CREATE TABLE IF NOT EXISTS `warrantypolicy` (
-  `ID` int(10) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `warrantypolicy` (
+  `ID` int(10) NOT NULL,
   `warrantyPeriod` int(11) NOT NULL,
   `description` varchar(120) DEFAULT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `warrantypolicy`
@@ -11124,6 +11014,414 @@ INSERT INTO `warrantypolicy` (`ID`, `warrantyPeriod`, `description`, `status`) V
 (2, 6, 'Hỗ trợ đổi sản phẩm do hư hại trong vòng 6 tháng.', 'active'),
 (3, 12, 'Bảo hành tiêu chuẩn trong vòng 12 tháng.', 'active'),
 (4, 24, 'Bảo hành sản phẩm cao cấp trong vòng 24 tháng.', 'active');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `access`
+--
+ALTER TABLE `access`
+  ADD PRIMARY KEY (`roleid`,`moduleid`);
+
+--
+-- Indexes for table `bankaccount`
+--
+ALTER TABLE `bankaccount`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_PaymentMethod_Bank` (`paymentMethodID`),
+  ADD KEY `FK_UserAcc_Bank` (`userAccID`);
+
+--
+-- Indexes for table `billingdetail`
+--
+ALTER TABLE `billingdetail`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `brand`
+--
+ALTER TABLE `brand`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `cart`
+--
+ALTER TABLE `cart`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_UserAcc_Cart` (`userAccID`);
+
+--
+-- Indexes for table `cartdetail`
+--
+ALTER TABLE `cartdetail`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_Cart_CartDetail` (`cartID`),
+  ADD KEY `FK_ProVariant_CartDetail` (`productID`);
+
+--
+-- Indexes for table `category`
+--
+ALTER TABLE `category`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_Parent` (`parent`);
+
+--
+-- Indexes for table `comment`
+--
+ALTER TABLE `comment`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `coupon`
+--
+ALTER TABLE `coupon`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `discount`
+--
+ALTER TABLE `discount`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `lot`
+--
+ALTER TABLE `lot`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_PurOrder_Lot` (`purchaseOrderID`);
+
+--
+-- Indexes for table `order`
+--
+ALTER TABLE `order`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_approver_Order` (`approver`),
+  ADD KEY `FK_Coupon_Order` (`couponID`),
+  ADD KEY `FK_customer_Order` (`customer`);
+
+--
+-- Indexes for table `orderdetail`
+--
+ALTER TABLE `orderdetail`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_Order_Orderdetail` (`orderID`),
+  ADD KEY `FK_Product_Orderdetail` (`productID`);
+
+--
+-- Indexes for table `payment`
+--
+ALTER TABLE `payment`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_Order_Payment` (`orderID`),
+  ADD KEY `FK_PaymentMethod_Payment` (`paymentMethodID`),
+  ADD KEY `FK_Bank_Payment` (`bankAccountID`);
+
+--
+-- Indexes for table `paymentmethod`
+--
+ALTER TABLE `paymentmethod`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `name` (`name`) USING BTREE;
+
+--
+-- Indexes for table `product`
+--
+ALTER TABLE `product`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_Category_Product` (`categoryID`),
+  ADD KEY `FK_Discount_Product` (`discountID`),
+  ADD KEY `FK_Brand_Product` (`brandID`);
+
+--
+-- Indexes for table `productdetail`
+--
+ALTER TABLE `productdetail`
+  ADD PRIMARY KEY (`ID`) USING BTREE,
+  ADD UNIQUE KEY `serialNumber` (`serialNumber`),
+  ADD KEY `FK_ProVariant_ProDetail` (`productVariantID`);
+
+--
+-- Indexes for table `productvariant`
+--
+ALTER TABLE `productvariant`
+  ADD PRIMARY KEY (`ID`) USING BTREE,
+  ADD UNIQUE KEY `Code` (`Code`),
+  ADD KEY `FK_Product_ProVariant` (`productID`),
+  ADD KEY `FK_Lot_Provariant` (`lotID`);
+
+--
+-- Indexes for table `purchaseorder`
+--
+ALTER TABLE `purchaseorder`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_approver_PurOrder` (`userAccID`),
+  ADD KEY `FK_Supplier_PurOrder` (`suppilerID`);
+
+--
+-- Indexes for table `review`
+--
+ALTER TABLE `review`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_UserAcc_Review` (`userAccID`),
+  ADD KEY `FK_Comment_Review` (`commentID`),
+  ADD KEY `FK_ProVariant_Review` (`productID`);
+
+--
+-- Indexes for table `role`
+--
+ALTER TABLE `role`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `shipment`
+--
+ALTER TABLE `shipment`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `shipmentmethod`
+--
+ALTER TABLE `shipmentmethod`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `shipmenttracking`
+--
+ALTER TABLE `shipmenttracking`
+  ADD PRIMARY KEY (`ID`) USING BTREE,
+  ADD UNIQUE KEY `code` (`code`),
+  ADD KEY `FK_Order_ShipTrack` (`billID`),
+  ADD KEY `FK_Shipment_ShipTrack` (`shipmentID`),
+  ADD KEY `FK_ShipMethod_ShipTrack` (`shipmentMethodID`);
+
+--
+-- Indexes for table `supplier`
+--
+ALTER TABLE `supplier`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `email` (`email`,`phone`,`address`);
+
+--
+-- Indexes for table `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `contact` (`email`,`phone`) USING BTREE,
+  ADD KEY `FK_Role_User` (`roleID`);
+
+--
+-- Indexes for table `useraccount`
+--
+ALTER TABLE `useraccount`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD KEY `FK_User_Account` (`userID`);
+
+--
+-- Indexes for table `user_coupon`
+--
+ALTER TABLE `user_coupon`
+  ADD PRIMARY KEY (`userID`,`couponID`) USING BTREE,
+  ADD KEY `FK_Coupon` (`couponID`);
+
+--
+-- Indexes for table `warranty`
+--
+ALTER TABLE `warranty`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_WarrPolicy_Warranty` (`warrantyPolicyID`),
+  ADD KEY `FK_OrderDetail_Warranty` (`orderDetailID`);
+
+--
+-- Indexes for table `warrantydetail`
+--
+ALTER TABLE `warrantydetail`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_Warr_Detail` (`warrantyID`),
+  ADD KEY `FK_ProDetail_WarrantyDetail` (`productDetailID`);
+
+--
+-- Indexes for table `warrantypolicy`
+--
+ALTER TABLE `warrantypolicy`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `bankaccount`
+--
+ALTER TABLE `bankaccount`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `brand`
+--
+ALTER TABLE `brand`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT for table `cart`
+--
+ALTER TABLE `cart`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `cartdetail`
+--
+ALTER TABLE `cartdetail`
+  MODIFY `ID` int(5) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `category`
+--
+ALTER TABLE `category`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT for table `comment`
+--
+ALTER TABLE `comment`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `coupon`
+--
+ALTER TABLE `coupon`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `discount`
+--
+ALTER TABLE `discount`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `lot`
+--
+ALTER TABLE `lot`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=451;
+
+--
+-- AUTO_INCREMENT for table `order`
+--
+ALTER TABLE `order`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT for table `orderdetail`
+--
+ALTER TABLE `orderdetail`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT for table `payment`
+--
+ALTER TABLE `payment`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT for table `paymentmethod`
+--
+ALTER TABLE `paymentmethod`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `product`
+--
+ALTER TABLE `product`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
+
+--
+-- AUTO_INCREMENT for table `productdetail`
+--
+ALTER TABLE `productdetail`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9001;
+
+--
+-- AUTO_INCREMENT for table `productvariant`
+--
+ALTER TABLE `productvariant`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=451;
+
+--
+-- AUTO_INCREMENT for table `purchaseorder`
+--
+ALTER TABLE `purchaseorder`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- AUTO_INCREMENT for table `review`
+--
+ALTER TABLE `review`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `role`
+--
+ALTER TABLE `role`
+  MODIFY `ID` tinyint(2) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `shipment`
+--
+ALTER TABLE `shipment`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `shipmentmethod`
+--
+ALTER TABLE `shipmentmethod`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `shipmenttracking`
+--
+ALTER TABLE `shipmenttracking`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `supplier`
+--
+ALTER TABLE `supplier`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `user`
+--
+ALTER TABLE `user`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+
+--
+-- AUTO_INCREMENT for table `useraccount`
+--
+ALTER TABLE `useraccount`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+
+--
+-- AUTO_INCREMENT for table `warranty`
+--
+ALTER TABLE `warranty`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+
+--
+-- AUTO_INCREMENT for table `warrantydetail`
+--
+ALTER TABLE `warrantydetail`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+
+--
+-- AUTO_INCREMENT for table `warrantypolicy`
+--
+ALTER TABLE `warrantypolicy`
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables

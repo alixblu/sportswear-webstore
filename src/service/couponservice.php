@@ -39,7 +39,14 @@ class CouponService
             throw new Exception("Failed to fetch coupons: " . $e->getMessage());
         }
     }
-
+    public function getCouponByUserId($userID)
+    {
+        try {
+            return $this->couponRepository->getCouponByUserId($userID);
+        } catch (Exception $e) {
+            throw new Exception("Failed to fetch coupons: " . $e->getMessage());
+        }
+    }
     public function updateCoupon($id, $name, $percent, $duration, $status)
     {
         try {

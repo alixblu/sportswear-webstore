@@ -1,6 +1,5 @@
-
 <?php
-include dirname(__FILE__) . '/../service/AccountService.php';
+include dirname(__FILE__) . '/../service/accountService.php';
 include dirname(__FILE__) . '/../config/response/apiresponse.php';
 
 class AccountController {
@@ -90,5 +89,6 @@ class AccountController {
             ApiResponse::customApiResponse(['error' => $e->getMessage()], 500);
         }
     }
+    
 }
 ?>

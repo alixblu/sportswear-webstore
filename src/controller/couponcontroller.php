@@ -49,4 +49,10 @@ class CouponController
         }
 
     }
+
+    public function getCouponByUserId($id)
+    {
+        $coupon = $this->couponService->getCouponByUserId($id);
+        ApiResponse::customApiResponse($coupon, 200);
+    }
 }
