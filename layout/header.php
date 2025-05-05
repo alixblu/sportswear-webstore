@@ -7,7 +7,7 @@ session_start();
 
       <!--=============== REMIXICONS ===============-->
       <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
-
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
       <!--=============== CSS ===============-->
       <link rel="stylesheet" href="./css/header.css">
 
@@ -26,94 +26,118 @@ session_start();
             <!--=============== NAV MENU ===============-->
             <div class="nav__menu" id="nav-menu">
                <ul class="nav__list">
-                  <li><a href="#" class="nav__link">Trang chủ</a></li>
+               <li>
+                  <a href="#" class="nav__link">
+                  <i class="fa-solid fa-home"></i> <!-- Home -->
+                    Trang chủ
+                  </a>
+               </li>
 
-                  <!--=============== DROPDOWN 1 ===============-->
-                  <li class="dropdown__item">
-                     <div class="nav__link">
+               <!--=============== DROPDOWN 1 ===============-->
+               <li class="dropdown__item">
+                  <div class="nav__link">
+                  <i class="fa-solid fa-box"></i> <!-- Product -->
                         Sản phẩm<i class="ri-arrow-down-s-line dropdown__arrow"></i>
-                     </div>
+                  </div>
 
-                     <ul class="dropdown__menu">
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-pie-chart-line"></i> Áo 
-                           </a>                          
-                        </li>
+                  <ul class="dropdown__menu">
+                     <li>
+                        <a href="#" class="dropdown__link">
+                           <i class="ri-t-shirt-line"></i> <!-- Add icon here -->
+                           Áo 
+                        </a>                          
+                     </li>
 
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-arrow-up-down-line"></i> Quần
-                           </a>
-                        </li>
+                     <li>
+                        <a href="#" class="dropdown__link">
+                           <i class="ri-pants-line"></i> <!-- Add icon here -->
+                           Quần
+                        </a>
+                     </li>
 
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-arrow-up-down-line"></i> Giày
-                           </a>
-                        </li>
+                     <li>
+                        <a href="#" class="dropdown__link">
+                           <i class="ri-shoe-line"></i> <!-- Add icon here -->
+                           Giày
+                        </a>
+                     </li>
 
-                        <!--=============== DROPDOWN SUBMENU ===============-->
-                        <li class="dropdown__subitem">
-                           <div class="dropdown__link">
-                              <i class="ri-bar-chart-line"></i> Phụ kiện <i class="ri-add-line dropdown__add"></i>
-                           </div>
+                     <!--=============== DROPDOWN SUBMENU ===============-->
+                     <li class="dropdown__subitem">
+                        <div class="dropdown__link">
+                           <i class="ri-accessory-line"></i> <!-- Add icon here -->
+                           Phụ kiện <i class="ri-add-line dropdown__add"></i>
+                        </div>
 
-                           <ul class="dropdown__submenu">
-                              <li>
+                        <ul class="dropdown__submenu">
+                           <li>
                                  <a href="#" class="dropdown__sublink">
-                                    <i class="ri-file-list-line"></i> Bình nước
+                                    <i class="ri-water-bottle-line"></i> <!-- Add icon here -->
+                                    Bình nước
                                  </a>
-                              </li>
-      
-                              <li>
+                           </li>
+                           <li>
                                  <a href="#" class="dropdown__sublink">
-                                    <i class="ri-cash-line"></i> Vợt
+                                    <i class="ri-racket-line"></i> <!-- Add icon here -->
+                                    Vợt
                                  </a>
-                              </li>
-      
-                              <li>
+                           </li>
+                           <li>
                                  <a href="#" class="dropdown__sublink">
-                                    <i class="ri-refund-2-line"></i> Balo/Túi
+                                    <i class="ri-bag-line"></i> <!-- Add icon here -->
+                                    Balo/Túi
                                  </a>
-                              </li>
-                           </ul>
-                        </li>
-                     </ul>
-                  </li>
-                  
-                  <!--=============== DROPDOWN 2 ===============-->
-                  <li class="dropdown__item">
-                     <div class="nav__link">
+                           </li>
+                        </ul>
+                     </li>
+                  </ul>
+               </li>
+
+               <!--=============== DROPDOWN 2 ===============-->
+               <li class="dropdown__item">
+                  <div class="nav__link">
+                  <i class="fa-solid fa-tags"></i> <!-- Brand -->  
                         Thương hiệu <i class="ri-arrow-down-s-line dropdown__arrow"></i>
-                     </div>
+                  </div>
 
-                     <ul class="dropdown__menu">
+                  <ul class="dropdown__menu">
                         <li>
                            <a href="#" class="dropdown__link">
-                              <i class="ri-user-line"></i> Nike
+                              <i class="ri-nike-line"></i> <!-- Add icon here -->
+                              Nike
                            </a>                          
                         </li>
 
                         <li>
                            <a href="#" class="dropdown__link">
-                              <i class="ri-lock-line"></i> Adidas
+                              <i class="ri-adidas-line"></i> <!-- Add icon here -->
+                              Adidas
                            </a>
                         </li>
 
                         <li>
                            <a href="#" class="dropdown__link">
-                              <i class="ri-message-3-line"></i> Puma
+                              <i class="ri-puma-line"></i> <!-- Add icon here -->
+                              Puma
                            </a>
                         </li>
-                     </ul>
-                  </li>
+                  </ul>
+               </li>
 
-                  <li><a href="#" class="nav__link">Chính sách bảo hành</a></li>
+               <li>
+                  <a href="#" class="nav__link">
+                  <i class="fa-solid fa-shield-alt"></i> <!-- Warranty -->
+                        Chính sách bảo hành
+                  </a>
+               </li>
 
-                  <li><a href="#" class="nav__link">Liên hệ</a></li>
-
-               </ul>
+               <li>
+                  <a href="#" class="nav__link">
+                  <i class="fa-solid fa-envelope"></i> <!-- Contact -->  
+                  Liên hệ
+                  </a>
+               </li>
+            </ul>
             </div>
             
             <div class="nav__tools">
