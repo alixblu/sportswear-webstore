@@ -480,3 +480,6 @@
     align-items: center;
     justify-content: center;
 }
+#searchForm{
+  width: 100%;
+}

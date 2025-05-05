@@ -117,10 +117,12 @@ session_start();
             </div>
             
             <div class="nav__tools">
-               <div class="search-box" >
+            <div class="search-box">
+               <form id="searchForm" action="./index.php" method="GET">
                   <i class="ri-search-line"></i>
-               <input type="text"placeholder="Search...">
-               </div>
+                  <input type="text" name="search" placeholder="Search..." required>
+               </form>
+            </div>
                
                <i class="ri-shopping-cart-2-line nav__cart"></i>
                <a class="nav__account"  id="account">
