@@ -17,26 +17,24 @@
   <link rel="stylesheet" href="../../css/admin/style.css" />
   <link rel="stylesheet" href="../../css/admin/header.css" />
   <script src="../../JS/admin/table.js"></script>
-  <script src="../../JS/admin/sidebar.js"></script>
+  <script src="../../JS/admin/sidebar.js" defer></script>
 
 </head>
 
 <body>
   <div class="container">
     <?php include './includes/sidebar.php'; ?>
-    <div class="main-content-area">
-      <?php include './includes/header.php'; ?>
-      <?php
-      $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
-      $allowed_pages = ['dashboard', 'user', 'dathang', 'product', 'account'];
+    <?php include './includes/header.php'; ?>
+    <?php
+    $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
+    $allowed_pages = ['dashboard', 'user', 'dathang', 'product', 'account'];
 
-      if (in_array($page, $allowed_pages)) {
-        include "./modules/$page.php";
-      } else {
-        echo "<h2>404 - Page not found</h2>";
-      }
-      ?>
-    </div>
+    if (in_array($page, $allowed_pages)) {
+      include "./modules/$page.php";
+    } else {
+      echo "<h2>404 - Page not found</h2>";
+    }
+    ?>
   </div>
 
 </body>

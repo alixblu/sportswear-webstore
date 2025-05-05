@@ -57,6 +57,7 @@ while ($row = $resultRoles->fetch_assoc()) {
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -66,6 +67,7 @@ while ($row = $resultRoles->fetch_assoc()) {
     <link rel="stylesheet" href="/web2/sportswear-webstore/css/admin/account.css">
     <title>Quản lý tài khoản</title>
 </head>
+
 <body>
     <div class="main-content">
         <div id="pageTitle" class="page-title">
@@ -76,7 +78,7 @@ while ($row = $resultRoles->fetch_assoc()) {
                 </button>
             </div>
         </div>
-        
+
         <div class="tab-container">
             <div class="tab active" onclick="switchTab('staff')">Tài khoản nhân viên</div>
             <div class="tab" onclick="switchTab('customer')">Tài khoản khách hàng</div>
@@ -111,7 +113,7 @@ while ($row = $resultRoles->fetch_assoc()) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while($row = $resultStaff->fetch_assoc()): ?>
+                            <?php while ($row = $resultStaff->fetch_assoc()): ?>
                                 <tr data-userid="<?php echo $row['userID']; ?>" data-accountid="<?php echo $row['accountID']; ?>" data-password="<?php echo htmlspecialchars($row['password']); ?>">
                                     <td><?php echo $row['username']; ?></td>
                                     <td><?php echo $row['fullname']; ?></td>
@@ -119,13 +121,20 @@ while ($row = $resultRoles->fetch_assoc()) {
                                     <td><?php echo $row['roleName']; ?></td>
                                     <td>
                                         <span class="status <?php echo strtolower($row['status']); ?>">
-                                            <?php 
-                                            switch(strtolower($row['status'])) {
-                                                case 'active': echo 'Hoạt động'; break;
-                                                case 'inactive': echo 'Không hoạt động'; break;
-                                                case 'banned': echo 'Bị cấm'; break;
-                                                default: echo $row['status']; 
-                                            } 
+                                            <?php
+                                            switch (strtolower($row['status'])) {
+                                                case 'active':
+                                                    echo 'Hoạt động';
+                                                    break;
+                                                case 'inactive':
+                                                    echo 'Không hoạt động';
+                                                    break;
+                                                case 'banned':
+                                                    echo 'Bị cấm';
+                                                    break;
+                                                default:
+                                                    echo $row['status'];
+                                            }
                                             ?>
                                         </span>
                                     </td>
@@ -174,20 +183,27 @@ while ($row = $resultRoles->fetch_assoc()) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while($row = $resultCustomer->fetch_assoc()): ?>
+                            <?php while ($row = $resultCustomer->fetch_assoc()): ?>
                                 <tr data-userid="<?php echo $row['userID']; ?>" data-accountid="<?php echo $row['accountID']; ?>" data-password="<?php echo htmlspecialchars($row['password']); ?>">
                                     <td><?php echo $row['username']; ?></td>
                                     <td><?php echo $row['fullname']; ?></td>
                                     <td><?php echo $row['phone']; ?></td>
                                     <td>
                                         <span class="status <?php echo strtolower($row['status']); ?>">
-                                            <?php 
-                                            switch(strtolower($row['status'])) {
-                                                case 'active': echo 'Hoạt động'; break;
-                                                case 'inactive': echo 'Không hoạt động'; break;
-                                                case 'banned': echo 'Bị cấm'; break;
-                                                default: echo $row['status']; 
-                                            } 
+                                            <?php
+                                            switch (strtolower($row['status'])) {
+                                                case 'active':
+                                                    echo 'Hoạt động';
+                                                    break;
+                                                case 'inactive':
+                                                    echo 'Không hoạt động';
+                                                    break;
+                                                case 'banned':
+                                                    echo 'Bị cấm';
+                                                    break;
+                                                default:
+                                                    echo $row['status'];
+                                            }
                                             ?>
                                         </span>
                                     </td>
@@ -210,11 +226,14 @@ while ($row = $resultRoles->fetch_assoc()) {
     <div id="portal-root"></div>
 
     <!-- Hidden data for JavaScript -->
-    <script id="roles-data" type="application/json"><?php echo json_encode($roles); ?></script>
+    <script id="roles-data" type="application/json">
+        <?php echo json_encode($roles); ?>
+    </script>
 
     <!-- JavaScript -->
     <script src="/web2/sportswear-webstore/JS/admin/account.js"></script>
 </body>
+
 </html>
 
 <?php
