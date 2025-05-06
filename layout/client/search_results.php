@@ -1,40 +1,69 @@
 <?php
 session_start();
 
-// Database connection
+// Kết nối cơ sở dữ liệu
 try {
     $conn = new PDO("mysql:host=localhost;dbname=sportswear;charset=utf8mb4", "root", "");
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 } catch(PDOException $e) {
-    die('<div class="error-message">Database connection error: ' . htmlspecialchars($e->getMessage()) . '</div>');
+    die('<div class="error-message">Lỗi kết nối cơ sở dữ liệu: ' . htmlspecialchars($e->getMessage()) . '</div>');
 }
 
-// Pagination settings
-$items_per_page = 10; // 2 rows x 5 products
+// Thiết lập phân trang
+$items_per_page = 10; // 2 hàng x 5 sản phẩm
 $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $items_per_page;
 
-// Input sanitization
+// Hàm làm sạch dữ liệu đầu vào
 function sanitize_input($input) {
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 }
 
-// Build query conditions
+// Xây dựng điều kiện truy vấn
 $conditions = [];
 $params = [];
 $order_by = "";
 
-// Search parameters
-if (!empty($_GET['search'])) {
+// Xử lý tham số tìm kiếm từ thanh tìm kiếm
+if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
     $search = sanitize_input($_GET['search']);
-    $conditions[] = "(p.name LIKE :search OR p.description LIKE :search)";
-    $params[':search'] = "%$search%";
+    
+    // Kiểm tra xem từ khóa tìm kiếm có khớp với thương hiệu không
+    $brand_stmt = $conn->prepare("SELECT ID FROM brand WHERE LOWER(name) LIKE LOWER(:search)");
+    $brand_stmt->bindValue(':search', "%$search%");
+    $brand_stmt->execute();
+    $brand = $brand_stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($brand) {
+        $conditions[] = "p.brandID = :brand";
+        $params[':brand'] = $brand['ID'];
+    } else {
+        // Kiểm tra xem từ khóa có khớp với danh mục không
+        $category_stmt = $conn->prepare("SELECT ID FROM category WHERE LOWER(name) LIKE LOWER(:search)");
+        $category_stmt->bindValue(':search', "%$search%");
+        $category_stmt->execute();
+        $category = $category_stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($category) {
+            $conditions[] = "p.categoryID = :category";
+            $params[':category'] = $category['ID'];
+        } else {
+            $conditions[] = "(b.name LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR c.name LIKE :search)";
+            $params[':search'] = "%$search%";
+        }
+    }
 }
 
-if (!empty($_GET['brand']) && is_numeric($_GET['brand'])) {
+// Xử lý tham số bộ lọc từ biểu mẫu
+if (isset($_GET['brand']) && is_numeric($_GET['brand']) && $_GET['brand'] > 0) {
     $conditions[] = "p.brandID = :brand";
     $params[':brand'] = (int)$_GET['brand'];
+}
+
+if (isset($_GET['category']) && is_numeric($_GET['category']) && $_GET['category'] > 0) {
+    $conditions[] = "p.categoryID = :category";
+    $params[':category'] = (int)$_GET['category'];
 }
 
 if (!empty($_GET['status']) && in_array($_GET['status'], ['in_stock', 'out_of_stock'])) {
@@ -42,12 +71,7 @@ if (!empty($_GET['status']) && in_array($_GET['status'], ['in_stock', 'out_of_st
     $params[':status'] = $_GET['status'];
 }
 
-if (!empty($_GET['category']) && is_numeric($_GET['category'])) {
-    $conditions[] = "p.categoryID = :category";
-    $params[':category'] = (int)$_GET['category'];
-}
-
-// Rating filter
+// Bộ lọc đánh giá
 if (!empty($_GET['rating'])) {
     $rating_range = explode('-', $_GET['rating']);
     if (count($rating_range) === 2 && is_numeric($rating_range[0]) && is_numeric($rating_range[1])) {
@@ -57,34 +81,34 @@ if (!empty($_GET['rating'])) {
     }
 }
 
-// Price filter
+// Bộ lọc giá
 if (!empty($_GET['price_start']) && is_numeric($_GET['price_start']) && 
     !empty($_GET['price_end']) && is_numeric($_GET['price_end'])) {
     $price_start = (float)$_GET['price_start'];
     $price_end = (float)$_GET['price_end'];
     if ($price_start <= $price_end) {
-        $conditions[] = "calculated_price BETWEEN :price_start AND :price_end";
+        $conditions[] = "(pv.price + (pv.price * p.markup_percentage / 100)) BETWEEN :price_start AND :price_end";
         $params[':price_start'] = $price_start;
         $params[':price_end'] = $price_end;
     }
 }
 
-// Sorting
+// Sắp xếp
 $valid_sorts = [
-    'price_asc' => 'calculated_price ASC',
-    'price_desc' => 'calculated_price DESC',
+    'price_asc' => '(MIN(pv.price + (pv.price * p.markup_percentage / 100))) ASC',
+    'price_desc' => '(MIN(pv.price + (pv.price * p.markup_percentage / 100))) DESC',
     'rating_asc' => 'COALESCE(r.avg_rating, 0) ASC',
     'rating_desc' => 'COALESCE(r.avg_rating, 0) DESC',
     'newest' => 'p.ID DESC'
 ];
 
 $order_by = !empty($_GET['sort']) && isset($valid_sorts[$_GET['sort']]) ? 
-             "ORDER BY " . $valid_sorts[$_GET['sort']] : "ORDER BY p.ID DESC";
+            "ORDER BY " . $valid_sorts[$_GET['sort']] : "ORDER BY p.ID DESC";
 
-// WHERE clause
+// Mệnh đề WHERE
 $where_clause = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
 
-// SELECT clause
+// Mệnh đề SELECT
 $select_clause = "
     p.ID, p.name, p.status, p.brandID, p.categoryID, p.markup_percentage,
     MIN(pv.price + (pv.price * p.markup_percentage / 100)) AS calculated_price,
@@ -93,7 +117,7 @@ $select_clause = "
     c.name AS category_name
 ";
 
-// Count total products
+// Đếm tổng số sản phẩm
 $total_query = "
     SELECT COUNT(DISTINCT p.ID)
     FROM product p
@@ -117,7 +141,7 @@ $stmt->execute();
 $total_items = $stmt->fetchColumn();
 $total_pages = max(1, ceil($total_items / $items_per_page));
 
-// Get products
+// Lấy danh sách sản phẩm
 $query = "
     SELECT $select_clause
     FROM product p
@@ -145,7 +169,7 @@ $stmt->bindValue(':items_per_page', $items_per_page, PDO::PARAM_INT);
 $stmt->execute();
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get brands and categories for filters
+// Lấy danh sách thương hiệu và danh mục cho bộ lọc
 $brands = $conn->query("SELECT ID, name FROM brand ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -155,7 +179,7 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results - SportsWear</title>
+    <title>Kết quả tìm kiếm - SportsWear</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -271,7 +295,6 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
             background-color: #c1121f;
         }
         
-        /* Product Grid Layout - 2 rows of 5 products */
         .product-grid-container {
             display: flex;
             flex-direction: column;
@@ -337,6 +360,7 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
             color: #333;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -436,7 +460,6 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
             margin-bottom: 10px;
         }
         
-        /* Responsive adjustments */
         @media (max-width: 1200px) {
             .product-row {
                 grid-template-columns: repeat(3, 1fr);
@@ -464,27 +487,26 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
     <div class="container">
         <div class="search-header">
             <h1 class="search-title">
-                <?= !empty($_GET['search']) ? 'Search Results: "' . htmlspecialchars($_GET['search']) . '"' : 'All Products' ?>
+                <?= !empty($_GET['search']) ? 'Kết quả tìm kiếm: "' . htmlspecialchars($_GET['search']) . '"' : 
+                    (!empty($_GET['brand']) ? 'Kết quả theo thương hiệu: ' . getBrandName($_GET['brand']) : 
+                    (!empty($_GET['category']) ? 'Kết quả theo danh mục: ' . getCategoryName($_GET['category']) : 'Tất cả sản phẩm')) ?>
             </h1>
-            <div class="search-count"><?= $total_items ?> products found</div>
+            <div class="search-count"><?= $total_items ?> sản phẩm được tìm thấy</div>
         </div>
         
-        <!-- Filter Section -->
+        <!-- Phần bộ lọc -->
         <div class="filter-section">
-            <form method="GET" action="">
+            <form method="GET" action="/sportswear-webstore/layout/client/search_results.php">
                 <div class="filter-form">
                     <div class="filter-group">
-                        <label class="filter-label">Search</label>
-                        <input type="text" class="filter-input" name="search" placeholder="Product name..." 
-                               value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>">
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Brand</label>
+                        <label class="filter-label">Thương hiệu</label>
                         <select class="filter-select" name="brand">
-                            <option value="">All Brands</option>
-                            <?php foreach ($brands as $brand): ?>
-                                <option value="<?= $brand['ID'] ?>" <?= isset($_GET['brand']) && $_GET['brand'] == $brand['ID'] ? 'selected' : '' ?>>
+                            <option value="">Tất cả thương hiệu</option>
+                            <?php 
+                            foreach ($brands as $brand): 
+                                $selected = (isset($_GET['brand']) && $_GET['brand'] == $brand['ID']) ? 'selected' : '';
+                            ?>
+                                <option value="<?= $brand['ID'] ?>" <?= $selected ?>>
                                     <?= htmlspecialchars($brand['name']) ?>
                                 </option>
                             <?php endforeach; ?>
@@ -492,9 +514,9 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
                     </div>
                     
                     <div class="filter-group">
-                        <label class="filter-label">Category</label>
+                        <label class="filter-label">Danh mục</label>
                         <select class="filter-select" name="category">
-                            <option value="">All Categories</option>
+                            <option value="">Tất cả danh mục</option>
                             <?php foreach ($categories as $category): ?>
                                 <option value="<?= $category['ID'] ?>" <?= isset($_GET['category']) && $_GET['category'] == $category['ID'] ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($category['name']) ?>
@@ -504,57 +526,64 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
                     </div>
                     
                     <div class="filter-group">
-                        <label class="filter-label">Price Range</label>
+                        <label class="filter-label">Khoảng giá</label>
                         <div style="display: flex; gap: 10px;">
-                            <input type="number" class="filter-input" name="price_start" placeholder="From" 
+                            <input type="number" class="filter-input" name="price_start" placeholder="Từ" 
                                    value="<?= isset($_GET['price_start']) ? htmlspecialchars($_GET['price_start']) : '' ?>">
-                            <input type="number" class="filter-input" name="price_end" placeholder="To" 
+                            <input type="number" class="filter-input" name="price_end" placeholder="Đến" 
                                    value="<?= isset($_GET['price_end']) ? htmlspecialchars($_GET['price_end']) : '' ?>">
                         </div>
                     </div>
                     
                     <div class="filter-group">
-                        <label class="filter-label">Rating</label>
+                        <label class="filter-label">Đánh giá</label>
                         <select class="filter-select" name="rating">
-                            <option value="">All Ratings</option>
-                            <option value="4-5" <?= isset($_GET['rating']) && $_GET['rating'] === '4-5' ? 'selected' : '' ?>>4-5 stars</option>
-                            <option value="3-4" <?= isset($_GET['rating']) && $_GET['rating'] === '3-4' ? 'selected' : '' ?>>3-4 stars</option>
-                            <option value="2-3" <?= isset($_GET['rating']) && $_GET['rating'] === '2-3' ? 'selected' : '' ?>>2-3 stars</option>
-                            <option value="1-2" <?= isset($_GET['rating']) && $_GET['rating'] === '1-2' ? 'selected' : '' ?>>1-2 stars</option>
+                            <option value="">Tất cả đánh giá</option>
+                            <option value="4-5" <?= isset($_GET['rating']) && $_GET['rating'] === '4-5' ? 'selected' : '' ?>>4-5 sao</option>
+                            <option value="3-4" <?= isset($_GET['rating']) && $_GET['rating'] === '3-4' ? 'selected' : '' ?>>3-4 sao</option>
+                            <option value="2-3" <?= isset($_GET['rating']) && $_GET['rating'] === '2-3' ? 'selected' : '' ?>>2-3 sao</option>
+                            <option value="1-2" <?= isset($_GET['rating']) && $_GET['rating'] === '1-2' ? 'selected' : '' ?>>1-2 sao</option>
                         </select>
                     </div>
                     
                     <div class="filter-group">
-                        <label class="filter-label">Status</label>
+                        <label class="filter-label">Trạng thái</label>
                         <select class="filter-select" name="status">
-                            <option value="">All Statuses</option>
-                            <option value="in_stock" <?= isset($_GET['status']) && $_GET['status'] === 'in_stock' ? 'selected' : '' ?>>In Stock</option>
-                            <option value="out_of_stock" <?= isset($_GET['status']) && $_GET['status'] === 'out_of_stock' ? 'selected' : '' ?>>Out of Stock</option>
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="in_stock" <?= isset($_GET['status']) && $_GET['status'] === 'in_stock' ? 'selected' : '' ?>>Còn hàng</option>
+                            <option value="out_of_stock" <?= isset($_GET['status']) && $_GET['status'] === 'out_of_stock' ? 'selected' : '' ?>>Hết hàng</option>
                         </select>
                     </div>
                     
                     <div class="filter-group">
-                        <label class="filter-label">Sort By</label>
+                        <label class="filter-label">Sắp xếp theo</label>
                         <select class="filter-select" name="sort">
-                            <option value="newest" <?= isset($_GET['sort']) && $_GET['sort'] === 'newest' ? 'selected' : '' ?>>Newest</option>
-                            <option value="price_asc" <?= isset($_GET['sort']) && $_GET['sort'] === 'price_asc' ? 'selected' : '' ?>>Price: Low to High</option>
-                            <option value="price_desc" <?= isset($_GET['sort']) && $_GET['sort'] === 'price_desc' ? 'selected' : '' ?>>Price: High to Low</option>
-                            <option value="rating_desc" <?= isset($_GET['sort']) && $_GET['sort'] === 'rating_desc' ? 'selected' : '' ?>>Highest Rating</option>
+                            <option value="newest" <?= isset($_GET['sort']) && $_GET['sort'] === 'newest' ? 'selected' : '' ?>>Mới nhất</option>
+                            <option value="price_asc" <?= isset($_GET['sort']) && $_GET['sort'] === 'price_asc' ? 'selected' : '' ?>>Giá: Thấp đến cao</option>
+                            <option value="price_desc" <?= isset($_GET['sort']) && $_GET['sort'] === 'price_desc' ? 'selected' : '' ?>>Giá: Cao đến thấp</option>
+                            <option value="rating_desc" <?= isset($_GET['sort']) && $_GET['sort'] === 'rating_desc' ? 'selected' : '' ?>>Đánh giá cao nhất</option>
                         </select>
                     </div>
                     
-                    <button type="submit" class="filter-button">Apply Filters</button>
+                    <!-- Giữ lại các tham số khác -->
+                    <?php foreach ($_GET as $key => $value): ?>
+                        <?php if (!in_array($key, ['brand', 'category', 'price_start', 'price_end', 'rating', 'status', 'sort', 'page']) && !empty($value)): ?>
+                            <input type="hidden" name="<?= htmlspecialchars($key) ?>" value="<?= htmlspecialchars($value) ?>">
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    
+                    <button type="submit" class="filter-button">Áp dụng bộ lọc</button>
                 </div>
             </form>
         </div>
         
-        <!-- Product Grid - 2 rows of 5 products each -->
+        <!-- Lưới sản phẩm - 2 hàng, mỗi hàng 5 sản phẩm -->
         <div class="product-grid-container">
             <?php if (!empty($products)): ?>
                 <?php 
-                // Split products into chunks of 5 for each row
+                // Chia sản phẩm thành các nhóm 5 sản phẩm cho mỗi hàng
                 $product_chunks = array_chunk($products, 5);
-                // Display only first 2 rows (10 products total)
+                // Chỉ hiển thị 2 hàng đầu tiên (tổng cộng 10 sản phẩm)
                 $display_chunks = array_slice($product_chunks, 0, 2);
                 
                 foreach ($display_chunks as $row_products): ?>
@@ -568,9 +597,9 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
                             $full_stars = floor($rating);
                             $has_half_star = $rating - $full_stars >= 0.5;
                         ?>
-                            <a href="product_detail.php?id=<?= $product['ID'] ?>" class="product-card">
+                            <a href="/sportswear-webstore/layout/client/product_detail.php?id=<?= $product['ID'] ?>" class="product-card">
                                 <?php if ($product['status'] === 'out_of_stock'): ?>
-                                    <div class="product-badge">Out of Stock</div>
+                                    <div class="product-badge">Hết hàng</div>
                                 <?php endif; ?>
                                 
                                 <img src="<?= $image_src ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="product-image" 
@@ -598,7 +627,7 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
                                     
                                     <div class="product-status">
                                         <span class="status-icon <?= $product['status'] === 'in_stock' ? 'in-stock' : 'out-of-stock' ?>"></span>
-                                        <?= $product['status'] === 'in_stock' ? 'In Stock' : 'Out of Stock' ?>
+                                        <?= $product['status'] === 'in_stock' ? 'Còn hàng' : 'Hết hàng' ?>
                                     </div>
                                 </div>
                             </a>
@@ -608,37 +637,38 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
             <?php else: ?>
                 <div class="no-results">
                     <i class="fas fa-search"></i>
-                    <h3>No products found</h3>
-                    <p>Try adjusting your filters or search with different keywords</p>
+                    <h3>Không tìm thấy sản phẩm</h3>
+                    <p>Hãy thử điều chỉnh bộ lọc hoặc tìm kiếm với từ khóa khác</p>
                 </div>
             <?php endif; ?>
         </div>
         
-        <!-- Pagination -->
+        <!-- Phân trang -->
         <?php if ($total_pages > 1): ?>
             <div class="pagination">
                 <?php
                 $query_params = $_GET;
-                // Previous page link
+                // Liên kết trang trước
                 if ($page > 1) {
                     $query_params['page'] = $page - 1;
-                    $prev_url = '?' . http_build_query($query_params);
-                    echo '<a href="' . htmlspecialchars($prev_url) . '" class="page-link">&laquo; Previous</a>';
+                    $prev_url = '/sportswear-webstore/layout/client/search_results.php?' . http_build_query($query_params);
+                    echo '<a href="' . htmlspecialchars($prev_url) . '" class="page-link">« Trước</a>';
                 }
                 
-                // Page numbers
+                // Số trang
                 $start_page = max(1, $page - 2);
                 $end_page = min($total_pages, $page + 2);
                 
                 if ($start_page > 1) {
                     $query_params['page'] = 1;
-                    echo '<a href="?' . http_build_query($query_params) . '" class="page-link">1</a>';
+                    $first_url = '/sportswear-webstore/layout/client/search_results.php?' . http_build_query($query_params);
+                    echo '<a href="' . htmlspecialchars($first_url) . '" class="page-link">1</a>';
                     if ($start_page > 2) echo '<span class="page-link">...</span>';
                 }
                 
                 for ($i = $start_page; $i <= $end_page; $i++) {
                     $query_params['page'] = $i;
-                    $page_url = '?' . http_build_query($query_params);
+                    $page_url = '/sportswear-webstore/layout/client/search_results.php?' . http_build_query($query_params);
                     if ($i === $page) {
                         echo '<span class="page-current">' . $i . '</span>';
                     } else {
@@ -649,18 +679,40 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
                 if ($end_page < $total_pages) {
                     if ($end_page < $total_pages - 1) echo '<span class="page-link">...</span>';
                     $query_params['page'] = $total_pages;
-                    echo '<a href="?' . http_build_query($query_params) . '" class="page-link">' . $total_pages . '</a>';
+                    $last_url = '/sportswear-webstore/layout/client/search_results.php?' . http_build_query($query_params);
+                    echo '<a href="' . htmlspecialchars($last_url) . '" class="page-link">' . $total_pages . '</a>';
                 }
                 
-                // Next page link
+                // Liên kết trang tiếp theo
                 if ($page < $total_pages) {
                     $query_params['page'] = $page + 1;
-                    $next_url = '?' . http_build_query($query_params);
-                    echo '<a href="' . htmlspecialchars($next_url) . '" class="page-link">Next &raquo;</a>';
+                    $next_url = '/sportswear-webstore/layout/client/search_results.php?' . http_build_query($query_params);
+                    echo '<a href="' . htmlspecialchars($next_url) . '" class="page-link">Tiếp theo »</a>';
                 }
                 ?>
             </div>
         <?php endif; ?>
     </div>
+
+    <?php
+    // Hàm hỗ trợ
+    function getBrandName($brandId) {
+        global $conn;
+        $stmt = $conn->prepare("SELECT name FROM brand WHERE ID = :id");
+        $stmt->bindValue(':id', $brandId, PDO::PARAM_INT);
+        $stmt->execute();
+        $brand = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $brand ? htmlspecialchars($brand['name']) : 'Không xác định';
+    }
+
+    function getCategoryName($categoryId) {
+        global $conn;
+        $stmt = $conn->prepare("SELECT name FROM category WHERE ID = :id");
+        $stmt->bindValue(':id', $categoryId, PDO::PARAM_INT);
+        $stmt->execute();
+        $category = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $category ? htmlspecialchars($category['name']) : 'Không xác định';
+    }
+    ?>
 </body>
 </html>
