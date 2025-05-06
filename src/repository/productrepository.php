@@ -75,6 +75,59 @@ class ProductRepository
     }
 
     /**
+     *  Get products with options
+     * @return array List of products
+     * @param $category : category of product
+     * @param $brand : brand of product
+     * @param $status : status of product
+     * @param $min_price : min price of product
+     * @param $max_price : max price of product
+     */
+    public function getFilteredProducts($category, $brand, $status, $min_price, $max_price)
+    {
+        try {
+            $query = "
+                SELECT * FROM product AS p
+                JOIN productvariant as pv
+                WHERE 1=1
+            ";
+            $params = [];
+            if ($category) {
+                $query .= "AND p.categoryID=?";
+                $params[] = $category;
+            }
+            if ($brand) {
+                $query .= "AND p.brandID=?";
+                $params[] = $brand;
+            }
+            if ($status) {
+                $query .= "AND status=?";
+                $params[] = $status;
+            }
+            if ($min_price) {
+                $query .= "pv.price>=?";
+                $params[] = $min_price;
+            }
+
+            if ($max_price) {
+                $query .= "pv.price<=?";
+                $params[] = $max_price;
+            }
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute($params);
+            $result = $stmt->get_result();
+
+            $products = [];
+            while ($row = $result->fetch_assoc())
+                $products[] = $row;
+            return $products;
+        } catch (Exception $e) {
+            throw new Exception('');
+        }
+    }
+
+    /**
      * Get a product by ID without variants
      * @param int $id Product ID
      * @return array|null Product data if found, null otherwise

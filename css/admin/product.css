@@ -282,7 +282,6 @@
     border-right: 1px solid var(--border);
     width: 240px;
     position: relative;
-    overflow-y: auto;
     height: 100%;
 }
 

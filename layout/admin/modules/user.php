@@ -358,6 +358,8 @@
                 });
         }
 
+        showAllUsers()
+
         function showFormAddUser() {
             const portalRoot = document.createElement('div');
             portalRoot.id = 'portal-root';
