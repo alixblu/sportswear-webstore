@@ -199,7 +199,7 @@
                 };
 
                 // Assign the image source
-                imgElement.src = `../../img/products/product_${product.ID}.png`;
+                imgElement.src = `../../img/products/product_${product.ID}.jpg`;
 
 
                 const modalElements = {
