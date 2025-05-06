@@ -176,7 +176,8 @@ session_start();
                      <a href="#" onclick="adminPageRedirect()"><i class="ri-admin-line"></i> Go to admin page</a>
                   </li>
                   <?php endif; ?>
-                  <?php if(isset($_SESSION['user']['roleid']) && $_SESSION['user']['roleid'] === '05'): ?>
+
+                  <?php if (isset($_SESSION['user']['roleid']) && (string)$_SESSION['user']['roleid'] === '05'): ?>
                   <li>
                      <a href="#"><i class="ri-user-settings-line"></i> Profile</a>
                   </li>

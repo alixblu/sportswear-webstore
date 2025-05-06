@@ -12,7 +12,7 @@ function handleLogin(event) {
     .then(data => {
         if (data.success) {
             // alert(JSON.stringify(data, null, 2));
-            if(data.user.roleID === 5) {
+            if(data.user.roleID == 5) {
                 window.location.reload(); 
             } else {
                 // Redirect non-customers
