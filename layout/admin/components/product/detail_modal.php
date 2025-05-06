@@ -165,3 +165,132 @@
 
     </div>
 </div>
+
+<script>
+    // Show edit form
+    async function showEditForm() {
+        if (!product) return;
+        console.log('Product Data:', product.ID);
+
+        // Hide product info and show edit form
+        document.getElementById('product-info-section').style.display = 'none';
+        document.getElementById('edit-form-section').style.display = 'block';
+
+        try {
+            // Get product details
+
+
+            // Populate form fields
+            document.getElementById('editName').value = product.name || '';
+            document.getElementById('editMarkup').value = product.markup_percentage || '0';
+            document.getElementById('editDiscount').value = product.discountID || '';
+            document.getElementById('editDescription').value = product.description || '';
+
+            // Load categories
+            const categoriesResponse = await getAllCategories();
+            const categorySelect = document.getElementById('editCategory');
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+            categoriesResponse.data.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.ID;
+                option.textContent = category.name;
+                option.selected = category.ID === product.categoryID;
+                categorySelect.appendChild(option);
+            });
+
+            // Load brands
+            const brandsResponse = await getAllBrands();
+            const brandSelect = document.getElementById('editBrand');
+            brandSelect.innerHTML = '<option value="">Select Brand</option>';
+            brandsResponse.data.forEach(brand => {
+                const option = document.createElement('option');
+                option.value = brand.ID;
+                option.textContent = brand.name;
+                option.selected = brand.ID === product.brandID;
+                brandSelect.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error('Error loading edit form:', error);
+            alert('Error loading edit form: ' + error.message);
+        }
+    }
+
+    function triggerImageUpload() {
+        document.getElementById('changeImageInput').click();
+    }
+    // Form submission
+    document.getElementById('productEditForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        try {
+            const formData = {
+                id: product.ID,
+                name: document.getElementById('editName').value,
+                categoryID: document.getElementById('editCategory').value,
+                brandID: document.getElementById('editBrand').value,
+                markup_percentage: document.getElementById('editMarkup').value,
+                discountID: document.getElementById('editDiscount').value,
+                description: document.getElementById('editDescription').value,
+                rating: product.rating,
+                image: product.image,
+                stock: product.stock,
+                status: product.status
+            };
+
+            // Call updateProduct with the formData object
+            const response = await updateProduct(formData);
+
+            if (response.status === 200) {
+                alert('Product updated successfully!');
+                viewProduct(product.ID); // Refresh view
+                loadProducts(); // Refresh grid
+                cancelEdit(); // Close edit form
+            } else {
+                throw new Error(response.message || 'Failed to update product');
+            }
+        } catch (error) {
+            console.error('Error updating product:', error);
+            alert('Error updating product: ' + error.message);
+        }
+    });
+
+    // Cancel editing
+    function cancelEdit() {
+        document.getElementById('product-info-section').style.display = 'block';
+        document.getElementById('edit-form-section').style.display = 'none';
+    }
+
+    function closeModal() {
+        cancelEdit();
+        const modal = document.getElementById('productModal');
+        modal.style.display = 'none';
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // Show selected tab content and mark tab as active
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('productModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+</script>

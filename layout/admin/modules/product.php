@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="../../css/admin/product.css">
 
     <script src="../../JS/admin/product/product.js"></script>
-    <link rel="stylesheet" href="../../css/admin/product.css">
     <a href="../components/product/detail_modal.php"></a>
 </head>
 
@@ -32,26 +31,27 @@
             </div>
             <div class="filter-group">
                 <select id="category" class="filter-select">
-                    <option value="">All Categories</option>
+                    <option value="all">All Categories</option>
                 </select>
             </div>
             <div class="filter-group">
                 <select id="brand" class="filter-select">
-                    <option value="">All Brands</option>
+                    <option value="all">All Brands</option>
                 </select>
             </div>
             <div class="filter-group">
                 <select id="status" class="filter-select">
-                    <option value="">All Status</option>
+                    <option value="all">All Status</option>
                 </select>
             </div>
             <div class="filter-group">
                 <select id="rating" class="filter-select">
-                    <option value="">All Ratings</option>
-                    <option value="4-5">4-5 Stars</option>
-                    <option value="3-4">3-4 Stars</option>
-                    <option value="2-3">2-3 Stars</option>
-                    <option value="1-2">1-2 Stars</option>
+                    <option value="all">All Ratings</option>
+                    <option value="5">5 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="2">2 Stars</option>
+                    <option value="1">1 Star</option>
                 </select>
             </div>
             <div class="filter-group price-range-group">
@@ -71,15 +71,12 @@
 
     <!-- Modal Structure -->
     <div class="modal-overlay" id="productModal">
-
+        <?php
+        include(__DIR__ . '/../components/product/detail_modal.php');
+        ?>
     </div>
 
     <script>
-        function triggerImageUpload() {
-            document.getElementById('changeImageInput').click();
-        }
-
-
         // Function to render stars based on rating
         function renderStars(rating) {
             if (!rating) return '<div class="stars"><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div>';
@@ -109,71 +106,6 @@
             return starsHTML;
         }
 
-        // Function to load and display products
-        async function loadProducts() {
-            try {
-                const response = await getAllProducts();
-
-                const productGrid = document.getElementById('productGrid');
-                productGrid.innerHTML = '';
-
-                if (!Array.isArray(response)) {
-                    throw new Error('Invalid response format from server');
-                }
-
-                if (response.length === 0) {
-                    productGrid.innerHTML = '<div class="no-products">No products found</div>';
-                    return;
-                }
-
-                response.forEach(product => {
-                    const productCard = document.createElement('div');
-                    productCard.className = 'product-card';
-
-                    productCard.innerHTML = `
-                        <div class="product-image">
-                            <span class="product-id-badge">#${product.ID}</span>
-                            <i class="fas fa-tshirt"></i>
-                            <span class="product-badge badge-${product.status === 'in_stock' ? 'in-stock' : 'out-stock'}">
-                                ${product.status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
-                            </span>
-                        </div>
-                        <div class="product-info">
-                            <h5 class="product-title">${product.name}</h5>
-                            <div class="product-meta">
-                                <span class="product-stock">Stock: ${product.stock || 0}</span>
-                                <span class="product-markup">Markup: ${product.markup_percentage}%</span>
-                            </div>
-                            <div class="product-rating">
-                                ${renderStars(product.rating)}
-                                <span class="rating-count">${product.rating ? `(${product.rating})` : '(No rating)'}</span>
-                            </div>
-                            <div class="product-actions">
-                                <button class="btn btn-primary" onclick="viewProduct(${product.ID})">
-                                    <i class="fas fa-eye"></i> View
-                                </button>
-                            </div>
-                        </div>
-                    `;
-
-                    productGrid.appendChild(productCard);
-                });
-            } catch (error) {
-                console.error('Error loading products:', error);
-                const productGrid = document.getElementById('productGrid');
-                productGrid.innerHTML = `
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <p>Error loading products. Please try again.</p>
-                        <p>${error.message}</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Load products when the page loads
-        document.addEventListener('DOMContentLoaded', loadProducts);
-
         var product = null;
         // Modal functions
         async function viewProduct(id) {
@@ -188,8 +120,6 @@
                 if (!response || !response.data) {
                     throw new Error('No product data received');
                 }
-
-
                 product = response.data;
                 const imgElement = document.getElementById('modal-product-image');
 
@@ -199,7 +129,7 @@
                 };
 
                 // Assign the image source
-                imgElement.src = `../../img/products/product_${product.ID}.jpg`;
+                imgElement.src = `../../img/products/${product.ID}.jpg`;
 
 
                 const modalElements = {
@@ -273,132 +203,6 @@
             } catch (error) {
                 console.error('Error loading product details:', error);
                 alert('Error loading product details: ' + error.message);
-            }
-        }
-
-        // Show edit form
-        async function showEditForm() {
-            if (!product) return;
-            console.log('Product Data:', product.ID);
-
-            // Hide product info and show edit form
-            document.getElementById('product-info-section').style.display = 'none';
-            document.getElementById('edit-form-section').style.display = 'block';
-
-            try {
-                // Get product details
-
-
-                // Populate form fields
-                document.getElementById('editName').value = product.name || '';
-                document.getElementById('editMarkup').value = product.markup_percentage || '0';
-                document.getElementById('editDiscount').value = product.discountID || '';
-                document.getElementById('editDescription').value = product.description || '';
-
-                // Load categories
-                const categoriesResponse = await getAllCategories();
-                const categorySelect = document.getElementById('editCategory');
-                categorySelect.innerHTML = '<option value="">Select Category</option>';
-                categoriesResponse.data.forEach(category => {
-                    const option = document.createElement('option');
-                    option.value = category.ID;
-                    option.textContent = category.name;
-                    option.selected = category.ID === product.categoryID;
-                    categorySelect.appendChild(option);
-                });
-
-                // Load brands
-                const brandsResponse = await getAllBrands();
-                const brandSelect = document.getElementById('editBrand');
-                brandSelect.innerHTML = '<option value="">Select Brand</option>';
-                brandsResponse.data.forEach(brand => {
-                    const option = document.createElement('option');
-                    option.value = brand.ID;
-                    option.textContent = brand.name;
-                    option.selected = brand.ID === product.brandID;
-                    brandSelect.appendChild(option);
-                });
-
-            } catch (error) {
-                console.error('Error loading edit form:', error);
-                alert('Error loading edit form: ' + error.message);
-            }
-        }
-
-        // Cancel editing
-        function cancelEdit() {
-            document.getElementById('product-info-section').style.display = 'block';
-            document.getElementById('edit-form-section').style.display = 'none';
-        }
-
-        // Form submission
-        document.getElementById('productEditForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            try {
-
-                const formData = {
-                    id: product.ID,
-                    name: document.getElementById('editName').value,
-                    categoryID: document.getElementById('editCategory').value,
-                    brandID: document.getElementById('editBrand').value,
-                    markup_percentage: document.getElementById('editMarkup').value,
-                    discountID: document.getElementById('editDiscount').value,
-                    description: document.getElementById('editDescription').value,
-                    rating: product.rating,
-                    image: product.image,
-                    stock: product.stock,
-                    status: product.status
-                };
-
-                // Call updateProduct with the formData object
-                const response = await updateProduct(formData);
-
-                if (response.status === 200) {
-                    alert('Product updated successfully!');
-                    viewProduct(product.ID); // Refresh view
-                    loadProducts(); // Refresh grid
-                    cancelEdit(); // Close edit form
-                } else {
-                    throw new Error(response.message || 'Failed to update product');
-                }
-            } catch (error) {
-                console.error('Error updating product:', error);
-                alert('Error updating product: ' + error.message);
-            }
-        });
-
-        function closeModal() {
-            cancelEdit();
-            const modal = document.getElementById('productModal');
-            modal.style.display = 'none';
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            // Show selected tab content and mark tab as active
-
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('productModal');
-            if (event.target === modal) {
-                closeModal();
             }
         }
     </script>
