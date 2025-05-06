@@ -215,14 +215,14 @@ console.log(products)
 
                     const productRating = document.createElement('div');
                     productRating.classList.add('product-rating');
-                    const stars = Math.round(product.rating || 0); 
+                    const stars = Math.round(product.rating || 5); 
                     for (let i = 0; i < 5; i++) {
                         const starIcon = document.createElement('i');
                         starIcon.classList.add('fas', i < stars ? 'fa-star' : 'far', 'fa-star');
                         productRating.appendChild(starIcon);
                     }
                     const ratingText = document.createElement('span');
-                    ratingText.textContent = `(${product.rating || 0})`;
+                    ratingText.textContent = `(${product.rating || 5})`;
                     productRating.appendChild(ratingText);
 
                     const buyButton = document.createElement('button');
