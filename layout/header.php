@@ -8,20 +8,20 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="./css/header.css">
+    <link rel="stylesheet" href="/sportswear-webstore/css/header.css">
 </head>
 <body>
     <header class="header">
         <nav class="nav container">
             <div class="nav__data">
-                <a href="#" class="nav__logo">
+                <a href="/sportswear-webstore/index.php" class="nav__logo">
                     <i class="ri-store-2-fill"></i> Cửa hàng Sportwear
                 </a>
             </div>
 
             <div class="nav__menu" id="nav-menu">
                 <ul class="nav__list">
-                    <li><a href="#" class="nav__link">Trang chủ</a></li>
+                    <li><a href="/sportswear-webstore/index.php" class="nav__link">Trang chủ</a></li>
                     <li class="dropdown__item">
                         <div class="nav__link">
                             Sản phẩm <i class="ri-arrow-down-s-line dropdown__arrow"></i>
@@ -141,50 +141,45 @@ session_start();
                     <?php if(isset($_SESSION['user']['roleid']) && $_SESSION['user']['roleid'] !== '05'): ?>
                     <li><a href="#" onclick="adminPageRedirect()"><i class="ri-admin-line"></i> Đi đến trang quản trị</a></li>
                     <?php endif; ?>
-                    <li><a href="#"><i class="ri-user-settings-line"></i> Hồ sơ</a></li>
+                    <li><a href="/sportswear-webstore/layout/client/profile.php"><i class="ri-user-settings-line"></i> Hồ sơ</a></li>
                     <li><a href="#" onclick="handleLogout(event)"><i class="ri-logout-box-line"></i> Đăng xuất</a></li>
                 </ul>
             </div>
         <?php else: ?>
-            <?php include 'login_regis.php'; ?>
+            <?php include '/sportswear-webstore/layout/login_regis.php'; ?>
         <?php endif; ?>
     </div>
     <script>
-
-      // Xử lý tìm kiếm nâng cao
-      document.getElementById('searchForm').addEventListener('submit', async function(e) {
+        // Xử lý tìm kiếm nâng cao
+        document.getElementById('searchForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const searchInput = document.getElementById('searchInput').value.trim();
             
             if (!searchInput) return;
             
             try {
-                // Kiểm tra xem có phải là tên thương hiệu hoặc danh mục không
-                const response = await fetch('/sportswear-webstore/layout/client/check_search.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'search=' + encodeURIComponent(searchInput)
-                });
+                // Kiểm tra xem có phải là tên thương hiệu không
+                let response = await fetch(`/sportswear-webstore/src/router/productrouter.php?action=getBrandByName&name=${encodeURIComponent(searchInput)}`);
+                let data = await response.json();
                 
-                const data = await response.json();
-                
-                if (data.error) {
-                    console.error('Search error:', data.error);
-                    // Fallback to normal search
-                    this.submit();
+                if (data.success && data.data && data.data.ID) {
+                    // Chuyển hướng đến trang thương hiệu nếu tìm thấy
+                    window.location.href = `/sportswear-webstore/layout/client/search_results.php?brand=${data.data.ID}`;
                     return;
                 }
                 
-                if (data.brandId) {
-                    // Chuyển hướng đến trang thương hiệu nếu tìm thấy
-                    window.location.href = `/sportswear-webstore/layout/client/search_results.php?brand=${data.brandId}`;
-                } else if (data.categoryId) {
+                // Kiểm tra xem có phải là tên danh mục không
+                response = await fetch(`/sportswear-webstore/src/router/productrouter.php?action=getCategoryByName&name=${encodeURIComponent(searchInput)}`);
+                data = await response.json();
+                
+                if (data.success && data.data && data.data.ID) {
                     // Chuyển hướng đến trang danh mục nếu tìm thấy
-                    window.location.href = `/sportswear-webstore/layout/client/search_results.php?category=${data.categoryId}`;
-                } else {
-                    // Không tìm thấy thương hiệu/danh mục, thực hiện tìm kiếm thông thường
-                    this.submit();
+                    window.location.href = `/sportswear-webstore/layout/client/search_results.php?category=${data.data.ID}`;
+                    return;
                 }
+                
+                // Nếu không tìm thấy thương hiệu hoặc danh mục, thực hiện tìm kiếm thông thường
+                this.submit();
             } catch (error) {
                 console.error('Search failed:', error);
                 // Fallback to normal search if there's an error
@@ -207,39 +202,14 @@ session_start();
         });
 
         document.getElementById('loginOverlay').addEventListener('click', (e) => {
-            if (e.target === this) {
-                this.style.display = 'none';
+            if (e.target === document.getElementById('loginOverlay')) {
+                document.getElementById('loginOverlay').style.display = 'none';
             }
-        });
-        
-        document.getElementById('searchForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const searchInput = this.querySelector('input[name="search"]').value.trim();
-            fetch('/sportswear-webstore/layout/client/check_search.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'search=' + encodeURIComponent(searchInput)
-            })
-            .then(response => response.json())
-            .then(data => {
-                const form = document.getElementById('searchForm');
-                if (data.brandId) {
-                    window.location.href = '/sportswear-webstore/layout/client/search_results.php?brand=' + data.brandId;
-                } else if (data.categoryId) {
-                    window.location.href = '/sportswear-webstore/layout/client/search_results.php?category=' + data.categoryId;
-                } else {
-                    form.submit();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                form.submit();
-            });
         });
 
         function handleLogout(event) {
             event.preventDefault();
-            fetch('./layout/login_regis.php', {
+            fetch('/sportswear-webstore/layout/login_regis.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'submitLogout=1'
@@ -253,7 +223,7 @@ session_start();
         }
 
         function adminPageRedirect() {
-            window.location.href = './layout/admin/index.php';
+            window.location.href = '/sportswear-webstore/layout/admin/index.php';
         }
     </script>
 </body>

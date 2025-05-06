@@ -209,13 +209,13 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
         }
 
         .filter-select:focus, .filter-input:focus {
-            border-color: #e63946;
+            border-color: #3498db;
             outline: none;
             box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
         }
 
         .filter-button {
-            background-color: #e63946;
+            background-color: #3498db;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -227,7 +227,7 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
         }
 
         .filter-button:hover {
-            background-color: #c1121f;
+            background-color:rgb(15, 138, 220);
         }
 
         /* Adjust pagination to match content.css */
@@ -251,6 +251,11 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
         .no-results h3 {
             font-size: 20px;
             margin-bottom: 10px;
+        }
+
+        /* Fix for removing underline from product card links */
+        .product-card {
+            text-decoration: none;
         }
     </style>
 </head>
