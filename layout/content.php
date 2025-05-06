@@ -1,4 +1,6 @@
 <?php
+
+
 // Database connection
 try {
     $conn = new PDO("mysql:host=localhost;dbname=sportswear;charset=utf8mb4", "root", "");
@@ -101,10 +103,103 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-size: 20px;
             margin-bottom: 10px;
         }
+        .slider-wrapper {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+        }
+        .slider-container {
+            width: 100%;
+            max-width: 900px;
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+            margin: 0 auto;
+        }
+        .slides {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
+        .slides img {
+            width: 100%;
+            height: 100%;
+            flex: 0 0 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        .dots {
+            margin-top: 10px;
+        }
+        .dot {
+            height: 10px;
+            width: 10px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        .dot.active {
+            background-color: #ff0000;
+        }
+
+        /* text-content */
+        .text-content {
+            position: absolute;
+            bottom: 20%;
+            left: 5%;
+            text-align: left; 
+
+        }
+
+        .text-content h1 {
+            font-size: 45px;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .shop-now {
+            display: inline-block;
+            margin-top: 15px;
+            margin-left: 15px;
+            color: white;
+            font-size: 14px;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .shop-now:hover {
+            border-color: white;
+        }
     </style>
 </head>
 <body>
     <div class="product-section">
+        <div class="slider-wrapper">
+            <div class="slider-container">
+                <div class="slides">
+                    <img src="img/slider/1.svg" alt="Hình 1">
+                    <img src="img/slider/2.svg" alt="Hình 2">
+                    <img src="img/slider/3.svg" alt="Hình 3">
+                </div>
+            </div>
+            <div class="dots">
+                <span class="dot" onclick="currentSlide(0)"></span>
+                <span class="dot" onclick="currentSlide(1)"></span>
+                <span class="dot" onclick="currentSlide(2)"></span>
+            </div>
+
+            <div class="text-content">
+                <h1>Up to 10%<br>off Voucher</h1>
+                <a href="#" class="shop-now">Shop Now →</a>
+            </div>
+        </div>
+
         <div class="section-header">
             <h1>Sản phẩm đang bán</h1>
             <span class="search-count"><?= $total_items ?> sản phẩm được tìm thấy</span>
@@ -114,8 +209,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="product-list">
             <?php if (!empty($products)): ?>
                 <?php foreach ($products as $product): 
-                    $image_path = "/sportswear-webstore/img/products/" . $product['ID'] . ".jpg";
-                    $default_image = "/sportswear-webstore/img/products/default.jpg";
+                    $image_path = "/img/products/" . $product['ID'] . ".jpg";
+                    $default_image = "/img/products/default.jpg";
                     $image_src = file_exists($_SERVER['DOCUMENT_ROOT'] . $image_path) ? $image_path : $default_image;
                     $rating = (float)$product['rating'];
                     $full_stars = floor($rating);
@@ -203,5 +298,35 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         <?php endif; ?>
     </div>
+    
+    <script>
+        let slideIndex = 0;
+        const slides = document.querySelector('.slides');
+        const dots = document.querySelectorAll('.dot');
+        const totalSlides = document.querySelectorAll('.slides img').length;
+
+        function showSlides() {
+            slideIndex++;
+            if (slideIndex >= totalSlides) slideIndex = 0;
+            slides.style.transform = `translateX(${-slideIndex * 100}%)`;
+            
+            // Cập nhật trạng thái dot
+            dots.forEach(dot => dot.classList.remove('active'));
+            dots[slideIndex].classList.add('active');
+        }
+
+        function currentSlide(index) {
+            slideIndex = index;
+            slides.style.transform = `translateX(${-slideIndex * 100}%)`;
+            dots.forEach(dot => dot.classList.remove('active'));
+            dots[slideIndex].classList.add('active');
+        }
+
+        // Tự động chuyển slide mỗi 3 giây
+        setInterval(showSlides, 3000);
+
+        // Đặt dot đầu tiên là active khi tải trang
+        dots[0].classList.add('active');
+    </script>
 </body>
 </html>
