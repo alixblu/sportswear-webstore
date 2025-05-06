@@ -16,6 +16,13 @@ $productController = new ProductController();
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['action']) && $_GET['action'] === 'getAllProducts') {
         $productController->getAllProducts();
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getFilteredProducts') {
+        $category = $_GET['category'] ?? null;
+        $brand = $_GET['brand'] ?? null;
+        $status = $_GET['status'] ?? null;
+        $min_price = $_GET['min_price'] ?? null;
+        $max_price = $_GET['max_price'] ?? null;
+        $productController->getFilteredProducts($category, $brand, $status, $min_price, $max_price);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getProductById' && isset($_GET['id'])) {
         $productController->getProductById($_GET['id']);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getProductVariants' && isset($_GET['id'])) {
@@ -33,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     } else if (isset($_GET['action']) && $_GET['action'] === 'getCategoryByName' && isset($_GET['name'])) {
         $productController->getCategoryByName($_GET['name']);
     } else {
+        http_response_code(400);
         echo json_encode(['error' => 'Yêu cầu GET không hợp lệ']);
     }
 }

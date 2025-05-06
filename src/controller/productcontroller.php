@@ -27,6 +27,27 @@ class ProductController
     }
 
     /**
+     * Get products with options
+     * @return array List of products
+     * @param $category : category of product
+     * @param $brand : brand of product
+     * @param $status : status of product
+     * @param $min_price : min price of product
+     * @param $max_price : max price of product
+     */
+    public function getFilteredProducts($category, $brand, $status, $min_price, $max_price)
+    {
+        $products = null;
+        try {
+            $products =  $this->productService->getFilteredProducts($category, $brand, $status, $min_price, $max_price);
+            ApiResponse::customApiResponse($products, 200);
+            return $products;
+        } catch (Exception $e) {
+            ApiResponse::customApiResponse($products, 500, $e->getMessage());
+        }
+    }
+
+    /**
      * Handle GET request to get a product by ID
      * @param int $id Product ID
      */
@@ -237,7 +258,8 @@ class ProductController
      * Get all categories
      * @return void
      */
-    public function getAllCategories() {
+    public function getAllCategories()
+    {
         try {
             $categories = $this->productService->getAllCategories();
             ApiResponse::customResponse($categories, 200);
@@ -250,7 +272,8 @@ class ProductController
      * Get all brands
      * @return void
      */
-    public function getAllBrands() {
+    public function getAllBrands()
+    {
         try {
             $brands = $this->productService->getAllBrands();
             ApiResponse::customResponse($brands, 200);

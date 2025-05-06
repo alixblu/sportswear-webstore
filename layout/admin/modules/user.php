@@ -1,102 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-      <!--=============== REMIXICONS ===============-->
-      <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
 
 
-  <title>Dashboard</title>
+    <title>Dashboard</title>
     <style>
-
         .search-box input {
-        flex: 1;
-        border: none;          /* Remove all borders */
-        background-color: transparent; /* Make the background transparent */
-        outline: none;         /* Remove outline when focused */
-        color:#2d3748
+            flex: 1;
+            border: none;
+            /* Remove all borders */
+            background-color: transparent;
+            /* Make the background transparent */
+            outline: none;
+            /* Remove outline when focused */
+            color: #2d3748
         }
+
         .search-box {
-        display: flex;
-        align-items: center;
-        justify-content:space-around;
-        column-gap: .3rem;
-        border: 1px solid #ccc;
-        border-radius: 100px;
-        height: 1.8rem;
-        padding-left: 7px;
-        max-width: 500px;
-        width: 70%;
-        padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            column-gap: .3rem;
+            border: 1px solid #ccc;
+            border-radius: 100px;
+            height: 1.8rem;
+            padding-left: 7px;
+            max-width: 500px;
+            width: 70%;
+            padding: 20px;
         }
+
         .search-box:focus-within {
-        box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
-        border-color: rgba(67, 97, 238, 0.3);
-    }
-    .wrapperFilter{
-        max-width: 400px;
-        width: 70%;
-        display: flex;
-        gap: 20px;
-    }
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+            border-color: rgba(67, 97, 238, 0.3);
+        }
+
+        .wrapperFilter {
+            max-width: 400px;
+            width: 70%;
+            display: flex;
+            gap: 20px;
+        }
 
 
-    .formUserCss{
-        background-color:white;
-        max-width: 500px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        border-radius: 10px;
-        font-family: 'Poppins', sans-serif;
-    }
+        .formUserCss {
+            background-color: white;
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+        }
 
-    .birthdayGenderCss{
-        display: flex;
-        gap: 100px;
-    }
-    .wrapperCss{
-        padding: 0 30px;
-        padding-bottom: 30px;
-        display: flex;
-        flex-direction: column;
-        gap:10px
-    }
-    .genderCss{
-        display: flex;
-        margin: 10px 0px;
-        gap:5px
-    }
-    .inputUserCss{
-        border: none;
-        outline: none;
-        color: #2d3748;
-        font-size: 17px;
-    }
-    .wrapperInputCss{
-        display: flex;
-        flex-direction: column;
-        background: rgba(255, 255, 255, 0.1);
-        transition: border-bottom 0.3s ease;
-        border-bottom: 1px solid silver;
-        padding: 5px 3px;
-    }
-    .wrapperInputCss:focus-within {
-        border-bottom: 1px solid #00e5ff;
-    }
-    .wrapperBirthday{
-        margin: 10px 0px;
-    }
-    .selectUser {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #d1d1d1;
-        border-radius: 6px;
-        outline: none;
-    }
-    .buttonUserCss {
+        .birthdayGenderCss {
+            display: flex;
+            gap: 100px;
+        }
+
+        .wrapperCss {
+            padding: 0 30px;
+            padding-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .genderCss {
+            display: flex;
+            margin: 10px 0px;
+            gap: 5px
+        }
+
+        .inputUserCss {
+            border: none;
+            outline: none;
+            color: #2d3748;
+            font-size: 17px;
+        }
+
+        .wrapperInputCss {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.1);
+            transition: border-bottom 0.3s ease;
+            border-bottom: 1px solid silver;
+            padding: 5px 3px;
+        }
+
+        .wrapperInputCss:focus-within {
+            border-bottom: 1px solid #00e5ff;
+        }
+
+        .wrapperBirthday {
+            margin: 10px 0px;
+        }
+
+        .selectUser {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d1d1;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .buttonUserCss {
             width: 100%;
             padding: 12px;
             background: linear-gradient(135deg, var(--secondary), var(--primary));
@@ -107,118 +121,144 @@
             margin-top: 15px;
         }
 
-    .buttonUserCss:hover {
-        background: linear-gradient(135deg, var(--secondary), var(--primary));
-        box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
-    }
-    .wrapperButton{
-        display: flex;
-        gap: 10px
-    }
-    .CloseCss{
-        display: flex;
-        justify-content: flex-end;
-        padding: 10px;
-    }
-    #portal-root {
-        position: fixed;
-        top: 0;
-        left: 130px;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 999; 
-    }
-    .infoCss{
-        margin-bottom: 15px;
-        font-weight: bold; 
-    }
-    .status.active {
-        background-color: rgba(76, 201, 240, 0.15);
-        color: #0891b2;
-        border: 1px solid rgba(76, 201, 240, 0.3);
-    }
-    .deleteUserCss{
-        display: flex;
-        justify-content: center;
-        gap:30px;
-        margin: 10px;
-    }
-    .titleDeleteUserCss{
-        margin: 10px;
-        font-size: 17px
-    }
-    #cancelDelete{
-        width: 100%;
-        padding: 12px;
-        background: linear-gradient(135deg, var(--secondary), var(--primary));
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        margin-top: 15px;
-    }
-    #confirmDelete{
-        width: 100%;
-        padding: 12px;
-        background: linear-gradient(135deg, var(--secondary), var(--primary));
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        margin-top: 15px;
-    }
-    .wrapperFilterCss{
-        background-color:white;
-        max-width: 500px;
-        border-radius: 10px;
-        font-family: 'Poppins', sans-serif;
-        padding-left: 10px;
-        padding-bottom: 10px;
-        padding-right: 10px;
-    }
-    #toast-portal {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        z-index: 9999;
-    }
+        .buttonUserCss:hover {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            box-shadow: 0 6px 15px rgba(58, 12, 163, 0.2);
+        }
 
-    .toast {
-        min-width: 250px;
-        padding: 12px 18px;
-        color: #fff;
-        border-radius: 8px;
-        font-size: 15px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        opacity: 0;
-        transform: translateY(20px);
-        animation: fadeInOut 3s ease forwards;
-    }
+        .wrapperButton {
+            display: flex;
+            gap: 10px
+        }
 
-    .toast.success {
-        background-color: #4caf50;
-    }
+        .CloseCss {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px;
+        }
 
-    .toast.error {
-        background-color: #f44336;
-    }
+        #portal-root {
+            position: fixed;
+            top: 0;
+            left: 130px;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
 
-    @keyframes fadeInOut {
-        0%   { opacity: 0; transform: translateY(20px); }
-        10%  { opacity: 1; transform: translateY(0); }
-        90%  { opacity: 1; transform: translateY(0); }
-        100% { opacity: 0; transform: translateY(20px); }
-    }
+        .infoCss {
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
 
+        .status.active {
+            background-color: rgba(76, 201, 240, 0.15);
+            color: #0891b2;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+
+        .deleteUserCss {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 10px;
+        }
+
+        .titleDeleteUserCss {
+            margin: 10px;
+            font-size: 17px
+        }
+
+        #cancelDelete {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        #confirmDelete {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .wrapperFilterCss {
+            background-color: white;
+            max-width: 500px;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            padding-left: 10px;
+            padding-bottom: 10px;
+            padding-right: 10px;
+        }
+
+        #toast-portal {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9999;
+        }
+
+        .toast {
+            min-width: 250px;
+            padding: 12px 18px;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInOut 3s ease forwards;
+        }
+
+        .toast.success {
+            background-color: #4caf50;
+        }
+
+        .toast.error {
+            background-color: #f44336;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            10% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="main-content">
         <div id="pageTitle" class="page-title">
@@ -242,55 +282,31 @@
                 <div class="card-title">
                     <h3><i class="fa-solid fa-user"></i>Thông Tin Nhân Viên</h3>
                     <div class="wrapperFilter">
-                        <div class="search-box" >
+                        <div class="search-box">
                             <i class="ri-search-line"></i>
-                        <input id="searchPhone" type="text"placeholder="Tìm Kiếm Theo Số Điện Thoại">
+                            <input id="searchPhone" type="text" placeholder="Tìm Kiếm Theo Số Điện Thoại">
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="showFormFilter()">
+                            <i class="fa-solid fa-filter"></i>Bộ Lọc
+                        </button>
                     </div>
-                    <button class="btn btn-outline btn-sm" onclick="showFormFilter()">
-                        <i class="fa-solid fa-filter"></i>Bộ Lọc
-                    </button>
-                </div>
                 </div>
                 <table class="data-table">
                     <thead>
                         <tr>
-                        <th>STT</th>
-                        <th>Họ Và Tên</th>
-                        <th>Ngày Sinh</th>
-                        <th>Email</th>
-                        <th>Số Điện Thoại</th>
-                        <th>Địa Chỉ</th>
-                        <th>Giới Tính</th>
-                        <th>Vai Trò</th>
-                        <th>Ngày Tạo</th>
-                        <th>Chức Năng</th>
+                            <th>STT</th>
+                            <th>Họ Và Tên</th>
+                            <th>Ngày Sinh</th>
+                            <th>Email</th>
+                            <th>Số Điện Thoại</th>
+                            <th>Địa Chỉ</th>
+                            <th>Giới Tính</th>
+                            <th>Vai Trò</th>
+                            <th>Ngày Tạo</th>
+                            <th>Chức Năng</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>User001</td>
-                            <td>Lê Minh</td>
-                            <td>14/03/2004</td>
-                            <td>minhleminh@gmail.com</td>
-                            <td>0837002323</td>
-                            <td>Nam</td>
-                            <td>User</td>
-                            <td>14/03/2024</td>
-                            <td >
-                                <button class="btn btn-outline btn-sm" onclick="infoAccount()">
-                                <i class="fas fa-eye"></i> Xem
-                                </button>
-                                <button class="btn btn-outline btn-sm" onclick="showFormEditUser(this)">
-                                <i class="fa-solid fa-pen"></i> Sửa
-                                </button>
-                                <button class="btn btn-outline btn-sm" onclick="deleteUser()">
-                                <i class="fa-solid fa-user-xmark"></i> Xóa
-                                </button>
-                            </td>
-                            </td>
-                            </td>
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -298,20 +314,19 @@
     </div>
     <script src="../../JS/admin/userApi.js"></script>
     <script>
-        showAllUsers();
-        function showAllUsers() {
+        async function showAllUsers() {
             getAllUsers()
-            .then(result => {
-                let stt =1;
-                const users = result.data;
-                const tbody = document.querySelector(".data-table tbody");
-                tbody.innerHTML = ""; 
-                users.forEach(user => {
-                    if(user.roleName=='Customer'){
-                        return;
-                    }
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
+                .then(result => {
+                    let stt = 1;
+                    const users = result.data;
+                    const tbody = document.querySelector(".data-table tbody");
+                    tbody.innerHTML = "";
+                    users.forEach(user => {
+                        if (user.roleName == 'Customer') {
+                            return;
+                        }
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
                         <td>${stt}</td>
                         <td>${user.fullname}</td>
                         <td>${user.dateOfBirth == undefined ? '':user.dateOfBirth}</td>
@@ -334,19 +349,21 @@
                         </td>
                     `;
 
-                    tbody.appendChild(tr);
-                    stt=stt+1
+                        tbody.appendChild(tr);
+                        stt = stt + 1
+                    });
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy danh sách người dùng:', error.message);
                 });
-            })
-            .catch(error => {
-                console.error('Lỗi khi lấy danh sách người dùng:', error.message);
-            });
         }
 
-        function showFormAddUser(){
+        showAllUsers()
+
+        function showFormAddUser() {
             const portalRoot = document.createElement('div');
             portalRoot.id = 'portal-root';
-            portalRoot.innerHTML=`
+            portalRoot.innerHTML = `
                 <div class="formUserCss">
                     <div class="CloseCss" ><i class="fa-solid fa-xmark" onclick="closeFormAddUser()" style="cursor: pointer;"></i></div>
                     <div class="wrapperCss">
@@ -407,9 +424,9 @@
                 getAllRoles()
                     .then(result => {
                         const roles = result.data;
-                        
+
                         roles.forEach(role => {
-                            if(role.name=='Customer'){
+                            if (role.name == 'Customer') {
                                 return;
                             }
                             const option = document.createElement('option');
@@ -425,14 +442,15 @@
                 console.error('Lỗi xảy ra:', error);
             }
         }
-        function closeFormAddUser(){
+
+        function closeFormAddUser() {
             const portalRoot = document.getElementById('portal-root');
             if (portalRoot) {
                 portalRoot.remove();
             }
         }
 
-        function addUser(){
+        function addUser() {
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
             const address = document.getElementById('address').value.trim();
@@ -448,7 +466,7 @@
             const role = document.getElementById('role').value;
 
 
-            if (!name || !email || !phone || !birthday || !genderValue || !role||!address) {
+            if (!name || !email || !phone || !birthday || !genderValue || !role || !address) {
                 alert('Vui lòng điền đầy đủ thông tin.');
                 return;
             }
@@ -462,22 +480,22 @@
                 alert('Số điện thoại phải gồm 10 chữ số.');
                 return;
             }
-            createDefaultAccount(name,birthday, address,email,phone, genderValue, role)
-            .then(response => {
-                if (response.status === 200) {
-                    showToast('Thêm người dùng thành công!', 'success');
-                    closeFormAddUser();
-                    showAllUsers();
-                } 
-                else {
-                    showToast(response.data, 'error');
-                }
-            })
-            .catch(error => {
-                showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
-            });
+            createDefaultAccount(name, birthday, address, email, phone, genderValue, role)
+                .then(response => {
+                    if (response.status === 200) {
+                        showToast('Thêm người dùng thành công!', 'success');
+                        closeFormAddUser();
+                        showAllUsers();
+                    } else {
+                        showToast(response.data, 'error');
+                    }
+                })
+                .catch(error => {
+                    showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+                });
 
         }
+
         function validateEmail(email) {
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);
@@ -581,8 +599,9 @@
                 const [day, month, year] = parts;
                 return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
             }
-            return ''; 
+            return '';
         }
+
         function editUser(id) {
             const name = document.getElementById('name').value.trim();
             const address = document.getElementById('address').value.trim();
@@ -609,51 +628,54 @@
 
             const gender = genderEl.value;
 
-            updateUser(id, name,address, phone, genderValue, role)
-            .then(response => {
-                if (response.status === 200) {
-                    showToast('Cập nhật người dùng thành công!', 'success');
-                    closeFormAddUser();
-                    showAllUsers();
-                } else {
-                    showToast(response.data, 'error');
-                }
-            })
-            .catch(error => {
-                showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
-            });
+            updateUser(id, name, address, phone, genderValue, role)
+                .then(response => {
+                    if (response.status === 200) {
+                        showToast('Cập nhật người dùng thành công!', 'success');
+                        closeFormAddUser();
+                        showAllUsers();
+                    } else {
+                        showToast(response.data, 'error');
+                    }
+                })
+                .catch(error => {
+                    showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+                });
 
 
         }
 
-        function exportFile(){
+        function exportFile() {
             exportFileUser()
             showToast('export thành công!', 'success');
         }
-        function uploadFile(){
+
+        function uploadFile() {
             document.getElementById('fileInput').click()
         }
+
         function handleFileChange(event) {
             const file = event.target.files[0];
             if (!file) return;
             uploadFileUser(file)
-            .then(response => {
-                if (response.status === 200) {
-                    showToast('import thành công!', 'success');
-                } else {
-                    showToast('Email Đã Tồn Tại Không Được Thêm Vào \n'+response.data, 'error');
-                }
-            })
-            .catch(error => {
-                showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
-            });
+                .then(response => {
+                    if (response.status === 200) {
+                        showToast('import thành công!', 'success');
+                    } else {
+                        showToast('Email Đã Tồn Tại Không Được Thêm Vào \n' + response.data, 'error');
+                    }
+                })
+                .catch(error => {
+                    showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
+                });
         }
-        function infoAccount(id){
+
+        function infoAccount(id) {
             getAccountByUserId(id).then(result => {
-                const user = result.data;
-                const portalRoot = document.createElement('div');
-                portalRoot.id = 'portal-root';
-                portalRoot.innerHTML=`
+                    const user = result.data;
+                    const portalRoot = document.createElement('div');
+                    portalRoot.id = 'portal-root';
+                    portalRoot.innerHTML = `
                     <div class="formUserCss">
                         <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i></div>
                         <div class="wrapperCss">
@@ -664,17 +686,18 @@
                         </div>
                     </div>
                 `;
-                document.body.appendChild(portalRoot);
-            })
-            .catch(error => {
-                console.error('Lỗi khi lấy danh sách người dùng:', error.message);
-            });
+                    document.body.appendChild(portalRoot);
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy danh sách người dùng:', error.message);
+                });
 
         }
-        function deleteUser(id){
+
+        function deleteUser(id) {
             const portalRoot = document.createElement('div');
             portalRoot.id = 'portal-root';
-            portalRoot.innerHTML=`
+            portalRoot.innerHTML = `
                 <div class="formUserCss">
                     <div class="titleDeleteUserCss">Bạn có chắc chắn muốn xóa không?</div>
                     <div class="deleteUserCss">
@@ -686,29 +709,30 @@
             document.body.appendChild(portalRoot);
 
 
-            document.getElementById('confirmDelete').addEventListener('click', function () {
+            document.getElementById('confirmDelete').addEventListener('click', function() {
                 deleteUserApi(id)
-                .then(response => {
-                    if (response.status === 200) {
-                        showToast('Xóa người dùng thành công!', 'success');
+                    .then(response => {
+                        if (response.status === 200) {
+                            showToast('Xóa người dùng thành công!', 'success');
+                            closeFormAddUser();
+                            showAllUsers();
+                        } else {
+                            showToast(response.data, 'error');
+                            closeFormAddUser();
+                        }
+                    })
+                    .catch(error => {
+                        showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
                         closeFormAddUser();
-                        showAllUsers();
-                    } else {
-                        showToast(response.data, 'error');
-                        closeFormAddUser();
-                    }
-                })
-                .catch(error => {
-                    showToast('Có lỗi xảy ra khi cập nhật người dùng.', 'error');
-                    closeFormAddUser();
-                });
+                    });
                 showAllUsers();
             });
 
-            document.getElementById('cancelDelete').addEventListener('click', function () {
+            document.getElementById('cancelDelete').addEventListener('click', function() {
                 closeFormAddUser();
             });
         }
+
         function showToast(text, type = 'success') {
             let portalRoot = document.getElementById('toast-portal');
 
@@ -732,11 +756,11 @@
             }, 3000);
         }
 
-        
-        function showFormFilter(){
+
+        function showFormFilter() {
             const portalRoot = document.createElement('div');
             portalRoot.id = 'portal-root';
-            portalRoot.innerHTML=`
+            portalRoot.innerHTML = `
                 <div class="wrapperFilterCss">
                     <div class="CloseCss">
                         <i class="fa-solid fa-xmark" onclick="closeFormAddUser()"></i>
@@ -757,6 +781,7 @@
             `;
             document.body.appendChild(portalRoot);
         }
+
         function applySearchFilter() {
             const keyword = document.getElementById('search').value;
 
@@ -771,12 +796,12 @@
             }
 
             searchUsers(keyword, fields).then(result => {
-                const users = result.data;
-                const tbody = document.querySelector(".data-table tbody");
-                tbody.innerHTML = ""; 
-                users.forEach(user => {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
+                    const users = result.data;
+                    const tbody = document.querySelector(".data-table tbody");
+                    tbody.innerHTML = "";
+                    users.forEach(user => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
                         <td>${user.id}</td>
                         <td>${user.fullname}</td>
                         <td>${user.dateOfBirth}</td>
@@ -799,12 +824,12 @@
                         </td>
                     `;
 
-                    tbody.appendChild(tr);
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy danh sách người dùng:', error.message);
                 });
-            })
-            .catch(error => {
-                console.error('Lỗi khi lấy danh sách người dùng:', error.message);
-            });
 
             closeFormAddUser();
         }
@@ -821,12 +846,12 @@
                 }
 
                 searchUsers(keyword, fields).then(result => {
-                    const users = result.data;
-                    const tbody = document.querySelector(".data-table tbody");
-                    tbody.innerHTML = ""; 
-                    users.forEach(user => {
-                        const tr = document.createElement("tr");
-                        tr.innerHTML = `
+                        const users = result.data;
+                        const tbody = document.querySelector(".data-table tbody");
+                        tbody.innerHTML = "";
+                        users.forEach(user => {
+                            const tr = document.createElement("tr");
+                            tr.innerHTML = `
                             <td>${user.id}</td>
                             <td>${user.fullname}</td>
                             <td>${user.dateOfBirth}</td>
@@ -849,18 +874,17 @@
                             </td>
                         `;
 
-                        tbody.appendChild(tr);
+                            tbody.appendChild(tr);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi lấy danh sách người dùng:', error.message);
                     });
-                })
-                .catch(error => {
-                    console.error('Lỗi khi lấy danh sách người dùng:', error.message);
-                });
 
                 closeFormAddUser();
             }
         });
-
     </script>
 </body>
-</html>
 
+</html>

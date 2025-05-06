@@ -2,10 +2,12 @@
 session_start();
 ?>
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <!--=============== CSS ===============-->
     <link rel="stylesheet" href="./css/header.css">
 </head>
@@ -17,10 +19,12 @@ session_start();
                 <a href="#" class="nav__logo">
                     <i class="ri-store-2-fill"></i> Cửa hàng Sportwear
                 </a>
+
             </div>
 
             <!--=============== MENU ĐIỀU HƯỚNG ===============-->
             <div class="nav__menu" id="nav-menu">
+
                 <ul class="nav__list">
                     <li><a href="#" class="nav__link">Trang chủ</a></li>
 
@@ -160,6 +164,7 @@ session_start();
 
                     <li><a href="#" class="nav__link">Liên hệ</a></li>
                 </ul>
+
             </div>
             
             <div class="nav__tools">
@@ -185,6 +190,7 @@ session_start();
         <?php if(isset($_SESSION['user'])): ?>
             <!-- Người dùng đã đăng nhập -->
             <div class="user-menu">
+
                 <div class="user-info">
                     <i class="ri-user-circle-line"></i>
                     <span><?php echo htmlspecialchars($_SESSION['user']['username']); ?></span>
@@ -203,6 +209,7 @@ session_start();
                         <a href="#" onclick="handleLogout(event)"><i class="ri-logout-box-line"></i> Đăng xuất</a>
                     </li>
                 </ul>
+
             </div>
         <?php else: ?>
             <!-- Người dùng chưa đăng nhập -->

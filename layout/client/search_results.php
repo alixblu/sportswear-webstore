@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 // Kết nối cơ sở dữ liệu
 try {

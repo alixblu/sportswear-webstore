@@ -14,6 +14,7 @@ require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
  */
 class ProductRepository
 {
+    private $conn;
 
     public function __construct()
     {
@@ -70,6 +71,59 @@ class ProductRepository
         } catch (Exception $e) {
             error_log("Error in getAllProducts: " . $e->getMessage());
             throw new Exception("Failed to get products");
+        }
+    }
+
+    /**
+     *  Get products with options
+     * @return array List of products
+     * @param $category : category of product
+     * @param $brand : brand of product
+     * @param $status : status of product
+     * @param $min_price : min price of product
+     * @param $max_price : max price of product
+     */
+    public function getFilteredProducts($category, $brand, $status, $min_price, $max_price)
+    {
+        try {
+            $query = "
+                SELECT * FROM product AS p
+                JOIN productvariant as pv
+                WHERE 1=1
+            ";
+            $params = [];
+            if ($category) {
+                $query .= "AND p.categoryID=?";
+                $params[] = $category;
+            }
+            if ($brand) {
+                $query .= "AND p.brandID=?";
+                $params[] = $brand;
+            }
+            if ($status) {
+                $query .= "AND status=?";
+                $params[] = $status;
+            }
+            if ($min_price) {
+                $query .= "pv.price>=?";
+                $params[] = $min_price;
+            }
+
+            if ($max_price) {
+                $query .= "pv.price<=?";
+                $params[] = $max_price;
+            }
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute($params);
+            $result = $stmt->get_result();
+
+            $products = [];
+            while ($row = $result->fetch_assoc())
+                $products[] = $row;
+            return $products;
+        } catch (Exception $e) {
+            throw new Exception('');
         }
     }
 
@@ -226,7 +280,8 @@ class ProductRepository
      * @return array List of categories
      * @throws Exception If database error occurs
      */
-    public function getAllCategories() {
+    public function getAllCategories()
+    {
         try {
             $query = "SELECT * FROM category ORDER BY name";
             $stmt = $this->conn->prepare($query);
@@ -245,7 +300,8 @@ class ProductRepository
         }
     }
 
-    public function getCategoryByName($name) {
+    public function getCategoryByName($name)
+    {
         try {
             $query = "SELECT * FROM category WHERE name = ?";
             $stmt = $this->conn->prepare($query);
@@ -259,13 +315,14 @@ class ProductRepository
             throw new Exception("Failed to get category by name");
         }
     }
-    
+
     /**
      * Get all brands
      * @return array List of brands
      * @throws Exception If database error occurs
      */
-    public function getAllBrands() {
+    public function getAllBrands()
+    {
         try {
             $query = "SELECT * FROM brand ORDER BY name";
             $stmt = $this->conn->prepare($query);
@@ -284,4 +341,52 @@ class ProductRepository
         }
     }
 
+    /**
+     * Delete product by ID
+     * @param int $id : productID
+     * @return bool statement of success
+     * @throws Exception If any errors occurs
+     */
+    public function deleteProduct($id)
+    {
+        try {
+            // Delete all variants first
+            $query1 = "DELETE FROM productvariant WHERE productID=?";
+            $stmt1 = $this->conn->prepare($query1);
+            $stmt1->bind_param("i", $id);
+            $stmt1->execute();
+
+            // Then delete product 
+            $query2 = "DELETE FROM product WHERE id=?";
+            $stmt2 = $this->conn->prepare($query2);
+            $stmt2->bind_param("i", $id);
+            $stmt2->execute();
+
+            return $stmt2->affected_rows > 0;
+        } catch (Exception $error) {
+            error_log("ProductRepository - An error occurs - Delete product" . $error->getMessage());
+            throw new Exception("ProductRepository - Failed to delete product");
+        }
+    }
+
+    /**
+     * Delete productVariant by ID
+     * @param int $id : productVariantID
+     * @return bool statement of success
+     * @throws Exception If any errors occurs
+     */
+    public function deleteProductVariant($id)
+    {
+        try {
+            $query = "DELETE FROM productVariant WHERE id=?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+
+            return $stmt->affected_rows > 0;
+        } catch (Exception $error) {
+            error_log("ProductRepository - An error occurs - Delete productVariant" . $error->getMessage());
+            throw new Exception("ProductRepository - Failed to delete product variant");
+        }
+    }
 }

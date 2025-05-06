@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 04, 2025 at 06:14 PM
+-- Generation Time: May 06, 2025 at 04:27 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `sportswear`
 --
+CREATE DATABASE IF NOT EXISTS `sportswear` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `sportswear`;
 
 -- --------------------------------------------------------
 
@@ -27,9 +29,10 @@ SET time_zone = "+00:00";
 -- Table structure for table `access`
 --
 
-CREATE TABLE `access` (
+CREATE TABLE IF NOT EXISTS `access` (
   `roleid` int(11) NOT NULL,
-  `moduleid` int(11) NOT NULL
+  `moduleid` int(11) NOT NULL,
+  PRIMARY KEY (`roleid`,`moduleid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -70,12 +73,15 @@ INSERT INTO `access` (`roleid`, `moduleid`) VALUES
 -- Table structure for table `bankaccount`
 --
 
-CREATE TABLE `bankaccount` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `bankaccount` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `userAccID` int(10) NOT NULL,
   `paymentMethodID` int(10) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `content` varchar(255) NOT NULL
+  `content` varchar(255) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_PaymentMethod_Bank` (`paymentMethodID`),
+  KEY `FK_UserAcc_Bank` (`userAccID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -84,13 +90,14 @@ CREATE TABLE `bankaccount` (
 -- Table structure for table `billingdetail`
 --
 
-CREATE TABLE `billingdetail` (
+CREATE TABLE IF NOT EXISTS `billingdetail` (
   `ID` int(10) NOT NULL,
   `orderID` int(10) NOT NULL,
   `receiverName` varchar(50) NOT NULL,
   `address` text NOT NULL,
   `phone` varchar(10) NOT NULL,
-  `email` text DEFAULT NULL
+  `email` text DEFAULT NULL,
+  PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -131,11 +138,12 @@ INSERT INTO `billingdetail` (`ID`, `orderID`, `receiverName`, `address`, `phone`
 -- Table structure for table `brand`
 --
 
-CREATE TABLE `brand` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `brand` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
-  `status` enum('visible','hidden') NOT NULL DEFAULT 'visible'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('visible','hidden') NOT NULL DEFAULT 'visible',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `brand`
@@ -164,11 +172,13 @@ INSERT INTO `brand` (`ID`, `name`, `status`) VALUES
 -- Table structure for table `cart`
 --
 
-CREATE TABLE `cart` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `cart` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `userAccID` int(10) NOT NULL,
-  `totalPrice` double NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `totalPrice` double NOT NULL DEFAULT 0,
+  PRIMARY KEY (`ID`),
+  KEY `FK_UserAcc_Cart` (`userAccID`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `cart`
@@ -195,11 +205,14 @@ INSERT INTO `cart` (`ID`, `userAccID`, `totalPrice`) VALUES
 -- Table structure for table `cartdetail`
 --
 
-CREATE TABLE `cartdetail` (
-  `ID` int(5) NOT NULL,
+CREATE TABLE IF NOT EXISTS `cartdetail` (
+  `ID` int(5) NOT NULL AUTO_INCREMENT,
   `productID` int(5) NOT NULL,
   `quantity` smallint(6) DEFAULT NULL,
-  `cartID` int(11) NOT NULL
+  `cartID` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_Cart_CartDetail` (`cartID`),
+  KEY `FK_ProVariant_CartDetail` (`productID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -208,12 +221,14 @@ CREATE TABLE `cartdetail` (
 -- Table structure for table `category`
 --
 
-CREATE TABLE `category` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `category` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `parent` int(10) DEFAULT NULL,
-  `status` enum('visible','hidden') NOT NULL DEFAULT 'visible'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('visible','hidden') NOT NULL DEFAULT 'visible',
+  PRIMARY KEY (`ID`),
+  KEY `FK_Parent` (`parent`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `category`
@@ -243,11 +258,12 @@ INSERT INTO `category` (`ID`, `name`, `parent`, `status`) VALUES
 -- Table structure for table `comment`
 --
 
-CREATE TABLE `comment` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `comment` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `content` varchar(255) NOT NULL,
-  `createdAt` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `comment`
@@ -266,13 +282,14 @@ INSERT INTO `comment` (`ID`, `content`, `createdAt`) VALUES
 -- Table structure for table `coupon`
 --
 
-CREATE TABLE `coupon` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `coupon` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `percent` int(2) NOT NULL,
   `duration` int(2) NOT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'active'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `coupon`
@@ -293,12 +310,13 @@ INSERT INTO `coupon` (`ID`, `name`, `percent`, `duration`, `status`) VALUES
 -- Table structure for table `discount`
 --
 
-CREATE TABLE `discount` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `discount` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `discountRate` int(11) NOT NULL,
-  `status` enum('active','inactive') NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive') NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `discount`
@@ -320,13 +338,15 @@ INSERT INTO `discount` (`ID`, `name`, `discountRate`, `status`) VALUES
 -- Table structure for table `lot`
 --
 
-CREATE TABLE `lot` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `lot` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `purchaseOrderID` int(10) NOT NULL,
   `quantity` smallint(6) DEFAULT NULL,
   `totalPrice` decimal(10,0) NOT NULL DEFAULT 0,
-  `status` enum('pending','approved','defective') NOT NULL DEFAULT 'pending'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('pending','approved','defective') NOT NULL DEFAULT 'pending',
+  PRIMARY KEY (`ID`),
+  KEY `FK_PurOrder_Lot` (`purchaseOrderID`)
+) ENGINE=InnoDB AUTO_INCREMENT=451 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `lot`
@@ -787,18 +807,55 @@ INSERT INTO `lot` (`ID`, `purchaseOrderID`, `quantity`, `totalPrice`, `status`) 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `modules`
+--
+
+CREATE TABLE IF NOT EXISTS `modules` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `icon` varchar(255) DEFAULT NULL,
+  `type` varchar(50) DEFAULT NULL,
+  `page` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `modules`
+--
+
+INSERT INTO `modules` (`id`, `name`, `icon`, `type`, `page`) VALUES
+(1, 'Dashboard', 'fas fa-tachometer-alt', 'main', 'dashboard'),
+(2, 'Employees', 'fas fa-users', 'admin', 'user'),
+(3, 'Products', 'fas fa-box', 'admin', 'product'),
+(4, 'Warehouse', 'fas fa-warehouse', 'admin', 'warehouse'),
+(5, 'Orders', 'fas fa-file-invoice', 'admin', 'orders'),
+(6, 'Coupon & Discount', 'fas fa-tags', 'admin', 'coupon'),
+(7, 'Warranty', 'fas fa-shield-alt', 'admin', 'warranty'),
+(8, 'Account & Access', 'fas fa-user-lock', 'admin', 'account'),
+(9, 'Analytics', 'fas fa-chart-line', 'report', 'analytics'),
+(10, 'Sales', 'fas fa-dollar-sign', 'report', 'sales'),
+(11, 'Notifications', 'fas fa-bell', 'admin', 'notifications'),
+(12, 'Settings', 'fas fa-cog', 'admin', 'settings');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `order`
 --
 
-CREATE TABLE `order` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `order` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `customer` int(5) NOT NULL,
   `approver` int(5) NOT NULL,
   `couponID` int(5) NOT NULL,
   `totalPrice` double NOT NULL DEFAULT 0,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('pending','approved','canceled','delivered') NOT NULL DEFAULT 'pending'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('pending','approved','canceled','delivered') NOT NULL DEFAULT 'pending',
+  PRIMARY KEY (`ID`),
+  KEY `FK_approver_Order` (`approver`),
+  KEY `FK_Coupon_Order` (`couponID`),
+  KEY `FK_customer_Order` (`customer`)
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `order`
@@ -838,13 +895,16 @@ INSERT INTO `order` (`ID`, `customer`, `approver`, `couponID`, `totalPrice`, `cr
 -- Table structure for table `orderdetail`
 --
 
-CREATE TABLE `orderdetail` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `orderdetail` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `orderID` int(10) NOT NULL,
   `productID` int(10) NOT NULL,
   `quantity` smallint(6) DEFAULT NULL,
-  `totalPrice` decimal(10,0) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `totalPrice` decimal(10,0) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`ID`),
+  KEY `FK_Order_Orderdetail` (`orderID`),
+  KEY `FK_Product_Orderdetail` (`productID`)
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `orderdetail`
@@ -884,14 +944,18 @@ INSERT INTO `orderdetail` (`ID`, `orderID`, `productID`, `quantity`, `totalPrice
 -- Table structure for table `payment`
 --
 
-CREATE TABLE `payment` (
-  `ID` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `payment` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
   `paymentMethodID` int(11) NOT NULL,
   `orderID` int(11) NOT NULL,
   `bankAccountID` int(11) DEFAULT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('pending','completed','failed') NOT NULL DEFAULT 'pending'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('pending','completed','failed') NOT NULL DEFAULT 'pending',
+  PRIMARY KEY (`ID`),
+  KEY `FK_Order_Payment` (`orderID`),
+  KEY `FK_PaymentMethod_Payment` (`paymentMethodID`),
+  KEY `FK_Bank_Payment` (`bankAccountID`)
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `payment`
@@ -931,12 +995,14 @@ INSERT INTO `payment` (`ID`, `paymentMethodID`, `orderID`, `bankAccountID`, `cre
 -- Table structure for table `paymentmethod`
 --
 
-CREATE TABLE `paymentmethod` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `paymentmethod` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `description` varchar(50) DEFAULT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'active'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `name` (`name`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `paymentmethod`
@@ -953,8 +1019,8 @@ INSERT INTO `paymentmethod` (`ID`, `name`, `description`, `status`) VALUES
 -- Table structure for table `product`
 --
 
-CREATE TABLE `product` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `product` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `categoryID` int(11) NOT NULL,
   `discountID` int(11) DEFAULT NULL,
   `brandID` int(11) NOT NULL,
@@ -964,8 +1030,12 @@ CREATE TABLE `product` (
   `image` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL,
   `stock` smallint(6) DEFAULT NULL,
-  `status` enum('in_stock','out_of_stock') NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('in_stock','out_of_stock','discontinued') NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_Category_Product` (`categoryID`),
+  KEY `FK_Discount_Product` (`discountID`),
+  KEY `FK_Brand_Product` (`brandID`)
+) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `product`
@@ -991,7 +1061,7 @@ INSERT INTO `product` (`ID`, `categoryID`, `discountID`, `brandID`, `name`, `mar
 (17, 6, 1, 1, 'Nike Dri-FIT Stride Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với công nghệ Dri-FIT giúp thoát mồ hôi nhanh chóng, giữ cơ thể khô ráo và thoải mái.', 160, 'in_stock'),
 (18, 6, NULL, 2, 'Adidas Own The Run Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với chất liệu nhẹ và thoáng khí, phù hợp cho các buổi tập luyện cường độ cao.', 160, 'in_stock'),
 (19, 6, 2, 3, 'Puma Running Core Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với thiết kế năng động, chất liệu co giãn tốt, mang lại sự thoải mái khi vận động.', 160, 'in_stock'),
-(20, 6, NULL, 4, 'Under Armour Launch 7" Shorts', 10, NULL, 'null', 'Quần short thể thao nam với chiều dài 7 inch, chất liệu thoáng khí và khô nhanh, phù hợp cho mọi hoạt động.', 160, 'in_stock'),
+(20, 6, NULL, 4, 'Under Armour Launch 7\" Shorts', 10, NULL, 'null', 'Quần short thể thao nam với chiều dài 7 inch, chất liệu thoáng khí và khô nhanh, phù hợp cho mọi hoạt động.', 160, 'in_stock'),
 (21, 6, 3, 5, 'Reebok Running Essentials Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với thiết kế đơn giản, chất liệu nhẹ và thoáng khí, mang lại sự thoải mái tối đa.', 160, 'in_stock'),
 (22, 6, NULL, 6, 'Vans Range Relaxed Elastic Shorts', 10, NULL, 'null', 'Quần short nam với thiết kế thoải mái, chất liệu bền bỉ và phong cách đường phố đặc trưng của Vans.', 160, 'in_stock'),
 (23, 6, 4, 7, 'New Balance Accelerate 5 Inch Shorts', 10, NULL, 'null', 'Quần short chạy bộ nam với thiết kế 5 inch, chất liệu thoáng khí và khô nhanh, hỗ trợ tối đa khi luyện tập.', 160, 'in_stock'),
@@ -1062,12 +1132,15 @@ INSERT INTO `product` (`ID`, `categoryID`, `discountID`, `brandID`, `name`, `mar
 -- Table structure for table `productdetail`
 --
 
-CREATE TABLE `productdetail` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `productdetail` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `serialNumber` int(10) UNSIGNED ZEROFILL NOT NULL,
   `productVariantID` int(10) NOT NULL,
-  `status` enum('not_sold','sold','returned','exchanged') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('not_sold','sold','returned','exchanged') DEFAULT NULL,
+  PRIMARY KEY (`ID`) USING BTREE,
+  UNIQUE KEY `serialNumber` (`serialNumber`),
+  KEY `FK_ProVariant_ProDetail` (`productVariantID`)
+) ENGINE=InnoDB AUTO_INCREMENT=9001 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `productdetail`
@@ -10087,8 +10160,8 @@ INSERT INTO `productdetail` (`ID`, `serialNumber`, `productVariantID`, `status`)
 -- Table structure for table `productvariant`
 --
 
-CREATE TABLE `productvariant` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `productvariant` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `Code` int(4) UNSIGNED ZEROFILL NOT NULL,
   `productID` int(11) NOT NULL,
   `lotID` int(11) NOT NULL,
@@ -10098,8 +10171,12 @@ CREATE TABLE `productvariant` (
   `size` varchar(2) DEFAULT NULL,
   `weight` varchar(3) DEFAULT NULL,
   `price` decimal(10,0) NOT NULL DEFAULT 0,
-  `status` enum('in_stock','out_of_stock') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('in_stock','out_of_stock') DEFAULT NULL,
+  PRIMARY KEY (`ID`) USING BTREE,
+  UNIQUE KEY `Code` (`Code`),
+  KEY `FK_Product_ProVariant` (`productID`),
+  KEY `FK_Lot_Provariant` (`lotID`)
+) ENGINE=InnoDB AUTO_INCREMENT=451 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `productvariant`
@@ -10563,14 +10640,17 @@ INSERT INTO `productvariant` (`ID`, `Code`, `productID`, `lotID`, `fullName`, `q
 -- Table structure for table `purchaseorder`
 --
 
-CREATE TABLE `purchaseorder` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `purchaseorder` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `userAccID` int(10) NOT NULL,
   `suppilerID` int(10) NOT NULL,
   `totalPrice` decimal(10,0) NOT NULL DEFAULT 0,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('pending','approved','rejected','') NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('pending','approved','rejected','') NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_approver_PurOrder` (`userAccID`),
+  KEY `FK_Supplier_PurOrder` (`suppilerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `purchaseorder`
@@ -10600,15 +10680,19 @@ INSERT INTO `purchaseorder` (`ID`, `userAccID`, `suppilerID`, `totalPrice`, `cre
 -- Table structure for table `review`
 --
 
-CREATE TABLE `review` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `review` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `userAccID` int(10) NOT NULL,
   `commentID` int(10) DEFAULT NULL COMMENT 'a review could have a comment or not\r\n',
   `productID` int(10) NOT NULL,
   `rating` int(1) NOT NULL DEFAULT 5 COMMENT 'rate 1-5 star\r\n',
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('active','inactive','discontinued') DEFAULT 'active'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive','discontinued') DEFAULT 'active',
+  PRIMARY KEY (`ID`),
+  KEY `FK_UserAcc_Review` (`userAccID`),
+  KEY `FK_Comment_Review` (`commentID`),
+  KEY `FK_ProVariant_Review` (`productID`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `review`
@@ -10629,11 +10713,13 @@ INSERT INTO `review` (`ID`, `userAccID`, `commentID`, `productID`, `rating`, `cr
 -- Table structure for table `role`
 --
 
-CREATE TABLE `role` (
-  `ID` tinyint(2) UNSIGNED ZEROFILL NOT NULL,
+CREATE TABLE IF NOT EXISTS `role` (
+  `ID` tinyint(2) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT,
   `name` varchar(200) NOT NULL,
-  `statusRole` enum('locked','deletable') NOT NULL DEFAULT 'deletable'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `statusRole` enum('locked','deletable') NOT NULL DEFAULT 'deletable',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `role`
@@ -10652,13 +10738,15 @@ INSERT INTO `role` (`ID`, `name`, `statusRole`) VALUES
 -- Table structure for table `shipment`
 --
 
-CREATE TABLE `shipment` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `shipment` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `phone` varchar(11) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'active'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `shipment`
@@ -10676,13 +10764,15 @@ INSERT INTO `shipment` (`ID`, `name`, `phone`, `email`, `status`) VALUES
 -- Table structure for table `shipmentmethod`
 --
 
-CREATE TABLE `shipmentmethod` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `shipmentmethod` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `cost` decimal(10,0) NOT NULL,
   `estimatedTime` varchar(20) NOT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'active'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `shipmentmethod`
@@ -10700,13 +10790,18 @@ INSERT INTO `shipmentmethod` (`ID`, `name`, `cost`, `estimatedTime`, `status`) V
 -- Table structure for table `shipmenttracking`
 --
 
-CREATE TABLE `shipmenttracking` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `shipmenttracking` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `code` varchar(10) NOT NULL,
   `billID` int(10) NOT NULL,
   `shipmentID` int(10) NOT NULL,
   `shipmentMethodID` int(10) NOT NULL,
-  `status` enum('pending','in_trasit','failed','delivered') NOT NULL DEFAULT 'pending'
+  `status` enum('pending','in_trasit','failed','delivered') NOT NULL DEFAULT 'pending',
+  PRIMARY KEY (`ID`) USING BTREE,
+  UNIQUE KEY `code` (`code`),
+  KEY `FK_Order_ShipTrack` (`billID`),
+  KEY `FK_Shipment_ShipTrack` (`shipmentID`),
+  KEY `FK_ShipMethod_ShipTrack` (`shipmentMethodID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -10715,16 +10810,18 @@ CREATE TABLE `shipmenttracking` (
 -- Table structure for table `supplier`
 --
 
-CREATE TABLE `supplier` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `supplier` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `fullname` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `phone` varchar(11) NOT NULL,
   `address` varchar(255) NOT NULL,
   `logo` varchar(255) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('active','terminated') NOT NULL DEFAULT 'active'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','terminated') NOT NULL DEFAULT 'active',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `email` (`email`,`phone`,`address`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `supplier`
@@ -10742,8 +10839,8 @@ INSERT INTO `supplier` (`ID`, `fullname`, `email`, `phone`, `address`, `logo`, `
 -- Table structure for table `user`
 --
 
-CREATE TABLE `user` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `user` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `fullname` varchar(150) NOT NULL,
   `dateOfBirth` date DEFAULT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
@@ -10751,8 +10848,11 @@ CREATE TABLE `user` (
   `address` varchar(255) DEFAULT NULL,
   `gender` tinyint(1) NOT NULL,
   `roleID` tinyint(2) UNSIGNED ZEROFILL NOT NULL,
-  `createdAt` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `contact` (`email`,`phone`) USING BTREE,
+  KEY `FK_Role_User` (`roleID`)
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
@@ -10768,7 +10868,7 @@ INSERT INTO `user` (`ID`, `fullname`, `dateOfBirth`, `email`, `phone`, `address`
 (7, 'Phạm Thị Lan', '2003-08-10', 'phamthilan@gmail.com', '0934678912', '75 Trường Chinh, Quận Tân Bình, Thành phố Hồ Chí Minh, Việt Nam', 1, 04, '2024-04-21 12:00:00'),
 (8, 'Lê Hoàng Anh', '2000-12-05', 'lehoanganh@gmail.com', '0945789123', '300 Nguyễn Oanh, Quận Gò Vấp, Thành phố Hồ Chí Minh, Việt Nam', 0, 04, '2024-04-22 12:00:00'),
 (9, 'Đặng Thị Huyền', '2004-04-30', 'dangthihuyen@gmail.com', '0956891234', '120 Nguyễn Đình Chiểu, Quận 1, Thành phố Hồ Chí Minh, Việt Nam', 1, 04, '2024-04-23 12:00:00'),
-(10, 'Nguyễn Thị Mai', '1998-07-20', 'nguyenthimai@gmail.com', '0912345678', '123 Hai Bà Trưng, Quận 3, Thành phố Hồ Chí Minh, Việt Nam', 1, 05, '2024-05-01 10:00:00'),
+(10, 'Nguyễn Thị Mai', '1998-07-20', 'nguyenthimai@gmail.com', '0912345678', '12 Hai Bà Trưng, Quận 3, Thành phố Hồ Chí Minh, Việt Nam', 0, 05, '2024-05-01 10:00:00'),
 (11, 'Phạm Quốc Bảo', '1996-12-15', 'phamquocbao@gmail.com', '0934567890', '789 Cách Mạng Tháng 8, Quận 10, Thành phố Hồ Chí Minh, Việt Nam', 0, 05, '2024-05-03 10:45:00'),
 (12, 'Đỗ Thị Lan', '1999-04-22', 'dothilan@gmail.com', '0968123456', '321 Trường Chinh, Quận Tân Bình, Thành phố Hồ Chí Minh, Việt Nam', 1, 05, '2024-05-05 11:00:00'),
 (13, 'Nguyễn Văn An', '2001-01-15', NULL, '0901000001', NULL, 0, 05, '2024-05-07 12:00:00'),
@@ -10801,14 +10901,17 @@ INSERT INTO `user` (`ID`, `fullname`, `dateOfBirth`, `email`, `phone`, `address`
 -- Table structure for table `useraccount`
 --
 
-CREATE TABLE `useraccount` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `useraccount` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `username` varchar(150) NOT NULL,
   `password` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `userID` int(10) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('active','inactive','banned','') NOT NULL DEFAULT 'active'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive','banned','') NOT NULL DEFAULT 'active',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `username` (`username`),
+  KEY `FK_User_Account` (`userID`)
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `useraccount`
@@ -10844,11 +10947,13 @@ INSERT INTO `useraccount` (`ID`, `username`, `password`, `userID`, `createdAt`, 
 -- Table structure for table `user_coupon`
 --
 
-CREATE TABLE `user_coupon` (
+CREATE TABLE IF NOT EXISTS `user_coupon` (
   `userID` int(11) NOT NULL,
   `couponID` int(11) NOT NULL,
   `assignedDate` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` enum('valid','used','expired') NOT NULL DEFAULT 'valid'
+  `status` enum('valid','used','expired') NOT NULL DEFAULT 'valid',
+  PRIMARY KEY (`userID`,`couponID`) USING BTREE,
+  KEY `FK_Coupon` (`couponID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -10898,14 +11003,17 @@ INSERT INTO `user_coupon` (`userID`, `couponID`, `assignedDate`, `status`) VALUE
 -- Table structure for table `warranty`
 --
 
-CREATE TABLE `warranty` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `warranty` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `warrantyPolicyID` int(11) NOT NULL,
   `orderDetailID` int(11) NOT NULL,
   `startDate` date NOT NULL DEFAULT current_timestamp(),
   `endDate` date NOT NULL,
-  `status` enum('active','expired','void') NOT NULL DEFAULT 'active'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','expired','void') NOT NULL DEFAULT 'active',
+  PRIMARY KEY (`ID`),
+  KEY `FK_WarrPolicy_Warranty` (`warrantyPolicyID`),
+  KEY `FK_OrderDetail_Warranty` (`orderDetailID`)
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `warranty`
@@ -10945,11 +11053,14 @@ INSERT INTO `warranty` (`ID`, `warrantyPolicyID`, `orderDetailID`, `startDate`, 
 -- Table structure for table `warrantydetail`
 --
 
-CREATE TABLE `warrantydetail` (
-  `ID` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `warrantydetail` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
   `warrantyID` int(11) NOT NULL,
-  `productDetailID` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `productDetailID` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_Warr_Detail` (`warrantyID`),
+  KEY `FK_ProDetail_WarrantyDetail` (`productDetailID`)
+) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `warrantydetail`
@@ -10998,12 +11109,13 @@ INSERT INTO `warrantydetail` (`ID`, `warrantyID`, `productDetailID`) VALUES
 -- Table structure for table `warrantypolicy`
 --
 
-CREATE TABLE `warrantypolicy` (
-  `ID` int(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `warrantypolicy` (
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `warrantyPeriod` int(11) NOT NULL,
   `description` varchar(120) DEFAULT NULL,
-  `status` enum('active','inactive') NOT NULL DEFAULT 'active'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `warrantypolicy`
@@ -11015,413 +11127,42 @@ INSERT INTO `warrantypolicy` (`ID`, `warrantyPeriod`, `description`, `status`) V
 (3, 12, 'Bảo hành tiêu chuẩn trong vòng 12 tháng.', 'active'),
 (4, 24, 'Bảo hành sản phẩm cao cấp trong vòng 24 tháng.', 'active');
 
---
--- Indexes for dumped tables
---
+-- --------------------------------------------------------
 
 --
--- Indexes for table `access`
---
-ALTER TABLE `access`
-  ADD PRIMARY KEY (`roleid`,`moduleid`);
-
---
--- Indexes for table `bankaccount`
---
-ALTER TABLE `bankaccount`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_PaymentMethod_Bank` (`paymentMethodID`),
-  ADD KEY `FK_UserAcc_Bank` (`userAccID`);
-
---
--- Indexes for table `billingdetail`
---
-ALTER TABLE `billingdetail`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `brand`
---
-ALTER TABLE `brand`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `cart`
---
-ALTER TABLE `cart`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_UserAcc_Cart` (`userAccID`);
-
---
--- Indexes for table `cartdetail`
---
-ALTER TABLE `cartdetail`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_Cart_CartDetail` (`cartID`),
-  ADD KEY `FK_ProVariant_CartDetail` (`productID`);
-
---
--- Indexes for table `category`
---
-ALTER TABLE `category`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_Parent` (`parent`);
-
---
--- Indexes for table `comment`
---
-ALTER TABLE `comment`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `coupon`
---
-ALTER TABLE `coupon`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `discount`
---
-ALTER TABLE `discount`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `lot`
---
-ALTER TABLE `lot`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_PurOrder_Lot` (`purchaseOrderID`);
-
---
--- Indexes for table `order`
---
-ALTER TABLE `order`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_approver_Order` (`approver`),
-  ADD KEY `FK_Coupon_Order` (`couponID`),
-  ADD KEY `FK_customer_Order` (`customer`);
-
---
--- Indexes for table `orderdetail`
---
-ALTER TABLE `orderdetail`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_Order_Orderdetail` (`orderID`),
-  ADD KEY `FK_Product_Orderdetail` (`productID`);
-
---
--- Indexes for table `payment`
---
-ALTER TABLE `payment`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_Order_Payment` (`orderID`),
-  ADD KEY `FK_PaymentMethod_Payment` (`paymentMethodID`),
-  ADD KEY `FK_Bank_Payment` (`bankAccountID`);
-
---
--- Indexes for table `paymentmethod`
---
-ALTER TABLE `paymentmethod`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `name` (`name`) USING BTREE;
-
---
--- Indexes for table `product`
---
-ALTER TABLE `product`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_Category_Product` (`categoryID`),
-  ADD KEY `FK_Discount_Product` (`discountID`),
-  ADD KEY `FK_Brand_Product` (`brandID`);
-
---
--- Indexes for table `productdetail`
---
-ALTER TABLE `productdetail`
-  ADD PRIMARY KEY (`ID`) USING BTREE,
-  ADD UNIQUE KEY `serialNumber` (`serialNumber`),
-  ADD KEY `FK_ProVariant_ProDetail` (`productVariantID`);
-
---
--- Indexes for table `productvariant`
---
-ALTER TABLE `productvariant`
-  ADD PRIMARY KEY (`ID`) USING BTREE,
-  ADD UNIQUE KEY `Code` (`Code`),
-  ADD KEY `FK_Product_ProVariant` (`productID`),
-  ADD KEY `FK_Lot_Provariant` (`lotID`);
-
---
--- Indexes for table `purchaseorder`
---
-ALTER TABLE `purchaseorder`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_approver_PurOrder` (`userAccID`),
-  ADD KEY `FK_Supplier_PurOrder` (`suppilerID`);
-
---
--- Indexes for table `review`
---
-ALTER TABLE `review`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_UserAcc_Review` (`userAccID`),
-  ADD KEY `FK_Comment_Review` (`commentID`),
-  ADD KEY `FK_ProVariant_Review` (`productID`);
-
---
--- Indexes for table `role`
---
-ALTER TABLE `role`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `name` (`name`);
-
---
--- Indexes for table `shipment`
---
-ALTER TABLE `shipment`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `name` (`name`);
-
---
--- Indexes for table `shipmentmethod`
---
-ALTER TABLE `shipmentmethod`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `name` (`name`);
-
---
--- Indexes for table `shipmenttracking`
---
-ALTER TABLE `shipmenttracking`
-  ADD PRIMARY KEY (`ID`) USING BTREE,
-  ADD UNIQUE KEY `code` (`code`),
-  ADD KEY `FK_Order_ShipTrack` (`billID`),
-  ADD KEY `FK_Shipment_ShipTrack` (`shipmentID`),
-  ADD KEY `FK_ShipMethod_ShipTrack` (`shipmentMethodID`);
-
---
--- Indexes for table `supplier`
---
-ALTER TABLE `supplier`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `email` (`email`,`phone`,`address`);
-
---
--- Indexes for table `user`
---
-ALTER TABLE `user`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `contact` (`email`,`phone`) USING BTREE,
-  ADD KEY `FK_Role_User` (`roleID`);
-
---
--- Indexes for table `useraccount`
---
-ALTER TABLE `useraccount`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD KEY `FK_User_Account` (`userID`);
-
---
--- Indexes for table `user_coupon`
---
-ALTER TABLE `user_coupon`
-  ADD PRIMARY KEY (`userID`,`couponID`) USING BTREE,
-  ADD KEY `FK_Coupon` (`couponID`);
-
---
--- Indexes for table `warranty`
---
-ALTER TABLE `warranty`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_WarrPolicy_Warranty` (`warrantyPolicyID`),
-  ADD KEY `FK_OrderDetail_Warranty` (`orderDetailID`);
-
---
--- Indexes for table `warrantydetail`
---
-ALTER TABLE `warrantydetail`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_Warr_Detail` (`warrantyID`),
-  ADD KEY `FK_ProDetail_WarrantyDetail` (`productDetailID`);
-
---
--- Indexes for table `warrantypolicy`
---
-ALTER TABLE `warrantypolicy`
-  ADD PRIMARY KEY (`ID`);
-
---
--- AUTO_INCREMENT for dumped tables
+-- Table structure for table `wishlist`
 --
 
---
--- AUTO_INCREMENT for table `bankaccount`
---
-ALTER TABLE `bankaccount`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT;
+CREATE TABLE IF NOT EXISTS `wishlist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `added_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `product_id` (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- AUTO_INCREMENT for table `brand`
+-- Dumping data for table `wishlist`
 --
-ALTER TABLE `brand`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
---
--- AUTO_INCREMENT for table `cart`
---
-ALTER TABLE `cart`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
---
--- AUTO_INCREMENT for table `cartdetail`
---
-ALTER TABLE `cartdetail`
-  MODIFY `ID` int(5) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `category`
---
-ALTER TABLE `category`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
-
---
--- AUTO_INCREMENT for table `comment`
---
-ALTER TABLE `comment`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `coupon`
---
-ALTER TABLE `coupon`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `discount`
---
-ALTER TABLE `discount`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT for table `lot`
---
-ALTER TABLE `lot`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=451;
-
---
--- AUTO_INCREMENT for table `order`
---
-ALTER TABLE `order`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
-
---
--- AUTO_INCREMENT for table `orderdetail`
---
-ALTER TABLE `orderdetail`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
-
---
--- AUTO_INCREMENT for table `payment`
---
-ALTER TABLE `payment`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
-
---
--- AUTO_INCREMENT for table `paymentmethod`
---
-ALTER TABLE `paymentmethod`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `product`
---
-ALTER TABLE `product`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
-
---
--- AUTO_INCREMENT for table `productdetail`
---
-ALTER TABLE `productdetail`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9001;
-
---
--- AUTO_INCREMENT for table `productvariant`
---
-ALTER TABLE `productvariant`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=451;
-
---
--- AUTO_INCREMENT for table `purchaseorder`
---
-ALTER TABLE `purchaseorder`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
-
---
--- AUTO_INCREMENT for table `review`
---
-ALTER TABLE `review`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT for table `role`
---
-ALTER TABLE `role`
-  MODIFY `ID` tinyint(2) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `shipment`
---
-ALTER TABLE `shipment`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `shipmentmethod`
---
-ALTER TABLE `shipmentmethod`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `shipmenttracking`
---
-ALTER TABLE `shipmenttracking`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `supplier`
---
-ALTER TABLE `supplier`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `user`
---
-ALTER TABLE `user`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
-
---
--- AUTO_INCREMENT for table `useraccount`
---
-ALTER TABLE `useraccount`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
-
---
--- AUTO_INCREMENT for table `warranty`
---
-ALTER TABLE `warranty`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
-
---
--- AUTO_INCREMENT for table `warrantydetail`
---
-ALTER TABLE `warrantydetail`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
-
---
--- AUTO_INCREMENT for table `warrantypolicy`
---
-ALTER TABLE `warrantypolicy`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+INSERT INTO `wishlist` (`id`, `user_id`, `product_id`, `added_at`) VALUES
+(1, 1, 3, '2025-05-06 02:05:06'),
+(2, 2, 5, '2025-05-06 02:05:06'),
+(3, 1, 7, '2025-05-06 02:05:06'),
+(4, 3, 2, '2025-05-06 02:05:06'),
+(5, 4, 8, '2025-05-06 02:05:06'),
+(6, 5, 1, '2025-05-06 02:05:06'),
+(7, 6, 6, '2025-05-06 02:05:06'),
+(8, 3, 9, '2025-05-06 02:05:06'),
+(9, 7, 4, '2025-05-06 02:05:06'),
+(10, 8, 10, '2025-05-06 02:05:06'),
+(11, 2, 11, '2025-05-06 02:05:06'),
+(12, 9, 12, '2025-05-06 02:05:06'),
+(13, 10, 3, '2025-05-06 02:05:06'),
+(14, 11, 7, '2025-05-06 02:05:06'),
+(15, 12, 5, '2025-05-06 02:05:06');
 
 --
 -- Constraints for dumped tables
@@ -11558,6 +11299,13 @@ ALTER TABLE `warranty`
 ALTER TABLE `warrantydetail`
   ADD CONSTRAINT `FK_ProDetail_WarrantyDetail` FOREIGN KEY (`productDetailID`) REFERENCES `productdetail` (`ID`),
   ADD CONSTRAINT `FK_Warr_Detail` FOREIGN KEY (`warrantyID`) REFERENCES `warranty` (`ID`);
+
+--
+-- Constraints for table `wishlist`
+--
+ALTER TABLE `wishlist`
+  ADD CONSTRAINT `wishlist_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`ID`),
+  ADD CONSTRAINT `wishlist_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `product` (`ID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

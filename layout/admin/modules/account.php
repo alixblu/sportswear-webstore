@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -358,20 +359,21 @@
             gap: 10px;
         }
 
-        .CloseCss {
-            display: flex;
-            justify-content: flex-end;
-            padding: 10px;
+        .genderCss input[type="radio"] {
+            margin-right: 8px;
         }
 
-        #portal-root {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .buttonUserCss {
             width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             z-index: 999;
@@ -470,10 +472,25 @@
         }
 
         @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(20px); }
-            10% { opacity: 1; transform: translateY(0); }
-            90% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(20px); }
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            10% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
         }
 
         @media (max-width: 768px) {
@@ -528,6 +545,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="main-content">
         <div id="pageTitle" class="page-title">
@@ -626,10 +644,11 @@
 
     <script src="../../JS/admin/account.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             showAll();
             switchTab('staff');
         });
     </script>
 </body>
+
 </html>
