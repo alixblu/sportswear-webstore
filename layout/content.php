@@ -177,70 +177,119 @@
                 </button>
             </div>
         </div>
-        
+
+        <div class="pagination" id="pagination"></div>
     </div>
     <script src="../../JS/admin/product/product.js"></script>
     <script>
 
-        //Product
-        const displayProducts = async () => {
-            try {
-                const products = await getAllProducts();
-console.log(products)
-                const productList = document.querySelector('.product-list');
-                productList.innerHTML = ''; 
+    //Product
+    let currentPage = 1;
+    const productsPerPage = 18;
+    let allProducts = [];
 
-                products.forEach(product => {
-                    const productCard = document.createElement('div');
-                    productCard.classList.add('product-card');
+    const renderPagination = (totalPages) => {
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
 
-                    const productImage = document.createElement('div');
-                    productImage.classList.add('product-image');
-                    const img = document.createElement('img');
-                    img.src = `/img/products/${product.ID}.jpg`;
-                    img.alt = product.name;
-                    img.onerror = function () { this.src = '/img/products/default.jpg'; };
-                    productImage.appendChild(img);
+        for (let i = 1; i <= totalPages; i++) {
+            const pageLink = document.createElement('a');
+            pageLink.className = 'page-link';
+            pageLink.textContent = i;
+            pageLink.href = '#';
 
-                    const productName = document.createElement('div');
-                    productName.classList.add('product-name');
-                    productName.textContent = product.name || 'Tên sản phẩm';
+            pageLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentPage = i;
+                renderProducts();
+                renderPagination(totalPages); 
+            });
 
-                    const productPrice = document.createElement('div');
-                    productPrice.classList.add('product-price');
-                    const currentPrice = document.createElement('span');
-                    currentPrice.classList.add('current-price');
-                    currentPrice.textContent = `$${product.price || '0.00'}`; 
-                    productPrice.appendChild(currentPrice);
-
-                    const productRating = document.createElement('div');
-                    productRating.classList.add('product-rating');
-                    const stars = Math.round(product.rating || 5); 
-                    for (let i = 0; i < 5; i++) {
-                        const starIcon = document.createElement('i');
-                        starIcon.classList.add('fas', i < stars ? 'fa-star' : 'far', 'fa-star');
-                        productRating.appendChild(starIcon);
-                    }
-                    const ratingText = document.createElement('span');
-                    ratingText.textContent = `(${product.rating || 5})`;
-                    productRating.appendChild(ratingText);
-
-                    const buyButton = document.createElement('button');
-                    buyButton.classList.add('buy-button');
-                    buyButton.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ';
-
-                    productCard.appendChild(productImage);
-                    productCard.appendChild(productName);
-                    productCard.appendChild(productPrice);
-                    productCard.appendChild(productRating);
-                    productCard.appendChild(buyButton);
-
-                    productList.appendChild(productCard);
-                });
-            } catch (error) {
-                console.error('Error displaying products:', error);
+            if (i === currentPage) {
+                pageLink.classList.add('active');
             }
-        };
+
+            pagination.appendChild(pageLink);
+        }
+    };
+
+
+    const renderProducts = () => {
+        const productList = document.querySelector('.product-list');
+        productList.innerHTML = '';
+
+        const start = (currentPage - 1) * productsPerPage;
+        const end = start + productsPerPage;
+        const pageProducts = allProducts.slice(start, end);
+
+        if (pageProducts.length === 0) {
+            productList.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-box-open"></i>
+                    <h3>Không có sản phẩm nào.</h3>
+                </div>`;
+            return;
+        }
+
+        pageProducts.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.classList.add('product-card');
+
+            const productImage = document.createElement('div');
+            productImage.classList.add('product-image');
+            const img = document.createElement('img');
+            img.src = `/img/products/${product.ID}.jpg`;
+            img.alt = product.name;
+            img.onerror = function () { this.src = '/img/products/default.jpg'; };
+            productImage.appendChild(img);
+
+            const productName = document.createElement('div');
+            productName.classList.add('product-name');
+            productName.textContent = product.name || 'Tên sản phẩm';
+
+            const productPrice = document.createElement('div');
+            productPrice.classList.add('product-price');
+            const currentPrice = document.createElement('span');
+            currentPrice.classList.add('current-price');
+            currentPrice.textContent = `$${product.price || '0.00'}`;
+            productPrice.appendChild(currentPrice);
+
+            const productRating = document.createElement('div');
+            productRating.classList.add('product-rating');
+            const stars = Math.round(product.rating || 5);
+            for (let i = 0; i < 5; i++) {
+                const starIcon = document.createElement('i');
+                starIcon.classList.add(i < stars ? 'fas' : 'far', 'fa-star');
+                productRating.appendChild(starIcon);
+            }
+            const ratingText = document.createElement('span');
+            ratingText.textContent = `(${product.rating || 5})`;
+            productRating.appendChild(ratingText);
+
+            const buyButton = document.createElement('button');
+            buyButton.classList.add('buy-button');
+            buyButton.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ';
+
+            productCard.appendChild(productImage);
+            productCard.appendChild(productName);
+            productCard.appendChild(productPrice);
+            productCard.appendChild(productRating);
+            productCard.appendChild(buyButton);
+
+            productList.appendChild(productCard);
+        });
+    };
+
+    const displayProducts = async () => {
+        try {
+            allProducts = await getAllProducts();
+            const totalPages = Math.ceil(allProducts.length / productsPerPage);
+            renderPagination(totalPages);
+            renderProducts();
+        } catch (error) {
+            console.error('Error displaying products:', error);
+        }
+    };
 
         document.addEventListener('DOMContentLoaded', displayProducts);
 
