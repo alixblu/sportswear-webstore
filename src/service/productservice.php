@@ -252,4 +252,24 @@ class ProductService
             throw new Exception("Failed to get brands: " . $e->getMessage());
         }
     }
+
+    /**
+     * Delete product by ID
+     * @return bool Statement of success
+     * @throws Exception If database error occurs
+     * @param int $id Product ID
+     */
+    public function deleteProduct($id)
+    {
+        try {
+            if (!is_numeric($id) || $id <= 0) {
+                throw new Exception("Invalid product ID");
+            }
+
+            return $this->productRepository->deleteProduct($id);
+        } catch (Exception $e) {
+            error_log("Error in deleteProduct service: " . $e->getMessage());
+            throw new Exception("Failed to delete product: " . $e->getMessage());
+        }
+    }
 }

@@ -4,7 +4,7 @@ function handleLogin(event) {
     const formData = new FormData(event.target);
     formData.append('submitLogin', '1');
     
-    fetch('./layout/login_regis.php', {
+    fetch('../../layout/login_regis.php', {
         method: 'POST',
         body: formData
     })
