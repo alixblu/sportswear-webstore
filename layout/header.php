@@ -27,11 +27,10 @@ session_start();
             <div class="nav__menu" id="nav-menu">
                <ul class="nav__list">
                <li>
-                  <a href="#" class="nav__link">
-                  <i class="fa-solid fa-home"></i> <!-- Home -->
-                    Trang chủ
-                  </a>
-               </li>
+               <a href="./index.php" class="nav__link"> <!-- Update href to point to index.php -->
+                  <i class="fa-solid fa-home"></i> <!-- Home icon -->
+                  Trang chủ
+               </a>
 
                <!--=============== DROPDOWN 1 ===============-->
                <li class="dropdown__item">

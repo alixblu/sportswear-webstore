@@ -98,6 +98,7 @@
   }
   #searchForm{
     width: 100%;
+    display: flex;
   }
   header i:not(.ri-search-line):not(.nav__list i) {
     font-size: x-large;
@@ -277,9 +278,9 @@
     background-color: transparent; /* Make the background transparent */
     outline: none;         /* Remove outline when focused */
     color: #fff;
-    width: 90%rem; /* Ensure input takes full width */
+    width: 90%; /* Ensure input takes full width */
     font-size: larger;
-    margin-left: 0.5rem; /* Add some padding to the left */
+    margin-inline: 1.25rem;
   }
   .search-box {
     display: flex;
@@ -483,7 +484,7 @@
     align-items: center;
     justify-content: flex-end;
     column-gap: 0.7rem;
-    width: 35%;
+
   }
   
   .nav__account {
