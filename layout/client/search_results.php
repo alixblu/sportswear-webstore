@@ -234,6 +234,7 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
         .pagination {
             margin-top: 3rem;
         }
+        
 
         .no-results {
             text-align: center;
