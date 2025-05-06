@@ -1,7 +1,7 @@
 <!-- Header -->
 <div class="header">
   <div class="header-left">
-    <div class="dashboard_open" id="dashboard_switch">
+    <div class="dashboard_open" id="dashboard_switch" onclick="toggle_sidebar()">
       <i class="fas fa-bars fa-xl"></i>
     </div>
     <div class="search-bar">
@@ -27,3 +27,13 @@
     </div>
   </div>
 </div>
+
+<script>
+  function toggle_sidebar() {
+    let sidebar = document.getElementById('sidebar')
+    let mainContentArea = document.getElementsByClassName('main-content-area')
+
+    sidebar.classList.toggle('collapsed')
+    mainContentArea[0].classList.toggle('sidebar-collapsed')
+  }
+</script>

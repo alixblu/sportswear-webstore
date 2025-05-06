@@ -1,5 +1,6 @@
 const API_URL = '../../src/router/productRouter.php';
 
+// ===================================== GET products ===================================== 
 const getAllProducts = async () => {
     try {
         const response = await fetch(`${API_URL}?action=getAllProducts`, {
@@ -22,27 +23,55 @@ const getAllProducts = async () => {
 
         const data = await response.json();
 
-        let products = [];
+        // Check if data is an array or has a data property
         if (Array.isArray(data)) {
-            products = data;
+            return data;
         } else if (data && Array.isArray(data.data)) {
-            products = data.data;
+            return data.data;
         } else {
-            throw new Error('Định dạng phản hồi từ server không hợp lệ');
+            throw new Error('Invalid response format from server');
         }
-
-        // Thêm đường dẫn hình ảnh cho mỗi sản phẩm
-        products = products.map(product => ({
-            ...product,
-            image: `/sportswear-webstore/img/products/${product.id}.jpg`
-        }));
-
-        return products;
     } catch (error) {
-        console.error('Lỗi trong getAllProducts:', error);
+        console.error('Error in getAllProducts:', error);
         throw error;
     }
 };
+
+const getFilteredProducts = async (category=null, brand=null, status=null, min_price=null, max_price=null) => {
+    // Không có thì lấy toàn bộ
+    if(category == null && brand == null && status == null && min_price == null && max_price == null )
+        return data = await getAllProducts();
+
+    try {
+        const url = new URL(API_URL)
+        url.searchParams.set('action', 'getFilteredProducts')
+        if (category) url.searchParams.set('category', category)
+        if (brand) url.searchParams.set('brand', brand)
+        if (status) url.searchParams.set('status', status)
+        if (min_price) url.searchParams.set('min_price', min_price)
+        if (max_price) url.searchParams.set('max_price', max_price)
+
+        const response = await fetch(url.toString(),
+            {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                    'Content-Type':'application/json'
+                }
+            }
+        )
+        if(!response.ok)
+            throw new Error("Không thể lấy sản phẩm theo tùy chọn !!!")
+    
+        const data = response.json()
+
+        return Array.isArray(data) ? data : data.data
+    } catch (error) {
+        console.error('Lỗi, không thể lấy sản phẩm theo tùy chọn !!!', error)
+        throw error
+        
+    }
+}
 
 const getProductById = async (id) => {
     const response = await fetch(`${API_URL}?action=getProductById&id=${id}`, {
@@ -68,6 +97,8 @@ const getProductVariants = async (id) => {
     return await response.json();
 };
 
+
+// ===================================== GET category ===================================== 
 const getCategoryById = async (id) => {
     const response = await fetch(`${API_URL}?action=getCategoryById&id=${id}`, {
         method: 'GET',
@@ -79,7 +110,6 @@ const getCategoryById = async (id) => {
 
     return await response.json();
 };
-
 const getCategoryByName = async (name) => {
     const response = await fetch(`${API_URL}?action=getCategoryByName&name=${name}`, {
         method: 'GET',
@@ -92,30 +122,56 @@ const getCategoryByName = async (name) => {
     return await response.json();
 };
 
+const getAllCategories = async () => {
+    const response = await fetch(`${API_URL}?action=getAllCategories`, {
+        method: 'GET',
+    });
+
+    if (!response.ok) {
+        throw new Error('Không thể lấy danh sách phân loại');
+    }
+
+    return await response.json();
+};
+
+// ===================================== GET brand ===================================== 
+
+const getAllBrands = async () => {
+    const response = await fetch(`${API_URL}?action=getAllBrands`, {
+        method: 'GET',
+    });
+
+    if (!response.ok) {
+        throw new Error('Không thể lấy danh sách thương hiệu');
+    }
+
+    return await response.json();
+};
+
 const getBrandById = async (id) => {
     const response = await fetch(`${API_URL}?action=getBrandById&id=${id}`, {
         method: 'GET',
     });
 
     if (!response.ok) {
-        throw new Error('Không thể lấy thương hiệu');
+        throw new Error('Không thể lấy phân loại sản phẩm');
     }
 
     return await response.json();
 };
-
 const getBrandByName = async (name) => {
     const response = await fetch(`${API_URL}?action=getBrandByName&name=${name}`, {
         method: 'GET',
     });
 
     if (!response.ok) {
-        throw new Error('Không thể lấy thương hiệu');
+        throw new Error('Không thể lấy phân loại sản phẩm');
     }
 
     return await response.json();
 };
 
+// ===================================== Update & Delete product ===================================== 
 const updateProduct = async (product) => {
     const formData = new URLSearchParams();
     formData.append('action', 'updateProduct');
@@ -160,12 +216,13 @@ const deleteProduct = async (id) => {
     });
 
     if (!response.ok) {
-        throw new Error('Không thể xóa sản phẩm');
+        throw new Error('Không thể xoá sản phẩm');
     }
 
     return await response.json();
 };
 
+<<<<<<< HEAD:JS/admin/product.js
 const getAllCategories = async () => {
     try {
         const response = await fetch(`${API_URL}?action=getAllCategories`, {
@@ -219,6 +276,9 @@ const getAllBrands = async () => {
 };
 
 // Function to populate category dropdown
+=======
+// ===================================== Function to populate category dropdown ===================================== 
+>>>>>>> 998f7b470fd2ec054e78425567cbd6275a993c2a:JS/admin/product/product.js
 const populateCategoryFilter = async () => {
     try {
         const response = await getAllCategories();
@@ -244,11 +304,11 @@ const populateCategoryFilter = async () => {
             categorySelect.appendChild(option);
         });
     } catch (error) {
-        console.error('Lỗi khi điền bộ lọc danh mục:', error);
+        console.error('Error populating category filter:', error);
     }
 };
 
-// Function to populate brand dropdown
+// ===================================== Function to populate brand dropdown ===================================== 
 const populateBrandFilter = async () => {
     try {
         const response = await getAllBrands();
@@ -274,64 +334,71 @@ const populateBrandFilter = async () => {
             brandSelect.appendChild(option);
         });
     } catch (error) {
-        console.error('Lỗi khi điền bộ lọc thương hiệu:', error);
+        console.error('Error populating brand filter:', error);
     }
 };
 
-// Function to load products with filters
+// ===================================== Function to load products with filters ===================================== 
 const loadProducts = async () => {
     try {
-        const products = await getAllProducts();
-        const categoryFilter = document.getElementById('category').value;
-        const brandFilter = document.getElementById('brand').value;
-        const statusFilter = document.getElementById('status').value;
+        const normalize = (val) => (val == '' || val == 'all') ? null : val;
 
-        let filteredProducts = products;
+        let categoryFilter = normalize(document.getElementById('category').value);
+        let brandFilter = normalize(document.getElementById('brand').value);
+        let statusFilter = normalize(document.getElementById('status').value);
+        let startPriceFilter = normalize(document.getElementById('priceStart').value)
+        let endPriceFilter = normalize(document.getElementById('priceEnd').value)
 
-        if (categoryFilter !== 'all') {
-            filteredProducts = filteredProducts.filter(product => product.categoryID === categoryFilter);
-        }
-        if (brandFilter !== 'all') {
-            filteredProducts = filteredProducts.filter(product => product.brandID === brandFilter);
-        }
-        if (statusFilter !== 'all') {
-            filteredProducts = filteredProducts.filter(product => product.status === statusFilter);
-        }
+        let filteredProducts = await getFilteredProducts(categoryFilter, brandFilter, statusFilter, startPriceFilter, endPriceFilter);
 
-        const productContainer = document.getElementById('product-list');
-        productContainer.innerHTML = '';
-
+        const productGrid = document.getElementById('productGrid')
+        productGrid.innerHTML = '';
         filteredProducts.forEach(product => {
-            const productElement = document.createElement('div');
-            productElement.className = 'product-item';
-            productElement.innerHTML = `
-                <img src="${product.image}" alt="${product.name}" style="max-width: 100px;" loading="lazy">
-                <h3>${product.name}</h3>
-                <p>ID: ${product.id}</p>
-                <p>Giá: ${product.price || 'Chưa có giá'}</p>
-                <p>Trạng thái: ${product.status}</p>
-            `;
-            productContainer.appendChild(productElement);
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.innerHTML = `
+                <div class="product-image">
+                    <span class="product-id-badge">#${product.ID}</span>
+                    <i class="fas fa-tshirt"></i>
+                    <span class="product-badge badge-${product.status === 'in_stock' ? 'in-stock' : 'out-stock'}">
+                        ${product.status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
+                    </span>
+                </div>
+                <div class="product-info">
+                    <h5 class="product-title">${product.name}</h5>
+                    <div class="product-meta">
+                        <span class="product-stock">Stock: ${product.stock || 0}</span>
+                        <span class="product-markup">Markup: ${product.markup_percentage}%</span>
+                    </div>
+                    <div class="product-rating">
+                        ${renderStars(product.rating)}
+                        <span class="rating-count">${product.rating ? `(${product.rating})` : '(No rating)'}</span>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary" onclick="viewProduct(${product.ID})">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </div>
+                </div>
+                `;
+            productGrid.appendChild(productCard);
         });
     } catch (error) {
         console.error('Lỗi khi tải sản phẩm:', error);
     }
 };
 
-// Initialize filters when page loads
+// ===================================== Initialize filters when page loads===================================== 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        console.log('Khởi tạo bộ lọc...');
-        
         // Populate category filter
         await populateCategoryFilter();
         
-        // Populate brand filter
+         // Populate brand filter
         await populateBrandFilter();
         
         // Set status filter options
         const statusSelect = document.getElementById('status');
-        console.log('Phần tử select trạng thái:', statusSelect);
         
         // Keep the first "All Status" option
         while (statusSelect.options.length > 1) {
@@ -345,21 +412,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         ];
         
         statusOptions.forEach(status => {
-            console.log('Thêm trạng thái:', status);
             const option = document.createElement('option');
             option.value = status.value;
             option.textContent = status.text;
             statusSelect.appendChild(option);
         });
+         // Load products after filters are set
+         loadProducts();
+     } catch (error) {
+         console.error('Error initializing filters:', error);
+     }
+ });
 
-        // Load products after filters are set
-        loadProducts();
-
-        // Add event listeners for filter changes
-        document.getElementById('category').addEventListener('change', loadProducts);
-        document.getElementById('brand').addEventListener('change', loadProducts);
-        document.getElementById('status').addEventListener('change', loadProducts);
-    } catch (error) {
-        console.error('Lỗi khi khởi tạo bộ lọc:', error);
-    }
-});
