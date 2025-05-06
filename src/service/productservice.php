@@ -32,6 +32,23 @@ class ProductService
             throw new Exception("Failed to get products: " . $e->getMessage());
         }
     }
+    /**
+     * Get products with options
+     * @return array List of products
+     * @param $category : category of product
+     * @param $brand : brand of product
+     * @param $status : status of product
+     * @param $min_price : min price of product
+     * @param $max_price : max price of product
+     */
+    public function getFilteredProducts($category, $brand, $status, $min_price, $max_price)
+    {
+        try {
+            return $this->productRepository->getFilteredProducts($category, $brand, $status, $min_price, $max_price);
+        } catch (Exception $e) {
+            throw new Exception('');
+        }
+    }
 
     /**checked
      * Get a product by ID without variants
