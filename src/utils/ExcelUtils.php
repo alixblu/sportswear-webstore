@@ -1,26 +1,26 @@
-<?php 
-    require_once dirname(__FILE__) .'/../../vendor/autoload.php';
+<?php
+require_once dirname(__FILE__) . '/../../vendor/autoload.php';
 
-    use PhpOffice\PhpSpreadsheet\IOFactory;
-    use PhpOffice\PhpSpreadsheet\Spreadsheet;
-    use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-    class ExcelUtils
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+class ExcelUtils
+{
+
+    public function readExcelRows($file): array
     {
+        try {
+            $spreadsheet = IOFactory::load($file);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
 
-        public function readExcelRows($file): array
-        {
-            try {
-                $spreadsheet = IOFactory::load($file);
-                $sheet = $spreadsheet->getActiveSheet();
-                $rows = $sheet->toArray();
-
-                return $rows;
-
-            } catch (Exception $e) {
-                throw new Exception("Lỗi đọc file Excel: " . $e->getMessage(), 400);
-            }
+            return $rows;
+        } catch (Exception $e) {
+            throw new Exception("Lỗi đọc file Excel: " . $e->getMessage(), 400);
         }
-        public function exportExcel(array $data, array $headers, $filename = 'export.xlsx')
+    }
+    public function exportExcel(array $data, array $headers, $filename = 'export.xlsx')
     {
         try {
             $spreadsheet = new Spreadsheet();
@@ -45,6 +45,4 @@
             throw new Exception("Lỗi xuất Excel: " . $e->getMessage(), $e->getCode() ?: 400);
         }
     }
-    }
-    
-?>
+}

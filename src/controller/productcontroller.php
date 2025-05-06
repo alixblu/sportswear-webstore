@@ -237,7 +237,8 @@ class ProductController
      * Get all categories
      * @return void
      */
-    public function getAllCategories() {
+    public function getAllCategories()
+    {
         try {
             $categories = $this->productService->getAllCategories();
             ApiResponse::customResponse($categories, 200);
@@ -250,7 +251,8 @@ class ProductController
      * Get all brands
      * @return void
      */
-    public function getAllBrands() {
+    public function getAllBrands()
+    {
         try {
             $brands = $this->productService->getAllBrands();
             ApiResponse::customResponse($brands, 200);
