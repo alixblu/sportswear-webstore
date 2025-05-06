@@ -1,275 +1,207 @@
 <?php
-    include './layout/slider.php';
+// Database connection
+try {
+    $conn = new PDO("mysql:host=localhost;dbname=sportswear;charset=utf8mb4", "root", "");
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+} catch(PDOException $e) {
+    die('<div class="error-message">Database connection error: ' . htmlspecialchars($e->getMessage()) . '</div>');
+}
 
-// Sample product data (to be replaced with database data later)
-$all_products = [
-    [
-        'id' => 1,
-        'discount' => '40%',
-        'name' => 'Adidas RUNFALCON 3.0',
-        'price' => '$120',
-        'original_price' => '$200',
-        'rating' => '★★★★★ (88)'
-    ],
-    [
-        'id' => 2,
-        'name' => 'Nike Air Max 270',
-        'price' => '$150',
-        'rating' => '★★★★★ (92)'
-    ],
-    [
-        'id' => 3,
-        'discount' => '25%',
-        'name' => 'Puma RS-X',
-        'price' => '$90',
-        'original_price' => '$120',
-        'rating' => '★★★★☆ (76)'
-    ],
-    [
-        'id' => 4,
-        'name' => 'New Balance 574',
-        'price' => '$85',
-        'rating' => '★★★★★ (89)'
-    ],
-    [
-        'id' => 5,
-        'discount' => '30%',
-        'name' => 'Reebok Classic',
-        'price' => '$70',
-        'original_price' => '$100',
-        'rating' => '★★★★☆ (65)'
-    ],
-    [
-        'id' => 6,
-        'name' => 'Converse Chuck 70',
-        'price' => '$80',
-        'rating' => '★★★★★ (95)'
-    ],
-    [
-        'id' => 7,
-        'discount' => '15%',
-        'name' => 'Vans Old Skool',
-        'price' => '$60',
-        'original_price' => '$70',
-        'rating' => '★★★★★ (91)'
-    ],
-    [
-        'id' => 8,
-        'name' => 'Asics Gel-Kayano 28',
-        'price' => '$160',
-        'rating' => '★★★★★ (87)'
-    ],
-    [
-        'id' => 9,
-        'name' => 'Under Armour Tech T-Shirt',
-        'price' => '$30',
-        'rating' => '★★★★☆ (45)'
-    ],
-    [
-        'id' => 10,
-        'discount' => '25%',
-        'name' => 'Reebok Running Shoes',
-        'price' => '$90',
-        'original_price' => '$120',
-        'rating' => '★★★★★ (67)'
-    ],
-    [
-        'id' => 11,
-        'name' => 'Nike Basketball Shorts',
-        'price' => '$55',
-        'rating' => '★★★★★ (89)'
-    ],
-    [
-        'id' => 12,
-        'name' => 'Adidas Soccer Jersey',
-        'price' => '$85',
-        'rating' => '★★★★★ (92)'
-    ],
-    [
-        'id' => 13,
-        'discount' => '30%',
-        'name' => 'Puma Training Shoes',
-        'price' => '$70',
-        'original_price' => '$100',
-        'rating' => '★★★★☆ (56)'
-    ],
-    [
-        'id' => 14,
-        'name' => 'New Balance Running Jacket',
-        'price' => '$110',
-        'rating' => '★★★★★ (78)'
-    ],
-    [
-        'id' => 15,
-        'name' => 'Asics Volleyball Shoes',
-        'price' => '$130',
-        'rating' => '★★★★★ (82)'
-    ],
-    [
-        'id' => 16,
-        'discount' => '15%',
-        'name' => 'Skechers Walking Shoes',
-        'price' => '$65',
-        'original_price' => '$75',
-        'rating' => '★★★★★ (91)'
-    ],
-    [
-        'id' => 17,
-        'name' => 'Fila Training Pants',
-        'price' => '$45',
-        'rating' => '★★★★☆ (63)'
-    ],
-    [
-        'id' => 18,
-        'name' => 'Vans Classic Sneakers',
-        'price' => '$60',
-        'rating' => '★★★★★ (87)'
-    ],
-    [
-        'id' => 19,
-        'name' => 'Nike Air Force 1',
-        'price' => '$100',
-        'rating' => '★★★★★ (94)'
-    ],
-    [
-        'id' => 20,
-        'discount' => '20%',
-        'name' => 'Adidas Ultraboost',
-        'price' => '$160',
-        'original_price' => '$200',
-        'rating' => '★★★★★ (89)'
-    ],
-    [
-        'id' => 21,
-        'name' => 'Puma Cali Sport',
-        'price' => '$85',
-        'rating' => '★★★★☆ (72)'
-    ],
-    [
-        'id' => 22,
-        'name' => 'New Balance 990v5',
-        'price' => '$175',
-        'rating' => '★★★★★ (91)'
-    ],
-    [
-        'id' => 23,
-        'discount' => '10%',
-        'name' => 'Reebok Nano X1',
-        'price' => '$135',
-        'original_price' => '$150',
-        'rating' => '★★★★☆ (68)'
-    ],
-    [
-        'id' => 23,
-        'discount' => '10%',
-        'name' => 'Reebok Nano X1',
-        'price' => '$135',
-        'original_price' => '$150',
-        'rating' => '★★★★☆ (68)'
-    ],
-    [
-        'id' => 24,
-        'name' => 'Nike React Infinity Run',
-        'price' => '$120',
-        'rating' => '★★★★★ (90)'
-    ],
-    [
-        'id' => 24,
-        'name' => 'Nike React Infinity Run',
-        'price' => '$120',
-        'rating' => '★★★★★ (90)'
-    ],
-    [
-        'id' => 24,
-        'name' => 'Nike React Infinity Run',
-        'price' => '$120',
-        'rating' => '★★★★★ (90)'
-    ],
-    [
-        'id' => 24,
-        'name' => 'Nike React Infinity Run',
-        'price' => '$120',
-        'rating' => '★★★★★ (90)'
-    ],
-    [
-        'id' => 24,
-        'name' => 'Converse One Star',
-        'price' => '$75',
-        'rating' => '★★★★★ (85)'
-    ]
-];
+// Pagination setup
+$items_per_page = 12;
+$page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $items_per_page;
 
-// Check if view all is requested
-$view_all = isset($_GET['view_all']) && $_GET['view_all'] == '1';
+// Count total products
+$total_query = "
+    SELECT COUNT(DISTINCT p.ID)
+    FROM product p
+    LEFT JOIN productvariant pv ON p.ID = pv.productID
+    WHERE p.status = 'in_stock'
+";
+$stmt = $conn->prepare($total_query);
+$stmt->execute();
+$total_items = $stmt->fetchColumn();
+$total_pages = max(1, ceil($total_items / $items_per_page));
 
-// Pagination logic
-$items_per_page_default = 18; // Hiển thị 18 sản phẩm mặc định
-$items_per_page = $view_all ? count($all_products) : $items_per_page_default;
-$current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$total_items = count($all_products);
-$total_pages = ceil($total_items / $items_per_page);
-$offset = ($current_page - 1) * $items_per_page;
-$products = array_slice($all_products, $offset, $items_per_page);
+// Fetch products
+$query = "
+    SELECT 
+        p.ID, p.name, p.status, p.markup_percentage,
+        MIN(pv.price + (pv.price * p.markup_percentage / 100)) AS calculated_price,
+        COALESCE(r.avg_rating, 0) AS rating,
+        b.name AS brand_name,
+        c.name AS category_name
+    FROM product p
+    LEFT JOIN productvariant pv ON p.ID = pv.productID
+    LEFT JOIN brand b ON p.brandID = b.ID
+    LEFT JOIN category c ON p.categoryID = c.ID
+    LEFT JOIN (
+        SELECT productID, AVG(rating) AS avg_rating
+        FROM review
+        WHERE status = 'active'
+        GROUP BY productID
+    ) r ON p.ID = r.productID
+    WHERE p.status = 'in_stock'
+    GROUP BY p.ID, p.name, p.status, p.markup_percentage, b.name, c.name
+    ORDER BY p.ID DESC
+    LIMIT :offset, :items_per_page
+";
+$stmt = $conn->prepare($query);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->bindValue(':items_per_page', $items_per_page, PDO::PARAM_INT);
+$stmt->execute();
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<section class="product-section">
-    <div class="section-header">
-        <h1>Explore Our Products</h1>
-        <?php if (!$view_all && $total_items > $items_per_page_default): ?>
-            <a href="?view_all=1" class="view-all-button">
-                <i class="ri-eye-line"></i> View All
-            </a>
-        <?php elseif ($view_all): ?>
-            <a href="?" class="view-all-button view-less-button">
-                <i class="ri-close-line"></i> View Less
-            </a>
-        <?php endif; ?>
-    </div>
-    
-    <div class="product-list <?= $view_all ? 'view-all-mode' : '' ?>">
-        <?php foreach ($products as $product): ?>
-            <div class="product-card">
-                <?php if (isset($product['discount'])): ?>
-                    <div class="discount-badge"><?= $product['discount'] ?></div>
-                <?php endif; ?>
-                <div class="product-image">
-                    <img src="https://via.placeholder.com/250x200?text=<?= urlencode($product['name']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản phẩm đang bán - SportsWear</title>
+    <link rel="stylesheet" href="/sportswear-webstore/css/content.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .pagination {
+            margin-top: 3rem;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .page-link {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+        .page-link:hover {
+            background-color: #f0f0f0;
+        }
+        .page-link.active {
+            background-color: #e63946;
+            color: white;
+            border-color: #e63946;
+        }
+        .no-results {
+            text-align: center;
+            padding: 50px 0;
+            color: #666;
+            grid-column: 1 / -1;
+        }
+        .no-results i {
+            font-size: 50px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        .no-results h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="product-section">
+        <div class="section-header">
+            <h1>Sản phẩm đang bán</h1>
+            <span class="search-count"><?= $total_items ?> sản phẩm được tìm thấy</span>
+        </div>
+
+        <!-- Product List -->
+        <div class="product-list">
+            <?php if (!empty($products)): ?>
+                <?php foreach ($products as $product): 
+                    $image_path = "/sportswear-webstore/img/products/" . $product['ID'] . ".jpg";
+                    $default_image = "/sportswear-webstore/img/products/default.jpg";
+                    $image_src = file_exists($_SERVER['DOCUMENT_ROOT'] . $image_path) ? $image_path : $default_image;
+                    $rating = (float)$product['rating'];
+                    $full_stars = floor($rating);
+                    $has_half_star = $rating - $full_stars >= 0.5;
+                ?>
+                    <a href="/sportswear-webstore/layout/client/product_detail.php?id=<?= $product['ID'] ?>" class="product-card">
+                        <div class="product-image">
+                            <img src="<?= $image_src ?>" alt="<?= htmlspecialchars($product['name']) ?>" 
+                                 onerror="this.src='<?= $default_image ?>'">
+                        </div>
+                        <div class="product-name"><?= htmlspecialchars($product['name']) ?></div>
+                        <div class="product-price">
+                            <span class="current-price">$<?= number_format($product['calculated_price'], 2) ?></span>
+                        </div>
+                        <div class="product-rating">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <?php if ($i <= $full_stars): ?>
+                                    <i class="fas fa-star"></i>
+                                <?php elseif ($has_half_star && $i == $full_stars + 1): ?>
+                                    <i class="fas fa-star-half-alt"></i>
+                                <?php else: ?>
+                                    <i class="far fa-star"></i>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+                            <span>(<?= round($rating, 1) ?>)</span>
+                        </div>
+                        <button class="buy-button">
+                            <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
+                        </button>
+                    </a>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="no-results">
+                    <i class="fas fa-search"></i>
+                    <h3>Không tìm thấy sản phẩm</h3>
+                    <p>Hiện tại không có sản phẩm nào đang bán</p>
                 </div>
-                <div class="product-name"><?= htmlspecialchars($product['name']) ?></div>
-                <div class="product-price">
-                    <?php if (isset($product['original_price'])): ?>
-                        <span class="original-price"><?= $product['original_price'] ?></span>
-                    <?php endif; ?>
-                    <span class="current-price"><?= $product['price'] ?></span>
-                </div>
-                <div class="product-rating"><?= $product['rating'] ?></div>
-                <button class="buy-button" onclick="addToCart(<?= $product['id'] ?>)">
-                    <i class="ri-shopping-cart-line"></i> Mua ngay
-                </button>
-            </div>
-        <?php endforeach; ?>
-    </div>
-    
-    <!-- Pagination -->
-    <?php if ($total_pages > 1): ?>
-        <div class="pagination">
-            <?php if ($current_page > 1): ?>
-                <a href="?<?= $view_all ? 'view_all=1&' : '' ?>page=<?= $current_page - 1 ?>" class="page-link">&laquo; Previous</a>
-            <?php endif; ?>
-            
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                <a href="?<?= $view_all ? 'view_all=1&' : '' ?>page=<?= $i ?>" class="page-link <?= $i == $current_page ? 'active' : '' ?>"><?= $i ?></a>
-            <?php endfor; ?>
-            
-            <?php if ($current_page < $total_pages): ?>
-                <a href="?<?= $view_all ? 'view_all=1&' : '' ?>page=<?= $current_page + 1 ?>" class="page-link">Next &raquo;</a>
             <?php endif; ?>
         </div>
-    <?php endif; ?>
-</section>
 
-<script>
-    function addToCart(productId) {
-        alert('Added product ' + productId + ' to cart!');
-    }
-</script>
+        <!-- Pagination -->
+        <?php if ($total_pages > 1): ?>
+            <div class="pagination">
+                <?php
+                $query_params = $_GET;
+                if ($page > 1) {
+                    $query_params['page'] = $page - 1;
+                    $prev_url = '/sportswear-webstore/layout/content.php?' . http_build_query($query_params);
+                    echo '<a href="' . htmlspecialchars($prev_url) . '" class="page-link">« Trước</a>';
+                }
+
+                $start_page = max(1, $page - 2);
+                $end_page = min($total_pages, $page + 2);
+
+                if ($start_page > 1) {
+                    $query_params['page'] = 1;
+                    $first_url = '/sportswear-webstore/layout/content.php?' . http_build_query($query_params);
+                    echo '<a href="' . htmlspecialchars($first_url) . '" class="page-link">1</a>';
+                    if ($start_page > 2) echo '<span class="page-link">...</span>';
+                }
+
+                for ($i = $start_page; $i <= $end_page; $i++) {
+                    $query_params['page'] = $i;
+                    $page_url = '/sportswear-webstore/layout/content.php?' . http_build_query($query_params);
+                    if ($i === $page) {
+                        echo '<span class="page-link active">' . $i . '</span>';
+                    } else {
+                        echo '<a href="' . htmlspecialchars($page_url) . '" class="page-link">' . $i . '</a>';
+                    }
+                }
+
+                if ($end_page < $total_pages) {
+                    if ($end_page < $total_pages - 1) echo '<span class="page-link">...</span>';
+                    $query_params['page'] = $total_pages;
+                    $last_url = '/sportswear-webstore/layout/content.php?' . http_build_query($query_params);
+                    echo '<a href="' . htmlspecialchars($last_url) . '" class="page-link">' . $total_pages . '</a>';
+                }
+
+                if ($page < $total_pages) {
+                    $query_params['page'] = $page + 1;
+                    $next_url = '/sportswear-webstore/layout/client/content.php?' . http_build_query($query_params);
+                    echo '<a href="' . htmlspecialchars($next_url) . '" class="page-link">Tiếp theo »</a>';
+                }
+                ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</body>
+</html>
