@@ -125,7 +125,7 @@
 
                 // Set the image source and handle errors using the 'error' event listener
                 imgElement.onerror = function() {
-                    this.src = '../../img/products/default.png';
+                    this.src = '../../img/products/default.jpg';
                 };
 
                 // Assign the image source

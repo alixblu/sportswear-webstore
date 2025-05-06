@@ -17,24 +17,16 @@ const getAllProducts = async () => {
 
         const data = await response.json();
 
-        let products = [];
+        // Check if data is an array or has a data property
         if (Array.isArray(data)) {
-            products = data;
+            return data;
         } else if (data && Array.isArray(data.data)) {
-            products = data.data;
+            return data.data;
         } else {
-            throw new Error('Định dạng phản hồi từ server không hợp lệ');
+            throw new Error('Invalid response format from server');
         }
-
-        // Thêm đường dẫn hình ảnh cho mỗi sản phẩm
-        products = products.map(product => ({
-            ...product,
-            image: `/sportswear-webstore/img/products/${product.id}.jpg`
-        }));
-
-        return products;
     } catch (error) {
-        console.error('Lỗi trong getAllProducts:', error);
+        console.error('Error in getAllProducts:', error);
         throw error;
     }
 };
@@ -112,7 +104,6 @@ const getCategoryById = async (id) => {
 
     return await response.json();
 };
-
 const getCategoryByName = async (name) => {
     const response = await fetch(`${API_URL}?action=getCategoryByName&name=${name}`, {
         method: 'GET',
@@ -157,19 +148,18 @@ const getBrandById = async (id) => {
     });
 
     if (!response.ok) {
-        throw new Error('Không thể lấy thương hiệu');
+        throw new Error('Không thể lấy phân loại sản phẩm');
     }
 
     return await response.json();
 };
-
 const getBrandByName = async (name) => {
     const response = await fetch(`${API_URL}?action=getBrandByName&name=${name}`, {
         method: 'GET',
     });
 
     if (!response.ok) {
-        throw new Error('Không thể lấy thương hiệu');
+        throw new Error('Không thể lấy phân loại sản phẩm');
     }
 
     return await response.json();
@@ -220,7 +210,7 @@ const deleteProduct = async (id) => {
     });
 
     if (!response.ok) {
-        throw new Error('Không thể xóa sản phẩm');
+        throw new Error('Không thể xoá sản phẩm');
     }
 
     return await response.json();
@@ -248,7 +238,7 @@ const populateCategoryFilter = async () => {
             categorySelect.appendChild(option);
         });
     } catch (error) {
-        console.error('Lỗi khi điền bộ lọc danh mục:', error);
+        console.error('Error populating category filter:', error);
     }
 };
 
@@ -274,7 +264,7 @@ const populateBrandFilter = async () => {
             brandSelect.appendChild(option);
         });
     } catch (error) {
-        console.error('Lỗi khi điền bộ lọc thương hiệu:', error);
+        console.error('Error populating brand filter:', error);
     }
 };
 
@@ -334,7 +324,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Populate category filter
         await populateCategoryFilter();
         
-        // Populate brand filter
+         // Populate brand filter
         await populateBrandFilter();
         
         // Set status filter options
@@ -357,15 +347,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             option.textContent = status.text;
             statusSelect.appendChild(option);
         });
+         // Load products after filters are set
+         loadProducts();
+     } catch (error) {
+         console.error('Error initializing filters:', error);
+     }
+ });
 
-        // Load products after filters are set
-        loadProducts();
-
-        // Add event listeners for filter changes
-        document.getElementById('category').addEventListener('change', loadProducts);
-        document.getElementById('brand').addEventListener('change', loadProducts);
-        document.getElementById('status').addEventListener('change', loadProducts);
-    } catch (error) {
-        console.error('Lỗi khi khởi tạo bộ lọc:', error);
-    }
-});
