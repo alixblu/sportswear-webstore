@@ -7,6 +7,7 @@ const getAllProducts = async () => {
             mode: 'cors',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
         });
 
@@ -14,18 +15,31 @@ const getAllProducts = async () => {
             throw new Error('Không thể lấy danh sách sản phẩm');
         }
 
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Phản hồi không phải là JSON');
+        }
+
         const data = await response.json();
 
-        // Check if data is an array or has a data property
+        let products = [];
         if (Array.isArray(data)) {
-            return data;
+            products = data;
         } else if (data && Array.isArray(data.data)) {
-            return data.data;
+            products = data.data;
         } else {
-            throw new Error('Invalid response format from server');
+            throw new Error('Định dạng phản hồi từ server không hợp lệ');
         }
+
+        // Thêm đường dẫn hình ảnh cho mỗi sản phẩm
+        products = products.map(product => ({
+            ...product,
+            image: `/sportswear-webstore/img/products/${product.id}.jpg`
+        }));
+
+        return products;
     } catch (error) {
-        console.error('Error in getAllProducts:', error);
+        console.error('Lỗi trong getAllProducts:', error);
         throw error;
     }
 };
@@ -53,6 +67,7 @@ const getProductVariants = async (id) => {
 
     return await response.json();
 };
+
 const getCategoryById = async (id) => {
     const response = await fetch(`${API_URL}?action=getCategoryById&id=${id}`, {
         method: 'GET',
@@ -64,6 +79,7 @@ const getCategoryById = async (id) => {
 
     return await response.json();
 };
+
 const getCategoryByName = async (name) => {
     const response = await fetch(`${API_URL}?action=getCategoryByName&name=${name}`, {
         method: 'GET',
@@ -74,29 +90,32 @@ const getCategoryByName = async (name) => {
     }
 
     return await response.json();
-}
+};
+
 const getBrandById = async (id) => {
     const response = await fetch(`${API_URL}?action=getBrandById&id=${id}`, {
         method: 'GET',
     });
 
     if (!response.ok) {
-        throw new Error('Không thể lấy phân loại sản phẩm');
+        throw new Error('Không thể lấy thương hiệu');
     }
 
     return await response.json();
 };
+
 const getBrandByName = async (name) => {
     const response = await fetch(`${API_URL}?action=getBrandByName&name=${name}`, {
         method: 'GET',
     });
 
     if (!response.ok) {
-        throw new Error('Không thể lấy phân loại sản phẩm');
+        throw new Error('Không thể lấy thương hiệu');
     }
 
     return await response.json();
-}
+};
+
 const updateProduct = async (product) => {
     const formData = new URLSearchParams();
     formData.append('action', 'updateProduct');
@@ -141,34 +160,62 @@ const deleteProduct = async (id) => {
     });
 
     if (!response.ok) {
-        throw new Error('Không thể xoá sản phẩm');
+        throw new Error('Không thể xóa sản phẩm');
     }
 
     return await response.json();
 };
 
 const getAllCategories = async () => {
-    const response = await fetch(`${API_URL}?action=getAllCategories`, {
-        method: 'GET',
-    });
+    try {
+        const response = await fetch(`${API_URL}?action=getAllCategories`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+        });
 
-    if (!response.ok) {
-        throw new Error('Không thể lấy danh sách phân loại');
+        if (!response.ok) {
+            throw new Error('Không thể lấy danh sách phân loại');
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Phản hồi không phải là JSON');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Lỗi trong getAllCategories:', error);
+        throw error;
     }
-
-    return await response.json();
 };
 
 const getAllBrands = async () => {
-    const response = await fetch(`${API_URL}?action=getAllBrands`, {
-        method: 'GET',
-    });
+    try {
+        const response = await fetch(`${API_URL}?action=getAllBrands`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+        });
 
-    if (!response.ok) {
-        throw new Error('Không thể lấy danh sách thương hiệu');
+        if (!response.ok) {
+            throw new Error('Không thể lấy danh sách thương hiệu');
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Phản hồi không phải là JSON');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Lỗi trong getAllBrands:', error);
+        throw error;
     }
-
-    return await response.json();
 };
 
 // Function to populate category dropdown
@@ -179,6 +226,10 @@ const populateCategoryFilter = async () => {
         const categories = response.data || [];
         
         const categorySelect = document.getElementById('category');
+        if (!categorySelect) {
+            console.error('Không tìm thấy phần tử category select');
+            return;
+        }
         
         // Clear existing options except the first one
         while (categorySelect.options.length > 1) {
@@ -193,7 +244,7 @@ const populateCategoryFilter = async () => {
             categorySelect.appendChild(option);
         });
     } catch (error) {
-        console.error('Error populating category filter:', error);
+        console.error('Lỗi khi điền bộ lọc danh mục:', error);
     }
 };
 
@@ -205,6 +256,10 @@ const populateBrandFilter = async () => {
         const brands = response.data || [];
         
         const brandSelect = document.getElementById('brand');
+        if (!brandSelect) {
+            console.error('Không tìm thấy phần tử brand select');
+            return;
+        }
         
         // Clear existing options except the first one
         while (brandSelect.options.length > 1) {
@@ -219,51 +274,92 @@ const populateBrandFilter = async () => {
             brandSelect.appendChild(option);
         });
     } catch (error) {
-        console.error('Error populating brand filter:', error);
+        console.error('Lỗi khi điền bộ lọc thương hiệu:', error);
     }
 };
 
+// Function to load products with filters
+const loadProducts = async () => {
+    try {
+        const products = await getAllProducts();
+        const categoryFilter = document.getElementById('category').value;
+        const brandFilter = document.getElementById('brand').value;
+        const statusFilter = document.getElementById('status').value;
 
-// // Initialize filters when page loads
-// document.addEventListener('DOMContentLoaded', async () => {
-//     try {
-//         console.log('Initializing filters...');
-        
-//         // Populate category filter
-//         await populateCategoryFilter();
-        
-//         // Populate brand filter
-//         await populateBrandFilter();
-        
+        let filteredProducts = products;
 
-//         // Set status filter options
-//         const statusSelect = document.getElementById('status');
-//         console.log('Status select element:', statusSelect);
-        
-//         // Keep the first "All Status" option
-//         while (statusSelect.options.length > 1) {
-//             statusSelect.remove(1);
-//         }
-        
-//         const statusOptions = [
-//             { value: 'in_stock', text: 'In Stock' },
-//             { value: 'out_of_stock', text: 'Out of Stock' },
-//             { value: 'discontinued', text: 'Discontinued' }
-//         ];
-        
+        if (categoryFilter !== 'all') {
+            filteredProducts = filteredProducts.filter(product => product.categoryID === categoryFilter);
+        }
+        if (brandFilter !== 'all') {
+            filteredProducts = filteredProducts.filter(product => product.brandID === brandFilter);
+        }
+        if (statusFilter !== 'all') {
+            filteredProducts = filteredProducts.filter(product => product.status === statusFilter);
+        }
 
-//         statusOptions.forEach(status => {
-//             console.log('Adding status:', status);
-//             const option = document.createElement('option');
-//             option.value = status.value;
-//             option.textContent = status.text;
-//             statusSelect.appendChild(option);
-//         });
+        const productContainer = document.getElementById('product-list');
+        productContainer.innerHTML = '';
 
-//         // Load products after filters are set
-//         loadProducts();
-//     } catch (error) {
-//         console.error('Error initializing filters:', error);
-//     }
-// });
+        filteredProducts.forEach(product => {
+            const productElement = document.createElement('div');
+            productElement.className = 'product-item';
+            productElement.innerHTML = `
+                <img src="${product.image}" alt="${product.name}" style="max-width: 100px;" loading="lazy">
+                <h3>${product.name}</h3>
+                <p>ID: ${product.id}</p>
+                <p>Giá: ${product.price || 'Chưa có giá'}</p>
+                <p>Trạng thái: ${product.status}</p>
+            `;
+            productContainer.appendChild(productElement);
+        });
+    } catch (error) {
+        console.error('Lỗi khi tải sản phẩm:', error);
+    }
+};
 
+// Initialize filters when page loads
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        console.log('Khởi tạo bộ lọc...');
+        
+        // Populate category filter
+        await populateCategoryFilter();
+        
+        // Populate brand filter
+        await populateBrandFilter();
+        
+        // Set status filter options
+        const statusSelect = document.getElementById('status');
+        console.log('Phần tử select trạng thái:', statusSelect);
+        
+        // Keep the first "All Status" option
+        while (statusSelect.options.length > 1) {
+            statusSelect.remove(1);
+        }
+        
+        const statusOptions = [
+            { value: 'in_stock', text: 'Còn hàng' },
+            { value: 'out_of_stock', text: 'Hết hàng' },
+            { value: 'discontinued', text: 'Ngừng kinh doanh' }
+        ];
+        
+        statusOptions.forEach(status => {
+            console.log('Thêm trạng thái:', status);
+            const option = document.createElement('option');
+            option.value = status.value;
+            option.textContent = status.text;
+            statusSelect.appendChild(option);
+        });
+
+        // Load products after filters are set
+        loadProducts();
+
+        // Add event listeners for filter changes
+        document.getElementById('category').addEventListener('change', loadProducts);
+        document.getElementById('brand').addEventListener('change', loadProducts);
+        document.getElementById('status').addEventListener('change', loadProducts);
+    } catch (error) {
+        console.error('Lỗi khi khởi tạo bộ lọc:', error);
+    }
+});
