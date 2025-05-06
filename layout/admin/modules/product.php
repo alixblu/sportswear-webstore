@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin/product.css">
 
-    <script src="../../JS/admin/product/product.js"></script>
+    <script src="../../JS/admin/product.js"></script>
     <link rel="stylesheet" href="../../css/admin/product.css">
     <a href="../components/product/detail_modal.php"></a>
 </head>
@@ -195,7 +195,7 @@
 
                 // Set the image source and handle errors using the 'error' event listener
                 imgElement.onerror = function() {
-                    this.src = '../../img/products/default.png';
+                    this.src = '../../img/products/default.png'; // Fallback image
                 };
 
                 // Assign the image source
