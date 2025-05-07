@@ -139,9 +139,13 @@ session_start();
                 </div>
                 <ul class="user-menu-list">
                     <?php if(isset($_SESSION['user']['roleid']) && $_SESSION['user']['roleid'] !== '05'): ?>
-                    <li><a href="#" onclick="adminPageRedirect()"><i class="ri-admin-line"></i> Đi đến trang quản trị</a></li>
+                    <li><a href="./layout/admin/index.php"><i class="ri-admin-line"></i> Đi đến trang quản trị</a></li>
                     <?php endif; ?>
-                    <li><a href="/layout/client/profile.php"><i class="ri-user-settings-line"></i> Hồ sơ</a></li>
+
+                    <?php if (isset($_SESSION['user']['roleid']) && (string)$_SESSION['user']['roleid'] === '05'): ?>
+                    <li><a href="#" onclick="userProfileRedirect()"><i class="ri-user-settings-line"></i> Hồ sơ</a></li>
+                    <?php endif; ?>
+
                     <li><a href="#" onclick="handleLogout(event)"><i class="ri-logout-box-line"></i> Đăng xuất</a></li>
                 </ul>
             </div>
@@ -201,15 +205,42 @@ session_start();
             document.getElementById('loginOverlay').style.display = 'flex';
         });
 
-        document.getElementById('loginOverlay').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('loginOverlay')) {
-                document.getElementById('loginOverlay').style.display = 'none';
-            }
+      document.getElementById('loginOverlay').addEventListener('click', (e) => {
+         const overlay = document.getElementById('loginOverlay');
+         if (e.target === overlay) { // Check if the click is on the overlay itself
+            overlay.style.display = 'none'; // Hide the overlay
+         }
+      });
+
+        
+        document.getElementById('searchForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const searchInput = this.querySelector('input[name="search"]').value.trim();
+            fetch('/sportswear-webstore/layout/client/check_search.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'search=' + encodeURIComponent(searchInput)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const form = document.getElementById('searchForm');
+                if (data.brandId) {
+                    window.location.href = '/sportswear-webstore/layout/client/search_results.php?brand=' + data.brandId;
+                } else if (data.categoryId) {
+                    window.location.href = '/sportswear-webstore/layout/client/search_results.php?category=' + data.categoryId;
+                } else {
+                    form.submit();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                form.submit();
+            });
         });
 
         function handleLogout(event) {
             event.preventDefault();
-            fetch('/layout/login_regis.php', {
+            fetch('./layout/login_regis.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'submitLogout=1'
@@ -222,9 +253,17 @@ session_start();
             .catch(error => alert('Đăng xuất thất bại: ' + error.message));
         }
 
-        function adminPageRedirect() {
-            window.location.href = '/layout/admin/index.php';
-        }
+         function userProfileRedirect() {
+            const pageContainer = document.querySelector('.page-container');
+            fetch('./layout/client/profile/')
+               .then(response => response.text())
+               .then(data => {
+                     pageContainer.innerHTML = data; // Load the profile content into the page-container
+                     const overlay = document.getElementById('loginOverlay');
+                     overlay.style.display = 'none'; // Hide the login overlay
+               })
+               .catch(error => console.error('Error loading profile:', error));
+         }
     </script>
 </body>
 </html>
