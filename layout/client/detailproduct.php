@@ -261,22 +261,21 @@
                     <img src="/img/adidas.svg" alt="" > -->
                 </div>
                 <div class="mainImage">
-                    <img src="/img/adidas.svg" alt="" >
+                    <img src="" alt="" >
                 </div>
             </div>
             <div class="detailProductCss">
                <h2 class="product-title">Adidas RUNFALCON 3.0</h2>
 
                <div class="rating-stock">
-                  <span class="stars">★★★★☆</span>
+                  <span class="stars">★★★★★</span>
                   <span class="reviews">(Reviews)</span> |
                   <span class="in-stock">In Stock</span>
                </div>
 
-               <h3 class="price">$192.00</h3>
+               <h3 class="price"></h3>
 
                <p class="description">
-                  Freely challenge the trails! Maximize outdoor running with grip and support, whether on tarmac or trail.
                </p>
 
                <hr>
@@ -284,19 +283,13 @@
                <div class="section">
                   <strong>Colours:</strong>
                   <div class="colors">
-                     <span class="color-option black"></span>
-                     <span class="color-option pink"></span>
+     
                   </div>
                </div>
 
                <div class="section">
                   <strong>Size:</strong>
                   <div class="sizes">
-                        <button class="size-btn">XS</button>
-                        <button class="size-btn">S</button>
-                        <button class="size-btn active">M</button>
-                        <button class="size-btn">L</button>
-                        <button class="size-btn">XL</button>
                   </div>
                </div>
 
@@ -312,7 +305,7 @@
                </div>
 
                <div class="delivery-box">
-                  <strong>🔁 Trả hàng miễn phí</strong><br>
+                  <strong>🔁 Chính Sách Bảo Hành</strong><br>
                   <small>Trả hàng miễn phí trong 30 ngày. </small>
                </div>
 
@@ -327,7 +320,7 @@
       <script>
       let selectedColor = null;
       let selectedSize = null;
-
+      let variants = null;
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
       if (id) {
@@ -338,17 +331,6 @@
                document.querySelector(".product-title").innerText = product.name;
 
                document.querySelector(".description").innerText = product.description;
-
-               document.querySelector(".price").innerText = `${product.markup_percentage}% markup`;
-
-               const stockStatus = document.querySelector(".in-stock");
-               if (product.status === "in_stock" && product.stock > 0) {
-                  stockStatus.innerText = "Còn hàng";
-                  stockStatus.classList.remove("out-of-stock");
-               } else {
-                  stockStatus.innerText = "Hết hàng";
-                  stockStatus.classList.add("out-of-stock");
-               }
 
                const mainImg = document.querySelector(".mainImage img");
                mainImg.src = `/img/products/${product.ID}.jpg`;
@@ -365,7 +347,7 @@
             getProductVariants(id)
                .then(res => {
                   if (res.status === 200) {
-                     const variants = res.data;
+                     variants = res.data;
                      renderColors(variants);
                      renderSizes(variants);
                      updatePriceStock(variants);
@@ -423,11 +405,17 @@
          const colors = [...new Set(variants.map(v => v.color))];
          colorContainer.innerHTML = '';
 
-         colors.forEach(color => {
+         colors.forEach((color, index) => {
             const span = document.createElement('span');
             span.className = 'color-option';
             span.dataset.color = color;
             span.style.backgroundColor = getColorCSS(color);
+            
+            if (index === 0) {
+               selectedColor = color;
+               span.classList.add('selected');
+            }
+
             span.addEventListener('click', () => {
                selectedColor = color;
                document.querySelectorAll('.color-option').forEach(option => option.classList.remove('selected'));
@@ -435,9 +423,11 @@
                renderSizes(variants);
                updatePriceStock(variants);
             });
+
             colorContainer.appendChild(span);
          });
       }
+
 
 
       function renderSizes(variants) {
@@ -448,17 +438,25 @@
          const sizes = [...new Set(filtered.map(v => v.size))];
 
          sizeContainer.innerHTML = '';
-         sizes.forEach(size => {
+         sizes.forEach((size, index) => {
             const btn = document.createElement('button');
             btn.className = 'size-btn';
             btn.textContent = size;
             btn.dataset.size = size;
+
+            if (index === 0) {
+               selectedSize = size;
+               btn.classList.add('active');
+               updatePriceStock(variants);
+            }
+
             btn.addEventListener('click', () => {
                selectedSize = size;
                updatePriceStock(variants);
                document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
                btn.classList.add('active');
             });
+
             sizeContainer.appendChild(btn);
          });
       }
@@ -518,11 +516,23 @@
          });
       });
       
+      function getVariantId(selectedColor, selectedSize) {
+            const idvariant = variants.find(item => item.color === selectedColor && item.size === selectedSize);
+            return idvariant ? idvariant.ID : null;
+         }
+         async function themVaoGio() {
+            const activeSizeBtn = document.querySelector('.size-btn.active');
+            const selectedSize = activeSizeBtn ? activeSizeBtn.getAttribute('data-size') : null;
 
-      async function themVaoGio() {
+            const activeColorBtn = document.querySelector('.color-option.selected');
+            const selectedColor = activeColorBtn ? activeColorBtn.getAttribute('data-color') : null;
+
+            const variantId = getVariantId( selectedColor, selectedSize);
             const quantity = document.querySelector('.qty-input').value;
+
+            console.log(variantId)
             try {
-                const result = await addCartDetail(id, quantity);
+                const result = await addCartDetail(variantId, quantity);
 
                 if (result.status === 200) {
                     alert('Đã thêm sản phẩm vào giỏ');
@@ -541,8 +551,7 @@
                     alert('Đã xảy ra lỗi: ' + message);
                 }
             }
-
-        }
+         }
 
    </script>
 </html>

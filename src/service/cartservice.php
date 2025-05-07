@@ -26,11 +26,9 @@ class CartService {
         }
     }
 
-    public function getCartByUserId($userAccID) {
+    public function getCartByUserId() {
         try {
-            if (!is_numeric($userAccID) || $userAccID <= 0) {
-                throw new Exception("Invalid user ID");
-            }
+            $userAccID = $this->userUtils->getUserId();
             return $this->cartRepository->findByUserAccId($userAccID);
         } catch (Exception $e) {
             throw new Exception("Failed to get cart: " . $e->getMessage());

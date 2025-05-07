@@ -172,131 +172,52 @@
                transition: background-color 0.2s ease;
                margin-top: 15px;
             }
+
+            .popup-overlay {
+               position: fixed;
+               top: 0;
+               left: 0;
+               width: 100%;
+               height: 100%;
+               background: rgba(0, 0, 0, 0.6);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               z-index: 9999;
+            }
+
+            .popup-content {
+               background: white;
+               padding: 20px;
+               border-radius: 8px;
+               width: 300px;
+               max-width: 90%;
+               box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            }
+
+            .titlePopup {
+               display: flex;
+               justify-content: space-between;
+               margin-bottom: 15px;
+               font-weight: bold;
+            }
+
+            .form-group {
+               margin-bottom: 10px;
+            }
+
+            .form-group input {
+               width: 100%;
+               padding: 6px;
+               box-sizing: border-box;
+            }
+
+
         </style>  
     </head>
 
       <body>
-        <header class="header">
-         <nav class="nav container">
-            <div class="nav__data">
-               <a href="#" class="nav__logo">
-                  <i class="ri-store-2-fill"></i> Sportwear Store
-               </a>
-               
-            </div>
-
-            <!--=============== NAV MENU ===============-->
-            <div class="nav__menu" id="nav-menu">
-               <ul class="nav__list">
-                  <li><a href="#" class="nav__link">Trang chủ</a></li>
-
-                  <!--=============== DROPDOWN 1 ===============-->
-                  <li class="dropdown__item">
-                     <div class="nav__link">
-                        Sản phẩm<i class="ri-arrow-down-s-line dropdown__arrow"></i>
-                     </div>
-
-                     <ul class="dropdown__menu">
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-pie-chart-line"></i> Áo 
-                           </a>                          
-                        </li>
-
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-arrow-up-down-line"></i> Quần
-                           </a>
-                        </li>
-
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-arrow-up-down-line"></i> Giày
-                           </a>
-                        </li>
-
-                        <!--=============== DROPDOWN SUBMENU ===============-->
-                        <li class="dropdown__subitem">
-                           <div class="dropdown__link">
-                              <i class="ri-bar-chart-line"></i> Phụ kiện <i class="ri-add-line dropdown__add"></i>
-                           </div>
-
-                           <ul class="dropdown__submenu">
-                              <li>
-                                 <a href="#" class="dropdown__sublink">
-                                    <i class="ri-file-list-line"></i> Bình nước
-                                 </a>
-                              </li>
-      
-                              <li>
-                                 <a href="#" class="dropdown__sublink">
-                                    <i class="ri-cash-line"></i> Vợt
-                                 </a>
-                              </li>
-      
-                              <li>
-                                 <a href="#" class="dropdown__sublink">
-                                    <i class="ri-refund-2-line"></i> Balo/Túi
-                                 </a>
-                              </li>
-                           </ul>
-                        </li>
-                     </ul>
-                  </li>
-                  
-                  <!--=============== DROPDOWN 2 ===============-->
-                  <li class="dropdown__item">
-                     <div class="nav__link">
-                        Thương hiệu <i class="ri-arrow-down-s-line dropdown__arrow"></i>
-                     </div>
-
-                     <ul class="dropdown__menu">
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-user-line"></i> Nike
-                           </a>                          
-                        </li>
-
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-lock-line"></i> Adidas
-                           </a>
-                        </li>
-
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-message-3-line"></i> Puma
-                           </a>
-                        </li>
-                     </ul>
-                  </li>
-
-                  <li><a href="#" class="nav__link">Chính sách bảo hành</a></li>
-
-                  <li><a href="#" class="nav__link">Liên hệ</a></li>
-
-               </ul>
-            </div>
-            
-            <div class="nav__tools">
-               <div class="search-box" >
-                  <i class="ri-search-line"></i>
-               <input type="text"placeholder="Search...">
-               </div>
-               
-               <i class="ri-shopping-cart-2-line nav__cart"></i>
-               <a class="nav__account"  id="account">
-                  <i class="ri-account-circle-line"></i>
-               </a>
-               <div class="nav__toggle" id="nav-toggle">
-                  <i class="ri-menu-line nav__burger"></i>
-                  <i class="ri-close-line nav__close"></i>
-               </div>
-            </div>
-            
-            </nav>
-        </header>
-
+         <?php include __DIR__ . '/../header.php'; ?>
          <div class="cart-container">
             <div class="containerRight">
                <table class="cart-table">
@@ -349,15 +270,14 @@
          </div>
       </body>
    <script src="../../JS/client/cartApi.js"></script>
-   <script src="../../JS/client/cartdetail.js"></script>
    <script src="../../JS/admin/coupon.js"></script>
+   <script src="../../JS/client/cartdetail.js"></script>
 
-
-    <script>
+   <script>
       loadCart()
       function loadCart(){
          let total = 0;
-         getCartByUserId(10)
+         getCartByUserId()
             .then(res => {
                if (res.status === 200) {
                   const cartItems = res.data; 
@@ -370,7 +290,7 @@
                      const productCell = document.createElement("td");
                      productCell.innerHTML = `
                         <div class="product-info">
-                           <img src="/img/adidas.svg" alt="${item.productName}">
+                           <img src="/img/products/${item.productID}.jpg" alt="${item.productName}">
                            <span>${item.productName}</span>
                         </div>
                      `;
@@ -411,7 +331,7 @@
             })
             .catch(error => console.error('Lỗi khi lấy biến thể sản phẩm:', error));
 
-         getCouponByUserId(10)
+         getCouponByUserId()
             .then(result => {
             const coupons = result.data; 
             const container = document.querySelector(".voucher");
@@ -492,7 +412,7 @@
          `;
          overlay.appendChild(popup);
          document.body.appendChild(overlay);
-         }
+      }
 
       function closePopup() {
          const overlay = document.querySelector('.popup-overlay');
@@ -523,8 +443,56 @@
         
       }
 
+      function showCustomerInfoPopup() {
+         const overlay = document.createElement('div');
+         overlay.classList.add('popup-overlay');
+
+         const popup = document.createElement('div');
+         popup.classList.add('popup-content');
+         popup.innerHTML = `
+            <div class="titlePopup">
+               <div>Nhập Thông Tin Khách Hàng</div>
+               <div onclick="closePopup()" style="cursor: pointer;">X</div>
+            </div>
+            <form id="customerForm" onsubmit="submitCustomerInfo(event)">
+               <div class="form-group">
+                  <label for="name">Họ tên:</label>
+                  <input type="text" id="name" name="name" required />
+               </div>
+               <div class="form-group">
+                  <label for="address">Địa chỉ:</label>
+                  <input type="text" id="address" name="address" required />
+               </div>
+               <div class="form-group">
+                  <label for="phone">Số điện thoại:</label>
+                  <input type="tel" id="phone" name="phone" required pattern="\\d{10,11}" />
+               </div>
+               <button type="submit" class="btn-xong">Đặt Hàng</button>
+            </form>
+         `;
+         overlay.appendChild(popup);
+         document.body.appendChild(overlay);
+      }
+
       document.querySelector('.btn-buy').addEventListener('click', function () {
-         window.location.href = 'billDetail.php';
+         showCustomerInfoPopup()
       });
+
+      function submitCustomerInfo(event) {
+         event.preventDefault();
+         const name = document.getElementById('name').value.trim();
+         const address = document.getElementById('address').value.trim();
+         const phone = document.getElementById('phone').value.trim();
+
+         if (!name || !address || !phone) {
+            alert('Vui lòng điền đầy đủ thông tin');
+            return;
+         }
+
+         console.log({ name, address, phone });
+
+         alert('Thông tin đã được gửi!');
+         closePopup();
+      }
     </script>
 </html>

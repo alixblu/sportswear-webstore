@@ -121,7 +121,9 @@ session_start();
                         <input type="text" name="search" id="searchInput" placeholder="Tìm kiếm..." required>
                     </form>
                 </div>
-                <i class="ri-shopping-cart-2-line nav__cart"></i>
+                <a href="/layout/client/card.php">
+                    <i class="ri-shopping-cart-2-line nav__cart"></i>
+                </a>               
                 <a class="nav__account" id="account"><i class="ri-account-circle-line"></i></a>
                 <div class="nav__toggle" id="nav-toggle">
                     <i class="ri-menu-line nav__burger"></i>

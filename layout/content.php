@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sản phẩm đang bán - SportsWear</title>
-    <link rel="stylesheet" href="/sportswear-webstore/css/content.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
@@ -232,7 +231,10 @@
             productPrice.classList.add('product-price');
             const currentPrice = document.createElement('span');
             currentPrice.classList.add('current-price');
-            currentPrice.textContent = `$${product.price || '0.00'}`;
+            currentPrice.textContent = new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(product.price || 0);
             productPrice.appendChild(currentPrice);
 
             const productRating = document.createElement('div');
@@ -248,7 +250,7 @@
             productRating.appendChild(ratingText);
 
             const buyButton = document.createElement('button');
-            buyButton.id = `idProduct-${product.ID}`;
+            buyButton.id = `idProduct-${product.productVariantID}`;
             buyButton.classList.add('buy-button');
             buyButton.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ';
             buyButton.addEventListener('click', function (event) {

@@ -17,8 +17,8 @@ const getAllCoupons = async () => {
     }
 };
 
-const getCouponById = async (id) => {
-    const response = await fetch(`${COUPON_API_URL}?action=getCouponById&id=${id}`, {
+const getCouponById = async () => {
+    const response = await fetch(`${COUPON_API_URL}?action=getCouponById`, {
         method: 'GET',
     });
 
@@ -73,8 +73,8 @@ const deleteCoupon = async (id) => {
 
     return await response.json();
 };
-const getCouponByUserId = async (userID) => {
-    const url = `${COUPON_API_URL}?action=getCouponByUserId&id=${userID}`;
+const getCouponByUserId = async () => {
+    const url = `${COUPON_API_URL}?action=getCouponByUserId`;
 
     const response = await fetch(url, {
         method: 'GET'
