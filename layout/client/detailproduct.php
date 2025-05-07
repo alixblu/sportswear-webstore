@@ -320,7 +320,7 @@
       <script>
       let selectedColor = null;
       let selectedSize = null;
-
+      let variants = null;
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
       if (id) {
@@ -347,7 +347,7 @@
             getProductVariants(id)
                .then(res => {
                   if (res.status === 200) {
-                     const variants = res.data;
+                     variants = res.data;
                      renderColors(variants);
                      renderSizes(variants);
                      updatePriceStock(variants);
@@ -405,11 +405,17 @@
          const colors = [...new Set(variants.map(v => v.color))];
          colorContainer.innerHTML = '';
 
-         colors.forEach(color => {
+         colors.forEach((color, index) => {
             const span = document.createElement('span');
             span.className = 'color-option';
             span.dataset.color = color;
             span.style.backgroundColor = getColorCSS(color);
+            
+            if (index === 0) {
+               selectedColor = color;
+               span.classList.add('selected');
+            }
+
             span.addEventListener('click', () => {
                selectedColor = color;
                document.querySelectorAll('.color-option').forEach(option => option.classList.remove('selected'));
@@ -417,9 +423,11 @@
                renderSizes(variants);
                updatePriceStock(variants);
             });
+
             colorContainer.appendChild(span);
          });
       }
+
 
 
       function renderSizes(variants) {
@@ -430,17 +438,25 @@
          const sizes = [...new Set(filtered.map(v => v.size))];
 
          sizeContainer.innerHTML = '';
-         sizes.forEach(size => {
+         sizes.forEach((size, index) => {
             const btn = document.createElement('button');
             btn.className = 'size-btn';
             btn.textContent = size;
             btn.dataset.size = size;
+
+            if (index === 0) {
+               selectedSize = size;
+               btn.classList.add('active');
+               updatePriceStock(variants);
+            }
+
             btn.addEventListener('click', () => {
                selectedSize = size;
                updatePriceStock(variants);
                document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
                btn.classList.add('active');
             });
+
             sizeContainer.appendChild(btn);
          });
       }
@@ -500,11 +516,23 @@
          });
       });
       
+      function getVariantId(selectedColor, selectedSize) {
+            const idvariant = variants.find(item => item.color === selectedColor && item.size === selectedSize);
+            return idvariant ? idvariant.ID : null;
+         }
+         async function themVaoGio() {
+            const activeSizeBtn = document.querySelector('.size-btn.active');
+            const selectedSize = activeSizeBtn ? activeSizeBtn.getAttribute('data-size') : null;
 
-      async function themVaoGio() {
+            const activeColorBtn = document.querySelector('.color-option.selected');
+            const selectedColor = activeColorBtn ? activeColorBtn.getAttribute('data-color') : null;
+
+            const variantId = getVariantId( selectedColor, selectedSize);
             const quantity = document.querySelector('.qty-input').value;
+
+            console.log(variantId)
             try {
-                const result = await addCartDetail(id, quantity);
+                const result = await addCartDetail(variantId, quantity);
 
                 if (result.status === 200) {
                     alert('Đã thêm sản phẩm vào giỏ');
@@ -523,8 +551,7 @@
                     alert('Đã xảy ra lỗi: ' + message);
                 }
             }
-
-        }
+         }
 
    </script>
 </html>
