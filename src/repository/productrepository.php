@@ -83,39 +83,54 @@ class ProductRepository
      * @param $min_price : min price of product
      * @param $max_price : max price of product
      */
-    public function getFilteredProducts($category, $brand, $status, $min_price, $max_price)
+    public function getFilteredProducts($category, $brand, $status, $rating, $min_price, $max_price)
     {
         try {
-            $query = "
-                SELECT * FROM product AS p
-                JOIN productvariant as pv
-                WHERE 1=1
-            ";
+            $query = "SELECT DISTINCT p.* FROM product AS p";
             $params = [];
+
+            if ($min_price || $max_price)
+                $query .= " JOIN productvariant as pv ON pv.productID = p.ID ";
+            $query .= " WHERE 1=1 ";
+
             if ($category) {
-                $query .= "AND p.categoryID=?";
+                $query .= " AND p.categoryID=?";
                 $params[] = $category;
             }
             if ($brand) {
-                $query .= "AND p.brandID=?";
+                $query .= " AND p.brandID=?";
                 $params[] = $brand;
             }
             if ($status) {
-                $query .= "AND status=?";
+                $query .= " AND p.status=?";
                 $params[] = $status;
             }
+            if ($rating) {
+                $query .= ($rating == 1) ? " AND p.rating=?" : " AND p.rating>=? AND p.rating<=?";
+                $params[] = $rating - 1;
+                if ($rating != 1)
+                    $params[] = $rating;
+            }
+
             if ($min_price) {
-                $query .= "pv.price>=?";
+                $query .= " AND pv.price>=?";
                 $params[] = $min_price;
             }
 
             if ($max_price) {
-                $query .= "pv.price<=?";
+                $query .= " AND pv.price<=?";
                 $params[] = $max_price;
             }
+            error_log("SQL Query: " . $query);
+            error_log("Params: " . print_r($params, true));
+
 
             $stmt = $this->conn->prepare($query);
+            if (!$stmt)
+                throw new Exception("Prepare failed !!" . $this->conn->error);
             $stmt->execute($params);
+            if (!$stmt)
+                throw new Exception("Execute failed !!" . $this->conn->error);
             $result = $stmt->get_result();
 
             $products = [];

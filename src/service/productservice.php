@@ -41,12 +41,13 @@ class ProductService
      * @param $min_price : min price of product
      * @param $max_price : max price of product
      */
-    public function getFilteredProducts($category, $brand, $status, $min_price, $max_price)
+    public function getFilteredProducts($category, $brand, $status, $rating, $min_price, $max_price)
     {
         try {
-            return $this->productRepository->getFilteredProducts($category, $brand, $status, $min_price, $max_price);
+            return $this->productRepository->getFilteredProducts($category, $brand, $status, $rating, $min_price, $max_price);
         } catch (Exception $e) {
-            throw new Exception('');
+            error_log('Error at getFilteredProducts service: ' . $e->getMessage());
+            throw new Exception('Failed to get product - Service' . $e->getMessage());
         }
     }
 

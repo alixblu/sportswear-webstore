@@ -35,11 +35,11 @@ class ProductController
      * @param $min_price : min price of product
      * @param $max_price : max price of product
      */
-    public function getFilteredProducts($category, $brand, $status, $min_price, $max_price)
+    public function getFilteredProducts($category, $brand, $status, $rating, $min_price, $max_price)
     {
         $products = null;
         try {
-            $products =  $this->productService->getFilteredProducts($category, $brand, $status, $min_price, $max_price);
+            $products =  $this->productService->getFilteredProducts($category, $brand, $status, $rating, $min_price, $max_price);
             ApiResponse::customApiResponse($products, 200);
             return $products;
         } catch (Exception $e) {

@@ -20,9 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $category = $_GET['category'] ?? null;
         $brand = $_GET['brand'] ?? null;
         $status = $_GET['status'] ?? null;
+        $rating = $_GET['rating'] ?? null;
         $min_price = $_GET['min_price'] ?? null;
         $max_price = $_GET['max_price'] ?? null;
-        $productController->getFilteredProducts($category, $brand, $status, $min_price, $max_price);
+        $productController->getFilteredProducts($category, $brand, $status, $rating, $min_price, $max_price);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getProductById' && isset($_GET['id'])) {
         $productController->getProductById($_GET['id']);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getProductVariants' && isset($_GET['id'])) {

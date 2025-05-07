@@ -108,4 +108,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         echo json_encode(['status' => 400, 'message' => 'Yêu cầu DELETE không hợp lệ'], JSON_UNESCAPED_UNICODE);
     }
 }
-?>
