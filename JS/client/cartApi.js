@@ -1,5 +1,4 @@
 const CART_API_URL = '../../src/router/cartRouter.php';
-const CART_DETAIL_API_URL = '../../src/router/cartdetailrouter.php';
 
 const createCart = async (userId) => {
     const formData = new URLSearchParams();
@@ -21,14 +20,13 @@ const createCart = async (userId) => {
     return await response.json();
 };
 
-const addCartDetail = async (productID, quantity, cartID) => {
+const addCartDetail = async (productID, quantity) => {
     const formData = new URLSearchParams();
     formData.append('action', 'addCartDetail');
     formData.append('productID', productID);
     formData.append('quantity', quantity);
-    formData.append('cartID', cartID);
 
-    const response = await fetch(CART_DETAIL_API_URL, {
+    const response = await fetch(CART_API_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -40,7 +38,7 @@ const addCartDetail = async (productID, quantity, cartID) => {
         throw new Error('Không thể thêm sản phẩm vào giỏ hàng');
     }
 
-    return await response.text();
+    return await response.json();
 };
 
 

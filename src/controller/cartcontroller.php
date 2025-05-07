@@ -26,4 +26,13 @@ class CartController
         $card = $this->cartService->updateTotalPrice($cartID, $totalPrice);
         ApiResponse::customApiResponse($card, 200);
     }
+    public function addProductCart($productID, $quantity)
+    {
+        try {
+            $insertId = $this->cartService->addProductCart($productID, $quantity);
+            ApiResponse::customApiResponse(['insertId' => $insertId], 200);
+        } catch (Exception $e) {
+            ApiResponse::customApiResponse(['error' => $e->getMessage()], 400);
+        }
+    }
 }

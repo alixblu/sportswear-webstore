@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
-include dirname(__FILE__) . '/../../src/config/exception/exceptionHandler.php';
+require_once  dirname(__FILE__) . '/../../src/config/exception/exceptionHandler.php';
 
 class CartRepository {
     private $conn;
@@ -108,6 +108,31 @@ class CartRepository {
             $this->conn->close();
         }
     }
-
+    public function findCartIdByUserAccId($userAccID) {
+        try {
+            $stmt = $this->conn->prepare("
+                SELECT ID as cartID
+                FROM cart
+                WHERE userAccID = ?
+                LIMIT 1
+            ");
+            $stmt->bind_param("i", $userAccID);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            $cartID = null;
+            if ($row = $result->fetch_assoc()) {
+                $cartID = $row['cartID'];
+            }
+    
+            $stmt->close();
+            $this->conn->close();
+            return $cartID; 
+        } catch (Exception $e) {
+            error_log("findCartIdByUserAccId failed: " . $e->getMessage());
+            return null;
+        }
+    }
+    
 }
 ?>

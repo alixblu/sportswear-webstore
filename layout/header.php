@@ -14,14 +14,14 @@ session_start();
     <header class="header">
         <nav class="nav container">
             <div class="nav__data">
-                <a href="/sportswear-webstore/index.php" class="nav__logo">
+                <a href="/index.php" class="nav__logo">
                     <i class="ri-store-2-fill"></i> Cửa hàng Sportwear
                 </a>
             </div>
 
             <div class="nav__menu" id="nav-menu">
                 <ul class="nav__list">
-                    <li><a href="/sportswear-webstore/index.php" class="nav__link">Trang chủ</a></li>
+                    <li><a href="/index.php" class="nav__link">Trang chủ</a></li>
                     <li class="dropdown__item">
                         <div class="nav__link">
                             Sản phẩm <i class="ri-arrow-down-s-line dropdown__arrow"></i>
@@ -32,13 +32,13 @@ session_start();
                                     <i class="ri-user-line"></i> Nam <i class="ri-add-line dropdown__add"></i>
                                 </div>
                                 <ul class="dropdown__submenu">
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=5&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/layout/client/search_results.php?category=5&sort=newest" class="dropdown__sublink">
                                         <i class="ri-t-shirt-line"></i> Áo nam
                                     </a></li>
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=6&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/layout/client/search_results.php?category=6&sort=newest" class="dropdown__sublink">
                                         <i class="ri-arrow-up-down-line"></i> Quần nam
                                     </a></li>
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=7&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/layout/client/search_results.php?category=7&sort=newest" class="dropdown__sublink">
                                         <i class="ri-footprint-line"></i> Giày nam
                                     </a></li>
                                 </ul>
@@ -48,13 +48,13 @@ session_start();
                                     <i class="ri-user-star-line"></i> Nữ <i class="ri-add-line dropdown__add"></i>
                                 </div>
                                 <ul class="dropdown__submenu">
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=8&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/layout/client/search_results.php?category=8&sort=newest" class="dropdown__sublink">
                                         <i class="ri-t-shirt-line"></i> Áo nữ
                                     </a></li>
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=9&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/layout/client/search_results.php?category=9&sort=newest" class="dropdown__sublink">
                                         <i class="ri-arrow-up-down-line"></i> Quần nữ
                                     </a></li>
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=10&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/layout/client/search_results.php?category=10&sort=newest" class="dropdown__sublink">
                                         <i class="ri-footprint-line"></i> Giày nữ
                                     </a></li>
                                 </ul>
@@ -64,13 +64,13 @@ session_start();
                                     <i class="ri-shield-line"></i> Trang bị <i class="ri-add-line dropdown__add"></i>
                                 </div>
                                 <ul class="dropdown__submenu">
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=14&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/layout/client/search_results.php?category=14&sort=newest" class="dropdown__sublink">
                                         <i class="ri-baseball-line"></i> Vợt
                                     </a></li>
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=15&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/layout/client/search_results.php?category=15&sort=newest" class="dropdown__sublink">
                                         <i class="ri-football-line"></i> Bóng
                                     </a></li>
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=16&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/layout/client/search_results.php?category=16&sort=newest" class="dropdown__sublink">
                                         <i class="ri-dumbbell-line"></i> Dụng cụ tập gym
                                     </a></li>
                                 </ul>
@@ -80,13 +80,13 @@ session_start();
                                     <i class="ri-bar-chart-line"></i> Phụ kiện <i class="ri-add-line dropdown__add"></i>
                                 </div>
                                 <ul class="dropdown__submenu">
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=11&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/layout/client/search_results.php?category=11&sort=newest" class="dropdown__sublink">
                                         <i class="ri-briefcase-line"></i> Balo
                                     </a></li>
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=12&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/layout/client/search_results.php?category=12&sort=newest" class="dropdown__sublink">
                                         <i class="ri-hand-heart-line"></i> Găng tay
                                     </a></li>
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=13&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/layout/client/search_results.php?category=13&sort=newest" class="dropdown__sublink">
                                         <i class="ri-bandage-line"></i> Băng quấn
                                     </a></li>
                                 </ul>
@@ -98,13 +98,13 @@ session_start();
                             Thương hiệu <i class="ri-arrow-down-s-line dropdown__arrow"></i>
                         </div>
                         <ul class="dropdown__menu">
-                            <li><a href="/sportswear-webstore/layout/client/search_results.php?brand=1" class="dropdown__link">
+                            <li><a href="/layout/client/search_results.php?brand=1" class="dropdown__link">
                                 <i class="ri-user-line"></i> Nike
                             </a></li>
-                            <li><a href="/sportswear-webstore/layout/client/search_results.php?brand=2" class="dropdown__link">
+                            <li><a href="/layout/client/search_results.php?brand=2" class="dropdown__link">
                                 <i class="ri-lock-line"></i> Adidas
                             </a></li>
-                            <li><a href="/sportswear-webstore/layout/client/search_results.php?brand=3" class="dropdown__link">
+                            <li><a href="/layout/client/search_results.php?brand=3" class="dropdown__link">
                                 <i class="ri-message-3-line"></i> Puma
                             </a></li>
                         </ul>
@@ -116,7 +116,7 @@ session_start();
             
             <div class="nav__tools">
                 <div class="search-box">
-                    <form id="searchForm" action="/sportswear-webstore/layout/client/search_results.php" method="GET">
+                    <form id="searchForm" action="/layout/client/search_results.php" method="GET">
                         <i class="ri-search-line"></i>
                         <input type="text" name="search" id="searchInput" placeholder="Tìm kiếm..." required>
                     </form>
@@ -141,12 +141,12 @@ session_start();
                     <?php if(isset($_SESSION['user']['roleid']) && $_SESSION['user']['roleid'] !== '05'): ?>
                     <li><a href="#" onclick="adminPageRedirect()"><i class="ri-admin-line"></i> Đi đến trang quản trị</a></li>
                     <?php endif; ?>
-                    <li><a href="/sportswear-webstore/layout/client/profile.php"><i class="ri-user-settings-line"></i> Hồ sơ</a></li>
+                    <li><a href="/layout/client/profile.php"><i class="ri-user-settings-line"></i> Hồ sơ</a></li>
                     <li><a href="#" onclick="handleLogout(event)"><i class="ri-logout-box-line"></i> Đăng xuất</a></li>
                 </ul>
             </div>
         <?php else: ?>
-            <?php include '/layout/login_regis.php'; ?>
+            <?php include './layout/login_regis.php'; ?>
         <?php endif; ?>
     </div>
     <script>
@@ -159,22 +159,22 @@ session_start();
             
             try {
                 // Kiểm tra xem có phải là tên thương hiệu không
-                let response = await fetch(`/sportswear-webstore/src/router/productrouter.php?action=getBrandByName&name=${encodeURIComponent(searchInput)}`);
+                let response = await fetch(`/src/router/productrouter.php?action=getBrandByName&name=${encodeURIComponent(searchInput)}`);
                 let data = await response.json();
                 
                 if (data.success && data.data && data.data.ID) {
                     // Chuyển hướng đến trang thương hiệu nếu tìm thấy
-                    window.location.href = `/sportswear-webstore/layout/client/search_results.php?brand=${data.data.ID}`;
+                    window.location.href = `/layout/client/search_results.php?brand=${data.data.ID}`;
                     return;
                 }
                 
                 // Kiểm tra xem có phải là tên danh mục không
-                response = await fetch(`/sportswear-webstore/src/router/productrouter.php?action=getCategoryByName&name=${encodeURIComponent(searchInput)}`);
+                response = await fetch(`/src/router/productrouter.php?action=getCategoryByName&name=${encodeURIComponent(searchInput)}`);
                 data = await response.json();
                 
                 if (data.success && data.data && data.data.ID) {
                     // Chuyển hướng đến trang danh mục nếu tìm thấy
-                    window.location.href = `/sportswear-webstore/layout/client/search_results.php?category=${data.data.ID}`;
+                    window.location.href = `/layout/client/search_results.php?category=${data.data.ID}`;
                     return;
                 }
                 
@@ -209,7 +209,7 @@ session_start();
 
         function handleLogout(event) {
             event.preventDefault();
-            fetch('/sportswear-webstore/layout/login_regis.php', {
+            fetch('/layout/login_regis.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'submitLogout=1'
@@ -223,7 +223,7 @@ session_start();
         }
 
         function adminPageRedirect() {
-            window.location.href = '/sportswear-webstore/layout/admin/index.php';
+            window.location.href = '/layout/admin/index.php';
         }
     </script>
 </body>
