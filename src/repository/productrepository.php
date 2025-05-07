@@ -92,50 +92,80 @@ class ProductRepository
      * @param $min_price : min price of product
      * @param $max_price : max price of product
      */
-    public function getFilteredProducts($category, $brand, $status, $min_price, $max_price)
+    public function getFilteredProducts($category, $brand, $status, $min_price, $max_price, $sort = 'newest', $search = null)
     {
         try {
             $query = "
-                SELECT * FROM product AS p
-                JOIN productvariant as pv
+                SELECT 
+                    p.*, 
+                    pv.id AS productVariantID,
+                    MIN(pv.price) AS price,
+                    COALESCE(p.rating, 0) AS rating
+                FROM product p
+                LEFT JOIN productvariant pv ON p.ID = pv.productID
                 WHERE 1=1
             ";
+            $types = "";
             $params = [];
-            if ($category) {
-                $query .= "AND p.categoryID=?";
+
+            if ($category && is_numeric($category)) {
+                $query .= " AND p.categoryID = ?";
+                $types .= "i";
                 $params[] = $category;
             }
-            if ($brand) {
-                $query .= "AND p.brandID=?";
+            if ($brand && is_numeric($brand)) {
+                $query .= " AND p.brandID = ?";
+                $types .= "i";
                 $params[] = $brand;
             }
             if ($status) {
-                $query .= "AND status=?";
+                $query .= " AND p.status = ?";
+                $types .= "s";
                 $params[] = $status;
             }
-            if ($min_price) {
-                $query .= "pv.price>=?";
+            if ($min_price && is_numeric($min_price)) {
+                $query .= " AND pv.price >= ?";
+                $types .= "d";
                 $params[] = $min_price;
             }
-
-            if ($max_price) {
-                $query .= "pv.price<=?";
+            if ($max_price && is_numeric($max_price)) {
+                $query .= " AND pv.price <= ?";
+                $types .= "d";
                 $params[] = $max_price;
             }
+            if ($search && !empty($search)) {
+                $query .= " AND p.name LIKE ?";
+                $types .= "s";
+                $params[] = "%" . $search . "%"; 
+            }
+
+            // Xử lý sắp xếp
+            $sort_map = [
+                'newest' => 'p.ID DESC',
+                'price_asc' => 'MIN(pv.price) ASC',
+                'price_desc' => 'MIN(pv.price) DESC',
+                'rating_desc' => 'COALESCE(p.rating, 0) DESC'
+            ];
+            $sort_order = isset($sort_map[$sort]) ? $sort_map[$sort] : 'p.ID DESC';
+            $query .= " GROUP BY p.ID ORDER BY $sort_order";
 
             $stmt = $this->conn->prepare($query);
-            $stmt->execute($params);
+            if (!empty($types) && !empty($params)) {
+                $stmt->bind_param($types, ...$params);
+            }
+            $stmt->execute();
             $result = $stmt->get_result();
 
             $products = [];
-            while ($row = $result->fetch_assoc())
+            while ($row = $result->fetch_assoc()) {
                 $products[] = $row;
+            }
             return $products;
         } catch (Exception $e) {
-            throw new Exception('');
+            error_log("Error in getFilteredProducts: " . $e->getMessage());
+            throw new Exception("Failed to get filtered products: " . $e->getMessage());
         }
     }
-
     /**
      * Get a product by ID without variants
      * @param int $id Product ID

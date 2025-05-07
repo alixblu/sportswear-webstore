@@ -32,13 +32,13 @@ session_start();
                                     <i class="ri-user-line"></i> Nam <i class="ri-add-line dropdown__add"></i>
                                 </div>
                                 <ul class="dropdown__submenu">
-                                    <li><a href="/layout/client/search_results.php?category=5&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=5&sort=newest" class="dropdown__sublink">
                                         <i class="ri-t-shirt-line"></i> Áo nam
                                     </a></li>
-                                    <li><a href="/layout/client/search_results.php?category=6&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=6&sort=newest" class="dropdown__sublink">
                                         <i class="ri-arrow-up-down-line"></i> Quần nam
                                     </a></li>
-                                    <li><a href="/layout/client/search_results.php?category=7&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=7&sort=newest" class="dropdown__sublink">
                                         <i class="ri-footprint-line"></i> Giày nam
                                     </a></li>
                                 </ul>
@@ -48,13 +48,13 @@ session_start();
                                     <i class="ri-user-star-line"></i> Nữ <i class="ri-add-line dropdown__add"></i>
                                 </div>
                                 <ul class="dropdown__submenu">
-                                    <li><a href="/layout/client/search_results.php?category=8&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=8&sort=newest" class="dropdown__sublink">
                                         <i class="ri-t-shirt-line"></i> Áo nữ
                                     </a></li>
-                                    <li><a href="/layout/client/search_results.php?category=9&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=9&sort=newest" class="dropdown__sublink">
                                         <i class="ri-arrow-up-down-line"></i> Quần nữ
                                     </a></li>
-                                    <li><a href="/layout/client/search_results.php?category=10&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=10&sort=newest" class="dropdown__sublink">
                                         <i class="ri-footprint-line"></i> Giày nữ
                                     </a></li>
                                 </ul>
@@ -64,13 +64,13 @@ session_start();
                                     <i class="ri-shield-line"></i> Trang bị <i class="ri-add-line dropdown__add"></i>
                                 </div>
                                 <ul class="dropdown__submenu">
-                                    <li><a href="/layout/client/search_results.php?category=14&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=14&sort=newest" class="dropdown__sublink">
                                         <i class="ri-baseball-line"></i> Vợt
                                     </a></li>
-                                    <li><a href="/layout/client/search_results.php?category=15&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=15&sort=newest" class="dropdown__sublink">
                                         <i class="ri-football-line"></i> Bóng
                                     </a></li>
-                                    <li><a href="/layout/client/search_results.php?category=16&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=16&sort=newest" class="dropdown__sublink">
                                         <i class="ri-dumbbell-line"></i> Dụng cụ tập gym
                                     </a></li>
                                 </ul>
@@ -80,13 +80,13 @@ session_start();
                                     <i class="ri-bar-chart-line"></i> Phụ kiện <i class="ri-add-line dropdown__add"></i>
                                 </div>
                                 <ul class="dropdown__submenu">
-                                    <li><a href="/layout/client/search_results.php?category=11&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=11&sort=newest" class="dropdown__sublink">
                                         <i class="ri-briefcase-line"></i> Balo
                                     </a></li>
-                                    <li><a href="/layout/client/search_results.php?category=12&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=12&sort=newest" class="dropdown__sublink">
                                         <i class="ri-hand-heart-line"></i> Găng tay
                                     </a></li>
-                                    <li><a href="/layout/client/search_results.php?category=13&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=13&sort=newest" class="dropdown__sublink">
                                         <i class="ri-bandage-line"></i> Băng quấn
                                     </a></li>
                                 </ul>
@@ -98,13 +98,13 @@ session_start();
                             Thương hiệu <i class="ri-arrow-down-s-line dropdown__arrow"></i>
                         </div>
                         <ul class="dropdown__menu">
-                            <li><a href="/layout/client/search_results.php?brand=1" class="dropdown__link">
+                            <li><a href="/sportswear-webstore/layout/client/search_results.php?brand=1" class="dropdown__link">
                                 <i class="ri-user-line"></i> Nike
                             </a></li>
-                            <li><a href="/layout/client/search_results.php?brand=2" class="dropdown__link">
+                            <li><a href="/sportswear-webstore/layout/client/search_results.php?brand=2" class="dropdown__link">
                                 <i class="ri-lock-line"></i> Adidas
                             </a></li>
-                            <li><a href="/layout/client/search_results.php?brand=3" class="dropdown__link">
+                            <li><a href="/sportswear-webstore/layout/client/search_results.php?brand=3" class="dropdown__link">
                                 <i class="ri-message-3-line"></i> Puma
                             </a></li>
                         </ul>
@@ -116,7 +116,7 @@ session_start();
             
             <div class="nav__tools">
                 <div class="search-box">
-                    <form id="searchForm" action="/layout/client/search_results.php" method="GET">
+                    <form id="searchForm" action="/sportswear-webstore/layout/client/search_results.php" method="GET">
                         <i class="ri-search-line"></i>
                         <input type="text" name="search" id="searchInput" placeholder="Tìm kiếm..." required>
                     </form>
@@ -156,41 +156,14 @@ session_start();
         <?php endif; ?>
     </div>
     <script>
-        // Xử lý tìm kiếm nâng cao
         document.getElementById('searchForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const searchInput = document.getElementById('searchInput').value.trim();
             
             if (!searchInput) return;
             
-            try {
-                // Kiểm tra xem có phải là tên thương hiệu không
-                let response = await fetch(`/src/router/productrouter.php?action=getBrandByName&name=${encodeURIComponent(searchInput)}`);
-                let data = await response.json();
-                
-                if (data.success && data.data && data.data.ID) {
-                    // Chuyển hướng đến trang thương hiệu nếu tìm thấy
-                    window.location.href = `/layout/client/search_results.php?brand=${data.data.ID}`;
-                    return;
-                }
-                
-                // Kiểm tra xem có phải là tên danh mục không
-                response = await fetch(`/src/router/productrouter.php?action=getCategoryByName&name=${encodeURIComponent(searchInput)}`);
-                data = await response.json();
-                
-                if (data.success && data.data && data.data.ID) {
-                    // Chuyển hướng đến trang danh mục nếu tìm thấy
-                    window.location.href = `/layout/client/search_results.php?category=${data.data.ID}`;
-                    return;
-                }
-                
-                // Nếu không tìm thấy thương hiệu hoặc danh mục, thực hiện tìm kiếm thông thường
-                this.submit();
-            } catch (error) {
-                console.error('Search failed:', error);
-                // Fallback to normal search if there's an error
-                this.submit();
-            }
+            // Redirect to search results page with the search term
+            window.location.href = `/sportswear-webstore/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
         });
         
         const showMenu = (toggleId, navId) => {
@@ -213,32 +186,6 @@ session_start();
             overlay.style.display = 'none'; // Hide the overlay
          }
       });
-
-        
-        document.getElementById('searchForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const searchInput = this.querySelector('input[name="search"]').value.trim();
-            fetch('/sportswear-webstore/layout/client/check_search.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'search=' + encodeURIComponent(searchInput)
-            })
-            .then(response => response.json())
-            .then(data => {
-                const form = document.getElementById('searchForm');
-                if (data.brandId) {
-                    window.location.href = '/sportswear-webstore/layout/client/search_results.php?brand=' + data.brandId;
-                } else if (data.categoryId) {
-                    window.location.href = '/sportswear-webstore/layout/client/search_results.php?category=' + data.categoryId;
-                } else {
-                    form.submit();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                form.submit();
-            });
-        });
 
         function handleLogout(event) {
             event.preventDefault();

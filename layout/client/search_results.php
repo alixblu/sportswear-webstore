@@ -1,169 +1,107 @@
 <?php
-// Database connection
-try {
-    $conn = new PDO("mysql:host=localhost;dbname=sportswear;charset=utf8mb4", "root", "");
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-} catch(PDOException $e) {
-    die('<div class="error-message">Database connection error: ' . htmlspecialchars($e->getMessage()) . '</div>');
+session_start();
+require_once __DIR__ . '/../../src/config/response/apiresponse.php';
+
+// Hàm gọi API từ productrouter.php với xử lý lỗi
+function callApi($url) {
+    try {
+        $response = @file_get_contents($url);
+        if ($response === false) {
+            error_log("Failed to fetch API: $url");
+            return ['status' => 500, 'message' => 'Không thể kết nối đến API'];
+        }
+        $data = json_decode($response, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            error_log("JSON decode error for API $url: " . json_last_error_msg());
+            return ['status' => 500, 'message' => 'Dữ liệu API không hợp lệ'];
+        }
+        return $data;
+    } catch (Exception $e) {
+        error_log("Error calling API $url: " . $e->getMessage());
+        return ['status' => 500, 'message' => 'Lỗi khi gọi API: ' . $e->getMessage()];
+    }
+}
+
+// Hàm lấy tên thương hiệu hoặc danh mục từ ID
+function getNameFromId($id, $type) {
+    if (!is_numeric($id) || $id <= 0) {
+        error_log("Invalid ID for $type: $id");
+        return 'Không xác định';
+    }
+    $url = "http://localhost/sportswear-webstore/src/router/productrouter.php?action=get{$type}ById&id=" . urlencode($id);
+    $data = callApi($url);
+    if (!isset($data['status']) || $data['status'] !== 200 || !isset($data['data']) || !isset($data['data']['name'])) {
+        error_log("Failed to get $type name for ID $id: " . ($data['message'] ?? 'No data returned'));
+        return 'Không xác định';
+    }
+    return htmlspecialchars($data['data']['name']);
 }
 
 // Pagination setup
-$items_per_page = 12; // Adjusted to match content.css grid (6 columns x 2 rows)
+$items_per_page = 12;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $items_per_page;
 
-// Sanitize input function
-function sanitize_input($input) {
-    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
+// Xây dựng URL cho API getFilteredProducts
+$api_params = [];
+if (isset($_GET['brand']) && is_numeric($_GET['brand'])) {
+    $api_params['brand'] = $_GET['brand'];
 }
-
-// Build query conditions
-$conditions = [];
-$params = [];
-$order_by = "";
-
-// Handle search parameter
-if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
-    $search = sanitize_input($_GET['search']);
-    
-    $brand_stmt = $conn->prepare("SELECT ID FROM brand WHERE LOWER(name) LIKE LOWER(:search)");
-    $brand_stmt->bindValue(':search', "%$search%");
-    $brand_stmt->execute();
-    $brand = $brand_stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($brand) {
-        $conditions[] = "p.brandID = :brand";
-        $params[':brand'] = $brand['ID'];
-    } else {
-        $category_stmt = $conn->prepare("SELECT ID FROM category WHERE LOWER(name) LIKE LOWER(:search)");
-        $category_stmt->bindValue(':search', "%$search%");
-        $category_stmt->execute();
-        $category = $category_stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($category) {
-            $conditions[] = "p.categoryID = :category";
-            $params[':category'] = $category['ID'];
-        } else {
-            $conditions[] = "(b.name LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR c.name LIKE :search)";
-            $params[':search'] = "%$search%";
-        }
-    }
+if (isset($_GET['category']) && is_numeric($_GET['category'])) {
+    $api_params['category'] = $_GET['category'];
 }
-
-// Handle filter parameters
-if (isset($_GET['brand']) && is_numeric($_GET['brand']) && $_GET['brand'] > 0) {
-    $conditions[] = "p.brandID = :brand";
-    $params[':brand'] = (int)$_GET['brand'];
-}
-
-if (isset($_GET['category']) && is_numeric($_GET['category']) && $_GET['category'] > 0) {
-    $conditions[] = "p.categoryID = :category";
-    $params[':category'] = (int)$_GET['category'];
-}
-
 if (!empty($_GET['status']) && in_array($_GET['status'], ['in_stock', 'out_of_stock'])) {
-    $conditions[] = "p.status = :status";
-    $params[':status'] = $_GET['status'];
+    $api_params['status'] = $_GET['status'];
+}
+if (!empty($_GET['price_start']) && is_numeric($_GET['price_start'])) {
+    $api_params['min_price'] = $_GET['price_start'];
+}
+if (!empty($_GET['price_end']) && is_numeric($_GET['price_end'])) {
+    $api_params['max_price'] = $_GET['price_end'];
 }
 
-if (!empty($_GET['rating'])) {
-    $rating_range = explode('-', $_GET['rating']);
-    if (count($rating_range) === 2 && is_numeric($rating_range[0]) && is_numeric($rating_range[1])) {
-        $conditions[] = "COALESCE(r.avg_rating, 0) BETWEEN :rating_min AND :rating_max";
-        $params[':rating_min'] = (float)$rating_range[0];
-        $params[':rating_max'] = (float)$rating_range[1];
+// Xử lý tìm kiếm
+$search_handled = false;
+if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
+    $search = htmlspecialchars(trim($_GET['search']));
+    
+    // Add search term to API params for product name matching
+    $api_params['search'] = $search;
+    
+    // Optionally check if the search term matches a brand name
+    $brand_url = "http://localhost/sportswear-webstore/src/router/productrouter.php?action=getBrandByName&name=" . urlencode($search);
+    $brand_data = callApi($brand_url);
+    
+    if (isset($brand_data['status']) && $brand_data['status'] === 200 && !empty($brand_data['data']) && isset($brand_data['data']['ID'])) {
+        $api_params['brand'] = $brand_data['data']['ID'];
+        $search_handled = true;
     }
 }
 
-if (!empty($_GET['price_start']) && is_numeric($_GET['price_start']) && 
-    !empty($_GET['price_end']) && is_numeric($_GET['price_end'])) {
-    $price_start = (float)$_GET['price_start'];
-    $price_end = (float)$_GET['price_end'];
-    if ($price_start <= $price_end) {
-        $conditions[] = "(pv.price + (pv.price * p.markup_percentage / 100)) BETWEEN :price_start AND :price_end";
-        $params[':price_start'] = $price_start;
-        $params[':price_end'] = $price_end;
-    }
-}
+// Sắp xếp
+$sort = isset($_GET['sort']) && in_array($_GET['sort'], ['newest', 'price_asc', 'price_desc', 'rating_desc']) 
+    ? $_GET['sort'] : 'newest';
+$api_params['sort'] = $sort;
 
-// Sorting options
-$valid_sorts = [
-    'price_asc' => '(MIN(pv.price + (pv.price * p.markup_percentage / 100))) ASC',
-    'price_desc' => '(MIN(pv.price + (pv.price * p.markup_percentage / 100))) DESC',
-    'rating_asc' => 'COALESCE(r.avg_rating, 0) ASC',
-    'rating_desc' => 'COALESCE(r.avg_rating, 0) DESC',
-    'newest' => 'p.ID DESC'
-];
+// Gọi API để lấy sản phẩm
+$api_url = "http://localhost/sportswear-webstore/src/router/productrouter.php?action=getFilteredProducts&" . http_build_query($api_params);
+$product_data = callApi($api_url);
+$products = (isset($product_data['status']) && $product_data['status'] === 200 && isset($product_data['data'])) ? $product_data['data'] : [];
 
-$order_by = !empty($_GET['sort']) && isset($valid_sorts[$_GET['sort']]) ? 
-            "ORDER BY " . $valid_sorts[$_GET['sort']] : "ORDER BY p.ID DESC";
-
-$where_clause = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
-
-$select_clause = "
-    p.ID, p.name, p.status, p.brandID, p.categoryID, p.markup_percentage,
-    MIN(pv.price + (pv.price * p.markup_percentage / 100)) AS calculated_price,
-    COALESCE(r.avg_rating, 0) AS rating,
-    b.name AS brand_name,
-    c.name AS category_name
-";
-
-// Count total products
-$total_query = "
-    SELECT COUNT(DISTINCT p.ID)
-    FROM product p
-    LEFT JOIN productvariant pv ON p.ID = pv.productID
-    LEFT JOIN brand b ON p.brandID = b.ID
-    LEFT JOIN category c ON p.categoryID = c.ID
-    LEFT JOIN (
-        SELECT productID, AVG(rating) AS avg_rating
-        FROM review
-        WHERE status = 'active'
-        GROUP BY productID
-    ) r ON p.ID = r.productID
-    $where_clause
-";
-
-$stmt = $conn->prepare($total_query);
-foreach ($params as $key => $value) {
-    $stmt->bindValue($key, $value);
-}
-$stmt->execute();
-$total_items = $stmt->fetchColumn();
+// Tính toán phân trang
+$total_items = count($products);
 $total_pages = max(1, ceil($total_items / $items_per_page));
 
-// Fetch products
-$query = "
-    SELECT $select_clause
-    FROM product p
-    LEFT JOIN productvariant pv ON p.ID = pv.productID
-    LEFT JOIN brand b ON p.brandID = b.ID
-    LEFT JOIN category c ON p.categoryID = c.ID
-    LEFT JOIN (
-        SELECT productID, AVG(rating) AS avg_rating
-        FROM review
-        WHERE status = 'active'
-        GROUP BY productID
-    ) r ON p.ID = r.productID
-    $where_clause
-    GROUP BY p.ID, p.name, p.status, p.brandID, p.categoryID, p.markup_percentage, b.name, c.name
-    $order_by
-    LIMIT :offset, :items_per_page
-";
+// Lấy danh sách thương hiệu và danh mục
+$brands_url = "http://localhost/sportswear-webstore/src/router/productrouter.php?action=getAllBrands";
+$categories_url = "http://localhost/sportswear-webstore/src/router/productrouter.php?action=getAllCategories";
+$brands_data = callApi($brands_url);
+$categories_data = callApi($categories_url);
+$brands = (isset($brands_data['status']) && $brands_data['status'] === 200 && isset($brands_data['data'])) ? $brands_data['data'] : [];
+$categories = (isset($categories_data['status']) && $categories_data['status'] === 200 && isset($categories_data['data'])) ? $categories_data['data'] : [];
 
-$stmt = $conn->prepare($query);
-foreach ($params as $key => $value) {
-    $stmt->bindValue($key, $value);
-}
-$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-$stmt->bindValue(':items_per_page', $items_per_page, PDO::PARAM_INT);
-$stmt->execute();
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch brands and categories for filters
-$brands = $conn->query("SELECT ID, name FROM brand ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
-$categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
+// Cắt danh sách sản phẩm theo phân trang
+$products = array_slice($products, $offset, $items_per_page);
 ?>
 
 <!DOCTYPE html>
@@ -175,7 +113,6 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
     <link rel="stylesheet" href="/sportswear-webstore/css/content.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Additional styles for filter section and layout */
         .filter-section {
             background-color: white;
             border-radius: 8px;
@@ -183,13 +120,11 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
             padding: 20px;
             margin-bottom: 30px;
         }
-
         .filter-form {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
         }
-
         .filter-label {
             display: block;
             margin-bottom: 8px;
@@ -197,7 +132,6 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
             color: #1d3557;
             font-size: 14px;
         }
-
         .filter-select, .filter-input {
             width: 100%;
             padding: 10px;
@@ -207,13 +141,11 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
             background-color: #fff;
             transition: border-color 0.3s;
         }
-
         .filter-select:focus, .filter-input:focus {
             border-color: #3498db;
             outline: none;
             box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
         }
-
         .filter-button {
             background-color: #3498db;
             color: white;
@@ -225,48 +157,54 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
             transition: background-color 0.3s;
             align-self: flex-end;
         }
-
         .filter-button:hover {
-            background-color:rgb(15, 138, 220);
+            background-color: rgb(15, 138, 220);
         }
-
-        /* Adjust pagination to match content.css */
         .pagination {
             margin-top: 3rem;
         }
-        
-
         .no-results {
             text-align: center;
             padding: 50px 0;
             color: #666;
             grid-column: 1 / -1;
         }
-
         .no-results i {
             font-size: 50px;
             color: #ddd;
             margin-bottom: 20px;
         }
-
         .no-results h3 {
             font-size: 20px;
             margin-bottom: 10px;
         }
-
-        /* Fix for removing underline from product card links */
         .product-card {
             text-decoration: none;
+        }
+        .error-message {
+            text-align: center;
+            padding: 20px;
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <div class="product-section">
+        <?php if (isset($product_data['status']) && $product_data['status'] !== 200): ?>
+            <div class="error-message">
+                Lỗi khi tải dữ liệu sản phẩm: <?= htmlspecialchars($product_data['message'] ?? 'Không rõ nguyên nhân') ?>
+            </div>
+        <?php endif; ?>
+
         <div class="section-header">
             <h1>
                 <?= !empty($_GET['search']) ? 'Kết quả tìm kiếm: "' . htmlspecialchars($_GET['search']) . '"' : 
-                    (!empty($_GET['brand']) ? 'Kết quả theo thương hiệu: ' . getBrandName($_GET['brand']) : 
-                    (!empty($_GET['category']) ? 'Kết quả theo danh mục: ' . getCategoryName($_GET['category']) : 'Tất cả sản phẩm')) ?>
+                    (!empty($_GET['brand']) ? 'Kết quả theo thương hiệu: ' . getNameFromId($_GET['brand'], 'Brand') : 
+                    (!empty($_GET['category']) ? 'Kết quả theo danh mục: ' . getNameFromId($_GET['category'], 'Category') : 'Tất cả sản phẩm')) ?>
             </h1>
             <span class="search-count"><?= $total_items ?> sản phẩm được tìm thấy</span>
         </div>
@@ -310,17 +248,6 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
                     </div>
 
                     <div class="filter-group">
-                        <label class="filter-label">Đánh giá</label>
-                        <select class="filter-select" name="rating">
-                            <option value="">Tất cả đánh giá</option>
-                            <option value="4-5" <?= isset($_GET['rating']) && $_GET['rating'] === '4-5' ? 'selected' : '' ?>>4-5 sao</option>
-                            <option value="3-4" <?= isset($_GET['rating']) && $_GET['rating'] === '3-4' ? 'selected' : '' ?>>3-4 sao</option>
-                            <option value="2-3" <?= isset($_GET['rating']) && $_GET['rating'] === '2-3' ? 'selected' : '' ?>>2-3 sao</option>
-                            <option value="1-2" <?= isset($_GET['rating']) && $_GET['rating'] === '1-2' ? 'selected' : '' ?>>1-2 sao</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
                         <label class="filter-label">Trạng thái</label>
                         <select class="filter-select" name="status">
                             <option value="">Tất cả trạng thái</option>
@@ -340,10 +267,13 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
                     </div>
 
                     <?php foreach ($_GET as $key => $value): ?>
-                        <?php if (!in_array($key, ['brand', 'category', 'price_start', 'price_end', 'rating', 'status', 'sort', 'page']) && !empty($value)): ?>
+                        <?php if (!in_array($key, ['brand', 'category', 'price_start', 'price_end', 'status', 'sort', 'page', 'search']) && !empty($value)): ?>
                             <input type="hidden" name="<?= htmlspecialchars($key) ?>" value="<?= htmlspecialchars($value) ?>">
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <?php if (!empty($_GET['search'])): ?>
+                        <input type="hidden" name="search" value="<?= htmlspecialchars($_GET['search']) ?>">
+                    <?php endif; ?>
 
                     <button type="submit" class="filter-button">Áp dụng bộ lọc</button>
                 </div>
@@ -357,7 +287,7 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
                     $image_path = "/sportswear-webstore/img/products/" . $product['ID'] . ".jpg";
                     $default_image = "/sportswear-webstore/img/products/default.jpg";
                     $image_src = file_exists($_SERVER['DOCUMENT_ROOT'] . $image_path) ? $image_path : $default_image;
-                    $rating = (float)$product['rating'];
+                    $rating = (float)($product['rating'] ?? 0);
                     $full_stars = floor($rating);
                     $has_half_star = $rating - $full_stars >= 0.5;
                 ?>
@@ -374,7 +304,7 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
                         <div class="product-name"><?= htmlspecialchars($product['name']) ?></div>
                         
                         <div class="product-price">
-                            <span class="current-price">$<?= number_format($product['calculated_price'], 2) ?></span>
+                            <span class="current-price">$<?= number_format($product['price'], 2) ?></span>
                         </div>
                         
                         <div class="product-rating">
@@ -452,25 +382,5 @@ $categories = $conn->query("SELECT ID, name FROM category ORDER BY name")->fetch
             </div>
         <?php endif; ?>
     </div>
-
-    <?php
-    function getBrandName($brandId) {
-        global $conn;
-        $stmt = $conn->prepare("SELECT name FROM brand WHERE ID = :id");
-        $stmt->bindValue(':id', $brandId, PDO::PARAM_INT);
-        $stmt->execute();
-        $brand = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $brand ? htmlspecialchars($brand['name']) : 'Không xác định';
-    }
-
-    function getCategoryName($categoryId) {
-        global $conn;
-        $stmt = $conn->prepare("SELECT name FROM category WHERE ID = :id");
-        $stmt->bindValue(':id', $categoryId, PDO::PARAM_INT);
-        $stmt->execute();
-        $category = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $category ? htmlspecialchars($category['name']) : 'Không xác định';
-    }
-    ?>
 </body>
 </html>
