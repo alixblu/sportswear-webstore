@@ -304,7 +304,7 @@
                   <button class="qty-btn">−</button>
                   <input type="number" value="1" class="qty-input" />
                   <button class="qty-btn">+</button>
-                  <button class="add-to-cart">Add To Cart</button>
+                  <button class="add-to-cart" onclick="themVaoGio()">Add To Cart</button>
                </div>
                <div class="delivery-box">
                   <strong>🚚 Giao hàng miễn phí</strong><br>
@@ -322,6 +322,7 @@
     </body>
       <script src="../../JS/admin/product/product.js"></script>
       <script src="../../JS/client/reviewApi.js"></script>
+      <script src="../../JS/client/cartApi.js"></script>
 
       <script>
       let selectedColor = null;
@@ -351,8 +352,8 @@
 
                const mainImg = document.querySelector(".mainImage img");
                mainImg.src = `/img/products/${product.ID}.jpg`;
-               img.alt = product.name;
-               img.onerror = function () { this.src = '/img/products/default.jpg'; };
+               mainImg.alt = product.name;
+               mainImg.onerror = function () { this.src = '/img/products/default.jpg'; };
 
                if (product.rating) {
                   document.querySelector(".stars").innerText = "★".repeat(product.rating) + "☆".repeat(5 - product.rating);
@@ -517,5 +518,31 @@
          });
       });
       
+
+      async function themVaoGio() {
+            const quantity = document.querySelector('.qty-input').value;
+            try {
+                const result = await addCartDetail(id, quantity);
+
+                if (result.status === 200) {
+                    alert('Đã thêm sản phẩm vào giỏ');
+                } else {
+                    alert('Có lỗi xảy ra: ' + (result.data?.error || 'Không rõ lỗi'));
+                }
+            } catch (error) {
+                const status = error.response?.status;
+                const message = error.response?.data?.error || 'Lỗi không xác định';
+
+                if (status === 400) {
+                    alert('Lỗi 400 - Bad Request: ' + message);
+                } else if (status === 401) {
+                    alert('Bạn chưa đăng nhập. Vui lòng đăng nhập lại.');
+                } else {
+                    alert('Đã xảy ra lỗi: ' + message);
+                }
+            }
+
+        }
+
    </script>
 </html>
