@@ -76,7 +76,21 @@
                 throw new Exception($e->getMessage(), $e->getCode() ?: 400);
             }
         }
-
+        public function updateUserLogin($name, $address, $newPassword) {
+            try {
+                $id = $this->userUtils->getUserId();
+                if($newPassword!=null){
+                    $user = $this->userRepository->updatePasswordByUserId($id, $newPassword);
+                }
+                $user = $this->userRepository->userUpdate($id, $name, $address, null, null,null);
+                if (!$user) {
+                    throw new Exception("Failed to update user", 500);
+                }
+                return $user;
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
+            }
+        }
         public function defaultAccount($name, $email, $address,$phone, $gender, $roleID,$birthday) {
             try {
                 $passWordDefault ='123456';

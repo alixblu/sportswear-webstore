@@ -71,6 +71,15 @@
                 throw $e;
             }
         }
+        public function updateUserLogin($name, $address, $newPassword){
+            try {
+                $user =  $this->userService->updateUserLogin($name, $address, $newPassword);
+                ApiResponse::customApiResponse($user, 200);
+
+            } catch (Exception $e) {
+                throw $e;
+            }
+        }
     }
 
 ?>

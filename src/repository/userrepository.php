@@ -300,38 +300,68 @@
         }
 
 
-        public function userUpdate($id, $name,$address, $phone, $gender, $roleID) {
+        public function userUpdate($id, $name, $address, $phone, $gender, $roleID) {
             $conn = null;
             $stmt = null;
             try {
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
-            
-                $sql = "UPDATE user 
-                        SET fullname = ?, address = ? ,phone = ?, gender = ?, roleID = ?
-                        WHERE id = ?";
-            
-            $stmt = $conn->prepare($sql);
-                $stmt->bind_param("sssssi", $name, $address, $phone, $gender, $roleID, $id);
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
         
-            $stmt->execute();
+                $fields = [];
+                $params = [];
+                $types = '';
         
-            $user = null;
-            if ($stmt->affected_rows === 0) {
-                throw new Exception("No changes detected, user not updated.", 500);
-            }
-
-            if ($stmt->affected_rows > 0) {
-                $user = [
-                    'id' => $id,
-                        'name' => $name,
-                        'phone' => $phone,
-                        'gender' => $gender,
-                        'roleID' => $roleID
-                ];
-            }
-
-            return $user;
+                if ($name !== null) {
+                    $fields[] = 'fullname = ?';
+                    $params[] = $name;
+                    $types .= 's';
+                }
+                if ($address !== null) {
+                    $fields[] = 'address = ?';
+                    $params[] = $address;
+                    $types .= 's';
+                }
+                if ($phone !== null) {
+                    $fields[] = 'phone = ?';
+                    $params[] = $phone;
+                    $types .= 's';
+                }
+                if ($gender !== null) {
+                    $fields[] = 'gender = ?';
+                    $params[] = $gender;
+                    $types .= 's';
+                }
+                if ($roleID !== null) {
+                    $fields[] = 'roleID = ?';
+                    $params[] = $roleID;
+                    $types .= 'i';
+                }
+        
+                if (empty($fields)) {
+                    throw new Exception("No fields provided for update.", 400);
+                }
+        
+                $sql = "UPDATE user SET " . implode(', ', $fields) . " WHERE id = ?";
+                $params[] = $id;
+                $types .= 'i';
+        
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param($types, ...$params);
+        
+                $stmt->execute();
+        
+                if ($stmt->affected_rows === 0) {
+                }
+        
+                $user = ['id' => $id];
+                if ($name !== null) $user['name'] = $name;
+                if ($address !== null) $user['address'] = $address;
+                if ($phone !== null) $user['phone'] = $phone;
+                if ($gender !== null) $user['gender'] = $gender;
+                if ($roleID !== null) $user['roleID'] = $roleID;
+        
+                return $user;
+        
             } catch (Exception $e) {
                 error_log("Database error in userUpdate: " . $e->getMessage());
                 throw new Exception("Database error: " . $e->getMessage());
@@ -340,6 +370,7 @@
                 if ($conn) $conn->close();
             }
         }
+        
         
         public function bulkInsertWithNPlus1($data) {
             $mysql = new configMysqli();
@@ -468,7 +499,36 @@
                 if ($conn) $conn->close();
             }
         }
-    }
+        public function updatePasswordByUserId($userID, $newPassword) {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
         
+                $stmt = $conn->prepare("UPDATE useraccount SET password = ? WHERE userID = ?");
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+        
+                $stmt->bind_param("si", $newPassword, $userID);
+                $stmt->execute();
+        
+                if ($stmt->affected_rows === 0) {
+                    throw new Exception("No changes detected, password not updated.", 500);
+                }
+        
+                return true;
+                
+            } catch (Exception $e) {
+                error_log("Database error in updatePasswordByUserId: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+            }
+        }
+        
+    }
+    
     
 ?>

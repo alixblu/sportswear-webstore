@@ -245,5 +245,49 @@
         }).catch(err => {
             console.error("Có lỗi xảy ra khi lấy thông tin:", err);
         });
+
+        document.querySelector('.save-btn').addEventListener('click', async () => {
+            const fullname = document.getElementById('first-name').value.trim() || null;
+            const address = document.getElementById('address').value.trim() || null;
+            const oldPassword = document.querySelectorAll('.form-section input')[0].value.trim() || null;
+            const newPassword = document.querySelectorAll('.form-section input')[1].value.trim() || null;
+            const confirmPassword = document.querySelectorAll('.form-section input')[2].value.trim() || null;
+
+            if (!fullname || !address) {
+                alert("Vui lòng nhập đầy đủ họ tên và địa chỉ.");
+                return;
+            }
+
+            let finalPassword = null; // Mặc định không đổi mật khẩu
+
+            if (oldPassword || newPassword || confirmPassword) {
+                if (!oldPassword || !newPassword || !confirmPassword) {
+                    alert("Vui lòng nhập đầy đủ 3 trường mật khẩu nếu muốn đổi mật khẩu.");
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    alert("Mật khẩu mới và xác nhận không khớp.");
+                    return;
+                }
+
+                finalPassword = newPassword;
+            }
+
+            try {
+                const response = await updateUserLogin(fullname, address, finalPassword);
+                if (response && response.status === 200) {
+                    alert("Cập nhật thông tin thành công!");
+                } else {
+                    alert("Cập nhật thất bại.");
+                }
+            } catch (err) {
+                console.error("Lỗi khi cập nhật:", err);
+                alert("Có lỗi xảy ra, vui lòng thử lại sau.");
+            }
+        });
+
+
+
     </script>
 </html>

@@ -84,27 +84,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $input = json_decode(file_get_contents('php://input'), true);
-    if (isset($input['action']) && $input['action'] === 'updateAccount') {
-        $accountId = $input['accountId'] ?? null;
-        $username = $input['username'] ?? '';
-        $password = $input['password'] ?? '';
-        $fullname = $input['fullname'] ?? '';
-        $phone = $input['phone'] ?? '';
-        $roleId = $input['roleId'] ?? '';
-        $status = $input['status'] ?? '';
-        $email = $input['email'] ?? null;
-        $address = $input['address'] ?? null;
-        $gender = $input['gender'] ?? null;
-        $dateOfBirth = $input['dateOfBirth'] ?? null;
-        if ($accountId !== null) {
-            $controller->updateAccount($accountId, $username, $password, $fullname, $phone, $roleId, $status, $email, $address, $gender, $dateOfBirth);
-        } else {
-            echo json_encode(['status' => 400, 'message' => 'Thiếu accountId'], JSON_UNESCAPED_UNICODE);
+
+    if (isset($input['action'])) {
+        switch ($input['action']) {
+            case 'updateAccount':
+                $accountId = $input['accountId'] ?? null;
+                $username = $input['username'] ?? '';
+                $password = $input['password'] ?? '';
+                $fullname = $input['fullname'] ?? '';
+                $phone = $input['phone'] ?? '';
+                $roleId = $input['roleId'] ?? '';
+                $status = $input['status'] ?? '';
+                $email = $input['email'] ?? null;
+                $address = $input['address'] ?? null;
+                $gender = $input['gender'] ?? null;
+                $dateOfBirth = $input['dateOfBirth'] ?? null;
+
+                if ($accountId !== null) {
+                    $controller->updateAccount($accountId, $username, $password, $fullname, $phone, $roleId, $status, $email, $address, $gender, $dateOfBirth);
+                } else {
+                    echo json_encode(['status' => 400, 'message' => 'Thiếu accountId'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
+
+            case 'updateUserLogin':
+                $name = $input['name'] ?? '';
+                $address = $input['address'] ?? '';
+                $newPassword = $input['newPassword'] ?? '';
+
+                $authController->updateUserLogin($name, $address, $newPassword);
+                break;
+
+            default:
+                echo json_encode(['status' => 400, 'message' => 'Hành động không hợp lệ'], JSON_UNESCAPED_UNICODE);
         }
     } else {
         echo json_encode(['status' => 400, 'message' => 'Yêu cầu PUT không hợp lệ'], JSON_UNESCAPED_UNICODE);
     }
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     if (isset($_GET['action']) && $_GET['action'] === 'deleteAccount' && isset($_GET['accountId'])) {

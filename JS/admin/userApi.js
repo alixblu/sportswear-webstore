@@ -194,3 +194,31 @@ const getInfo = async () => {
         console.error("Lỗi:", err);
     }
 };
+
+const updateUserLogin = async (name, address, newPassword) => {
+    try {
+        const response = await fetch(`${API_ACCOUNT_URL}`, {
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: "updateUserLogin",
+                name: name,
+                address: address,
+                newPassword: newPassword,
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Cập nhật thành công:", data);
+            return data;
+        } else {
+            const errorMessage = await response.text();
+            alert("Lỗi khi cập nhật: " + errorMessage);
+        }
+    } catch (err) {
+        console.error("Lỗi:", err);
+    }
+};
