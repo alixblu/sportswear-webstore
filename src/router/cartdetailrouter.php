@@ -20,22 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action']) && $_POST['action'] === 'addCartDetail') {
-        $productID = $_POST['productID'] ?? null;
-        $quantity = $_POST['quantity'] ?? null;
-        $cartID = $_POST['cartID'] ?? null;
-
-        if ($productID !== null && $quantity !== null && $cartID !== null) {
-            $cartDetailController->addCartDetail($productID, $quantity, $cartID);
-        } else {
-            echo "Thiếu productID, quantity hoặc cartID.";
-        }
-    } else {
-        echo "Invalid POST request.";
-    }
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     parse_str(file_get_contents("php://input"), $putData);
 
