@@ -168,141 +168,22 @@
     </head>
 
     <body>
-        <header class="header">
-         <nav class="nav container">
-            <div class="nav__data">
-               <a href="#" class="nav__logo">
-                  <i class="ri-store-2-fill"></i> Sportwear Store
-               </a>
-               
-            </div>
-
-            <!--=============== NAV MENU ===============-->
-            <div class="nav__menu" id="nav-menu">
-               <ul class="nav__list">
-                  <li><a href="#" class="nav__link">Trang chủ</a></li>
-
-                  <!--=============== DROPDOWN 1 ===============-->
-                  <li class="dropdown__item">
-                     <div class="nav__link">
-                        Sản phẩm<i class="ri-arrow-down-s-line dropdown__arrow"></i>
-                     </div>
-
-                     <ul class="dropdown__menu">
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-pie-chart-line"></i> Áo 
-                           </a>                          
-                        </li>
-
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-arrow-up-down-line"></i> Quần
-                           </a>
-                        </li>
-
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-arrow-up-down-line"></i> Giày
-                           </a>
-                        </li>
-
-                        <!--=============== DROPDOWN SUBMENU ===============-->
-                        <li class="dropdown__subitem">
-                           <div class="dropdown__link">
-                              <i class="ri-bar-chart-line"></i> Phụ kiện <i class="ri-add-line dropdown__add"></i>
-                           </div>
-
-                           <ul class="dropdown__submenu">
-                              <li>
-                                 <a href="#" class="dropdown__sublink">
-                                    <i class="ri-file-list-line"></i> Bình nước
-                                 </a>
-                              </li>
-      
-                              <li>
-                                 <a href="#" class="dropdown__sublink">
-                                    <i class="ri-cash-line"></i> Vợt
-                                 </a>
-                              </li>
-      
-                              <li>
-                                 <a href="#" class="dropdown__sublink">
-                                    <i class="ri-refund-2-line"></i> Balo/Túi
-                                 </a>
-                              </li>
-                           </ul>
-                        </li>
-                     </ul>
-                  </li>
-                  
-                  <!--=============== DROPDOWN 2 ===============-->
-                  <li class="dropdown__item">
-                     <div class="nav__link">
-                        Thương hiệu <i class="ri-arrow-down-s-line dropdown__arrow"></i>
-                     </div>
-
-                     <ul class="dropdown__menu">
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-user-line"></i> Nike
-                           </a>                          
-                        </li>
-
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-lock-line"></i> Adidas
-                           </a>
-                        </li>
-
-                        <li>
-                           <a href="#" class="dropdown__link">
-                              <i class="ri-message-3-line"></i> Puma
-                           </a>
-                        </li>
-                     </ul>
-                  </li>
-
-                  <li><a href="#" class="nav__link">Chính sách bảo hành</a></li>
-
-                  <li><a href="#" class="nav__link">Liên hệ</a></li>
-
-               </ul>
-            </div>
-            
-            <div class="nav__tools">
-               <div class="search-box" >
-                  <i class="ri-search-line"></i>
-               <input type="text"placeholder="Search...">
-               </div>
-               
-               <i class="ri-shopping-cart-2-line nav__cart"></i>
-               <a class="nav__account"  id="account">
-                  <i class="ri-account-circle-line"></i>
-               </a>
-               <div class="nav__toggle" id="nav-toggle">
-                  <i class="ri-menu-line nav__burger"></i>
-                  <i class="ri-close-line nav__close"></i>
-               </div>
-            </div>
-            
-            </nav>
-        </header>
-
+     
+    <?php include __DIR__ . '/../header.php'; ?>
 
         <main>
         <div class="wrapperContent">
             <!-- Sidebar -->
             <div class="sidebar">
                 <div class="section">
-                    <div class="section-title">Manage My Account</div>
+                    <div class="section-title">Thông Tin Người Dùng</div>
                     <div class="section-items">
-                        <div class="sidebar-item active">My Profile</div>
-                        <div class="sidebar-item">Address Book</div>
-                        <div class="sidebar-item">My Payment Options</div>
+                        <div class="sidebar-item active">Tài Khoản</div>
+                        <!-- <div class="sidebar-item">Address Book</div>
+                        <div class="sidebar-item">My Payment Options</div> -->
                     </div>
                 </div>
-                <div class="section">
+                <!-- <div class="section">
                     <div class="section-title">My Orders</div>
                     <div class="section-items">
                         <div class="sidebar-item">My Returns</div>
@@ -311,20 +192,20 @@
                 </div>
                 <div class="section">
                     <div class="section-title">My WishList</div>
-                </div>
+                </div> -->
             </div>
 
             <!-- Profile Form -->
             <div class="profile-form">
-                <div class="form-title">Edit Your Profile</div>
+                <div class="form-title">Thông tin Tài Khoản</div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="first-name">First Name</label>
+                        <label for="first-name">Họ</label>
                         <input id="first-name" type="text" value="">
                     </div>
                     <div class="form-group">
-                        <label for="last-name">Last Name</label>
+                        <label for="last-name">Tên</label>
                         <input id="last-name" type="text" value="">
                     </div>
                 </div>
@@ -335,24 +216,27 @@
                         <input id="email" type="email" value="" disabled>
                     </div>
                     <div class="form-group">
-                        <label for="address">Address</label>
+                        <label for="address">Địa Chỉ</label>
                         <input id="address" type="text" value="">
                     </div>
                 </div>
 
                 <div class="form-section">
-                    <label>Password Changes</label>
-                    <input type="password" placeholder="Current Password">
-                    <input type="password" placeholder="New Password">
-                    <input type="password" placeholder="Confirm New Password">
+                    <label>Thay Đổi Mật Khẩu</label>
+                    <input type="password" placeholder="Mật Khẩu">
+                    <input type="password" placeholder="Mật Khẩu Mới">
+                    <input type="password" placeholder="Xác Nhận Mật Khẩu Mới">
                 </div>
 
                 <div class="form-actions">
-                    <button class="save-btn">Save Changes</button>
+                    <button class="save-btn">Lưu Thay Đổi</button>
                 </div>
             </div>
         </div>
 
         </main>
     </body>
+    <script>
+        
+    </script>
 </html>
