@@ -95,7 +95,7 @@
             bottom: 20%;
             left: 5%;
             text-align: left; 
-
+            color: white;
         }
 
         .text-content h1 {
@@ -181,6 +181,8 @@
         <div class="pagination" id="pagination"></div>
     </div>
     <script src="../../JS/admin/product/product.js"></script>
+    <script src="../../JS/client/cartApi.js"></script>
+
     <script>
 
     //Product
@@ -267,8 +269,15 @@
             productRating.appendChild(ratingText);
 
             const buyButton = document.createElement('button');
+            buyButton.id = `idProduct-${product.ID}`;
             buyButton.classList.add('buy-button');
             buyButton.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ';
+            buyButton.addEventListener('click', function () {
+                const productId = this.id.replace('idProduct-', '');
+                themVaoGio(productId);
+            });
+
+        
 
             productCard.appendChild(productImage);
             productCard.appendChild(productName);
@@ -320,7 +329,19 @@
         setInterval(showSlides, 3000);
 
         dots[0].classList.add('active');
-        // ----
+        // ----CARD
+        async function themVaoGio(productId) {
+            const cartID = '1';
+            const quantity = 1;
+
+            try {
+                const result = await addCartDetail(productId, quantity, cartID);
+                alert('Đã thêm sản phẩm vào giỏ');
+            } catch (error) {
+                alert('Lỗi khi thêm vào giỏ hàng:', error);
+            }
+        }
+
     </script>
 </body>
 </html>
