@@ -95,7 +95,7 @@
             bottom: 20%;
             left: 5%;
             text-align: left; 
-
+            color: white;
         }
 
         .text-content h1 {
@@ -156,31 +156,13 @@
 
         <!-- Product List -->
         <div class="product-list">
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="/img/products/1.jpg" alt="Tên sản phẩm 1" onerror="this.src='/img/products/default.jpg'">
-                </div>
-                <div class="product-name">Tên sản phẩm 1</div>
-                <div class="product-price">
-                    <span class="current-price">$49.99</span>
-                </div>
-                <div class="product-rating">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                    <i class="far fa-star"></i>
-                    <span>(3.5)</span>
-                </div>
-                <button class="buy-button">
-                    <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
-                </button>
-            </div>
         </div>
 
         <div class="pagination" id="pagination"></div>
     </div>
     <script src="../../JS/admin/product/product.js"></script>
+    <script src="../../JS/client/cartApi.js"></script>
+
     <script>
 
     //Product
@@ -267,8 +249,15 @@
             productRating.appendChild(ratingText);
 
             const buyButton = document.createElement('button');
+            buyButton.id = `idProduct-${product.ID}`;
             buyButton.classList.add('buy-button');
             buyButton.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ';
+            buyButton.addEventListener('click', function () {
+                const productId = this.id.replace('idProduct-', '');
+                themVaoGio(productId);
+            });
+
+        
 
             productCard.appendChild(productImage);
             productCard.appendChild(productName);
@@ -320,7 +309,32 @@
         setInterval(showSlides, 3000);
 
         dots[0].classList.add('active');
-        // ----
+        // ----CARD
+        async function themVaoGio(productId) {
+            const quantity = 1;
+            try {
+                const result = await addCartDetail(productId, quantity);
+
+                if (result.status === 200) {
+                    alert('Đã thêm sản phẩm vào giỏ');
+                } else {
+                    alert('Có lỗi xảy ra: ' + (result.data?.error || 'Không rõ lỗi'));
+                }
+            } catch (error) {
+                const status = error.response?.status;
+                const message = error.response?.data?.error || 'Lỗi không xác định';
+
+                if (status === 400) {
+                    alert('Lỗi 400 - Bad Request: ' + message);
+                } else if (status === 401) {
+                    alert('Bạn chưa đăng nhập. Vui lòng đăng nhập lại.');
+                } else {
+                    alert('Đã xảy ra lỗi: ' + message);
+                }
+            }
+
+        }
+
     </script>
 </body>
 </html>

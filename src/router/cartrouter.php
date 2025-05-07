@@ -21,17 +21,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action']) && $_POST['action'] === 'createCart') {
-        $userId = $_POST['userId'] ?? null;
-        if ($userId !== null) {
-            $cartController->createCart($userId);
-        } else {
-            echo "Thiếu userId.";
-        }
-    } else {
-        echo "Invalid POST request.";
+    $action = $_POST['action'] ?? null;
+
+    switch ($action) {
+        case 'createCart':
+            $userId = $_POST['userId'] ?? null;
+            if ($userId !== null) {
+                $cartController->createCart($userId);
+            } else {
+                echo "Thiếu userId.";
+            }
+            break;
+
+        case 'addCartDetail':
+            $productID = $_POST['productID'] ?? null;
+            $quantity = $_POST['quantity'] ?? null;
+
+            if ($productID !== null && $quantity !== null) {
+                $cartController->addProductCart($productID, $quantity);
+            } else {
+                echo "Thiếu productID, quantity hoặc cartID.";
+            }
+            break;
+
+        default:
+            echo "Invalid POST request.";
+            break;
     }
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     parse_str(file_get_contents("php://input"), $putData);

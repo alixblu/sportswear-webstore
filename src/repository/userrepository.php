@@ -1,7 +1,7 @@
 <?php
     require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
     require_once dirname(__FILE__) . '/../enums/UserStatus.php';
-    include dirname(__FILE__) . '/../../src/config/exception/exceptionHandler.php';
+    require_once  dirname(__FILE__) . '/../../src/config/exception/exceptionHandler.php';
     class UserRepository{
         /**
          * Find a user by their username (email)

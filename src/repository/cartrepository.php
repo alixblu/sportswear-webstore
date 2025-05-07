@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
-include dirname(__FILE__) . '/../../src/config/exception/exceptionHandler.php';
+require_once  dirname(__FILE__) . '/../../src/config/exception/exceptionHandler.php';
 
 class CartRepository {
     private $conn;
@@ -11,32 +11,34 @@ class CartRepository {
 
     public function save($userAccID, $totalPrice = 0.0) {
         $stmt = null;
-
+    
         try {
             if (!$this->conn) {
                 throw new Exception("Failed to connect to database");
             }
-
+    
             if (!$this->conn->begin_transaction()) {
                 throw new Exception("Failed to start transaction");
             }
-
+    
             $stmt = $this->conn->prepare("INSERT INTO cart (userAccID, totalPrice) VALUES (?, ?)");
             if (!$stmt) {
                 throw new Exception("Failed to prepare cart insert: " . $this->conn->error);
             }
-
+    
             $stmt->bind_param("id", $userAccID, $totalPrice);
             if (!$stmt->execute()) {
                 throw new Exception("Failed to insert cart: " . $stmt->error);
             }
-
+    
+            $insertedId = $this->conn->insert_id;
+    
             if (!$this->conn->commit()) {
                 throw new Exception("Failed to commit cart transaction");
             }
-
+    
             return [
-                'cartID' => $this->conn->insert_id,
+                'cartID' => $insertedId,
                 'userAccID' => $userAccID,
                 'totalPrice' => $totalPrice
             ];
@@ -48,9 +50,9 @@ class CartRepository {
             throw $e;
         } finally {
             if ($stmt) $stmt->close();
-            if ($this->conn) $this->conn->close();
         }
     }
+    
 
     public function findByUserAccId($userAccID) {
         try {
@@ -108,6 +110,30 @@ class CartRepository {
             $this->conn->close();
         }
     }
-
+    public function findCartIdByUserAccId($userAccID) {
+        try {
+            $stmt = $this->conn->prepare("
+                SELECT ID as cartID
+                FROM cart
+                WHERE userAccID = ?
+                LIMIT 1
+            ");
+            $stmt->bind_param("i", $userAccID);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            $cartID = null;
+            if ($row = $result->fetch_assoc()) {
+                $cartID = $row['cartID'];
+            }
+    
+            $stmt->close();
+            return $cartID; 
+        } catch (Exception $e) {
+            error_log("findCartIdByUserAccId failed: " . $e->getMessage());
+            return null;
+        }
+    }
+    
 }
 ?>
