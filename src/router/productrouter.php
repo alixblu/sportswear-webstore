@@ -22,7 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $status = $_GET['status'] ?? null;
         $min_price = $_GET['min_price'] ?? null;
         $max_price = $_GET['max_price'] ?? null;
-        $productController->getFilteredProducts($category, $brand, $status, $min_price, $max_price);
+        $sort = isset($_GET['sort']) && in_array($_GET['sort'], ['newest', 'price_asc', 'price_desc', 'rating_desc']) ? $_GET['sort'] : 'newest';
+        $search = $_GET['search'] ?? null;
+        $productController->getFilteredProducts($category, $brand, $status, $min_price, $max_price, $sort, $search);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getProductById' && isset($_GET['id'])) {
         $productController->getProductById($_GET['id']);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getProductVariants' && isset($_GET['id'])) {
@@ -44,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode(['error' => 'Yêu cầu GET không hợp lệ']);
     }
 }
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProductImage') {
     $productId = $_POST['product_id'];
     if (isset($_FILES['image']) && $productId) {
