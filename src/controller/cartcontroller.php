@@ -1,6 +1,6 @@
 <?php
 include dirname(__FILE__) . '/../service/cartservice.php';
-include dirname(__FILE__) . '/../config/response/apiresponse.php';
+include_once  dirname(__FILE__) . '/../config/response/apiresponse.php';
 
 class CartController
 {
@@ -16,14 +16,23 @@ class CartController
         $card = $this->cartService->createCart($userId);
         ApiResponse::customApiResponse($card, 200);
     }
-    public function getCartByUserId($userId)
+    public function getCartByUserId()
     {
-        $card = $this->cartService->getCartByUserId($userId);
+        $card = $this->cartService->getCartByUserId();
         ApiResponse::customApiResponse($card, 200);
     }
     public function updateTotalPrice($cartID, $totalPrice)
     {
         $card = $this->cartService->updateTotalPrice($cartID, $totalPrice);
         ApiResponse::customApiResponse($card, 200);
+    }
+    public function addProductCart($productID, $quantity)
+    {
+        try {
+            $insertId = $this->cartService->addProductCart($productID, $quantity);
+            ApiResponse::customApiResponse(['insertId' => $insertId], 200);
+        } catch (Exception $e) {
+            ApiResponse::customApiResponse(['error' => $e->getMessage()], 400);
+        }
     }
 }

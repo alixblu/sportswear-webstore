@@ -1,6 +1,6 @@
 <?php
 include dirname(__FILE__) . '/../service/couponservice.php';
-include dirname(__FILE__) . '/../config/response/apiresponse.php';
+include_once  dirname(__FILE__) . '/../config/response/apiresponse.php';
 
 class CouponController
 {
@@ -50,9 +50,9 @@ class CouponController
 
     }
 
-    public function getCouponByUserId($id)
+    public function getCouponByUserId()
     {
-        $coupon = $this->couponService->getCouponByUserId($id);
+        $coupon = $this->couponService->getCouponByUserId();
         ApiResponse::customApiResponse($coupon, 200);
     }
 }

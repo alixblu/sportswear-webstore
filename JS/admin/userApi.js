@@ -1,4 +1,5 @@
 const API_URL = '../../src/router/userRouter.php';
+const API_ACCOUNT_URL = '../../src/router/accountrouter.php';
 
 const getAccountByUserId = async (userId) => {
     const response = await fetch(`${API_URL}?action=getAccountByUserId&userId=${userId}`, {
@@ -166,6 +167,56 @@ const searchUsers = async (keyword, fields) => {
         } else {
             const errorMessage = await response.text();
             alert("Lỗi khi tìm kiếm: " + errorMessage);
+        }
+    } catch (err) {
+        console.error("Lỗi:", err);
+    }
+};
+
+const getInfo = async () => {
+    try {
+        const response = await fetch(`${API_ACCOUNT_URL}?action=info`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Thông tin người dùng:", data);
+            return data;
+        } else {
+            const errorMessage = await response.text();
+            alert("Lỗi khi lấy thông tin: " + errorMessage);
+        }
+    } catch (err) {
+        console.error("Lỗi:", err);
+    }
+};
+
+const updateUserLogin = async (name, address, newPassword) => {
+    try {
+        const response = await fetch(`${API_ACCOUNT_URL}`, {
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: "updateUserLogin",
+                name: name,
+                address: address,
+                newPassword: newPassword,
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Cập nhật thành công:", data);
+            return data;
+        } else {
+            const errorMessage = await response.text();
+            alert("Lỗi khi cập nhật: " + errorMessage);
         }
     } catch (err) {
         console.error("Lỗi:", err);

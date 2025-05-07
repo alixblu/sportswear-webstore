@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
-include dirname(__FILE__) . '/../../src/config/exception/exceptionHandler.php';
+require_once  dirname(__FILE__) . '/../../src/config/exception/exceptionHandler.php';
 
 class DiscountRepository {
     private $conn;

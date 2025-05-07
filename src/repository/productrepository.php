@@ -57,7 +57,16 @@ class ProductRepository
     public function getAllProducts()
     {
         try {
-            $query = "SELECT * FROM product ORDER BY ID";
+            $query = "
+                SELECT 
+                    p.*, 
+                    pv.id AS productVariantID,
+                    MIN(pv.price) AS price
+                FROM product p
+                LEFT JOIN productvariant pv ON p.ID = pv.productID
+                GROUP BY p.ID
+                ORDER BY p.ID
+            ";
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
             $result = $stmt->get_result();
