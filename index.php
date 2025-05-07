@@ -20,12 +20,7 @@
 
     <div class="page-container">
         <?php
-        // Check if a search query is present
-        if (isset($_GET['search']) && !empty($_GET['search'])) {
-            include './layout/client/search_results.php'; // Include the search results page
-        } else {
-            include './layout/content.php'; // Include the main content
-        }
+            include './layout/content.php';
         ?>
     </div>
 

@@ -88,6 +88,7 @@
     display: flex;
     flex-direction: column;
     height: 320px;
+    max-width: 180px;
 }
 
 .product-card:hover {
@@ -123,11 +124,14 @@
 
 .product-name {
     font-size: 1rem;
-    font-weight: 600;
     margin: 0.8rem 1rem 0.5rem;
     color: #333;
     flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
 
 .product-price {
     margin: 0 1rem;
@@ -137,8 +141,7 @@
 }
 
 .current-price {
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: 0.9rem;
     color: #e74c3c;
 }
 
@@ -149,9 +152,9 @@
 }
 
 .product-rating {
-    margin: 0.5rem 1rem;
+    margin: 0.2rem 1rem;
     color: #f39c12;
-    font-size: 0.9rem;
+    font-size: 0.7rem;
 }
 
 .buy-button {
@@ -161,7 +164,6 @@
     padding: 0.7rem;
     margin: 1rem;
     border-radius: 5px;
-    font-weight: 600;
     cursor: pointer;
     transition: background 0.3s ease;
     display: flex;
