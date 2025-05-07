@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../controller/accountController.php';
+require_once __DIR__ . '/../controller/authcontroller.php';
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -12,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 $controller = new AccountController();
+$authController = new AuthController();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['action'])) {
@@ -40,6 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 break;
             case 'getAllRoles':
                 $controller->getAllRoles();
+                break;
+            case 'info':
+                $authController->info();
                 break;
             default:
                 echo json_encode(['status' => 400, 'message' => 'Hành động không hợp lệ'], JSON_UNESCAPED_UNICODE);

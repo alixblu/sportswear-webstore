@@ -1,6 +1,6 @@
 <?php
-include dirname(__FILE__) . '/../service/accountService.php';
-include dirname(__FILE__) . '/../config/response/apiresponse.php';
+include_once  dirname(__FILE__) . '/../service/accountService.php';
+include_once  dirname(__FILE__) . '/../config/response/apiresponse.php';
 
 class AccountController {
     private $accountService;

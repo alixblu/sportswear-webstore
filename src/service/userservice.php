@@ -1,15 +1,19 @@
 <?php
     include dirname(__FILE__) . '/../repository/userrepository.php';
     include dirname(__FILE__) . '/../utils/ExcelUtils.php';
+    require_once dirname(__FILE__) . '/../utils/userUtils.php';
 
     class UserService{
         private $userRepository;
         private $excelUtils;
-    
+        private $userUtils;
+
         public function __construct()
         {
             $this->userRepository = new UserRepository();
             $this->excelUtils = new ExcelUtils();
+            $this->userUtils = new UserUtils();
+
         }
 
         public function login($userName, $passWord) {
@@ -24,7 +28,17 @@
             } catch (Exception $e) {
                 throw new Exception($e->getMessage(), $e->getCode() ?: 400);
             }
-        }        
+        }     
+        public function info() {
+            try {
+                $userName = $this->userUtils->getUserName();
+                $user = $this->userRepository->findUserByUsername($userName);
+
+                return $user;
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
+            }
+        }     
         public function getAccessModulesByRoleId($roleID) {
             try {
                 // Call the repository method to get access modules

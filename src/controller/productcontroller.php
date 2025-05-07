@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../service/productservice.php';
-include dirname(__FILE__) . '/../config/response/apiresponse.php';
+include_once  dirname(__FILE__) . '/../config/response/apiresponse.php';
 
 class ProductController
 {

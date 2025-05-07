@@ -1,7 +1,8 @@
 <?php
     include dirname(__FILE__) . '/../service/userservice.php';
-    include dirname(__FILE__) . '/../config/response/apiresponse.php';
-    
+    include_once  dirname(__FILE__) . '/../config/response/apiresponse.php';
+    require_once dirname(__FILE__) . '/../utils/userUtils.php';
+
     class AuthController{
 
         private $userService;
@@ -9,6 +10,7 @@
         public function __construct()
         {
             $this->userService = new UserService();
+
         }
 
         public function login($userName, $passWord){
@@ -55,6 +57,16 @@
             try {
                 $_SESSION = [];            
                 return ['success' => true, 'message' => 'Logout successful'];
+            } catch (Exception $e) {
+                throw $e;
+            }
+        }
+
+        public function info(){
+            try {
+                $user =  $this->userService->info();
+                ApiResponse::customApiResponse($user, 200);
+
             } catch (Exception $e) {
                 throw $e;
             }

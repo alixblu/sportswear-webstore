@@ -201,13 +201,13 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="first-name">Họ</label>
+                        <label for="first-name">Họ Và Tên</label>
                         <input id="first-name" type="text" value="">
                     </div>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label for="last-name">Tên</label>
                         <input id="last-name" type="text" value="">
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="form-row">
@@ -236,7 +236,14 @@
 
         </main>
     </body>
+    <script src="../../JS/admin/userApi.js"></script>
     <script>
-        
+        getInfo().then(data => {
+            document.getElementById('first-name').value = data.data.fullname;
+            document.getElementById('email').value = data.data.email;
+            document.getElementById('address').value = data.data.address;
+        }).catch(err => {
+            console.error("Có lỗi xảy ra khi lấy thông tin:", err);
+        });
     </script>
 </html>
