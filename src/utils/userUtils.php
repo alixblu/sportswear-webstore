@@ -15,4 +15,16 @@ class UserUtils
             throw new Exception("Chưa đăng nhập");
         }
     }
+    public function getUserName()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (isset($_SESSION['user']['username'])) {
+            return $_SESSION['user']['username'];
+        } else {
+            throw new Exception("Chưa đăng nhập");
+        }
+    }
 }
