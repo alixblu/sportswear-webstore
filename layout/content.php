@@ -212,7 +212,6 @@
                 </div>`;
             return;
         }
-
         pageProducts.forEach(product => {
             const productCard = document.createElement('div');
             productCard.classList.add('product-card');
@@ -252,12 +251,15 @@
             buyButton.id = `idProduct-${product.ID}`;
             buyButton.classList.add('buy-button');
             buyButton.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ';
-            buyButton.addEventListener('click', function () {
+            buyButton.addEventListener('click', function (event) {
+                event.preventDefault(); 
                 const productId = this.id.replace('idProduct-', '');
                 themVaoGio(productId);
             });
 
-        
+            const productLink = document.createElement('a');
+            productLink.href = `/layout/client/detailproduct.php?id=${product.ID}`;
+            productLink.appendChild(productCard);
 
             productCard.appendChild(productImage);
             productCard.appendChild(productName);
@@ -265,8 +267,10 @@
             productCard.appendChild(productRating);
             productCard.appendChild(buyButton);
 
-            productList.appendChild(productCard);
+            productList.appendChild(productLink);
         });
+
+
     };
 
     const displayProducts = async () => {
