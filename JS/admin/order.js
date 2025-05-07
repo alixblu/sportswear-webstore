@@ -1,4 +1,4 @@
-const API_URL = '../src/router/orderrouter.php';
+const API_URL = '../../../src/router/orderrouter.php';
 
 // Lấy tất cả đơn hàng
 const getAllOrders = async () => {

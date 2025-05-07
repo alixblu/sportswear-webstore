@@ -33,11 +33,9 @@ class OrderRepository {
         while ($row = $result->fetch_assoc()) {
             $order[] = $row;
         }
-        $result->close();
-        $this->conn->close();
         return $order;
     } catch (Exception $e) {
-        error_log("Lỗi lấy danh sách tài khoản: " . $e->getMessage());
+        error_log("Lỗi lấy danh sách đơn hàng: " . $e->getMessage());
         throw $e;
     } finally {
         if ($this->conn) $this->conn->close();
@@ -91,7 +89,7 @@ class OrderRepository {
         $stmt->bind_param("ssssi", $receiverName, $address, $phone, $email, $orderID);
         return $stmt->execute();
     }
-   
+    
 
     // 🔍 Tìm kiếm theo ID, tên khách hàng, thời gian
     public function searchOrders($orderID = null, $customerName = '', $fromDate = '', $toDate = '') {

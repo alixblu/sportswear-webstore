@@ -72,7 +72,7 @@
         </form>
     </div>
 
-    <script src="/sportswear-webstore/JS/admin/order.js"></script>
+    <script src="../../../JS/admin/order.js"></script>
     <script>
         showAll();
         function showAll() {
