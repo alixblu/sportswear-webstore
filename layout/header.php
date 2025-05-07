@@ -254,15 +254,9 @@ session_start();
         }
 
          function userProfileRedirect() {
-            const pageContainer = document.querySelector('.page-container');
-            fetch('./layout/client/profile/')
-               .then(response => response.text())
-               .then(data => {
-                     pageContainer.innerHTML = data; // Load the profile content into the page-container
-                     const overlay = document.getElementById('loginOverlay');
-                     overlay.style.display = 'none'; // Hide the login overlay
-               })
-               .catch(error => console.error('Error loading profile:', error));
+            const overlay = document.getElementById('loginOverlay');
+            overlay.style.display = 'none'; // Hide the overlay
+            window.location.href = '/sportswear-webstore/index.php?page=profile';
          }
     </script>
 </body>

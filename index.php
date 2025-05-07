@@ -13,6 +13,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="./css/content.css">
     <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/profile.css">
 </head>
 
 <body>
@@ -23,7 +24,12 @@
         // Check if a search query is present
         if (isset($_GET['search']) && !empty($_GET['search'])) {
             include './layout/client/search_results.php'; // Include the search results page
-        } else {
+        } 
+        // Check if profile page is requested
+        else if (isset($_GET['page']) && $_GET['page'] === 'profile') {
+            include './layout/client/profile/index.php'; // Include the profile page
+        }
+        else {
             include './layout/content.php'; // Include the main content
         }
         ?>
