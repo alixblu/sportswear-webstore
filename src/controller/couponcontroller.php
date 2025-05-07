@@ -39,9 +39,9 @@ class CouponController
         }
     }
 
-    public function getCouponById($id)
+    public function getCouponById()
     {
-        $coupon = $this->couponService->getCouponById($id);
+        $coupon = $this->couponService->getCouponById();
         if ($coupon) {
             ApiResponse::customApiResponse($coupon, 200);
         } else {

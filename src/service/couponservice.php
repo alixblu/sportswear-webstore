@@ -1,13 +1,16 @@
 <?php
 require_once dirname(__FILE__) . '/../repository/couponrepository.php';
+require_once dirname(__FILE__) . '/../utils/userUtils.php';
 
 class CouponService
 {
     private $couponRepository;
+    private $userUtils;
 
     public function __construct()
     {
         $this->couponRepository = new CouponRepository();
+        $this->userUtils = new UserUtils();
     }
 
     public function createCoupon($name, $percent, $duration)
@@ -89,14 +92,11 @@ class CouponService
         }
     }
 
-    public function getCouponById($id)
+    public function getCouponById()
     {
         try {
-            if (!is_numeric($id) || $id <= 0) {
-                throw new Exception("Invalid coupon ID");
-            }
-
-            return $this->couponRepository->findById($id);
+            $userId = $this->userUtils->getUserId();
+            return $this->couponRepository->findById($userId);
         } catch (Exception $e) {
             throw new Exception("Failed to find coupon: " . $e->getMessage());
         }

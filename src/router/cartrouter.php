@@ -9,12 +9,7 @@ $cartController = new CartController();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['action']) && $_GET['action'] === 'getCartByUserId') {
-        $userId = $_GET['userId'] ?? null;
-        if ($userId !== null) {
-            $cartController->getCartByUserId($userId);
-        } else {
-            echo "Thiếu userId.";
-        }
+        $cartController->getCartByUserId();
     } else {
         echo "Invalid GET request.";
     }
