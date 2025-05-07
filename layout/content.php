@@ -250,7 +250,7 @@
             productRating.appendChild(ratingText);
 
             const buyButton = document.createElement('button');
-            buyButton.id = `idProduct-${product.ID}`;
+            buyButton.id = `idProduct-${product.productVariantID}`;
             buyButton.classList.add('buy-button');
             buyButton.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ';
             buyButton.addEventListener('click', function (event) {

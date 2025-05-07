@@ -42,8 +42,8 @@ const addCartDetail = async (productID, quantity) => {
 };
 
 
-const getCartByUserId = async (userId) => {
-    const response = await fetch(`${CART_API_URL}?action=getCartByUserId&userId=${userId}`, {
+const getCartByUserId = async () => {
+    const response = await fetch(`${CART_API_URL}?action=getCartByUserId`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

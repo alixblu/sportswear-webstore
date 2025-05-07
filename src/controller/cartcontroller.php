@@ -16,9 +16,9 @@ class CartController
         $card = $this->cartService->createCart($userId);
         ApiResponse::customApiResponse($card, 200);
     }
-    public function getCartByUserId($userId)
+    public function getCartByUserId()
     {
-        $card = $this->cartService->getCartByUserId($userId);
+        $card = $this->cartService->getCartByUserId();
         ApiResponse::customApiResponse($card, 200);
     }
     public function updateTotalPrice($cartID, $totalPrice)

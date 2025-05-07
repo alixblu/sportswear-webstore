@@ -277,7 +277,7 @@
       loadCart()
       function loadCart(){
          let total = 0;
-         getCartByUserId(10)
+         getCartByUserId()
             .then(res => {
                if (res.status === 200) {
                   const cartItems = res.data; 
@@ -331,7 +331,7 @@
             })
             .catch(error => console.error('Lỗi khi lấy biến thể sản phẩm:', error));
 
-         getCouponByUserId(10)
+         getCouponByUserId()
             .then(result => {
             const coupons = result.data; 
             const container = document.querySelector(".voucher");

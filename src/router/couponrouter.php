@@ -23,12 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 break;
 
             case 'getCouponByUserId':
-                $userId = $_GET['id'] ?? null;
-                if ($userId !== null) {
-                    $couponController->getCouponByUserId($userId);
-                } else {
-                    echo "Thiếu userId.";
-                }
+                $couponController->getCouponByUserId();
                 break;
 
             default:

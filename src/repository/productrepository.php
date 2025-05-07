@@ -60,6 +60,7 @@ class ProductRepository
             $query = "
                 SELECT 
                     p.*, 
+                    pv.id AS productVariantID,
                     MIN(pv.price) AS price
                 FROM product p
                 LEFT JOIN productvariant pv ON p.ID = pv.productID
