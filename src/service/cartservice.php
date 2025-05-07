@@ -60,9 +60,10 @@ class CartService {
             $userId = $this->userUtils->getUserId();
             $cartID = $this->cartRepository->findCartIdByUserAccId($userId);
 
-            if ($cartID !== null) {
-                $cartID = $this->createCart($userId);
-            } 
+            if ($cartID === null) {
+                $cartData = $this->cartRepository->save($userId);
+                $cartID = $cartData['cartID'];
+            }
             return $this->cartDetailService->addCartDetail($productID, $quantity, $cartID);
         } catch (Exception $e) {
             throw new Exception("Failed to add cart detail: " . $e->getMessage());

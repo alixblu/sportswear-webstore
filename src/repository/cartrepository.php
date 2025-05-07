@@ -11,32 +11,34 @@ class CartRepository {
 
     public function save($userAccID, $totalPrice = 0.0) {
         $stmt = null;
-
+    
         try {
             if (!$this->conn) {
                 throw new Exception("Failed to connect to database");
             }
-
+    
             if (!$this->conn->begin_transaction()) {
                 throw new Exception("Failed to start transaction");
             }
-
+    
             $stmt = $this->conn->prepare("INSERT INTO cart (userAccID, totalPrice) VALUES (?, ?)");
             if (!$stmt) {
                 throw new Exception("Failed to prepare cart insert: " . $this->conn->error);
             }
-
+    
             $stmt->bind_param("id", $userAccID, $totalPrice);
             if (!$stmt->execute()) {
                 throw new Exception("Failed to insert cart: " . $stmt->error);
             }
-
+    
+            $insertedId = $this->conn->insert_id;
+    
             if (!$this->conn->commit()) {
                 throw new Exception("Failed to commit cart transaction");
             }
-
+    
             return [
-                'cartID' => $this->conn->insert_id,
+                'cartID' => $insertedId,
                 'userAccID' => $userAccID,
                 'totalPrice' => $totalPrice
             ];
@@ -48,9 +50,9 @@ class CartRepository {
             throw $e;
         } finally {
             if ($stmt) $stmt->close();
-            if ($this->conn) $this->conn->close();
         }
     }
+    
 
     public function findByUserAccId($userAccID) {
         try {
@@ -126,7 +128,6 @@ class CartRepository {
             }
     
             $stmt->close();
-            $this->conn->close();
             return $cartID; 
         } catch (Exception $e) {
             error_log("findCartIdByUserAccId failed: " . $e->getMessage());
