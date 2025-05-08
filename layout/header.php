@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="./css/header.css">
+    <script src="../js/search.js" defer></script>
 </head>
 
 <body>
@@ -142,11 +143,9 @@
                     <?php if (isset($_SESSION['user']['roleid']) && $_SESSION['user']['roleid'] !== '05'): ?>
                         <li><a href="./layout/admin/index.php"><i class="ri-admin-line"></i> Đi đến trang quản trị</a></li>
                     <?php endif; ?>
-
                     <?php if (isset($_SESSION['user']['roleid']) && (string)$_SESSION['user']['roleid'] === '05'): ?>
                         <li><a href="#" onclick="userProfileRedirect()"><i class="ri-user-settings-line"></i> Hồ sơ</a></li>
                     <?php endif; ?>
-
                     <li><a href="#" onclick="handleLogout(event)"><i class="ri-logout-box-line"></i> Đăng xuất</a></li>
                 </ul>
             </div>
@@ -155,37 +154,6 @@
         <?php endif; ?>
     </div>
     <script>
-        document.getElementById('searchForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const searchInput = document.getElementById('searchInput').value.trim();
-
-            if (!searchInput) return;
-
-            try {
-                // Check if search term matches a brand
-                const brandResponse = await fetch(`http://localhost/sportswear-webstore/src/router/productrouter.php?action=getBrandByName&name=${encodeURIComponent(searchInput)}`);
-                const brandData = await brandResponse.json();
-                if (brandData.status === 200 && brandData.data && brandData.data.ID) {
-                    window.location.href = `/sportswear-webstore/layout/client/search_results.php?brand=${brandData.data.ID}`;
-                    return;
-                }
-
-                // Check if search term matches a category
-                const categoryResponse = await fetch(`http://localhost/sportswear-webstore/src/router/productrouter.php?action=getCategoryByName&name=${encodeURIComponent(searchInput)}`);
-                const categoryData = await categoryResponse.json();
-                if (categoryData.status === 200 && categoryData.data && categoryData.data.ID) {
-                    window.location.href = `/sportswear-webstore/layout/client/search_results.php?category=${categoryData.data.ID}`;
-                    return;
-                }
-
-                // If no brand or category match, perform a regular search
-                window.location.href = `/sportswear-webstore/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
-            } catch (error) {
-                console.error('Error checking brand/category:', error);
-                window.location.href = `/sportswear-webstore/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
-            }
-        });
-
         const showMenu = (toggleId, navId) => {
             const toggle = document.getElementById(toggleId),
                 nav = document.getElementById(navId);
@@ -210,12 +178,12 @@
         function handleLogout(event) {
             event.preventDefault();
             fetch('./layout/login_regis.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: 'submitLogout=1'
-                })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'submitLogout=1'
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) window.location.reload();
@@ -229,6 +197,39 @@
             overlay.style.display = 'none';
             window.location.href = '/index.php?page=profile';
         }
+
+        // Xử lý tìm kiếm từ search box
+    document.getElementById('searchForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const searchInput = document.getElementById('searchInput').value.trim();
+
+        if (!searchInput) return;
+
+        try {
+            // Kiểm tra nếu từ khóa khớp với thương hiệu
+            const brandResponse = await fetch(`http://localhost/sportswear-webstore/src/router/productrouter.php?action=getBrandByName&name=${encodeURIComponent(searchInput)}`);
+            const brandData = await brandResponse.json();
+            if (brandData.status === 200 && brandData.data && brandData.data.ID) {
+                window.location.href = `/sportswear-webstore/layout/client/search_results.php?brand=${brandData.data.ID}`;
+                return;
+            }
+
+            // Kiểm tra nếu từ khóa khớp với danh mục
+            const categoryResponse = await fetch(`http://localhost/sportswear-webstore/src/router/productrouter.php?action=getCategoryByName&name=${encodeURIComponent(searchInput)}`);
+            const categoryData = await categoryResponse.json();
+            if (categoryData.status === 200 && categoryData.data && categoryData.data.ID) {
+                window.location.href = `/sportswear-webstore/layout/client/search_results.php?category=${categoryData.data.ID}`;
+                return;
+            }
+
+            // Nếu không khớp thương hiệu hoặc danh mục, thực hiện tìm kiếm thông thường
+            window.location.href = `/sportswear-webstore/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
+        } catch (error) {
+            console.error('Lỗi khi kiểm tra thương hiệu/danh mục:', error);
+            // Fallback: tìm kiếm thông thường nếu có lỗi
+            window.location.href = `/sportswear-webstore/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
+        }
+    })
     </script>
 </body>
 
