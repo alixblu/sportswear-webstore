@@ -80,11 +80,11 @@ $user = $_SESSION['user'];
                         Account Settings
                     </div>
                     <div class="section-items">
-                        <div class="sidebar-item active">
+                        <div class="sidebar-item" data-profile="profile">
                             <i class="ri-user-line" style="color: #000;"></i>
                             My Profile
                         </div>
-                        <div class="sidebar-item">
+                        <div class="sidebar-item" data-profile="address">
                             <i class="ri-map-pin-line" style="color: #000;"></i>
                             Address Book
                         </div>
@@ -101,14 +101,48 @@ $user = $_SESSION['user'];
             </div>
 
             <div class="profile-container">
-                <?php include 'profile.php'; ?>
+                <?php
+                    $id = $_GET['profileIndex'] ?? 'profile';
+
+                    $allowedPages = [
+                        'profile' => 'profile.php',
+                        'address' => 'address.php',
+                    ];
+
+                    if (array_key_exists($id, $allowedPages)) {
+                        include $allowedPages[$id];
+                    } else {
+                        echo 'Page not found.';
+                    }
+                ?>
             </div>
         </div>
 
         </main>
         
         <script>
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', function () {
+                    const profileIndex = this.getAttribute('data-profile');
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('page', 'profile');
+                    url.searchParams.set('profileIndex', profileIndex);
+                    window.location.href = url.toString(); 
+                });
+            });
+
+            window.addEventListener('DOMContentLoaded', () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const profileIndex = urlParams.get('profileIndex') || 'profile';
+
+                document.querySelectorAll('.sidebar-item').forEach(item => {
+                    if (item.getAttribute('data-profile') === profileIndex) {
+                        item.classList.add('active');
+                    }
+                });
+            });
         </script>
+
     </body>
     
 </html>

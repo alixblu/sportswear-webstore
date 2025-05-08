@@ -21,16 +21,14 @@
 
     <div class="page-container">
         <?php
-        // Check if a search query is present
         if (isset($_GET['search']) && !empty($_GET['search'])) {
-            include './layout/client/search_results.php'; // Include the search results page
+            include './layout/client/search_results.php'; 
         } 
-        // Check if profile page is requested
         else if (isset($_GET['page']) && $_GET['page'] === 'profile') {
-            include './layout/client/profile/index.php'; // Include the profile page
+            include './layout/client/profile/index.php';
         }
         else {
-            include './layout/content.php'; // Include the main content
+            include './layout/content.php'; 
         }
         ?>
     </div>

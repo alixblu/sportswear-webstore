@@ -162,8 +162,7 @@ session_start();
             
             if (!searchInput) return;
             
-            // Redirect to search results page with the search term
-            window.location.href = `/sportswear-webstore/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
+            window.location.href = `/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
         });
         
         const showMenu = (toggleId, navId) => {
@@ -205,7 +204,7 @@ session_start();
          function userProfileRedirect() {
             const overlay = document.getElementById('loginOverlay');
             overlay.style.display = 'none'; // Hide the overlay
-            window.location.href = '/sportswear-webstore/index.php?page=profile';
+            window.location.href = '/index.php?page=profile';
          }
     </script>
 </body>
