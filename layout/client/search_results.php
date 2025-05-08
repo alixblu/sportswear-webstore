@@ -63,7 +63,7 @@ if (!empty($_GET['price_end']) && is_numeric($_GET['price_end'])) {
 // Xử lý tìm kiếm
 $search_handled = false;
 if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
-    $search = htmlspecialchars(trim($_GET['search']));
+    $search =  $search = htmlspecialchars(trim($_GET['search']));
     
     // Add search term to API params for product name matching
     $api_params['search'] = $search;
@@ -105,14 +105,23 @@ $products = array_slice($products, $offset, $items_per_page);
 ?>
 
 <!DOCTYPE html>
+
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kết quả tìm kiếm - SportsWear</title>
-    <link rel="stylesheet" href="/sportswear-webstore/css/content.css">
+    <link rel="stylesheet" href="../../css/header.css">
+    <link rel="stylesheet" href="../../css/footer.css">
+    <link rel="stylesheet" href="../../css/content.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        .page-container {
+             /* Adjust based on header height */
+            margin-top:30px;
+            padding: 20px;
+            min-height: calc(100vh - 300px); /* Adjust for header and footer */
+        }
         .filter-section {
             background-color: white;
             border-radius: 8px;
@@ -193,6 +202,10 @@ $products = array_slice($products, $offset, $items_per_page);
     </style>
 </head>
 <body>
+    <?php include __DIR__ . '/../header.php'; ?>
+
+```
+<div class="page-container">
     <div class="product-section">
         <?php if (isset($product_data['status']) && $product_data['status'] !== 200): ?>
             <div class="error-message">
@@ -382,5 +395,10 @@ $products = array_slice($products, $offset, $items_per_page);
             </div>
         <?php endif; ?>
     </div>
+</div>
+
+<?php include __DIR__ . '/../footer.php'; ?>
+
+
 </body>
 </html>

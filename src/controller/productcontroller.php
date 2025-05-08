@@ -281,4 +281,5 @@ class ProductController
             ApiResponse::customResponse(null, 500, $e->getMessage());
         }
     }
+    
 }
