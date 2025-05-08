@@ -41,6 +41,12 @@ async function updateResults(params = {}) {
     params.page = params.page || 1;
     params.limit = itemsPerPage;
 
+    // Đảm bảo rằng price_start và price_end được gửi dưới dạng min_price và max_price để đồng bộ với backend
+    if (params.price_start) params.min_price = params.price_start;
+    if (params.price_end) params.max_price = params.price_end;
+    delete params.price_start;
+    delete params.price_end;
+
     const queryString = new URLSearchParams(params).toString();
     const apiUrl = `http://localhost/sportswear-webstore/src/router/productrouter.php?action=getFilteredProducts&${queryString}`;
 
@@ -100,8 +106,18 @@ async function updateResults(params = {}) {
                     }
                 }
 
-                // Định dạng giá bán giống number_format($product['price'], 2)
-                const formattedPrice = Number(product.price).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                // Tính giá bán: price + price * markup_percentage
+                const basePrice = parseFloat(product.price) || 0;
+                const markupPercentage = parseFloat(product.markup_percentage) || 0;
+                if (isNaN(basePrice) || basePrice <= 0) {
+                    console.warn(`Giá cơ bản không hợp lệ cho sản phẩm ID ${product.ID}: ${product.price}`);
+                }
+                if (isNaN(markupPercentage)) {
+                    console.warn(`Phần trăm markup không hợp lệ cho sản phẩm ID ${product.ID}: ${product.markup_percentage}`);
+                }
+                const sellingPrice = basePrice + (basePrice * markupPercentage / 100);
+                // Định dạng giá bán theo kiểu Việt Nam: 1,234,567 ₫
+                const formattedPrice = Math.round(sellingPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' ₫';
 
                 return `
                     <a href="/sportswear-webstore/layout/client/product_detail.php?id=${product.ID}" class="product-card">
@@ -111,7 +127,7 @@ async function updateResults(params = {}) {
                         </div>
                         <div class="product-name">${product.name}</div>
                         <div class="product-price">
-                            <span class="current-price">$${formattedPrice}</span>
+                            <span class="current-price">${formattedPrice}</span>
                         </div>
                         <div class="product-rating">
                             ${ratingHtml}

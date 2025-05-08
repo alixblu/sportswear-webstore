@@ -100,7 +100,8 @@ class ProductRepository
                     p.*, 
                     pv.id AS productVariantID,
                     MIN(pv.price) AS price,
-                    COALESCE(p.rating, 0) AS rating
+                    COALESCE(p.rating, 0) AS rating,
+                    COALESCE(p.markup_percentage, 0) AS markup_percentage
                 FROM product p
                 LEFT JOIN productvariant pv ON p.ID = pv.productID
                 WHERE 1=1
@@ -124,12 +125,12 @@ class ProductRepository
                 $params[] = $status;
             }
             if ($min_price && is_numeric($min_price)) {
-                $query .= " AND pv.price >= ?";
+                $query .= " AND (pv.price * (1 + COALESCE(p.markup_percentage, 0) / 100)) >= ?";
                 $types .= "d";
                 $params[] = $min_price;
             }
             if ($max_price && is_numeric($max_price)) {
-                $query .= " AND pv.price <= ?";
+                $query .= " AND (pv.price * (1 + COALESCE(p.markup_percentage, 0) / 100)) <= ?";
                 $types .= "d";
                 $params[] = $max_price;
             }
@@ -142,8 +143,8 @@ class ProductRepository
             // Xử lý sắp xếp
             $sort_map = [
                 'newest' => 'p.ID DESC',
-                'price_asc' => 'MIN(pv.price) ASC',
-                'price_desc' => 'MIN(pv.price) DESC',
+                'price_asc' => 'MIN(pv.price * (1 + COALESCE(p.markup_percentage, 0) / 100)) ASC',
+                'price_desc' => 'MIN(pv.price * (1 + COALESCE(p.markup_percentage, 0) / 100)) DESC',
                 'rating_desc' => 'COALESCE(p.rating, 0) DESC'
             ];
             $sort_order = isset($sort_map[$sort]) ? $sort_map[$sort] : 'p.ID DESC';
@@ -164,27 +165,6 @@ class ProductRepository
         } catch (Exception $e) {
             error_log("Error in getFilteredProducts: " . $e->getMessage());
             throw new Exception("Failed to get filtered products: " . $e->getMessage());
-        }
-    }
-    /**
-     * Get a product by ID without variants
-     * @param int $id Product ID
-     * @return array|null Product data if found, null otherwise
-     * @throws Exception If database error occurs
-     */
-    public function getProductById($id)
-    {
-        try {
-            $query = "SELECT * FROM product WHERE ID = ?";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            return $result->fetch_assoc();
-        } catch (Exception $e) {
-            error_log("Error in getProductById: " . $e->getMessage());
-            throw new Exception("Failed to get product");
         }
     }
 

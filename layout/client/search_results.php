@@ -34,7 +34,14 @@ $categories = (isset($categories_data['status']) && $categories_data['status'] =
 $initial_params = [];
 foreach ($_GET as $key => $value) {
     if (!empty($value)) {
-        $initial_params[$key] = htmlspecialchars($value);
+        // Chuyển price_start/price_end thành min_price/max_price nếu có
+        if ($key === 'price_start') {
+            $initial_params['min_price'] = htmlspecialchars($value);
+        } else if ($key === 'price_end') {
+            $initial_params['max_price'] = htmlspecialchars($value);
+        } else {
+            $initial_params[$key] = htmlspecialchars($value);
+        }
     }
 }
 $initial_params_json = json_encode($initial_params);
@@ -49,7 +56,7 @@ $initial_params_json = json_encode($initial_params);
     <link rel="stylesheet" href="../../css/header.css">
     <link rel="stylesheet" href="../../css/footer.css">
     <link rel="stylesheet" href="../../css/content.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="../../js/client/search.js" defer></script>
     <style>
         .page-container {
@@ -90,7 +97,6 @@ $initial_params_json = json_encode($initial_params);
             outline: none;
             box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
         }
-        
         .pagination {
             margin-top: 3rem;
         }
@@ -120,6 +126,19 @@ $initial_params_json = json_encode($initial_params);
             border: 1px solid #f5c6cb;
             border-radius: 5px;
             margin-bottom: 20px;
+        }
+        /* Đảm bảo hiển thị biểu tượng Font Awesome */
+        .product-rating {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .product-rating i {
+            font-family: "Font Awesome 6 Free" !important;
+            font-style: normal;
+            display: inline-block;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -164,10 +183,10 @@ $initial_params_json = json_encode($initial_params);
                         <div class="filter-group">
                             <label class="filter-label">Khoảng giá</label>
                             <div style="display: flex; gap: 10px;">
-                                <input type="number" class="filter-input" name="price_start" placeholder="Từ" 
-                                       value="<?= isset($_GET['price_start']) ? htmlspecialchars($_GET['price_start']) : '' ?>">
-                                <input type="number" class="filter-input" name="price_end" placeholder="Đến" 
-                                       value="<?= isset($_GET['price_end']) ? htmlspecialchars($_GET['price_end']) : '' ?>">
+                                <input type="number" class="filter-input" name="min_price" placeholder="Từ" 
+                                       value="<?= isset($_GET['min_price']) ? htmlspecialchars($_GET['min_price']) : (isset($_GET['price_start']) ? htmlspecialchars($_GET['price_start']) : '') ?>">
+                                <input type="number" class="filter-input" name="max_price" placeholder="Đến" 
+                                       value="<?= isset($_GET['max_price']) ? htmlspecialchars($_GET['max_price']) : (isset($_GET['price_end']) ? htmlspecialchars($_GET['price_end']) : '') ?>">
                             </div>
                         </div>
 
@@ -193,8 +212,6 @@ $initial_params_json = json_encode($initial_params);
                         <?php if (!empty($_GET['search'])): ?>
                             <input type="hidden" name="search" value="<?= htmlspecialchars($_GET['search']) ?>">
                         <?php endif; ?>
-
-                        
                     </div>
                 </form>
             </div>
