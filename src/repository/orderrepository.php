@@ -36,13 +36,12 @@ class OrderRepository
             while ($row = $result->fetch_assoc()) {
                 $order[] = $row;
             }
-            $result->close();
             return $order;
         } catch (Exception $e) {
-            error_log("Lỗi lấy danh sách tài khoản: " . $e->getMessage());
+            error_log("Lỗi lấy danh sách đơn hàng: " . $e->getMessage());
             throw $e;
         } finally {
-            $this->conn->close();
+            if ($this->conn) $this->conn->close();
         }
     }
 

@@ -13,6 +13,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="./css/content.css">
     <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/profile.css">
 </head>
 
 <body>
@@ -20,7 +21,15 @@
 
     <div class="page-container">
         <?php
-            include './layout/content.php';
+        if (isset($_GET['search']) && !empty($_GET['search'])) {
+            include './layout/client/search_results.php'; 
+        } 
+        else if (isset($_GET['page']) && $_GET['page'] === 'profile') {
+            include './layout/client/profile/index.php';
+        }
+        else {
+            include './layout/content.php'; 
+        }
         ?>
     </div>
 

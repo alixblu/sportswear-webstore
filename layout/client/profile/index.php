@@ -1,6 +1,5 @@
 <?php
 // profile.php
-session_start();
 if (!isset($_SESSION['user'])) {
     echo '<p>Please log in to view your profile.</p>';
     exit;
@@ -32,48 +31,118 @@ $user = $_SESSION['user'];
         <div class="wrapperContent">
             <!-- Sidebar -->
             <div class="sidebar">
+        
+
                 <div class="section">
-                    <div class="section-title">Manage My Account</div>
+                    <div class="section-title">
+                        <i class="ri-shopping-bag-line" style="color: #000;"></i>
+                        Shopping
+                    </div>
                     <div class="section-items">
-                        <!-- error,not fix yet -->
-                        <div class="sidebar-item active" onclick="loadMyProfile()">My Profile</div>
-                        <div class="sidebar-item">Address Book</div>
-                        <div class="sidebar-item">My Payment Options</div>
+                        <div class="sidebar-item">
+                            <i class="ri-heart-line" style="color: #000;"></i>
+                            My Wishlist
+                        </div>
+                        <div class="sidebar-item">
+                            <i class="ri-shopping-cart-line" style="color: #000;"></i>
+                            My Orders
+                        </div>
+                        <div class="sidebar-item">
+                            <i class="ri-arrow-left-right-line" style="color: #000;"></i>
+                            My Returns
+                        </div>
+                        <div class="sidebar-item">
+                            <i class="ri-close-circle-line" style="color: #000;"></i>
+                            My Cancellations
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">
+                        <i class="ri-feedback-line" style="color: #000;"></i>
+                        Feedback
+                    </div>
+                    <div class="section-items">
+                        <div class="sidebar-item">
+                            <i class="ri-star-line" style="color: #000;"></i>
+                            My Reviews
+                        </div>
+                        <div class="sidebar-item">
+                            <i class="ri-question-line" style="color: #000;"></i>
+                            My Questions
+                        </div>
                     </div>
                 </div>
                 <div class="section">
-                    <div class="section-title">My Orders</div>
-                    <div class="section-items">
-                        <div class="sidebar-item">My Returns</div>
-                        <div class="sidebar-item">My Cancellations</div>
+                    <div class="section-title">
+                        <i class="ri-user-settings-line" style="color: #000;"></i>
+                        Account Settings
                     </div>
-                </div>
-                <div class="section">
-                    <div class="section-title">My WishList</div>
+                    <div class="section-items">
+                        <div class="sidebar-item" data-profile="profile">
+                            <i class="ri-user-line" style="color: #000;"></i>
+                            My Profile
+                        </div>
+                        <div class="sidebar-item" data-profile="address">
+                            <i class="ri-map-pin-line" style="color: #000;"></i>
+                            Address Book
+                        </div>
+                        <div class="sidebar-item">
+                            <i class="ri-bank-card-line" style="color: #000;"></i>
+                            My Payment
+                        </div>
+                        <div class="sidebar-item">
+                            <i class="ri-lock-password-line" style="color: #000;"></i>
+                            Change Password
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="profile-container">
-                <!-- pages go here -->
-                 <?php include 'profile.php'; ?>
+                <?php
+                    $id = $_GET['profileIndex'] ?? 'profile';
+
+                    $allowedPages = [
+                        'profile' => 'profile.php',
+                        'address' => 'address.php',
+                    ];
+
+                    if (array_key_exists($id, $allowedPages)) {
+                        include $allowedPages[$id];
+                    } else {
+                        echo 'Page not found.';
+                    }
+                ?>
             </div>
         </div>
 
         </main>
         
-        <script >
-        function loadMyProfile() {
-            const pageContainer = document.querySelector('.profile-container');
-            fetch('profile.php') // Fetch the profile page content
-               .then(response => response.text())
-               .then(data => {
-                     pageContainer.innerHTML = data; // Load the profile content into the page-container
-                     const overlay = document.getElementById('loginOverlay');
-                     overlay.style.display = 'none'; // Hide the login overlay
-               })
-               .catch(error => console.error('Error loading profile:', error));
-         }
+        <script>
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', function () {
+                    const profileIndex = this.getAttribute('data-profile');
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('page', 'profile');
+                    url.searchParams.set('profileIndex', profileIndex);
+                    window.location.href = url.toString(); 
+                });
+            });
+
+            window.addEventListener('DOMContentLoaded', () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const profileIndex = urlParams.get('profileIndex') || 'profile';
+
+                document.querySelectorAll('.sidebar-item').forEach(item => {
+                    if (item.getAttribute('data-profile') === profileIndex) {
+                        item.classList.add('active');
+                    }
+                });
+            });
         </script>
+
     </body>
     
 </html>

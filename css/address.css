@@ -1,0 +1,49 @@
+.edit-address-container {
+    padding: 30px;
+    background-color: #fff;
+    max-width: 600px;
+}
+
+.edit-address-container h2 {
+    color: #e53935;
+    margin-bottom: 20px;
+}
+
+.edit-address-form .form-group {
+    margin-bottom: 15px;
+}
+
+.edit-address-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.edit-address-form input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.form-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.btn-save {
+    background-color: #e53935;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-save:hover {
+    background-color: #c62828;
+}
+
