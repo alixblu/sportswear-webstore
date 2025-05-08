@@ -35,7 +35,7 @@ class ProductController
      * @param $min_price : min price of product
      * @param $max_price : max price of product
      */
-    public function getFilteredProducts($category, $brand, $status, $min_price, $max_price, $sort = 'newest', $search = null)
+    public function getFilteredProducts($category, $brand, $status, $min_price, $max_price, $sort, $search)
     {
         $products = null;
         try {

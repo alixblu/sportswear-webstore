@@ -119,8 +119,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
                 $birth = $input['birth'] ?? '';
                 $phone = $input['phone'] ?? '';
                 $gender = $input['gender'] ?? '';
-    
-                $authController->updateUserLogin($name, $address, $birth,$phone,$gender);
+
+                $authController->updateUserLogin($name, $address, $birth, $phone, $gender);
                 break;
 
             default:
@@ -139,4 +139,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         echo json_encode(['status' => 400, 'message' => 'Yêu cầu DELETE không hợp lệ'], JSON_UNESCAPED_UNICODE);
     }
 }
-?>

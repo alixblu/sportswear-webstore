@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +14,7 @@
             justify-content: center;
             gap: 10px;
         }
+
         .page-link {
             padding: 8px 12px;
             border: 1px solid #ddd;
@@ -21,29 +23,35 @@
             color: #333;
             transition: background-color 0.3s;
         }
+
         .page-link:hover {
             background-color: #f0f0f0;
         }
+
         .page-link.active {
             background-color: #e63946;
             color: white;
             border-color: #e63946;
         }
+
         .no-results {
             text-align: center;
             padding: 50px 0;
             color: #666;
             grid-column: 1 / -1;
         }
+
         .no-results i {
             font-size: 50px;
             color: #ddd;
             margin-bottom: 20px;
         }
+
         .no-results h3 {
             font-size: 20px;
             margin-bottom: 10px;
         }
+
         .slider-wrapper {
             width: 100%;
             max-width: 900px;
@@ -51,6 +59,7 @@
             text-align: center;
             position: relative;
         }
+
         .slider-container {
             width: 100%;
             max-width: 900px;
@@ -59,12 +68,14 @@
             position: relative;
             margin: 0 auto;
         }
+
         .slides {
             display: flex;
             width: 100%;
             height: 100%;
             transition: transform 0.5s ease-in-out;
         }
+
         .slides img {
             width: 100%;
             height: 100%;
@@ -72,9 +83,11 @@
             object-fit: cover;
             object-position: center;
         }
+
         .dots {
             margin-top: 10px;
         }
+
         .dot {
             height: 10px;
             width: 10px;
@@ -84,6 +97,7 @@
             margin: 0 5px;
             cursor: pointer;
         }
+
         .dot.active {
             background-color: #ff0000;
         }
@@ -93,7 +107,7 @@
             position: absolute;
             bottom: 20%;
             left: 5%;
-            text-align: left; 
+            text-align: left;
             color: white;
         }
 
@@ -121,9 +135,9 @@
         .product-rating i {
             color: #FFD700;
         }
- 
     </style>
 </head>
+
 <body>
     <div class="product-section">
         <div class="slider-wrapper">
@@ -148,7 +162,7 @@
 
         <div class="home-header">
             <svg width="20" height="40" viewBox="0 0 20 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="20" height="40" rx="4" fill="#DB4444"/>
+                <rect width="20" height="40" rx="4" fill="#DB4444" />
             </svg>
             <h1>Product</h1>
         </div>
@@ -159,132 +173,132 @@
 
         <div class="pagination" id="pagination"></div>
     </div>
-    <script src="../../JS/admin/product/product.js"></script>
     <script src="../../JS/client/cartApi.js"></script>
 
-    <script>
+    <script type="module">
+        import * as product_api from '../../JS/admin/product/api.js'
+        //Product
+        let currentPage = 1;
+        const productsPerPage = 18;
+        let allProducts = [];
 
-    //Product
-    let currentPage = 1;
-    const productsPerPage = 18;
-    let allProducts = [];
+        const renderPagination = (totalPages) => {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
 
-    const renderPagination = (totalPages) => {
-        const pagination = document.getElementById('pagination');
-        pagination.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const pageLink = document.createElement('a');
+                pageLink.className = 'page-link';
+                pageLink.textContent = i;
+                pageLink.href = '#';
 
-        for (let i = 1; i <= totalPages; i++) {
-            const pageLink = document.createElement('a');
-            pageLink.className = 'page-link';
-            pageLink.textContent = i;
-            pageLink.href = '#';
+                pageLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage = i;
+                    renderProducts();
+                    renderPagination(totalPages);
+                });
 
-            pageLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                currentPage = i;
-                renderProducts();
-                renderPagination(totalPages); 
-            });
+                if (i === currentPage) {
+                    pageLink.classList.add('active');
+                }
 
-            if (i === currentPage) {
-                pageLink.classList.add('active');
+                pagination.appendChild(pageLink);
             }
+        };
 
-            pagination.appendChild(pageLink);
-        }
-    };
+        const renderProducts = () => {
+            const productList = document.querySelector('.product-list');
+            productList.innerHTML = '';
 
+            const start = (currentPage - 1) * productsPerPage;
+            const end = start + productsPerPage;
+            const pageProducts = allProducts.slice(start, end);
 
-    const renderProducts = () => {
-        const productList = document.querySelector('.product-list');
-        productList.innerHTML = '';
-
-        const start = (currentPage - 1) * productsPerPage;
-        const end = start + productsPerPage;
-        const pageProducts = allProducts.slice(start, end);
-
-        if (pageProducts.length === 0) {
-            productList.innerHTML = `
+            if (pageProducts.length === 0) {
+                productList.innerHTML = `
                 <div class="no-results">
                     <i class="fas fa-box-open"></i>
                     <h3>Không có sản phẩm nào.</h3>
                 </div>`;
-            return;
-        }
-        pageProducts.forEach(product => {
-            const productCard = document.createElement('div');
-            productCard.classList.add('product-card');
-
-            const productImage = document.createElement('div');
-            productImage.classList.add('product-image');
-            const img = document.createElement('img');
-            img.src = `/img/products/${product.ID}.jpg`;
-            img.alt = product.name;
-            img.onerror = function () { this.src = '/img/products/default.jpg'; };
-            productImage.appendChild(img);
-
-            const productName = document.createElement('div');
-            productName.classList.add('product-name');
-            productName.textContent = product.name || 'Tên sản phẩm';
-
-            const productPrice = document.createElement('div');
-            productPrice.classList.add('product-price');
-            const currentPrice = document.createElement('span');
-            currentPrice.classList.add('current-price');
-            currentPrice.textContent = new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND'
-            }).format(product.price || 0);
-            productPrice.appendChild(currentPrice);
-
-            const productRating = document.createElement('div');
-            productRating.classList.add('product-rating');
-            const stars = Math.round(product.rating || 5);
-            for (let i = 0; i < 5; i++) {
-                const starIcon = document.createElement('i');
-                starIcon.classList.add(i < stars ? 'fas' : 'far', 'fa-star');
-                productRating.appendChild(starIcon);
+                return;
             }
-            const ratingText = document.createElement('span');
-            ratingText.textContent = `(${product.rating || 5})`;
-            productRating.appendChild(ratingText);
+            pageProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.classList.add('product-card');
 
-            const buyButton = document.createElement('button');
-            buyButton.id = `idProduct-${product.productVariantID}`;
-            buyButton.classList.add('buy-button');
-            buyButton.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ';
-            buyButton.addEventListener('click', function (event) {
-                event.preventDefault(); 
-                const productId = this.id.replace('idProduct-', '');
-                themVaoGio(productId);
+                const productImage = document.createElement('div');
+                productImage.classList.add('product-image');
+                const img = document.createElement('img');
+                img.src = `/img/products/${product.ID}.jpg`;
+                img.alt = product.name;
+                img.onerror = function() {
+                    this.src = '/img/products/default.jpg';
+                };
+                productImage.appendChild(img);
+
+                const productName = document.createElement('div');
+                productName.classList.add('product-name');
+                productName.textContent = product.name || 'Tên sản phẩm';
+
+                const productPrice = document.createElement('div');
+                productPrice.classList.add('product-price');
+                const currentPrice = document.createElement('span');
+                currentPrice.classList.add('current-price');
+                currentPrice.textContent = new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(product.price || 0);
+                productPrice.appendChild(currentPrice);
+
+                const productRating = document.createElement('div');
+                productRating.classList.add('product-rating');
+                const stars = Math.round(product.rating || 5);
+                for (let i = 0; i < 5; i++) {
+                    const starIcon = document.createElement('i');
+                    starIcon.classList.add(i < stars ? 'fas' : 'far', 'fa-star');
+                    productRating.appendChild(starIcon);
+                }
+                const ratingText = document.createElement('span');
+                ratingText.textContent = `(${product.rating || 5})`;
+                productRating.appendChild(ratingText);
+
+                const buyButton = document.createElement('button');
+                buyButton.id = `idProduct-${product.productVariantID}`;
+                buyButton.classList.add('buy-button');
+                buyButton.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ';
+                buyButton.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const productId = this.id.replace('idProduct-', '');
+                    themVaoGio(productId);
+                });
+
+                const productLink = document.createElement('a');
+                productLink.href = `/layout/client/detailproduct.php?id=${product.ID}`;
+                productLink.appendChild(productCard);
+
+                productCard.appendChild(productImage);
+                productCard.appendChild(productName);
+                productCard.appendChild(productPrice);
+                productCard.appendChild(productRating);
+                productCard.appendChild(buyButton);
+
+                productList.appendChild(productLink);
             });
 
-            const productLink = document.createElement('a');
-            productLink.href = `/layout/client/detailproduct.php?id=${product.ID}`;
-            productLink.appendChild(productCard);
 
-            productCard.appendChild(productImage);
-            productCard.appendChild(productName);
-            productCard.appendChild(productPrice);
-            productCard.appendChild(productRating);
-            productCard.appendChild(buyButton);
+        };
 
-            productList.appendChild(productLink);
-        });
-
-
-    };
-
-    const displayProducts = async () => {
-        try {
-            allProducts = await getAllProducts();
-            const totalPages = Math.ceil(allProducts.length / productsPerPage);
-            renderPagination(totalPages);
-            renderProducts();
-        } catch (error) {
-            console.error('Error displaying products:', error);
-        }
-    };
+        const displayProducts = async () => {
+            try {
+                allProducts = await product_api.getAllProducts();
+                const totalPages = Math.ceil(allProducts.length / productsPerPage);
+                renderPagination(totalPages);
+                renderProducts();
+            } catch (error) {
+                console.error('Error displaying products:', error);
+            }
+        };
 
         document.addEventListener('DOMContentLoaded', displayProducts);
 
@@ -300,7 +314,7 @@
             slideIndex++;
             if (slideIndex >= totalSlides) slideIndex = 0;
             slides.style.transform = `translateX(${-slideIndex * 100}%)`;
-            
+
             dots.forEach(dot => dot.classList.remove('active'));
             dots[slideIndex].classList.add('active');
         }
@@ -340,7 +354,7 @@
             }
 
         }
-
     </script>
 </body>
+
 </html>
