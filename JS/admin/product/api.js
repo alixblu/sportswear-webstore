@@ -30,13 +30,14 @@ const getAllProducts = async () => {
     }
 };
 
-const getFilteredProducts = async (category=null, brand=null, status=null, rating=null, min_price=null, max_price=null) => {
+const getFilteredProducts = async (search=null, category=null, brand=null, status=null, rating=null, min_price=null, max_price=null) => {
     // Không có thì lấy toàn bộ
-    if(category == null && brand == null && status == null && rating == null && min_price == null && max_price == null )
+    if(search=null && category == null && brand == null && status == null && rating == null && min_price == null && max_price == null )
         return data = await getAllProducts();
 
     try {
         let url = `${API_URL}?action=getFilteredProducts`
+        if (search) url += `&search=${search}`
         if (category) url += `&category=${category}`
         if (brand) url += `&brand=${brand}`
         if (status) url += `&status=${status}`
@@ -61,6 +62,10 @@ const getFilteredProducts = async (category=null, brand=null, status=null, ratin
         console.error('Lỗi, không thể lấy sản phẩm theo tùy chọn !!!', error)
         throw error
     }
+}
+
+const getProductList = async ($page) => {
+    
 }
 
 const getProductById = async (id) => {
@@ -273,4 +278,5 @@ export {
     getBrandById,
     getCategoryById,
     getProductVariants,
-}
+    getAllProducts,
+};

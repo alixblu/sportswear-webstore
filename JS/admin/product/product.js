@@ -18,8 +18,6 @@ const loadProducts = async () => {
         let ratingFilter    = document.getElementById('rating').value
         let startPriceFilter= document.getElementById('priceStart').value
         let endPriceFilter  = document.getElementById('priceEnd').value
-
-        console.log(ratingFilter);
         
         let filteredProducts = await getFilteredProducts(categoryFilter, brandFilter, statusFilter, ratingFilter, startPriceFilter, endPriceFilter);
 
@@ -103,10 +101,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
          // Gán sự kiện xử lý bộ lọc
-        ['category', 'brand', 'status', 'rating', 'priceStart', 'priceEnd'].forEach( id => {
+        ['search', 'category', 'brand', 'status', 'rating', 'priceStart', 'priceEnd'].forEach( id => {
             const element = document.getElementById(id)
             if(element){
-                const eventType = (id.includes('price') ? 'input' : 'change');
+                const eventType = (id.includes('price') || id.includes('search') ? 'input' : 'change');
                 element.addEventListener(eventType, loadProducts);
             }
         })
