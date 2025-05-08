@@ -164,7 +164,29 @@ session_start();
 
             if (!searchInput) return;
 
-            window.location.href = `/sportswear-webstore/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
+            try {
+                // Check if search term matches a brand
+                const brandResponse = await fetch(`http://localhost/sportswear-webstore/src/router/productrouter.php?action=getBrandByName&name=${encodeURIComponent(searchInput)}`);
+                const brandData = await brandResponse.json();
+                if (brandData.status === 200 && brandData.data && brandData.data.ID) {
+                    window.location.href = `/sportswear-webstore/layout/client/search_results.php?brand=${brandData.data.ID}`;
+                    return;
+                }
+
+                // Check if search term matches a category
+                const categoryResponse = await fetch(`http://localhost/sportswear-webstore/src/router/productrouter.php?action=getCategoryByName&name=${encodeURIComponent(searchInput)}`);
+                const categoryData = await categoryResponse.json();
+                if (categoryData.status === 200 && categoryData.data && categoryData.data.ID) {
+                    window.location.href = `/sportswear-webstore/layout/client/search_results.php?category=${categoryData.data.ID}`;
+                    return;
+                }
+
+                // If no brand or category match, perform a regular search
+                window.location.href = `/sportswear-webstore/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
+            } catch (error) {
+                console.error('Error checking brand/category:', error);
+                window.location.href = `/sportswear-webstore/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
+            }
         });
 
         const showMenu = (toggleId, navId) => {
