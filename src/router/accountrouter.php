@@ -110,9 +110,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
             case 'updateUserLogin':
                 $name = $input['name'] ?? '';
                 $address = $input['address'] ?? '';
-                $newPassword = $input['newPassword'] ?? '';
-
-                $authController->updateUserLogin($name, $address, $newPassword);
+                $birth = $input['birth'] ?? '';
+                $phone = $input['phone'] ?? '';
+                $gender = $input['gender'] ?? '';
+    
+                $authController->updateUserLogin($name, $address, $birth,$phone,$gender);
                 break;
 
             default:

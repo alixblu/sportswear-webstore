@@ -1,6 +1,5 @@
 <?php
 
-// Fetch user data from the session
 $user = $_SESSION['user']; 
 ?>
 <html>
@@ -52,71 +51,59 @@ $user = $_SESSION['user'];
 </body>
     <script src="../../JS/admin/userApi.js"></script>
     <script>
-        // Load user data when page loads
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                console.log('Fetching user data...');
-                // Get user info using the API
-                const userData = await getInfo();
-                console.log('Received user data:', userData);
+                const result = await getInfo();
+                if (result && result.data) {
+                    const userData = result.data;
 
-                if (userData) {
-                    // Populate form fields with user data
-                    const fullnameInput = document.getElementById('fullname');
-                    const dateOfBirthInput = document.getElementById('dateOfBirth');
-                    const emailInput = document.getElementById('email');
-                    const phoneInput = document.getElementById('phone');
-                    const genderSelect = document.getElementById('gender');
-                    const createdAtInput = document.getElementById('createdAt');
+                    const elements = {
+                        fullname: document.getElementById('fullname'),
+                        dateOfBirth: document.getElementById('dateOfBirth'),
+                        email: document.getElementById('email'),
+                        phone: document.getElementById('phone'),
+                        gender: document.getElementById('gender'),
+                        createdAt: document.getElementById('createdAt')
+                    };
 
-                    console.log('Setting form values...');
-                    
-                    // Set values with null checks
-                    fullnameInput.value = userData.name || '';
-                    dateOfBirthInput.value = userData.birthday || '';
-                    emailInput.value = userData.email || '';
-                    phoneInput.value = userData.phone || '';
-                    genderSelect.value = userData.gender || 'male';
-                    createdAtInput.value = userData.createdAt || '';
+                    if (elements.fullname) elements.fullname.value = userData.fullname || '';
+                    if (elements.dateOfBirth) elements.dateOfBirth.value = userData.dateOfBirth || '';
+                    if (elements.email) elements.email.value = userData.email || '';
+                    if (elements.phone) elements.phone.value = userData.phone || '';
+                    if (elements.gender) {
+                        elements.gender.value = userData.gender === 0 ? 'male' : userData.gender === 1 ? 'female' : 'other';
+                    }
+                    if (elements.createdAt) elements.createdAt.value = userData.createdAt || '';
 
-                    console.log('Form values set:', {
-                        name: fullnameInput.value,
-                        birthday: dateOfBirthInput.value,
-                        email: emailInput.value,
-                        phone: phoneInput.value,
-                        gender: genderSelect.value,
-                        createdAt: createdAtInput.value
-                    });
                 } else {
-                    console.error('No user data received');
                 }
             } catch (error) {
-                console.error('Error loading user data:', error);
             }
         });
 
-        // Handle form submission
-        document.querySelector('.profile-form').addEventListener('submit', async (e) => {
+        document.querySelector('.form-actions').addEventListener('click', async (e) => {
             e.preventDefault();
-            
             const formData = {
                 name: document.getElementById('fullname').value,
-                address: '', // Add address field if needed
-                newPassword: '' // Add password field if needed
+                address:null,
+                birth: document.getElementById('dateOfBirth').value,
+                phone: document.getElementById('phone').value,
+                gender: document.getElementById('gender').value,
             };
 
             try {
                 const result = await updateUserLogin(
                     formData.name,
                     formData.address,
-                    formData.newPassword
+                    formData.birth,
+                    formData.phone,
+                    formData.gender === 'male' ? 0 : gender === 'female' ? 1 : 2,
                 );
                 
                 if (result) {
                     alert('Profile updated successfully!');
                 }
             } catch (error) {
-                console.error('Error updating profile:', error);
                 alert('Failed to update profile. Please try again.');
             }
         });

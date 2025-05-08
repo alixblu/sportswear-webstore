@@ -76,13 +76,10 @@
                 throw new Exception($e->getMessage(), $e->getCode() ?: 400);
             }
         }
-        public function updateUserLogin($name, $address, $newPassword) {
+        public function updateUserLogin($name, $address, $birth,$phone,$gender) {
             try {
                 $id = $this->userUtils->getUserId();
-                if($newPassword!=null){
-                    $user = $this->userRepository->updatePasswordByUserId($id, $newPassword);
-                }
-                $user = $this->userRepository->userUpdate($id, $name, $address, null, null,null);
+                $user = $this->userRepository->userUpdate($id, $name, $address,$phone,$gender, $birth,null);
                 if (!$user) {
                     throw new Exception("Failed to update user", 500);
                 }

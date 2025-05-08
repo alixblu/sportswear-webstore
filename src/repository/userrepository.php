@@ -300,7 +300,7 @@
         }
 
 
-        public function userUpdate($id, $name, $address, $phone, $gender, $roleID) {
+        public function userUpdate($id, $name, $address, $phone, $gender, $birth, $roleID) {
             $conn = null;
             $stmt = null;
             try {
@@ -324,6 +324,11 @@
                 if ($phone !== null) {
                     $fields[] = 'phone = ?';
                     $params[] = $phone;
+                    $types .= 's';
+                }
+                if ($birth !== null) {
+                    $fields[] = 'dateOfBirth = ?';
+                    $params[] = $birth;
                     $types .= 's';
                 }
                 if ($gender !== null) {

@@ -184,7 +184,6 @@ const getInfo = async () => {
 
         if (response.ok) {
             const data = await response.json();
-            console.log("Thông tin người dùng:", data);
             return data;
         } else {
             const errorMessage = await response.text();
@@ -195,7 +194,7 @@ const getInfo = async () => {
     }
 };
 
-const updateUserLogin = async (name, address, newPassword) => {
+const updateUserLogin = async (name, address,birth,phone,gender) => {
     try {
         const response = await fetch(`${API_ACCOUNT_URL}`, {
             method: "PUT",
@@ -206,13 +205,14 @@ const updateUserLogin = async (name, address, newPassword) => {
                 action: "updateUserLogin",
                 name: name,
                 address: address,
-                newPassword: newPassword,
+                birth: birth,
+                phone:phone,
+                gender:gender
             }),
         });
 
         if (response.ok) {
             const data = await response.json();
-            console.log("Cập nhật thành công:", data);
             return data;
         } else {
             const errorMessage = await response.text();
