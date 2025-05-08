@@ -88,11 +88,11 @@ $user = $_SESSION['user'];
                             <i class="ri-map-pin-line" style="color: #000;"></i>
                             Address Book
                         </div>
-                        <div class="sidebar-item">
+                        <!-- <div class="sidebar-item">
                             <i class="ri-bank-card-line" style="color: #000;"></i>
                             My Payment
-                        </div>
-                        <div class="sidebar-item">
+                        </div> -->
+                        <div class="sidebar-item" data-profile="password">
                             <i class="ri-lock-password-line" style="color: #000;"></i>
                             Change Password
                         </div>
@@ -107,6 +107,8 @@ $user = $_SESSION['user'];
                     $allowedPages = [
                         'profile' => 'profile.php',
                         'address' => 'address.php',
+                        'password' => 'password.php',
+
                     ];
 
                     if (array_key_exists($id, $allowedPages)) {

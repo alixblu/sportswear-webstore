@@ -306,7 +306,40 @@ class UserRepository
         }
     }
 
-
+    public function getPasswordByUserID($userID) {
+        $conn = null;
+        $stmt = null;
+        try {
+            $mysql = new configMysqli();
+            $conn = $mysql->connectDatabase();
+            
+            if (!$conn) {
+                throw new Exception("Failed to connect to database");
+            }
+    
+            $stmt = $conn->prepare("SELECT password FROM useraccount WHERE userID = ?");
+            if (!$stmt) {
+                throw new Exception("Failed to prepare statement: " . $conn->error);
+            }
+    
+            $stmt->bind_param("i", $userID);
+            if (!$stmt->execute()) {
+                throw new Exception("Failed to execute statement: " . $stmt->error);
+            }
+    
+            $result = $stmt->get_result();
+            if ($row = $result->fetch_assoc()) {
+                return $row['password'];
+            } else {
+                throw new Exception("No useraccount found with userID = $userID");
+            }
+        } catch (Exception $e) {
+            error_log("Error fetching password: " . $e->getMessage());
+            throw $e;
+        } finally {
+            if ($stmt) $stmt->close();
+        }
+    }
     public function userUpdate($id, $name, $address, $phone, $gender, $birth, $roleID)
     {
         $conn = null;
@@ -482,63 +515,66 @@ class UserRepository
         }
     }
 
-    public function getAccessModulesByRoleId($roleID)
-    {
-        $conn = null;
-        $stmt = null;
-        try {
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
-
-            $stmt = $conn->prepare("SELECT moduleid FROM access WHERE roleid = ?");
-            if (!$stmt) {
-                throw new Exception("Database error: " . $conn->error);
+        public function getAccessModulesByRoleId($roleID) {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+        
+                $stmt = $conn->prepare("SELECT moduleid FROM access WHERE roleid = ?");
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+        
+                $stmt->bind_param("i", $roleID);
+                $stmt->execute();
+        
+                $result = $stmt->get_result();
+                $modules = [];
+                while ($row = $result->fetch_assoc()) {
+                    $modules[] = $row['moduleid'];
+                }
+        
+                return $modules;
+            } catch (Exception $e) {
+                error_log("Database error in getAccessModulesByRoleId: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
+                if ($conn) $conn->close();
             }
-
-            $stmt->bind_param("i", $roleID);
-            $stmt->execute();
-
-            $result = $stmt->get_result();
-            $modules = [];
-            while ($row = $result->fetch_assoc()) {
-                $modules[] = $row['moduleid'];
-            }
-
-            return $modules;
-        } catch (Exception $e) {
-            error_log("Database error in getAccessModulesByRoleId: " . $e->getMessage());
-            throw new Exception("Database error: " . $e->getMessage());
-        } finally {
-            if ($stmt) $stmt->close();
-            if ($conn) $conn->close();
         }
-    }
-    public function updatePasswordByUserId($userID, $newPassword)
-    {
-        $conn = null;
-        $stmt = null;
-        try {
-            $mysql = new configMysqli();
-            $conn = $mysql->connectDatabase();
-
-            $stmt = $conn->prepare("UPDATE useraccount SET password = ? WHERE userID = ?");
-            if (!$stmt) {
-                throw new Exception("Database error: " . $conn->error);
+        public function updatePasswordByUserId($userID, $newPassword) {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+        
+                $stmt = $conn->prepare("UPDATE useraccount SET password = ? WHERE userID = ?");
+                if (!$stmt) {
+                    throw new Exception("Database error: " . $conn->error);
+                }
+        
+                $stmt->bind_param("si", $newPassword, $userID);
+                $stmt->execute();
+        
+                if ($stmt->affected_rows === 0) {
+                    throw new Exception("No changes detected, password not updated.", 500);
+                }
+        
+                return true;
+                
+            } catch (Exception $e) {
+                error_log("Database error in updatePasswordByUserId: " . $e->getMessage());
+                throw new Exception("Database error: " . $e->getMessage());
+            } finally {
+                if ($stmt) $stmt->close();
             }
-
-            $stmt->bind_param("si", $newPassword, $userID);
-            $stmt->execute();
-
-            if ($stmt->affected_rows === 0) {
-                throw new Exception("No changes detected, password not updated.", 500);
-            }
-
-            return true;
-        } catch (Exception $e) {
-            error_log("Database error in updatePasswordByUserId: " . $e->getMessage());
-            throw new Exception("Database error: " . $e->getMessage());
-        } finally {
-            if ($stmt) $stmt->close();
         }
+        
     }
-}
+    
+    
+?>

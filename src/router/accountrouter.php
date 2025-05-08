@@ -74,6 +74,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'filterAccounts':
                 $controller->filterAccounts($input);
                 break;
+
+            case 'updatePassword':
+                $currentPassword = $input['currentPassword'] ?? '';
+                $newPassword = $input['newPassword'] ?? '';
+                $authController->updatePassword($currentPassword, $newPassword);
+                break;
             default:
                 echo json_encode(['status' => 400, 'message' => 'Hành động không hợp lệ'], JSON_UNESCAPED_UNICODE);
         }
