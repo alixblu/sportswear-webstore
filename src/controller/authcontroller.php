@@ -40,17 +40,17 @@ class AuthController
             exit;
         }
 
-        public function updatePassword($currentPassword,$passWord ){
-            try {
-                $this->userService->updatePassword($currentPassword,$passWord);
-                ApiResponse::customApiResponse('Cập Nhập Thành Công', 200);
+        
+    }
+    public function updatePassword($currentPassword,$passWord ){
+        try {
+            $this->userService->updatePassword($currentPassword,$passWord);
+            ApiResponse::customApiResponse('Cập Nhập Thành Công', 200);
 
-            } catch (Exception $e) {
-                throw $e;
-            }
+        } catch (Exception $e) {
+            throw $e;
         }
     }
-
     public function signup($name, $email, $passWord, $phone, $gender, $roleID)
     {
         try {
