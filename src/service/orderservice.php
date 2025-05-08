@@ -48,22 +48,6 @@ class OrderService
         }
     }
 
-    public function updateOrderDetails($orderID, $receiverName, $address, $phone, $email, $paymentMethodID)
-    {
-        try {
-            if (!is_numeric($orderID) || $orderID <= 0 || !is_numeric($paymentMethodID) || $paymentMethodID <= 0) {
-                throw new Exception("Invalid order or payment method ID");
-            }
-            if (empty($receiverName) || empty($address) || empty($phone) || empty($email)) {
-                throw new Exception("Missing billing detail information");
-            }
-
-            return $this->orderRepository->updateOrderDetails($orderID, $receiverName, $address, $phone, $email, $paymentMethodID);
-        } catch (Exception $e) {
-            throw new Exception("Failed to update order details: " . $e->getMessage());
-        }
-    }
-
     public function searchOrders($orderID = null, $customerName = '', $fromDate = '', $toDate = '')
     {
         try {

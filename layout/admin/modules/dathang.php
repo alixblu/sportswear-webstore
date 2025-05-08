@@ -17,9 +17,9 @@
         }
         .search-box input {
         flex: 1;
-        border: none;          /* Remove all borders */
-        background-color: transparent; /* Make the background transparent */
-        outline: none;         /* Remove outline when focused */
+        border: none;          
+        background-color: transparent; 
+        outline: none;         
         color:#2d3748
         }
         .search-box {
@@ -181,12 +181,7 @@
 <body>
     <div class="main-content">
         <div id="pageTitle" class="page-title">
-            <div class="title">Quản lý đơn hàng</div>
-            <div class="action-buttons">
-                <button id="exportBtn" class="btn btn-outline">
-                    <i class="fas fa-download"></i> Xuất Excel
-                </button>
-            </div>
+            <div class="title">Quản lý đơn hàng</div>          
         </div>
         <div class="stats-cards">
             <div class="table-card">
@@ -230,23 +225,7 @@
                                     <i class="fas fa-edit"></i> Cập nhật
                                 </button>
                             </td>
-                        </tr>
-                        <tr>
-                            <td>DH002</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>10/03/2024</td>
-                            <td>2,500,000đ</td>
-                            <td>Tiền mặt</td>
-                            <td><span class="status completed">Hoàn thành</span></td>
-                            <td>
-                                <button class="btn btn-outline btn-sm" onclick="viewOrderDetails()">
-                                    <i class="fas fa-eye"></i> Xem
-                                </button>
-                                <button class="btn btn-outline btn-sm" onclick="updateOrderStatus(this)">
-                                    <i class="fas fa-edit"></i> Cập nhật
-                                </button>
-                            </td>
-                        </tr>
+                        </tr>                        
                     </tbody>
                 </table>
             </div>

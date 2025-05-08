@@ -432,7 +432,7 @@
             return;
         }
 
-        updateCoupon(id, name, percent, duration, status)
+        updateCoupon(id, name, percent, duration, cc)
         .then(response => {
             if (response.status === 200) {
                 showToast('Cập nhật thành công!', 'success');

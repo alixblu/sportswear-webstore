@@ -159,8 +159,8 @@
 
         <div class="pagination" id="pagination"></div>
     </div>
-    <script src="../../JS/admin/product/product.js"></script>
-    <script src="../../JS/client/cartApi.js"></script>
+    <script src="../../../JS/admin/product/product.js"></script>
+    <script src="../../../JS/client/cartApi.js"></script>
 
     <script>
 

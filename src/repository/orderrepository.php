@@ -75,10 +75,21 @@ class OrderRepository {
     
         //cập nhật trạng thái đơn hànghàng
     public function updateOrderStatus($orderID, $status) {
-        $sql = "UPDATE `order` SET status = ? WHERE ID = ?";
-        $stmt = $this->conn->prepare($sql);
+      try{
+        $stmt = $this->conn->prepare("UPDATE `order` SET status = ? WHERE ID = ?");
+        if (!$stmt) {
+            throw new Exception("Failed to prepare update: " . $this->conn->error);
+        }
         $stmt->bind_param("si", $status, $orderID);
-        return $stmt->execute();
+        $stmt->execute();
+        return true;
+      }
+        catch (Exception $e) {
+                error_log("Update order status failed: " . $e->getMessage());
+                return false;
+            } finally {
+                if ($this->conn) $this->conn->close();
+            }
     }
 
     public function updateBillingDetail($orderID, $receiverName, $address, $phone, $email) {

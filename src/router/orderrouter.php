@@ -47,17 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     if (isset($putData['action']) && $putData['action'] === 'updateOrderStatus') {
         $orderID = $putData['orderID'] ?? null;
         $status = $putData['status'] ?? null;
-        $orderController->updateOrderStatus($orderID, $status);
-    } else if (isset($putData['action']) && $putData['action'] === 'updateOrderDetails') {
-        $orderID = $putData['orderID'] ?? null;
-        $receiverName = $putData['receiverName'] ?? '';
-        $address = $putData['address'] ?? '';
-        $phone = $putData['phone'] ?? '';
-        $email = $putData['email'] ?? '';
-        $paymentMethodID = $putData['paymentMethodID'] ?? null;
-        $orderController->updateOrderDetails($orderID, $receiverName, $address, $phone, $email, $paymentMethodID);
+
+        if ($id !== null) {
+            $orderController->updateOrderStatus($orderID, $status);
+            echo "Missing couponId.";
+        }
     } else {
-        http_response_code(400);
-        echo json_encode(['error' => 'Yêu cầu PUT không hợp lệ']);
+        echo "Invalid PUT request.";
     }
 }
