@@ -532,6 +532,40 @@
                 if ($stmt) $stmt->close();
             }
         }
+        public function getPasswordByUserID($userID) {
+            $conn = null;
+            $stmt = null;
+            try {
+                $mysql = new configMysqli();
+                $conn = $mysql->connectDatabase();
+                
+                if (!$conn) {
+                    throw new Exception("Failed to connect to database");
+                }
+        
+                $stmt = $conn->prepare("SELECT password FROM useraccount WHERE userID = ?");
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare statement: " . $conn->error);
+                }
+        
+                $stmt->bind_param("i", $userID);
+                if (!$stmt->execute()) {
+                    throw new Exception("Failed to execute statement: " . $stmt->error);
+                }
+        
+                $result = $stmt->get_result();
+                if ($row = $result->fetch_assoc()) {
+                    return $row['password'];
+                } else {
+                    throw new Exception("No useraccount found with userID = $userID");
+                }
+            } catch (Exception $e) {
+                error_log("Error fetching password: " . $e->getMessage());
+                throw $e;
+            } finally {
+                if ($stmt) $stmt->close();
+            }
+        }
         
     }
     

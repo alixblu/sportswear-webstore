@@ -67,7 +67,7 @@
 
         public function updateUser($id, $name, $address, $phone, $gender, $roleID) {
             try {
-                $user = $this->userRepository->userUpdate($id, $name, $address, $phone, $gender, $roleID);
+                $user = $this->userRepository->userUpdate($id, $name, $address, $phone, $gender,null, $roleID);
                 if (!$user) {
                     throw new Exception("Failed to update user", 500);
                 }
@@ -80,6 +80,23 @@
             try {
                 $id = $this->userUtils->getUserId();
                 $user = $this->userRepository->userUpdate($id, $name, $address,$phone,$gender, $birth,null);
+                if (!$user) {
+                    throw new Exception("Failed to update user", 500);
+                }
+                return $user;
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage(), $e->getCode() ?: 400);
+            }
+        }
+        public function updatePassword($currentPassword,$passWord) {
+            try {
+                $id = $this->userUtils->getUserId();
+                $passWordOld = $this->userRepository->getPasswordByUserID($id);
+                if($currentPassword !=  $passWordOld ){
+                    throw new Exception("Password incorrect", 500);
+                }
+                $user = $this->userRepository->updatePasswordByUserId($id,$passWord);
+
                 if (!$user) {
                     throw new Exception("Failed to update user", 500);
                 }

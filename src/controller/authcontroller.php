@@ -80,6 +80,16 @@
                 throw $e;
             }
         }
+
+        public function updatePassword($currentPassword,$passWord ){
+            try {
+                $this->userService->updatePassword($currentPassword,$passWord);
+                ApiResponse::customApiResponse('Cập Nhập Thành Công', 200);
+
+            } catch (Exception $e) {
+                throw $e;
+            }
+        }
     }
 
 ?>
