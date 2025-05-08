@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <title>Quản lý đơn hàng</title>
@@ -9,14 +10,18 @@
             border-collapse: collapse;
             margin-top: 20px;
         }
-        th, td {
+
+        th,
+        td {
             padding: 10px;
             border: 1px solid #ccc;
         }
+
         .actions button {
             margin-right: 5px;
             cursor: pointer;
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -27,13 +32,15 @@
             padding: 20px;
             border: 1px solid #888;
             z-index: 1000;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
+
         .modal.active {
             display: block;
         }
     </style>
 </head>
+
 <body>
     <h2>Quản lý đơn hàng</h2>
     <table>
@@ -72,9 +79,10 @@
         </form>
     </div>
 
-    <script src="/sportswear-webstore/JS/admin/order.js"></script>
+    <script src="../../../JS/admin/order.js"></script>
     <script>
         showAll();
+
         function showAll() {
             getAllOrders()
                 .then(result => {
@@ -184,4 +192,5 @@
         });
     </script>
 </body>
+
 </html>
