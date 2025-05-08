@@ -78,11 +78,11 @@ class OrderRepository
     }
 
     //cập nhật trạng thái đơn hànghàng
-    public function updateOrderStatus($orderID, $status)
+    public function updateOrderStatus($ID, $status)
     {
         $sql = "UPDATE `order` SET status = ? WHERE ID = ?";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("si", $status, $orderID);
+        $stmt->bind_param("si", $status, $ID);
         return $stmt->execute();
     }
 

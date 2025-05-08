@@ -50,18 +50,18 @@ class OrderController
 
     /**
      * Update order status
-     * @param int $orderID
+     * @param int $ID
      * @param string $status
      */
-    public function updateOrderStatus($orderID, $status)
+    public function updateOrderStatus($ID, $status)
     {
         try {
-            if (!isset($orderID) || !is_numeric($orderID)) {
+            if (!isset($ID) || !is_numeric($ID)) {
                 ApiResponse::customResponse(null, 400, 'Invalid order ID');
                 return;
             }
 
-            $result = $this->orderService->updateOrderStatus($orderID, $status);
+            $result = $this->orderService->updateOrderStatus($ID, $status);
             if ($result) {
                 ApiResponse::customResponse(null, 200, 'Order status updated successfully');
             } else {
@@ -75,27 +75,7 @@ class OrderController
     /**
      * Update order billing & payment details
      */
-    public function updateOrderDetails($orderID, $receiverName, $address, $phone, $email, $paymentMethodID)
-    {
-        try {
-            $result = $this->orderService->updateOrderDetails(
-                $orderID,
-                $receiverName,
-                $address,
-                $phone,
-                $email,
-                $paymentMethodID
-            );
-
-            if ($result) {
-                ApiResponse::customResponse(null, 200, 'Order details updated successfully');
-            } else {
-                ApiResponse::customResponse(null, 500, 'Failed to update order details');
-            }
-        } catch (Exception $e) {
-            ApiResponse::customResponse(null, 500, $e->getMessage());
-        }
-    }
+    
 
     /**
      * Search orders with filters

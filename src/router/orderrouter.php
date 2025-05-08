@@ -45,17 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     parse_str(file_get_contents("php://input"), $putData);
 
     if (isset($putData['action']) && $putData['action'] === 'updateOrderStatus') {
-        $orderID = $putData['orderID'] ?? null;
+        $ID = $putData['orderID'] ?? null;
         $status = $putData['status'] ?? null;
-        $orderController->updateOrderStatus($orderID, $status);
-    } else if (isset($putData['action']) && $putData['action'] === 'updateOrderDetails') {
-        $orderID = $putData['orderID'] ?? null;
-        $receiverName = $putData['receiverName'] ?? '';
-        $address = $putData['address'] ?? '';
-        $phone = $putData['phone'] ?? '';
-        $email = $putData['email'] ?? '';
-        $paymentMethodID = $putData['paymentMethodID'] ?? null;
-        $orderController->updateOrderDetails($orderID, $receiverName, $address, $phone, $email, $paymentMethodID);
+        $orderController->updateOrderStatus($ID, $status);
+    
     } else {
         http_response_code(400);
         echo json_encode(['error' => 'Yêu cầu PUT không hợp lệ']);

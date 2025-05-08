@@ -32,35 +32,19 @@ class OrderService
         }
     }
 
-    public function updateOrderStatus($orderID, $status)
+    public function updateOrderStatus($ID, $status)
     {
         try {
-            if (!is_numeric($orderID) || $orderID <= 0) {
+            if (!is_numeric($ID) || $ID <= 0) {
                 throw new Exception("Invalid order ID");
             }
             if (!in_array($status, ['pending', 'processing', 'shipped', 'completed', 'cancelled'])) {
                 throw new Exception("Invalid order status");
             }
 
-            return $this->orderRepository->updateOrderStatus($orderID, $status);
+            return $this->orderRepository->updateOrderStatus($ID, $status);
         } catch (Exception $e) {
             throw new Exception("Failed to update order status: " . $e->getMessage());
-        }
-    }
-
-    public function updateOrderDetails($orderID, $receiverName, $address, $phone, $email, $paymentMethodID)
-    {
-        try {
-            if (!is_numeric($orderID) || $orderID <= 0 || !is_numeric($paymentMethodID) || $paymentMethodID <= 0) {
-                throw new Exception("Invalid order or payment method ID");
-            }
-            if (empty($receiverName) || empty($address) || empty($phone) || empty($email)) {
-                throw new Exception("Missing billing detail information");
-            }
-
-            return $this->orderRepository->updateOrderDetails($orderID, $receiverName, $address, $phone, $email, $paymentMethodID);
-        } catch (Exception $e) {
-            throw new Exception("Failed to update order details: " . $e->getMessage());
         }
     }
 

@@ -49,12 +49,12 @@ const searchOrders = async ({ orderID = '', customerName = '', fromDate = '', to
 };
 
 // Cập nhật trạng thái đơn hàng
-const updateOrderStatus = async (orderID, status) => {
+const updateOrderStatus = async (ID, status) => {
     const formData = new URLSearchParams();
     formData.append('action', 'updateOrderStatus');
-    formData.append('orderID', orderID);
+    formData.append('ID', ID);
     formData.append('status', status);
-
+    console.log('formData:', formData.toString());
     const response = await fetch(API_URL, {
         method: 'PUT',
         body: formData.toString(),
