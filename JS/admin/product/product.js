@@ -1,285 +1,25 @@
-const API_URL = '../../src/router/productRouter.php';
-
-// ===================================== GET products ===================================== 
-const getAllProducts = async () => {
-    try {
-        const response = await fetch(`${API_URL}?action=getAllProducts`, {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error('Không thể lấy danh sách sản phẩm');
-        }
-
-        const data = await response.json();
-
-        // Check if data is an array or has a data property
-        if (Array.isArray(data)) {
-            return data;
-        } else if (data && Array.isArray(data.data)) {
-            return data.data;
-        } else {
-            throw new Error('Invalid response format from server');
-        }
-    } catch (error) {
-        console.error('Error in getAllProducts:', error);
-        throw error;
-    }
-};
-
-const getFilteredProducts = async (category=null, brand=null, status=null, min_price=null, max_price=null) => {
-    // Không có thì lấy toàn bộ
-    if(category == null && brand == null && status == null && min_price == null && max_price == null )
-        return data = await getAllProducts();
-
-    try {
-        const url = new URL(API_URL)
-        url.searchParams.set('action', 'getFilteredProducts')
-        if (category) url.searchParams.set('category', category)
-        if (brand) url.searchParams.set('brand', brand)
-        if (status) url.searchParams.set('status', status)
-        if (min_price) url.searchParams.set('min_price', min_price)
-        if (max_price) url.searchParams.set('max_price', max_price)
-
-        const response = await fetch(url.toString(),
-            {
-                method: 'GET',
-                mode: 'cors',
-                headers: {
-                    'Content-Type':'application/json'
-                }
-            }
-        )
-        if(!response.ok)
-            throw new Error("Không thể lấy sản phẩm theo tùy chọn !!!")
-    
-        const data = response.json()
-
-        return Array.isArray(data) ? data : data.data
-    } catch (error) {
-        console.error('Lỗi, không thể lấy sản phẩm theo tùy chọn !!!', error)
-        throw error
-        
-    }
-}
-
-const getProductById = async (id) => {
-    const response = await fetch(`${API_URL}?action=getProductById&id=${id}`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy thông tin sản phẩm');
-    }
-
-    return await response.json();
-};
-
-const getProductVariants = async (id) => {
-    const response = await fetch(`${API_URL}?action=getProductVariants&id=${id}`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy thông tin biến thể sản phẩm');
-    }
-
-    return await response.json();
-};
-
-
-// ===================================== GET category ===================================== 
-const getCategoryById = async (id) => {
-    const response = await fetch(`${API_URL}?action=getCategoryById&id=${id}`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy phân loại sản phẩm');
-    }
-
-    return await response.json();
-};
-const getCategoryByName = async (name) => {
-    const response = await fetch(`${API_URL}?action=getCategoryByName&name=${name}`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy phân loại sản phẩm');
-    }
-
-    return await response.json();
-};
-
-const getAllCategories = async () => {
-    const response = await fetch(`${API_URL}?action=getAllCategories`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy danh sách phân loại');
-    }
-
-    return await response.json();
-};
-
-// ===================================== GET brand ===================================== 
-
-const getAllBrands = async () => {
-    const response = await fetch(`${API_URL}?action=getAllBrands`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy danh sách thương hiệu');
-    }
-
-    return await response.json();
-};
-
-const getBrandById = async (id) => {
-    const response = await fetch(`${API_URL}?action=getBrandById&id=${id}`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy phân loại sản phẩm');
-    }
-
-    return await response.json();
-};
-const getBrandByName = async (name) => {
-    const response = await fetch(`${API_URL}?action=getBrandByName&name=${name}`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy phân loại sản phẩm');
-    }
-
-    return await response.json();
-};
-
-// ===================================== Update & Delete product ===================================== 
-const updateProduct = async (product) => {
-    const formData = new URLSearchParams();
-    formData.append('action', 'updateProduct');
-
-    // Dynamically append properties from the product object
-    for (const key in product) {
-        formData.append(key, product[key]);
-    }
-
-    const response = await fetch(API_URL, {
-        method: 'PUT',
-        body: formData.toString(),
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể cập nhật sản phẩm');
-    }
-
-    return await response.json();
-};
-
-const updateProductStock = async (id) => {
-    const formData = new URLSearchParams();
-    formData.append('action', 'updateProductStock');
-    formData.append('id', id);
-
-    const response = await fetch(API_URL, {
-        method: 'PUT',
-        body: formData.toString(),
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể cập nhật số lượng tồn kho');
-    }
-
-    return await response.json();
-};
-
-const deleteProduct = async (id) => {
-    const response = await fetch(`${API_URL}?action=deleteProduct&id=${id}`, {
-        method: 'DELETE',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể xoá sản phẩm');
-    }
-
-    return await response.json();
-};
-
-// ===================================== Function to populate category dropdown ===================================== 
-const populateCategoryFilter = async () => {
-    try {
-        const response = await getAllCategories();
-        
-        const categories = response.data || [];
-        
-        const categorySelect = document.getElementById('category');
-        
-        // Clear existing options except the first one
-        while (categorySelect.options.length > 1) {
-            categorySelect.remove(1);
-        }
-
-        // Add new options
-        categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.ID;
-            option.textContent = category.name;
-            categorySelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error populating category filter:', error);
-    }
-};
-
-// ===================================== Function to populate brand dropdown ===================================== 
-const populateBrandFilter = async () => {
-    try {
-        const response = await getAllBrands();
-        
-        const brands = response.data || [];
-        
-        const brandSelect = document.getElementById('brand');
-        
-        // Clear existing options except the first one
-        while (brandSelect.options.length > 1) {
-            brandSelect.remove(1);
-        }
-
-        // Add new options
-        brands.forEach(brand => {
-            const option = document.createElement('option');
-            option.value = brand.ID;
-            option.textContent = brand.name;
-            brandSelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error populating brand filter:', error);
-    }
-};
+import {
+    getFilteredProducts,
+    populateBrandFilter,
+    populateCategoryFilter,
+    getProductById,
+    getBrandById,
+    getCategoryById,
+    getProductVariants,
+} from './api.js'
+const IMG_URL = '../../img/products/';
 
 // ===================================== Function to load products with filters ===================================== 
 const loadProducts = async () => {
     try {
-        const normalize = (val) => (val == '' || val == 'all') ? null : val;
-
-        let categoryFilter = normalize(document.getElementById('category').value);
-        let brandFilter = normalize(document.getElementById('brand').value);
-        let statusFilter = normalize(document.getElementById('status').value);
-        let startPriceFilter = normalize(document.getElementById('priceStart').value)
-        let endPriceFilter = normalize(document.getElementById('priceEnd').value)
-
-        let filteredProducts = await getFilteredProducts(categoryFilter, brandFilter, statusFilter, startPriceFilter, endPriceFilter);
+        let categoryFilter  = document.getElementById('category').value
+        let brandFilter     = document.getElementById('brand').value
+        let statusFilter    = document.getElementById('status').value
+        let ratingFilter    = document.getElementById('rating').value
+        let startPriceFilter= document.getElementById('priceStart').value
+        let endPriceFilter  = document.getElementById('priceEnd').value
+        
+        let filteredProducts = await getFilteredProducts(categoryFilter, brandFilter, statusFilter, ratingFilter, startPriceFilter, endPriceFilter);
 
         const productGrid = document.getElementById('productGrid')
         productGrid.innerHTML = '';
@@ -289,7 +29,7 @@ const loadProducts = async () => {
             productCard.innerHTML = `
                 <div class="product-image">
                     <span class="product-id-badge">#${product.ID}</span>
-                    <i class="fas fa-tshirt"></i>
+                    <img src="${IMG_URL + product.image}.jpg"></img>
                     <span class="product-badge badge-${product.status === 'in_stock' ? 'in-stock' : 'out-stock'}">
                         ${product.status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
                     </span>
@@ -305,14 +45,21 @@ const loadProducts = async () => {
                         <span class="rating-count">${product.rating ? `(${product.rating})` : '(No rating)'}</span>
                     </div>
                     <div class="product-actions">
-                        <button class="btn btn-primary" onclick="viewProduct(${product.ID})">
+                        <button class="btn btn-primary view-button">
                             <i class="fas fa-eye"></i> View
                         </button>
                     </div>
                 </div>
                 `;
-            productGrid.appendChild(productCard);
-        });
+                productGrid.appendChild(productCard);
+
+                const view_btn = productCard.querySelector('.view-button')
+                if(view_btn)
+                    view_btn.addEventListener('click', () => viewProduct(product.ID))
+                else
+                    console.warn('Không tìm thấy nút view-button cho sản phẩm', product.ID);
+
+            });
     } catch (error) {
         console.error('Lỗi khi tải sản phẩm:', error);
     }
@@ -321,12 +68,17 @@ const loadProducts = async () => {
 // ===================================== Initialize filters when page loads===================================== 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // Populate category filter
-        await populateCategoryFilter();
-        
-         // Populate brand filter
-        await populateBrandFilter();
-        
+        // Populate category & brand filter
+        try {
+            await Promise.all([
+                populateBrandFilter(),
+                populateCategoryFilter(),
+                loadProducts()
+            ]);
+        } catch (err) {
+            console.error('Lỗi khi khởi tạo filters và product:', err);
+        }
+
         // Set status filter options
         const statusSelect = document.getElementById('status');
         
@@ -347,10 +99,146 @@ document.addEventListener('DOMContentLoaded', async () => {
             option.textContent = status.text;
             statusSelect.appendChild(option);
         });
-         // Load products after filters are set
-         loadProducts();
+
+         // Gán sự kiện xử lý bộ lọc
+        ['search', 'category', 'brand', 'status', 'rating', 'priceStart', 'priceEnd'].forEach( id => {
+            const element = document.getElementById(id)
+            if(element){
+                const eventType = (id.includes('price') || id.includes('search') ? 'input' : 'change');
+                element.addEventListener(eventType, loadProducts);
+            }
+        })
+
      } catch (error) {
          console.error('Error initializing filters:', error);
      }
  });
 
+ // ================================== View detail of product ==================================
+// Modal functions
+async function viewProduct(id) {
+    let product = null
+    const modal = document.getElementById('productModal');
+    modal.style.display = 'block';
+    try {
+        // Get product details
+        let response = await getProductById(id);
+
+        if (!response || !response.data) {
+            throw new Error('No product data received');
+        }
+        product = response.data;
+
+
+        // Set values for modal elements
+        const modalElements = {
+            id: document.getElementById('modal-product-id'),
+            name: document.getElementById('modal-product-name'),
+            markup: document.getElementById('modal-product-markup'),
+            rating: document.getElementById('modal-product-rating'),
+            stock: document.getElementById('modal-product-stock'),
+            status: document.getElementById('modal-product-status'),
+            description: document.getElementById('modal-product-description'),
+            category: document.getElementById('modal-product-category'),
+            brand: document.getElementById('modal-product-brand'),
+            discountId: document.getElementById('modal-product-discount-id'),
+            basePrice: document.getElementById('modal-product-base-price'),
+            image: document.getElementById('modal-product-image'),
+        };
+
+        // Update modal with product details
+        modalElements.id.textContent = product.ID || '-';
+        modalElements.name.textContent = product.name || '-';
+        modalElements.markup.textContent = (product.markup_percentage || '0') + '%';
+        modalElements.rating.innerHTML = renderStars(product.rating);
+        modalElements.stock.textContent = product.stock || '0';
+        modalElements.status.textContent = product.status === 'in_stock' ? 'In Stock' : 'Out of Stock';
+        modalElements.description.textContent = product.description || 'No description available';
+        modalElements.discountId.textContent = product.discountID || '-';
+        modalElements.basePrice.textContent = product.price || '-';
+
+        // Set the image source and handle errors using the 'error' event listener
+        modalElements.image.onerror = function() {
+            this.src = `${IMG_URL}default.jpg`;
+        };
+
+        // Assign the image source
+        modalElements.image.src = `${IMG_URL}${product.image}.jpg`;
+
+        // Get and display category name
+        if (product.categoryID) {
+            response = await getCategoryById(product.categoryID);
+            const category = response.data;
+            modalElements.category.textContent = category ? category.name : 'Unknown Category';
+        } else {
+            modalElements.category.textContent = 'No category';
+        }
+
+        // Get and display brand name
+        if (product.brandID) {
+            response = await getBrandById(product.brandID);
+            const brand = response.data;
+            modalElements.brand.textContent = brand ? brand.name : 'Unknown Brand';
+        } else {
+            modalElements.brand.textContent = 'No brand';
+        }
+
+        // Get and display variants
+        const res = await getProductVariants(id);
+        const variants = res.data || [];
+        const variantsList = document.getElementById('modal-variants-list');
+
+        if (variantsList) {
+            variantsList.innerHTML = '';
+            if (variants && variants.length > 0) {
+                variants.forEach(variant => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${variant.Code || '-'}</td>
+                        <td>${variant.fullName || '-'}</td>
+                        <td>${variant.color || '-'}</td>
+                        <td>${variant.size || '-'}</td>
+                        <td>${variant.quantity || '0'}</td>
+                        <td>${variant.price || '0'}</td>
+                        <td>${variant.status || '-'}</td>
+                    `;
+                    variantsList.appendChild(row);
+                });
+            } else {
+                variantsList.innerHTML = '<tr><td colspan="8" class="text-center">No variants found</td></tr>';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading product details:', error);
+        alert('Error loading product details: ' + error.message);
+    }
+}
+// Function to render stars based on rating
+function renderStars(rating) {
+    if (!rating) 
+        return '<div class="stars"><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div>';
+
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 >= 0.5;
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+    let starsHTML = '<div class="stars">';
+
+    // Add full stars
+    for (let i = 0; i < fullStars; i++) {
+        starsHTML += '<i class="fas fa-star"></i>';
+    }
+
+    // Add half star if needed
+    if (halfStar) {
+        starsHTML += '<i class="fas fa-star-half-alt"></i>';
+    }
+
+    // Add empty stars
+    for (let i = 0; i < emptyStars; i++) {
+        starsHTML += '<i class="far fa-star"></i>';
+    }
+
+    starsHTML += '</div>';
+    return starsHTML;
+}

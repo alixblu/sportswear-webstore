@@ -136,7 +136,7 @@ class ProductRepository
             if ($search && !empty($search)) {
                 $query .= " AND p.name LIKE ?";
                 $types .= "s";
-                $params[] = "%" . $search . "%"; 
+                $params[] = "%" . $search . "%";
             }
 
             // Xử lý sắp xếp
