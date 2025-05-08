@@ -3,8 +3,7 @@ session_start();
 require_once __DIR__ . '/../../src/config/response/apiresponse.php';
 
 // Hàm gọi API từ productrouter.php với xử lý lỗi
-function callApi($url)
-{
+function callApi($url) {
     try {
         $response = @file_get_contents($url);
         if ($response === false) {
@@ -24,8 +23,7 @@ function callApi($url)
 }
 
 // Hàm lấy tên thương hiệu hoặc danh mục từ ID
-function getNameFromId($id, $type)
-{
+function getNameFromId($id, $type) {
     if (!is_numeric($id) || $id <= 0) {
         error_log("Invalid ID for $type: $id");
         return 'Không xác định';
@@ -66,14 +64,14 @@ if (!empty($_GET['price_end']) && is_numeric($_GET['price_end'])) {
 $search_handled = false;
 if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
     $search = htmlspecialchars(trim($_GET['search']));
-
+    
     // Add search term to API params for product name matching
     $api_params['search'] = $search;
-
+    
     // Optionally check if the search term matches a brand name
     $brand_url = "http://localhost/sportswear-webstore/src/router/productrouter.php?action=getBrandByName&name=" . urlencode($search);
     $brand_data = callApi($brand_url);
-
+    
     if (isset($brand_data['status']) && $brand_data['status'] === 200 && !empty($brand_data['data']) && isset($brand_data['data']['ID'])) {
         $api_params['brand'] = $brand_data['data']['ID'];
         $search_handled = true;
@@ -81,7 +79,7 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
 }
 
 // Sắp xếp
-$sort = isset($_GET['sort']) && in_array($_GET['sort'], ['newest', 'price_asc', 'price_desc', 'rating_desc'])
+$sort = isset($_GET['sort']) && in_array($_GET['sort'], ['newest', 'price_asc', 'price_desc', 'rating_desc']) 
     ? $_GET['sort'] : 'newest';
 $api_params['sort'] = $sort;
 
@@ -108,7 +106,6 @@ $products = array_slice($products, $offset, $items_per_page);
 
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -119,17 +116,15 @@ $products = array_slice($products, $offset, $items_per_page);
         .filter-section {
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             padding: 20px;
             margin-bottom: 30px;
         }
-
         .filter-form {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
         }
-
         .filter-label {
             display: block;
             margin-bottom: 8px;
@@ -137,9 +132,7 @@ $products = array_slice($products, $offset, $items_per_page);
             color: #1d3557;
             font-size: 14px;
         }
-
-        .filter-select,
-        .filter-input {
+        .filter-select, .filter-input {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -148,14 +141,11 @@ $products = array_slice($products, $offset, $items_per_page);
             background-color: #fff;
             transition: border-color 0.3s;
         }
-
-        .filter-select:focus,
-        .filter-input:focus {
+        .filter-select:focus, .filter-input:focus {
             border-color: #3498db;
             outline: none;
             box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
         }
-
         .filter-button {
             background-color: #3498db;
             color: white;
@@ -167,37 +157,30 @@ $products = array_slice($products, $offset, $items_per_page);
             transition: background-color 0.3s;
             align-self: flex-end;
         }
-
         .filter-button:hover {
             background-color: rgb(15, 138, 220);
         }
-
         .pagination {
             margin-top: 3rem;
         }
-
         .no-results {
             text-align: center;
             padding: 50px 0;
             color: #666;
             grid-column: 1 / -1;
         }
-
         .no-results i {
             font-size: 50px;
             color: #ddd;
             margin-bottom: 20px;
         }
-
         .no-results h3 {
             font-size: 20px;
             margin-bottom: 10px;
         }
-
         .product-card {
             text-decoration: none;
         }
-
         .error-message {
             text-align: center;
             padding: 20px;
@@ -209,7 +192,6 @@ $products = array_slice($products, $offset, $items_per_page);
         }
     </style>
 </head>
-
 <body>
     <div class="product-section">
         <?php if (isset($product_data['status']) && $product_data['status'] !== 200): ?>
@@ -220,7 +202,9 @@ $products = array_slice($products, $offset, $items_per_page);
 
         <div class="section-header">
             <h1>
-                <?= !empty($_GET['search']) ? 'Kết quả tìm kiếm: "' . htmlspecialchars($_GET['search']) . '"' : (!empty($_GET['brand']) ? 'Kết quả theo thương hiệu: ' . getNameFromId($_GET['brand'], 'Brand') : (!empty($_GET['category']) ? 'Kết quả theo danh mục: ' . getNameFromId($_GET['category'], 'Category') : 'Tất cả sản phẩm')) ?>
+                <?= !empty($_GET['search']) ? 'Kết quả tìm kiếm: "' . htmlspecialchars($_GET['search']) . '"' : 
+                    (!empty($_GET['brand']) ? 'Kết quả theo thương hiệu: ' . getNameFromId($_GET['brand'], 'Brand') : 
+                    (!empty($_GET['category']) ? 'Kết quả theo danh mục: ' . getNameFromId($_GET['category'], 'Category') : 'Tất cả sản phẩm')) ?>
             </h1>
             <span class="search-count"><?= $total_items ?> sản phẩm được tìm thấy</span>
         </div>
@@ -256,10 +240,10 @@ $products = array_slice($products, $offset, $items_per_page);
                     <div class="filter-group">
                         <label class="filter-label">Khoảng giá</label>
                         <div style="display: flex; gap: 10px;">
-                            <input type="number" class="filter-input" name="price_start" placeholder="Từ"
-                                value="<?= isset($_GET['price_start']) ? htmlspecialchars($_GET['price_start']) : '' ?>">
-                            <input type="number" class="filter-input" name="price_end" placeholder="Đến"
-                                value="<?= isset($_GET['price_end']) ? htmlspecialchars($_GET['price_end']) : '' ?>">
+                            <input type="number" class="filter-input" name="price_start" placeholder="Từ" 
+                                   value="<?= isset($_GET['price_start']) ? htmlspecialchars($_GET['price_start']) : '' ?>">
+                            <input type="number" class="filter-input" name="price_end" placeholder="Đến" 
+                                   value="<?= isset($_GET['price_end']) ? htmlspecialchars($_GET['price_end']) : '' ?>">
                         </div>
                     </div>
 
@@ -299,7 +283,7 @@ $products = array_slice($products, $offset, $items_per_page);
         <!-- Product List -->
         <div class="product-list">
             <?php if (!empty($products)): ?>
-                <?php foreach ($products as $product):
+                <?php foreach ($products as $product): 
                     $image_path = "/sportswear-webstore/img/products/" . $product['ID'] . ".jpg";
                     $default_image = "/sportswear-webstore/img/products/default.jpg";
                     $image_src = file_exists($_SERVER['DOCUMENT_ROOT'] . $image_path) ? $image_path : $default_image;
@@ -311,18 +295,18 @@ $products = array_slice($products, $offset, $items_per_page);
                         <?php if ($product['status'] === 'out_of_stock'): ?>
                             <div class="discount-badge">Hết hàng</div>
                         <?php endif; ?>
-
+                        
                         <div class="product-image">
-                            <img src="<?= $image_src ?>" alt="<?= htmlspecialchars($product['name']) ?>"
-                                onerror="this.src='<?= $default_image ?>'">
+                            <img src="<?= $image_src ?>" alt="<?= htmlspecialchars($product['name']) ?>" 
+                                 onerror="this.src='<?= $default_image ?>'">
                         </div>
-
+                        
                         <div class="product-name"><?= htmlspecialchars($product['name']) ?></div>
-
+                        
                         <div class="product-price">
                             <span class="current-price">$<?= number_format($product['price'], 2) ?></span>
                         </div>
-
+                        
                         <div class="product-rating">
                             <?php for ($i = 1; $i <= 5; $i++): ?>
                                 <?php if ($i <= $full_stars): ?>
@@ -335,7 +319,7 @@ $products = array_slice($products, $offset, $items_per_page);
                             <?php endfor; ?>
                             <span>(<?= round($rating, 1) ?>)</span>
                         </div>
-
+                        
                         <button class="buy-button" <?= $product['status'] === 'out_of_stock' ? 'disabled' : '' ?>>
                             <i class="fas fa-shopping-cart"></i>
                             <?= $product['status'] === 'in_stock' ? 'Thêm vào giỏ' : 'Hết hàng' ?>
@@ -399,5 +383,4 @@ $products = array_slice($products, $offset, $items_per_page);
         <?php endif; ?>
     </div>
 </body>
-
 </html>

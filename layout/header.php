@@ -164,7 +164,7 @@ session_start();
 
             if (!searchInput) return;
 
-            window.location.href = `/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
+            window.location.href = `/sportswear-webstore/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
         });
 
         const showMenu = (toggleId, navId) => {
