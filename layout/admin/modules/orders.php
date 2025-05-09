@@ -135,17 +135,17 @@
             color: #d97706;
             border: 1px solid rgba(234, 179, 8, 0.3);
         }
-        .status.processing {
+        .status.approved {
             background-color: rgba(59, 130, 246, 0.15);
             color: #2563eb;
             border: 1px solid rgba(59, 130, 246, 0.3);
         }
-        .status.completed {
+        .status.delivered {
             background-color: rgba(16, 185, 129, 0.15);
             color: #059669;
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
-        .status.cancelled {
+        .status.canceled {
             background-color: rgba(239, 68, 68, 0.15);
             color: #dc2626;
             border: 1px solid rgba(239, 68, 68, 0.3);
@@ -221,7 +221,7 @@
                     <div class="wrapperFilter">
                         <div class="search-box">
                             <i class="ri-search-line"></i>
-                            <input type="text" placeholder="Tìm kiếm theo mã đơn hàng">
+                            <input type="text" id="search-order-id" placeholder="Tìm kiếm theo mã đơn hàng">
                         </div>
                         <button class="btn btn-outline btn-sm" onclick="showFormFilter()">
                             <i class="fa-solid fa-filter"></i> Bộ lọc
@@ -250,6 +250,14 @@
     </div>
     <script src="../../../JS/admin/order.js"></script>
     <script>
+    // Valid status transitions
+    const statusTransitions = {
+        'pending': ['approved', 'canceled'],
+        'approved': ['delivered', 'canceled'],
+        'delivered': [],
+        'canceled': []
+    };
+
     // Hiển thị danh sách đơn hàng
     function showAll() {
         getAllOrders()
@@ -267,7 +275,7 @@
                         <td>${order.createdAt}</td>
                         <td>${order.totalPrice}₫</td>
                         <td>${order.paymentMethod || 'N/A'}</td>
-                        <td><span class="status ${statusClass}">${order.status}</span></td>
+                        <td><span class="status ${statusClass}">${getStatusText(order.status)}</span></td>
                         <td class="actions">
                             <button class="btn btn-outline btn-sm" onclick="viewOrderDetails('${order.ID}')">
                                 <i class="fas fa-eye"></i> Xem
@@ -290,10 +298,21 @@
     function getStatusClass(status) {
         switch (status) {
             case 'pending': return 'pending';
-            case 'approved': return 'processing';
-            case 'delivered': return 'completed';
-            case 'canceled': return 'cancelled';
+            case 'approved': return 'approved';
+            case 'delivered': return 'delivered';
+            case 'canceled': return 'canceled';
             default: return '';
+        }
+    }
+
+    // Chuyển đổi trạng thái sang văn bản hiển thị
+    function getStatusText(status) {
+        switch (status) {
+            case 'pending': return 'Chưa xác nhận';
+            case 'approved': return 'Đã xác nhận';
+            case 'delivered': return 'Đã giao';
+            case 'canceled': return 'Hủy đơn';
+            default: return status;
         }
     }
 
@@ -304,6 +323,9 @@
             return;
         }
 
+        // Lấy danh sách trạng thái hợp lệ
+        const validStatuses = statusTransitions[currentStatus] || [];
+
         const modalHTML = `
             <div id="order-status-modal" class="modal">
                 <div class="modal-close" onclick="closeModal()">×</div>
@@ -313,10 +335,9 @@
                     <input type="hidden" id="current-status" value="${currentStatus}">
                     <label for="status-select">Trạng thái:</label>
                     <select id="status-select" class="status-dropdown">
-                        <option value="pending" ${currentStatus === 'pending' ? 'selected' : ''}>Đang xử lý</option>
-                        <option value="approved" ${currentStatus === 'approved' ? 'selected' : ''}>Đã xác nhận</option>
-                        <option value="delivered" ${currentStatus === 'delivered' ? 'selected' : ''}>Đã giao</option>
-                        <option value="canceled" ${currentStatus === 'canceled' ? 'selected' : ''}>Đã hủy</option>
+                        ${validStatuses.map(status => `
+                            <option value="${status}">${getStatusText(status)}</option>
+                        `).join('')}
                     </select>
                     <br><br>
                     <button type="submit">Lưu trạng thái</button>
@@ -343,17 +364,16 @@
     function updateOrderStatusFromForm(event) {
         event.preventDefault();
 
-        const Id = document.getElementById('status-order-id').value.trim();
+        const ID = document.getElementById('status-order-id').value.trim();
         const status = document.getElementById('status-select').value.trim();
         const currentStatus = document.getElementById('current-status').value.trim();
 
-        if (currentStatus === 'delivered' || currentStatus === 'canceled') {
-            alert("Không thể cập nhật trạng thái này nữa!");
-            closeModal();
+        if (!statusTransitions[currentStatus].includes(status)) {
+            alert("Trạng thái không hợp lệ!");
             return;
         }
 
-        updateOrderStatus(Id, status)
+        updateOrderStatus(ID, status)
             .then(response => {
                 if (response.success) {
                     alert('Trạng thái đơn hàng đã được cập nhật!');
@@ -370,20 +390,137 @@
     }
 
     // Hàm chỉnh sửa trạng thái đơn hàng
-    function editStatus(orderId, currentStatus) {
-        showStatusModal(orderId, currentStatus);
+    function editStatus(ID, currentStatus) {
+        showStatusModal(ID, currentStatus);
     }
 
-    // Hàm xem chi tiết đơn hàng (placeholder)
+    // Hàm xem chi tiết đơn hàng
     function viewOrderDetails(orderId) {
-        console.log('Viewing order details for:', orderId);
-        // Implement view order details logic here
+        getOrderDetails(orderId)
+            .then(details => {
+                const order = details[0];
+                const modalHTML = `
+                    <div id="order-details-modal" class="modal">
+                        <div class="modal-close" onclick="closeModal()">×</div>
+                        <h3>Chi tiết đơn hàng #${order.ID}</h3>
+                        <div class="order-details">
+                            <p><strong>Ngày đặt:</strong> ${order.createdAt}</p>
+                            <p><strong>Người nhận:</strong> ${order.receiverName}</p>
+                            <p><strong>Địa chỉ:</strong> ${order.address}</p>
+                            <p><strong>Số điện thoại:</strong> ${order.phone}</p>
+                            <p><strong>Email:</strong> ${order.email}</p>
+                            <p><strong>Phương thức thanh toán:</strong> ${order.paymentMethod || 'N/A'}</p>
+                        </div>
+                        <table class="order-items">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Số lượng</th>
+                                    <th>Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${details.map(item => `
+                                    <tr>
+                                        <td>${item.productName}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>${item.productTotal}₫</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        <div class="order-summary">
+                            <p>Tổng cộng: ${details.reduce((sum, item) => sum + parseFloat(item.productTotal), 0)}₫</p>
+                        </div>
+                    </div>
+                `;
+                const modalContainer = document.getElementById('modal-container');
+                modalContainer.innerHTML = modalHTML;
+                document.getElementById('order-details-modal').style.display = 'flex';
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy chi tiết đơn hàng:', error.message);
+                alert('Không thể tải chi tiết đơn hàng: ' + error.message);
+            });
     }
 
-    // Hàm hiển thị form bộ lọc (placeholder)
+    // Hàm hiển thị form bộ lọc
     function showFormFilter() {
-        console.log('Showing filter form');
-        // Implement filter form logic here
+        const modalHTML = `
+            <div id="filter-modal" class="modal">
+                <div class="modal-close" onclick="closeModal()">×</div>
+                <h3>Bộ lọc đơn hàng</h3>
+                <form id="filter-form">
+                    <label for="filter-status">Trạng thái:</label>
+                    <select id="filter-status" class="status-dropdown">
+                        <option value="">Tất cả</option>
+                        <option value="pending">Chưa xác nhận</option>
+                        <option value="approved">Đã xác nhận</option>
+                        <option value="delivered">Đã giao</option>
+                        <option value="canceled">Hủy đơn</option>
+                    </select>
+                    <br><br>
+                    <label for="from-date">Từ ngày:</label>
+                    <input type="date" id="from-date" class="inputOrderCss">
+                    <br><br>
+                    <label for="to-date">Đến ngày:</label>
+                    <input type="date" id="to-date" class="inputOrderCss">
+                    <br><br>
+                    <button type="submit">Áp dụng bộ lọc</button>
+                </form>
+            </div>
+        `;
+        const modalContainer = document.getElementById('modal-container');
+        modalContainer.innerHTML = modalHTML;
+        document.getElementById('filter-modal').style.display = 'flex';
+
+        // Add event listener for filter form submission
+        document.getElementById('filter-form').addEventListener('submit', applyFilter);
+    }
+
+    // Áp dụng bộ lọc
+    function applyFilter(event) {
+        event.preventDefault();
+
+        const orderID = document.getElementById('search-order-id').value.trim();
+        const status = document.getElementById('filter-status').value;
+        const fromDate = document.getElementById('from-date').value;
+        const toDate = document.getElementById('to-date').value;
+
+        searchOrders({ orderID, status, fromDate, toDate })
+            .then(result => {
+                const orders = result;
+                const tbody = document.querySelector("#order-table-body");
+                tbody.innerHTML = "";
+
+                orders.forEach(order => {
+                    const tr = document.createElement("tr");
+                    const statusClass = getStatusClass(order.status);
+                    tr.innerHTML = `
+                        <td>${order.ID}</td>
+                        <td>${order.customerName}</td>
+                        <td>${order.createdAt}</td>
+                        <td>${order.totalPrice}₫</td>
+                        <td>${order.paymentMethod || 'N/A'}</td>
+                        <td><span class="status ${statusClass}">${getStatusText(order.status)}</span></td>
+                        <td class="actions">
+                            <button class="btn btn-outline btn-sm" onclick="viewOrderDetails('${order.ID}')">
+                                <i class="fas fa-eye"></i> Xem
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="editStatus('${order.ID}', '${order.status}')">
+                                <i class="fas fa-edit"></i> Cập nhật
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                closeModal();
+            })
+            .catch(error => {
+                console.error('Lỗi khi tìm kiếm đơn hàng:', error.message);
+                alert('Không thể tìm kiếm đơn hàng: ' + error.message);
+            });
     }
 
     // Gọi hàm để hiển thị danh sách đơn hàng khi trang được tải

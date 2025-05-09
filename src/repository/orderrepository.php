@@ -77,7 +77,7 @@ class OrderRepository
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-    //cập nhật trạng thái đơn hànghàng
+    // Cập nhật trạng thái đơn hàng
     public function updateOrderStatus($ID, $status)
     {
         $sql = "UPDATE `order` SET status = ? WHERE ID = ?";
@@ -96,14 +96,15 @@ class OrderRepository
         return $stmt->execute();
     }
 
-
-    // 🔍 Tìm kiếm theo ID, tên khách hàng, thời gian
-    public function searchOrders($orderID = null, $customerName = '', $fromDate = '', $toDate = '')
+    // Tìm kiếm theo ID, tên khách hàng, trạng thái, thời gian
+    public function searchOrders($orderID = null, $customerName = '', $status = '', $fromDate = '', $toDate = '')
     {
         $sql = "
-            SELECT o.ID, o.status, o.totalPrice, o.createdAt, u.fullname AS customerName
+            SELECT o.ID, o.status, o.totalPrice, o.createdAt, u.fullname AS customerName, pm.name AS paymentMethod
             FROM `order` o
-            LEFT JOIN user u ON o.customer = u.ID  
+            LEFT JOIN user u ON o.customer = u.ID
+            LEFT JOIN payment p ON p.orderID = o.ID
+            LEFT JOIN paymentmethod pm ON pm.ID = p.paymentMethodID
             WHERE 1=1
         ";
 
@@ -119,9 +120,16 @@ class OrderRepository
 
         // Lọc theo tên khách hàng nếu có
         if (!empty($customerName)) {
-            $sql .= " AND u.fullname LIKE ?";  // Lọc theo fullname của khách hàng
+            $sql .= " AND u.fullname LIKE ?";
             $types .= "s";
             $params[] = "%" . $customerName . "%";
+        }
+
+        // Lọc theo trạng thái nếu có
+        if (!empty($status)) {
+            $sql .= " AND o.status = ?";
+            $types .= "s";
+            $params[] = $status;
         }
 
         // Lọc theo ngày bắt đầu nếu có

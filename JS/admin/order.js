@@ -18,6 +18,7 @@ const getAllOrders = async () => {
         throw error;
     }
 };
+
 // Lấy chi tiết một đơn hàng theo ID
 const getOrderDetails = async (orderID) => {
     const response = await fetch(`${API_URL}?action=getOrderDetails&id=${orderID}`, {
@@ -30,11 +31,12 @@ const getOrderDetails = async (orderID) => {
 };
 
 // Tìm kiếm đơn hàng theo nhiều tiêu chí
-const searchOrders = async ({ orderID = '', customerName = '', fromDate = '', toDate = '' }) => {
+const searchOrders = async ({ orderID = '', customerName = '', status = '', fromDate = '', toDate = '' }) => {
     const query = new URLSearchParams({
         action: 'searchOrders',
         orderID,
         customerName,
+        status,
         fromDate,
         toDate,
     });
@@ -85,4 +87,3 @@ const updateOrderDetails = async ({ orderID, receiverName, address, phone, email
 
     return await response.json();
 };
- 

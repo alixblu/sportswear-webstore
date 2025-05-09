@@ -63,7 +63,7 @@ class OrderController
 
             $result = $this->orderService->updateOrderStatus($ID, $status);
             if ($result) {
-                ApiResponse::customResponse(null, 200, 'Order status updated successfully');
+                ApiResponse::customResponse(['success' => true], 200, 'Order status updated successfully');
             } else {
                 ApiResponse::customResponse(null, 500, 'Failed to update order status');
             }
@@ -73,17 +73,12 @@ class OrderController
     }
 
     /**
-     * Update order billing & payment details
-     */
-    
-
-    /**
      * Search orders with filters
      */
-    public function searchOrders($orderID = null, $customerName = '', $fromDate = '', $toDate = '')
+    public function searchOrders($orderID = null, $customerName = '', $status = '', $fromDate = '', $toDate = '')
     {
         try {
-            $results = $this->orderService->searchOrders($orderID, $customerName, $fromDate, $toDate);
+            $results = $this->orderService->searchOrders($orderID, $customerName, $status, $fromDate, $toDate);
             ApiResponse::customResponse($results, 200);
         } catch (Exception $e) {
             ApiResponse::customResponse(null, 500, $e->getMessage());
