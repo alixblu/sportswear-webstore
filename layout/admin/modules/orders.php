@@ -15,35 +15,12 @@
             justify-content: center;
             gap: 8px;
         }
-        .search-box input {
-            flex: 1;
-            border: none;          
-            background-color: transparent; 
-            outline: none;         
-            color: #2d3748;
-        }
-        .search-box {
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            column-gap: .3rem;
-            border: 1px solid #ccc;
-            border-radius: 100px;
-            height: 1.8rem;
-            padding-left: 7px;
-            max-width: 500px;
-            width: 70%;
-            padding: 20px;
-        }
-        .search-box:focus-within {
-            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
-            border-color: rgba(67, 97, 238, 0.3);
-        }
         .wrapperFilter {
             max-width: 400px;
             width: 70%;
             display: flex;
             gap: 20px;
+            margin-bottom: 20px;
         }
         .formOrderCss {
             background-color: white;
@@ -60,23 +37,6 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-        }
-        .inputOrderCss {
-            border: none;
-            outline: none;
-            color: #2d3748;
-            font-size: 17px;
-        }
-        .wrapperInputCss {
-            display: flex;
-            flex-direction: column;
-            background: rgba(255, 255, 255, 0.1);
-            transition: border-bottom 0.3s ease;
-            border-bottom: 1px solid silver;
-            padding: 5px 3px;
-        }
-        .wrapperInputCss:focus-within {
-            border-bottom: 1px solid #00e5ff;
         }
         .selectOrder {
             width: 100%;
@@ -121,10 +81,6 @@
             justify-content: center;
             z-index: 999; 
         }
-        .infoCss {
-            margin-bottom: 15px;
-            font-weight: bold; 
-        }
         .status {
             padding: 5px 10px;
             border-radius: 20px;
@@ -149,27 +105,6 @@
             background-color: rgba(239, 68, 68, 0.15);
             color: #dc2626;
             border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-        .order-details {
-            margin-top: 20px;
-        }
-        .order-items {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        .order-items th, .order-items td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        .order-items th {
-            background-color: #f2f2f2;
-        }
-        .order-summary {
-            margin-top: 20px;
-            text-align: right;
-            font-weight: bold;
         }
         .modal {
             background-color: white;
@@ -207,6 +142,25 @@
         .modal button[type="submit"]:hover {
             background: linear-gradient(135deg, #4b5563, #2563eb);
         }
+        .filter-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .filter-container select, .filter-container input {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .filter-container button {
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -218,14 +172,17 @@
             <div class="table-card">
                 <div class="card-title">
                     <h3><i class="fa-solid fa-clipboard-list"></i> Danh sách đơn hàng</h3>
-                    <div class="wrapperFilter">
-                        <div class="search-box">
-                            <i class="ri-search-line"></i>
-                            <input type="text" id="search-order-id" placeholder="Tìm kiếm theo mã đơn hàng">
-                        </div>
-                        <button class="btn btn-outline btn-sm" onclick="showFormFilter()">
-                            <i class="fa-solid fa-filter"></i> Bộ lọc
-                        </button>
+                    <div class="filter-container">
+                        <select id="filter-status">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="pending">Chưa xác nhận</option>
+                            <option value="approved">Đã xác nhận</option>
+                            <option value="delivered">Đã giao</option>
+                            <option value="canceled">Hủy đơn</option>
+                        </select>
+                        <input type="date" id="from-date" placeholder="Từ ngày">
+                        <input type="date" id="to-date" placeholder="Đến ngày">
+                        <button onclick="applyFilter()">Lọc</button>
                     </div>
                 </div>
                 <table class="data-table">
@@ -258,13 +215,18 @@
         'canceled': []
     };
 
-    // Hiển thị danh sách đơn hàng
-    function showAll() {
-        getAllOrders()
+    // Load orders when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadOrders();
+    });
+
+    // Function to load orders with optional filters
+    function loadOrders(status = '', fromDate = '', toDate = '') {
+        searchOrders({ status, fromDate, toDate })
             .then(result => {
-                const orders = result;
+                const orders = Array.isArray(result) ? result : result.data;
                 const tbody = document.querySelector("#order-table-body");
-                tbody.innerHTML = ""; // Xóa nội dung cũ
+                tbody.innerHTML = "";
 
                 orders.forEach(order => {
                     const tr = document.createElement("tr");
@@ -277,9 +239,6 @@
                         <td>${order.paymentMethod || 'N/A'}</td>
                         <td><span class="status ${statusClass}">${getStatusText(order.status)}</span></td>
                         <td class="actions">
-                            <button class="btn btn-outline btn-sm" onclick="viewOrderDetails('${order.ID}')">
-                                <i class="fas fa-eye"></i> Xem
-                            </button>
                             <button class="btn btn-outline btn-sm" onclick="editStatus('${order.ID}', '${order.status}')">
                                 <i class="fas fa-edit"></i> Cập nhật
                             </button>
@@ -292,6 +251,20 @@
                 console.error('Lỗi khi lấy danh sách đơn hàng:', error.message);
                 alert('Không thể tải danh sách đơn hàng: ' + error.message);
             });
+    }
+
+    // Apply filter button click handler
+    function applyFilter() {
+        const status = document.getElementById('filter-status').value;
+        const fromDate = document.getElementById('from-date').value;
+        const toDate = document.getElementById('to-date').value;
+        
+        if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
+            alert("Ngày bắt đầu không thể lớn hơn ngày kết thúc!");
+            return;
+        }
+        
+        loadOrders(status, fromDate, toDate);
     }
 
     // Lấy lớp trạng thái cho đơn hàng
@@ -351,19 +324,21 @@
         modal.style.display = 'flex';
 
         // Add event listener for form submission
-        document.getElementById('status-form').addEventListener('submit', updateOrderStatusFromForm);
+        document.getElementById('status-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            updateOrderStatusFromForm();
+        });
     }
 
     // Đóng modal
     function closeModal() {
+         loadOrders();
         const modalContainer = document.getElementById('modal-container');
         modalContainer.innerHTML = '';
     }
 
     // Cập nhật trạng thái đơn hàng từ form
-    function updateOrderStatusFromForm(event) {
-        event.preventDefault();
-
+    function updateOrderStatusFromForm() {
         const ID = document.getElementById('status-order-id').value.trim();
         const status = document.getElementById('status-select').value.trim();
         const currentStatus = document.getElementById('current-status').value.trim();
@@ -376,16 +351,20 @@
         updateOrderStatus(ID, status)
             .then(response => {
                 if (response.success) {
-                    alert('Trạng thái đơn hàng đã được cập nhật!');
-                    closeModal();
-                    showAll();
+                    alert('Trạng thái đơn hàng đã được cập nhật!');                  
+                    closeModal();                
+                    // Reload orders with current filters
+                    const currentStatus = document.getElementById('filter-status').value;
+                    const fromDate = document.getElementById('from-date').value;
+                    const toDate = document.getElementById('to-date').value;
+                    loadOrders(currentStatus, fromDate, toDate);
                 } else {
-                    alert('Cập nhật thất bại: ' + (response.message || 'Lỗi không xác định'));
+                    alert('Cập nhật thất  ' + (response.message || 'Lỗi không xác định'));
                 }
             })
             .catch(error => {
                 console.error('Lỗi khi cập nhật trạng thái:', error.message, error.stack);
-                alert(`Cập nhật thất bại: ${error.message}`);
+                alert(`Cập nhật: ${error.message}`);
             });
     }
 
@@ -393,138 +372,6 @@
     function editStatus(ID, currentStatus) {
         showStatusModal(ID, currentStatus);
     }
-
-    // Hàm xem chi tiết đơn hàng
-    function viewOrderDetails(orderId) {
-        getOrderDetails(orderId)
-            .then(details => {
-                const order = details[0];
-                const modalHTML = `
-                    <div id="order-details-modal" class="modal">
-                        <div class="modal-close" onclick="closeModal()">×</div>
-                        <h3>Chi tiết đơn hàng #${order.ID}</h3>
-                        <div class="order-details">
-                            <p><strong>Ngày đặt:</strong> ${order.createdAt}</p>
-                            <p><strong>Người nhận:</strong> ${order.receiverName}</p>
-                            <p><strong>Địa chỉ:</strong> ${order.address}</p>
-                            <p><strong>Số điện thoại:</strong> ${order.phone}</p>
-                            <p><strong>Email:</strong> ${order.email}</p>
-                            <p><strong>Phương thức thanh toán:</strong> ${order.paymentMethod || 'N/A'}</p>
-                        </div>
-                        <table class="order-items">
-                            <thead>
-                                <tr>
-                                    <th>Sản phẩm</th>
-                                    <th>Số lượng</th>
-                                    <th>Giá</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${details.map(item => `
-                                    <tr>
-                                        <td>${item.productName}</td>
-                                        <td>${item.quantity}</td>
-                                        <td>${item.productTotal}₫</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                        <div class="order-summary">
-                            <p>Tổng cộng: ${details.reduce((sum, item) => sum + parseFloat(item.productTotal), 0)}₫</p>
-                        </div>
-                    </div>
-                `;
-                const modalContainer = document.getElementById('modal-container');
-                modalContainer.innerHTML = modalHTML;
-                document.getElementById('order-details-modal').style.display = 'flex';
-            })
-            .catch(error => {
-                console.error('Lỗi khi lấy chi tiết đơn hàng:', error.message);
-                alert('Không thể tải chi tiết đơn hàng: ' + error.message);
-            });
-    }
-
-    // Hàm hiển thị form bộ lọc
-    function showFormFilter() {
-        const modalHTML = `
-            <div id="filter-modal" class="modal">
-                <div class="modal-close" onclick="closeModal()">×</div>
-                <h3>Bộ lọc đơn hàng</h3>
-                <form id="filter-form">
-                    <label for="filter-status">Trạng thái:</label>
-                    <select id="filter-status" class="status-dropdown">
-                        <option value="">Tất cả</option>
-                        <option value="pending">Chưa xác nhận</option>
-                        <option value="approved">Đã xác nhận</option>
-                        <option value="delivered">Đã giao</option>
-                        <option value="canceled">Hủy đơn</option>
-                    </select>
-                    <br><br>
-                    <label for="from-date">Từ ngày:</label>
-                    <input type="date" id="from-date" class="inputOrderCss">
-                    <br><br>
-                    <label for="to-date">Đến ngày:</label>
-                    <input type="date" id="to-date" class="inputOrderCss">
-                    <br><br>
-                    <button type="submit">Áp dụng bộ lọc</button>
-                </form>
-            </div>
-        `;
-        const modalContainer = document.getElementById('modal-container');
-        modalContainer.innerHTML = modalHTML;
-        document.getElementById('filter-modal').style.display = 'flex';
-
-        // Add event listener for filter form submission
-        document.getElementById('filter-form').addEventListener('submit', applyFilter);
-    }
-
-    // Áp dụng bộ lọc
-    function applyFilter(event) {
-        event.preventDefault();
-
-        const orderID = document.getElementById('search-order-id').value.trim();
-        const status = document.getElementById('filter-status').value;
-        const fromDate = document.getElementById('from-date').value;
-        const toDate = document.getElementById('to-date').value;
-
-        searchOrders({ orderID, status, fromDate, toDate })
-            .then(result => {
-                const orders = result;
-                const tbody = document.querySelector("#order-table-body");
-                tbody.innerHTML = "";
-
-                orders.forEach(order => {
-                    const tr = document.createElement("tr");
-                    const statusClass = getStatusClass(order.status);
-                    tr.innerHTML = `
-                        <td>${order.ID}</td>
-                        <td>${order.customerName}</td>
-                        <td>${order.createdAt}</td>
-                        <td>${order.totalPrice}₫</td>
-                        <td>${order.paymentMethod || 'N/A'}</td>
-                        <td><span class="status ${statusClass}">${getStatusText(order.status)}</span></td>
-                        <td class="actions">
-                            <button class="btn btn-outline btn-sm" onclick="viewOrderDetails('${order.ID}')">
-                                <i class="fas fa-eye"></i> Xem
-                            </button>
-                            <button class="btn btn-outline btn-sm" onclick="editStatus('${order.ID}', '${order.status}')">
-                                <i class="fas fa-edit"></i> Cập nhật
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                closeModal();
-            })
-            .catch(error => {
-                console.error('Lỗi khi tìm kiếm đơn hàng:', error.message);
-                alert('Không thể tìm kiếm đơn hàng: ' + error.message);
-            });
-    }
-
-    // Gọi hàm để hiển thị danh sách đơn hàng khi trang được tải
-    showAll();
     </script>
 </body>
 </html>

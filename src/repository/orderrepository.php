@@ -133,17 +133,14 @@ class OrderRepository
         }
 
         // Lọc theo ngày bắt đầu nếu có
-        if (!empty($fromDate)) {
-            $sql .= " AND o.createdAt >= ?";
-            $types .= "s";
-            $params[] = $fromDate;
-        }
+         if (!empty($fromDate)) {
+        $sql .= " AND DATE(createdAt) >= ?";
+        $params[] = $fromDate; // YYYY-MM-DD
+          }
 
-        // Lọc theo ngày kết thúc nếu có
-        if (!empty($toDate)) {
-            $sql .= " AND o.createdAt <= ?";
-            $types .= "s";
-            $params[] = $toDate;
+       if (!empty($toDate)) {
+        $sql .= " AND DATE(createdAt) <= ?"; 
+        $params[] = $toDate; // YYYY-MM-DD
         }
 
         // Sắp xếp theo ngày tạo đơn giảm dần
