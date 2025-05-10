@@ -13,7 +13,9 @@ header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 $productController = new ProductController();
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // ==================================== GET for products ====================================
     if (isset($_GET['action']) && $_GET['action'] === 'getAllProducts') {
         $productController->getAllProducts();
     } else if (isset($_GET['action']) && $_GET['action'] === 'getFilteredProducts') {
@@ -25,27 +27,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $sort = isset($_GET['sort']) && in_array($_GET['sort'], ['newest', 'price_asc', 'price_desc', 'rating_desc']) ? $_GET['sort'] : 'newest';
         $search = $_GET['search'] ?? null;
         $productController->getFilteredProducts($category, $brand, $status, $min_price, $max_price, $sort, $search);
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getFilteredProductsAdmin') {
+        $search = $_GET['search'] ?? null;
+        $category = $_GET['category'] ?? null;
+        $brand = $_GET['brand'] ?? null;
+        $status = $_GET['status'] ?? null;
+        $rating = $_GET['rating'] ?? null;
+        if ($rating != null)
+            log($search);
+        else
+            $productController->getFilteredProductsAdmin($search, $category, $brand, $status, $rating);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getProductById' && isset($_GET['id'])) {
         $productController->getProductById($_GET['id']);
-    } else if (isset($_GET['action']) && $_GET['action'] === 'getProductVariants' && isset($_GET['id'])) {
+    }
+    // ==================================== GET for products's variants ====================================
+    else if (isset($_GET['action']) && $_GET['action'] === 'getProductVariants' && isset($_GET['id'])) {
         $productController->getProductVariants($_GET['id']);
-    } else if (isset($_GET['action']) && $_GET['action'] === 'getCategoryById' && isset($_GET['id'])) {
-        $productController->getCategoryById($_GET['id']);
-    } else if (isset($_GET['action']) && $_GET['action'] === 'getBrandById' && isset($_GET['id'])) {
-        $productController->getBrandById($_GET['id']);
-    } else if (isset($_GET['action']) && $_GET['action'] === 'getAllCategories') {
-        $productController->getAllCategories();
-    } else if (isset($_GET['action']) && $_GET['action'] === 'getAllBrands') {
+    }
+    // ==================================== GET for brands ====================================
+    else if (isset($_GET['action']) && $_GET['action'] === 'getAllBrands') {
         $productController->getAllBrands();
     } else if (isset($_GET['action']) && $_GET['action'] === 'getBrandByName' && isset($_GET['name'])) {
         $productController->getBrandByName($_GET['name']);
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getBrandById' && isset($_GET['id'])) {
+        $productController->getBrandById($_GET['id']);
+    }
+    // ==================================== GET for categories ====================================
+    else if (isset($_GET['action']) && $_GET['action'] === 'getCategoryById' && isset($_GET['id'])) {
+        $productController->getCategoryById($_GET['id']);
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getAllCategories') {
+        $productController->getAllCategories();
     } else if (isset($_GET['action']) && $_GET['action'] === 'getCategoryByName' && isset($_GET['name'])) {
         $productController->getCategoryByName($_GET['name']);
+    }
+    // ==================================== GET for discounts ====================================
+    else if (isset($_GET['action']) && $_GET['action'] === 'getAllDiscounts') {
+        $productController->getAllDiscounts();
+    } else if (isset($_GET['action']) && $_GET['action'] === 'getDiscountByID' && isset($_GET['id'])) {
+        $productController->getDiscountByID($_GET['id']);
     } else {
         http_response_code(400);
         echo json_encode(['error' => 'Yêu cầu GET không hợp lệ']);
     }
 }
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProductImage') {
     $productId = $_POST['product_id'];
     if (isset($_FILES['image']) && $productId) {

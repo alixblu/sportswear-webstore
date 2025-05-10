@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <script src="./js/client/search.js" defer></script>
 </head>
 </head>
+
 <body>
     <header class="header">
         <nav class="nav container">
@@ -176,14 +178,16 @@
         function handleLogout(event) {
             event.preventDefault();
             fetch('/sportswear-webstore/layout/login_regis.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'submitLogout=1'
-            })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'submitLogout=1'
+                })
                 .then(response => response.json())
                 .then(data => {
+                    console.log("Hello2");
+
                     if (data.success) window.location.reload();
                     else alert('Đăng xuất thất bại: ' + data.message);
                 })
@@ -197,4 +201,5 @@
         }
     </script>
 </body>
+
 </html>

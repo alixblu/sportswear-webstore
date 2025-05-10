@@ -33,6 +33,27 @@ class ProductService
         }
     }
     /**
+     *  Get products with options (ADMIN)
+     * @return array List of products
+     * @param $category : category of product
+     * @param $brand : brand of product
+     * @param $status : status of product
+     * @param $min_price : min price of product
+     * @param $max_price : max price of product
+     * @param $sort: sort option of product
+     * @param $search : name of product
+     */
+    public function getFilteredProductsAdmin($search, $category, $brand, $status, $rating)
+    {
+        try {
+            return $this->productRepository->getFilteredProductsAdmin($search, $category, $brand, $status, $rating);
+        } catch (Exception $e) {
+            error_log('Error at getFilteredProducts service: ' . $e->getMessage());
+            throw new Exception('Failed to get product - Service' . $e->getMessage());
+        }
+    }
+
+    /**
      * Get products with options
      * @return array List of products
      * @param $category : category of product
@@ -288,6 +309,41 @@ class ProductService
         } catch (Exception $e) {
             error_log("Error in deleteProduct service: " . $e->getMessage());
             throw new Exception("Failed to delete product: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get all discounts
+     * @return array List of discounts
+     * @throws Exception If database error occurs
+     */
+    public function getAllDiscounts()
+    {
+        try {
+            $discounts = $this->productRepository->getAllDiscounts();
+            ApiResponse::customApiResponse($discounts, 200);
+        } catch (Exception $e) {
+            error_log("Error in getAllDiscounts service: " . $e->getMessage());
+            throw new Exception("Failed to get discounts: " . $e->getMessage());
+        }
+    }
+    /**
+     * Get discount by id
+     * @return $discount
+     * @param int $id
+     * @throws Exception If database error occurs
+     */
+    public function getDiscountByID($id)
+    {
+        try {
+            if (!is_numeric($id) || $id <= 0) {
+                throw new Exception("Invalid discount ID");
+            }
+
+            return $this->productRepository->getDiscountByID($id);
+        } catch (Exception $e) {
+            error_log("Error in getDiscountByID service: " . $e->getMessage());
+            throw new Exception("Failed to getDiscountByID: " . $e->getMessage());
         }
     }
 }

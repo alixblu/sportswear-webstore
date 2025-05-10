@@ -84,13 +84,81 @@ class ProductRepository
     }
 
     /**
-     *  Get products with options
+     *  Get products with options (ADMIN)
      * @return array List of products
      * @param $category : category of product
      * @param $brand : brand of product
      * @param $status : status of product
      * @param $min_price : min price of product
      * @param $max_price : max price of product
+     * @param $sort: sort option of product
+     * @param $search : name of product
+     */
+    public function getFilteredProductsAdmin($search, $category, $brand, $status, $rating)
+    {
+        try {
+            $query = "SELECT p.* FROM product as p WHERE 1=1";
+            $params = [];
+
+            if ($category) {
+                $query .= " AND p.categoryID=?";
+                $params[] = $category;
+            }
+            if ($brand) {
+                $query .= " AND p.brandID=?";
+                $params[] = $brand;
+            }
+            if ($status) {
+                $query .= " AND status=?";
+                $params[] = $status;
+            }
+            if ($rating) {
+                $query .= ($rating == 1) ? " AND p.rating=?" : " AND p.rating>=? AND p.rating<=?";
+                $params[] = $rating - 1;
+                if ($rating != 1) $params[] = $rating;
+            }
+            if ($search) {
+                $query .= " AND p.name LIKE ?";
+                $params[] = '%' . $search . '%';
+            }
+
+            $stmt = $this->conn->prepare($query);
+            if (!$stmt) {
+                throw new Exception("getFilteredProductsAdmin- Prepare failed: " . $this->conn->error);
+                return [];
+            }
+            if (!$stmt->execute($params)) {
+                throw new Exception("getFilteredProductsAdmin- Execute failed: " . $stmt->error);
+                return [];
+            }
+            $result = $stmt->get_result();
+            if (!$result) {
+                throw new Exception("getFilteredProductsAdmin- Get result failed: " . $stmt->error);
+                return [];
+            }
+            $products = [];
+            while ($row = $result->fetch_assoc()) {
+                $products[] = $row;
+            }
+            return $products;
+        } catch (Exception $e) {
+            error_log("Error in getFilteredProductsAdmin: " . $e->getMessage());
+            throw new Exception("Failed to get filtered products ADMIN: " . $e->getMessage());
+        } finally {
+            $this->conn->close();
+        }
+    }
+
+    /**
+     *  Get products with options (CLIENT)
+     * @return array List of products
+     * @param $category : category of product
+     * @param $brand : brand of product
+     * @param $status : status of product
+     * @param $min_price : min price of product
+     * @param $max_price : max price of product
+     * @param $sort: sort option of product
+     * @param $search : name of product
      */
     public function getFilteredProducts($category, $brand, $status, $min_price, $max_price, $sort = 'newest', $search = null)
     {
@@ -408,6 +476,49 @@ class ProductRepository
             throw new Exception("ProductRepository - Failed to delete product variant");
         }
     }
+    /**
+     * Get all discounts
+     * @return array List of discounts
+     * @throws Exception If database error occurs
+     */
+    public function getAllDiscounts()
+    {
+        try {
+            $query = "SELECT * FROM discount";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-    
+            $discounts = [];
+            while ($row = $result->fetch_assoc()) {
+                $discounts[] = $row;
+            }
+
+            return $discounts;
+        } catch (Exception $e) {
+            error_log("Error in getAllDiscounts: " . $e->getMessage());
+            throw new Exception("Failed to get discounts");
+        }
+    }
+    /**
+     * Get discount by id
+     * @return $discount
+     * @param int $id
+     * @throws Exception If database error occurs
+     */
+    public function getDiscountByID($id)
+    {
+        try {
+            $query = "SELECT * FROM discount WHERE ID = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            return $result->fetch_assoc();
+        } catch (Exception $e) {
+            error_log("Error in getDiscountByID: " . $e->getMessage());
+            throw new Exception("Failed to get discount");
+        }
+    }
 }

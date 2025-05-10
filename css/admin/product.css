@@ -1,7 +1,7 @@
 /* Product Grid Layout */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1.5fr));
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1.5fr));
     gap: 15px;
     padding: 20px;
 }
@@ -683,4 +683,34 @@
     max-height: 100%;
     object-fit: contain; /* or 'cover' if you want to crop */
     display: block;
+}
+
+/* =================================== No content message =================================== */
+.product-grid.no-results {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    flex-direction: column;
+    text-align: center;
+    color: #888;
+    font-size: 18px;
+}
+.product-grid.no-results i {
+    font-size: 40px;
+    margin-bottom: 10px;
+    color: #bbb;
+}
+.no-products {
+    text-align: center;
+    color: #999;
+    font-size: 18px;
+    margin-top: 40px;
+    font-style: italic;
+}
+.no-products i {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 8px;
+    color: #ccc;
 }
