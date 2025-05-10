@@ -244,6 +244,10 @@ async function updateResults(params = {}) {
                 });
             });
         }
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // Cuộn mượt mà
+        });
     } catch (error) {
         console.error('Lỗi khi tải sản phẩm:', error);
         productList.innerHTML = `
