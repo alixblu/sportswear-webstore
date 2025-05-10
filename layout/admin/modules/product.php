@@ -54,6 +54,7 @@
                     <option value="1">0 Star</option>
                 </select>
             </div>
+            <!--
             <div class="filter-group price-range-group">
                 <div class="price-range-inputs">
                     <input type="number" id="priceStart" class="filter-input" placeholder="Min Price" min="0">
@@ -61,11 +62,17 @@
                     <input type="number" id="priceEnd" class="filter-input" placeholder="Max Price" min="0">
                 </div>
             </div>
+-->
         </div>
 
         <!-- Product Grid -->
         <div class="product-grid" id="productGrid">
             <!-- Products will be loaded here dynamically -->
+        </div>
+
+        <!-- Pagination  -->
+        <div id="pagination">
+            <!-- Insert page items -->
         </div>
     </div>
 

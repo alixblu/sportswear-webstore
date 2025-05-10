@@ -25,6 +25,28 @@ class ProductController
             ApiResponse::customResponse($products, 500, $e->getMessage());
         }
     }
+    /**
+     *  Get products with options (ADMIN)
+     * @return array List of products
+     * @param $category : category of product
+     * @param $brand : brand of product
+     * @param $status : status of product
+     * @param $min_price : min price of product
+     * @param $max_price : max price of product
+     * @param $sort: sort option of product
+     * @param $search : name of product
+     */
+    public function getFilteredProductsAdmin($search, $category, $brand, $status, $rating)
+    {
+        $products = null;
+        try {
+            $products =  $this->productService->getFilteredProductsAdmin($search, $category, $brand, $status, $rating);
+            ApiResponse::customApiResponse($products, 200);
+            return $products;
+        } catch (Exception $e) {
+            ApiResponse::customApiResponse($products, 500, $e->getMessage());
+        }
+    }
 
     /**
      * Get products with options
@@ -279,6 +301,33 @@ class ProductController
             ApiResponse::customResponse($brands, 200);
         } catch (Exception $e) {
             ApiResponse::customResponse(null, 500, $e->getMessage());
+        }
+    }
+    /**
+     * Get all discounts
+     * @return void
+     */
+    public function getAllDiscounts()
+    {
+        try {
+            $discounts = $this->productService->getAllDiscounts();
+            ApiResponse::customApiResponse($discounts, 200);
+        } catch (Exception $e) {
+            ApiResponse::customApiResponse(null, 500, $e->getMessage());
+        }
+    }
+    /**
+     * Get discount by id
+     * @param int $id
+     * @return void
+     */
+    public function getDiscountByID($id)
+    {
+        try {
+            $discount = $this->productService->getDiscountByID($id);
+            ApiResponse::customApiResponse($discount, 200);
+        } catch (Exception $e) {
+            ApiResponse::customApiResponse(null, 500, $e->getMessage());
         }
     }
 }
