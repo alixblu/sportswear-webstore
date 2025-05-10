@@ -1,43 +1,11 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../src/config/response/apiresponse.php';
-
-// Hàm gọi API từ productrouter.php với xử lý lỗi
-function callApi($url) {
-    try {
-        $response = @file_get_contents($url);
-        if ($response === false) {
-            error_log("Failed to fetch API: $url");
-            return ['status' => 500, 'message' => 'Không thể kết nối đến API'];
-        }
-        $data = json_decode($response, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            error_log("JSON decode error for API $url: " . json_last_error_msg());
-            return ['status' => 500, 'message' => 'Dữ liệu API không hợp lệ'];
-        }
-        return $data;
-    } catch (Exception $e) {
-        error_log("Error calling API $url: " . $e->getMessage());
-        return ['status' => 500, 'message' => 'Lỗi khi gọi API: ' . $e->getMessage()];
-    }
-}
-
-// Lấy danh sách thương hiệu và danh mục
-$brands_url = "http://localhost/sportswear-webstore/src/router/productrouter.php?action=getAllBrands";
-$categories_url = "http://localhost/sportswear-webstore/src/router/productrouter.php?action=getAllCategories";
-$brands_data = callApi($brands_url);
-$categories_data = callApi($categories_url);
-$brands = (isset($brands_data['status']) && $brands_data['status'] === 200 && isset($brands_data['data'])) ? $brands_data['data'] : [];
-$categories = (isset($categories_data['status']) && $categories_data['status'] === 200 && isset($categories_data['data'])) ? $categories_data['data'] : [];
-
-// Thu thập tham số tìm kiếm ban đầu từ URL
 $initial_params = [];
 foreach ($_GET as $key => $value) {
     if (!empty($value)) {
-        // Chuyển price_start/price_end thành min_price/max_price nếu có
         if ($key === 'price_start') {
             $initial_params['min_price'] = htmlspecialchars($value);
-        } else if ($key === 'price_end') {
+        } elseif ($key === 'price_end') {
             $initial_params['max_price'] = htmlspecialchars($value);
         } else {
             $initial_params[$key] = htmlspecialchars($value);
@@ -57,7 +25,7 @@ $initial_params_json = json_encode($initial_params);
     <link rel="stylesheet" href="../../css/footer.css">
     <link rel="stylesheet" href="../../css/content.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="../../js/client/search.js" defer></script>
+    <script src="/sportswear-webstore/js/client/search.js" defer></script>
     <style>
         .page-container {
             margin-top: 40px;
@@ -99,6 +67,9 @@ $initial_params_json = json_encode($initial_params);
         }
         .pagination {
             margin-top: 3rem;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
         }
         .no-results {
             text-align: center;
@@ -127,7 +98,6 @@ $initial_params_json = json_encode($initial_params);
             border-radius: 5px;
             margin-bottom: 20px;
         }
-        /* Đảm bảo hiển thị biểu tượng Font Awesome */
         .product-rating {
             font-size: 0.9rem;
             display: flex;
@@ -139,6 +109,12 @@ $initial_params_json = json_encode($initial_params);
             font-style: normal;
             display: inline-block;
             font-size: 0.9rem;
+        }
+        .filter-error {
+            color: #721c24;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
         }
     </style>
 </head>
@@ -160,57 +136,42 @@ $initial_params_json = json_encode($initial_params);
                             <label class="filter-label">Thương hiệu</label>
                             <select class="filter-select" name="brand">
                                 <option value="">Tất cả thương hiệu</option>
-                                <?php foreach ($brands as $brand): ?>
-                                    <option value="<?= $brand['ID'] ?>" <?= isset($_GET['brand']) && $_GET['brand'] == $brand['ID'] ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($brand['name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
                             </select>
+                            <div class="filter-error" id="brand-error">Không thể tải danh sách thương hiệu</div>
                         </div>
-
                         <div class="filter-group">
                             <label class="filter-label">Danh mục</label>
                             <select class="filter-select" name="category">
                                 <option value="">Tất cả danh mục</option>
-                                <?php foreach ($categories as $category): ?>
-                                    <option value="<?= $category['ID'] ?>" <?= isset($_GET['category']) && $_GET['category'] == $category['ID'] ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($category['name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
                             </select>
+                            <div class="filter-error" id="category-error">Không thể tải danh sách danh mục</div>
                         </div>
-
                         <div class="filter-group">
                             <label class="filter-label">Khoảng giá</label>
                             <div style="display: flex; gap: 10px;">
-                                <input type="number" class="filter-input" name="min_price" placeholder="Từ" 
-                                       value="<?= isset($_GET['min_price']) ? htmlspecialchars($_GET['min_price']) : (isset($_GET['price_start']) ? htmlspecialchars($_GET['price_start']) : '') ?>">
-                                <input type="number" class="filter-input" name="max_price" placeholder="Đến" 
-                                       value="<?= isset($_GET['max_price']) ? htmlspecialchars($_GET['max_price']) : (isset($_GET['price_end']) ? htmlspecialchars($_GET['price_end']) : '') ?>">
+                                <input type="number" class="filter-input" name="min_price" placeholder="Từ" value="<?= isset($initial_params['min_price']) ? $initial_params['min_price'] : '' ?>">
+                                <input type="number" class="filter-input" name="max_price" placeholder="Đến" value="<?= isset($initial_params['max_price']) ? $initial_params['max_price'] : '' ?>">
                             </div>
                         </div>
-
                         <div class="filter-group">
                             <label class="filter-label">Trạng thái</label>
                             <select class="filter-select" name="status">
                                 <option value="">Tất cả trạng thái</option>
-                                <option value="in_stock" <?= isset($_GET['status']) && $_GET['status'] === 'in_stock' ? 'selected' : '' ?>>Còn hàng</option>
-                                <option value="out_of_stock" <?= isset($_GET['status']) && $_GET['status'] === 'out_of_stock' ? 'selected' : '' ?>>Hết hàng</option>
+                                <option value="in_stock" <?= isset($initial_params['status']) && $initial_params['status'] === 'in_stock' ? 'selected' : '' ?>>Còn hàng</option>
+                                <option value="out_of_stock" <?= isset($initial_params['status']) && $initial_params['status'] === 'out_of_stock' ? 'selected' : '' ?>>Hết hàng</option>
                             </select>
                         </div>
-
                         <div class="filter-group">
                             <label class="filter-label">Sắp xếp theo</label>
                             <select class="filter-select" name="sort">
-                                <option value="newest" <?= isset($_GET['sort']) && $_GET['sort'] === 'newest' ? 'selected' : '' ?>>Mới nhất</option>
-                                <option value="price_asc" <?= isset($_GET['sort']) && $_GET['sort'] === 'price_asc' ? 'selected' : '' ?>>Giá: Thấp đến cao</option>
-                                <option value="price_desc" <?= isset($_GET['sort']) && $_GET['sort'] === 'price_desc' ? 'selected' : '' ?>>Giá: Cao đến thấp</option>
-                                <option value="rating_desc" <?= isset($_GET['sort']) && $_GET['sort'] === 'rating_desc' ? 'selected' : '' ?>>Đánh giá cao nhất</option>
+                                <option value="newest" <?= isset($initial_params['sort']) && $initial_params['sort'] === 'newest' ? 'selected' : '' ?>>Mới nhất</option>
+                                <option value="price_asc" <?= isset($initial_params['sort']) && $initial_params['sort'] === 'price_asc' ? 'selected' : '' ?>>Giá: Thấp đến cao</option>
+                                <option value="price_desc" <?= isset($initial_params['sort']) && $initial_params['sort'] === 'price_desc' ? 'selected' : '' ?>>Giá: Cao đến thấp</option>
+                                <option value="rating_desc" <?= isset($initial_params['sort']) && $initial_params['sort'] === 'rating_desc' ? 'selected' : '' ?>>Đánh giá cao nhất</option>
                             </select>
                         </div>
-
-                        <?php if (!empty($_GET['search'])): ?>
-                            <input type="hidden" name="search" value="<?= htmlspecialchars($_GET['search']) ?>">
+                        <?php if (!empty($initial_params['search'])): ?>
+                            <input type="hidden" name="search" value="<?= htmlspecialchars($initial_params['search']) ?>">
                         <?php endif; ?>
                     </div>
                 </form>
@@ -232,9 +193,9 @@ $initial_params_json = json_encode($initial_params);
     <?php include __DIR__ . '/../footer.php'; ?>
 
     <script>
-        // Khởi tạo tìm kiếm ban đầu dựa trên tham số URL
+        const initialParams = <?php echo $initial_params_json; ?>;
         window.addEventListener('DOMContentLoaded', () => {
-            const initialParams = <?php echo $initial_params_json; ?>;
+            loadFilters();
             if (Object.keys(initialParams).length > 0) {
                 updateResults(initialParams);
             }
