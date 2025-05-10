@@ -16,6 +16,8 @@
     rel="stylesheet" />
   <link rel="stylesheet" href="../../css/admin/style.css" />
   <link rel="stylesheet" href="../../css/admin/header.css" />
+  <link rel="stylesheet" href="../../css/admin/pagiantion.css">
+
   <script src="../../JS/admin/table.js"></script>
 </head>
 

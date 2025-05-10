@@ -30,9 +30,41 @@ const getAllProducts = async () => {
     }
 };
 
-const getFilteredProducts = async (search=null, category=null, brand=null, status=null, rating=null, min_price=null, max_price=null) => {
+const getFilteredProductsAdmin = async (category=null, brand=null, status=null, rating=null, search = null) => {
     // Không có thì lấy toàn bộ
-    if(search=null && category == null && brand == null && status == null && rating == null && min_price == null && max_price == null )
+    if(search==null && category == null && brand == null && status == null)
+        return data = await getAllProducts();
+
+    try {
+        let url = `${API_URL}?action=getFilteredProductsAdmin`
+        if (search) url += `&search=${search}`
+        if (category) url += `&category=${category}`
+        if (brand) url += `&brand=${brand}`
+        if (status) url += `&status=${status}`
+        if (rating) url += `&rating=${rating}`
+        const response = await fetch(url,
+            {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                    'Content-Type':'application/json'
+                }
+            }
+        )
+        if(!response.ok)
+            throw new Error("Không thể lấy sản phẩm theo tùy chọn !!!")
+    
+        const data = await response.json();
+        return data.data;
+    } catch (error) {
+        console.error('Lỗi, không thể lấy sản phẩm theo tùy chọn !!!', error)
+        throw error
+    }
+}
+
+const getFilteredProducts = async (category=null, brand=null, status=null, min_price=null, max_price=null, $sort = 'newest', search = null) => {
+    // Không có thì lấy toàn bộ
+    if(search=null && category == null && brand == null && status == null  && min_price == null && max_price == null)
         return data = await getAllProducts();
 
     try {
@@ -64,10 +96,6 @@ const getFilteredProducts = async (search=null, category=null, brand=null, statu
     }
 }
 
-const getProductList = async ($page) => {
-    
-}
-
 const getProductById = async (id) => {
     const response = await fetch(`${API_URL}?action=getProductById&id=${id}`, {
         method: 'GET',
@@ -87,80 +115,6 @@ const getProductVariants = async (id) => {
 
     if (!response.ok) {
         throw new Error('Không thể lấy thông tin biến thể sản phẩm');
-    }
-
-    return await response.json();
-};
-
-
-// ===================================== GET category ===================================== 
-const getCategoryById = async (id) => {
-    const response = await fetch(`${API_URL}?action=getCategoryById&id=${id}`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy phân loại sản phẩm');
-    }
-
-    return await response.json();
-};
-const getCategoryByName = async (name) => {
-    const response = await fetch(`${API_URL}?action=getCategoryByName&name=${name}`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy phân loại sản phẩm');
-    }
-
-    return await response.json();
-};
-
-const getAllCategories = async () => {
-    const response = await fetch(`${API_URL}?action=getAllCategories`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy danh sách phân loại');
-    }
-
-    return await response.json();
-};
-
-// ===================================== GET brand ===================================== 
-
-const getAllBrands = async () => {
-    const response = await fetch(`${API_URL}?action=getAllBrands`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy danh sách thương hiệu');
-    }
-
-    return await response.json();
-};
-
-const getBrandById = async (id) => {
-    const response = await fetch(`${API_URL}?action=getBrandById&id=${id}`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy phân loại sản phẩm');
-    }
-
-    return await response.json();
-};
-const getBrandByName = async (name) => {
-    const response = await fetch(`${API_URL}?action=getBrandByName&name=${name}`, {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        throw new Error('Không thể lấy phân loại sản phẩm');
     }
 
     return await response.json();
@@ -217,66 +171,10 @@ const deleteProduct = async (id) => {
     return await response.json();
 };
 
-// ===================================== Function to populate category dropdown ===================================== 
-const populateCategoryFilter = async () => {
-    try {
-        const response = await getAllCategories();
-        
-        const categories = response.data || [];
-        
-        const categorySelect = document.getElementById('category');
-        
-        // Clear existing options except the first one
-        while (categorySelect.options.length > 1) {
-            categorySelect.remove(1);
-        }
-
-        // Add new options
-        categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.ID;
-            option.textContent = category.name;
-            categorySelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error populating category filter:', error);
-    }
-};
-
-// ===================================== Function to populate brand dropdown ===================================== 
-const populateBrandFilter = async () => {
-    try {
-        const response = await getAllBrands();
-        
-        const brands = response.data || [];
-        
-        const brandSelect = document.getElementById('brand');
-        
-        // Clear existing options except the first one
-        while (brandSelect.options.length > 1) {
-            brandSelect.remove(1);
-        }
-
-        // Add new options
-        brands.forEach(brand => {
-            const option = document.createElement('option');
-            option.value = brand.ID;
-            option.textContent = brand.name;
-            brandSelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error populating brand filter:', error);
-    }
-};
-
 export {
     getFilteredProducts,
-    populateBrandFilter,
-    populateCategoryFilter,
     getProductById,
-    getAllBrands,
-    getBrandById,
-    getCategoryById,
     getProductVariants,
     getAllProducts,
+    getFilteredProductsAdmin,
 };

@@ -9,7 +9,7 @@
                 <img id="modal-product-image" src="" alt="Product Image" />
             </div>
             <div class="product-actions">
-                <button class="btn btn-primary" onclick="showEditForm()">
+                <button class="btn btn-primary open-edit-form" onclick="showEditForm()">
                     <i class="fas fa-edit"></i> Edit Product
                 </button>
 
@@ -149,7 +149,9 @@
                     </div>
                     <div class="form-group">
                         <label for="editDiscount">Discount ID</label>
-                        <input type="text" id="editDiscount" name="discount">
+                        <select name="discount" id="editDiscount">
+                            <!-- Discounts selection here -->
+                        </select>
                     </div>
                 </div>
                 <div class="form-group">
@@ -167,55 +169,7 @@
 </div>
 
 <script>
-    // Show edit form
-    async function showEditForm() {
-        if (!product) return;
-        console.log('Product Data:', product.ID);
-
-        // Hide product info and show edit form
-        document.getElementById('product-info-section').style.display = 'none';
-        document.getElementById('edit-form-section').style.display = 'block';
-
-        try {
-            // Get product details
-
-
-            // Populate form fields
-            document.getElementById('editName').value = product.name || '';
-            document.getElementById('editMarkup').value = product.markup_percentage || '0';
-            document.getElementById('editDiscount').value = product.discountID || '';
-            document.getElementById('editDescription').value = product.description || '';
-
-            // Load categories
-            const categoriesResponse = await getAllCategories();
-            const categorySelect = document.getElementById('editCategory');
-            categorySelect.innerHTML = '<option value="">Select Category</option>';
-            categoriesResponse.data.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.ID;
-                option.textContent = category.name;
-                option.selected = category.ID === product.categoryID;
-                categorySelect.appendChild(option);
-            });
-
-            // Load brands
-            const brandsResponse = await getAllBrands();
-            const brandSelect = document.getElementById('editBrand');
-            brandSelect.innerHTML = '<option value="">Select Brand</option>';
-            brandsResponse.data.forEach(brand => {
-                const option = document.createElement('option');
-                option.value = brand.ID;
-                option.textContent = brand.name;
-                option.selected = brand.ID === product.brandID;
-                brandSelect.appendChild(option);
-            });
-
-        } catch (error) {
-            console.error('Error loading edit form:', error);
-            alert('Error loading edit form: ' + error.message);
-        }
-    }
-
+    // Click input file
     function triggerImageUpload() {
         document.getElementById('changeImageInput').click();
     }
@@ -254,18 +208,6 @@
         }
     });
 
-    // Cancel editing
-    function cancelEdit() {
-        document.getElementById('product-info-section').style.display = 'block';
-        document.getElementById('edit-form-section').style.display = 'none';
-    }
-
-    function closeModal() {
-        cancelEdit();
-        const modal = document.getElementById('productModal');
-        modal.style.display = 'none';
-    }
-
     function switchTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.remove('active');
@@ -277,7 +219,6 @@
         });
 
         // Show selected tab content and mark tab as active
-
         document.querySelectorAll('.tab').forEach(tab => {
             tab.classList.remove('active');
         });
@@ -287,10 +228,12 @@
     }
 
     // Close modal when clicking outside
+    /*
     window.onclick = function(event) {
         const modal = document.getElementById('productModal');
         if (event.target === modal) {
             closeModal();
         }
     }
+    */
 </script>
