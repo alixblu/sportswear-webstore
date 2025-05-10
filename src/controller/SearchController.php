@@ -116,5 +116,5 @@ class SearchController
         } catch (Exception $e) {
             ApiResponse::customApiResponse(null, 500, $e->getMessage());
         }
-}
+    }
 }

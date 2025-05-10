@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     } elseif (isset($_GET['action']) && $_GET['action'] === 'getCategoryById' && isset($_GET['id'])) {
         $searchController->getCategoryById($_GET['id']);
     } elseif (isset($_GET['action']) && $_GET['action'] === 'searchByName' && isset($_GET['name'])) {
-        $searchController->searchByName($_GET['name']);
+    $searchController->searchByName($_GET['name']);
     }
      else {
         http_response_code(400);

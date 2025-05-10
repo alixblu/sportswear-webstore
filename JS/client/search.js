@@ -15,26 +15,37 @@ async function performSearch(e) {
     }
 
     try {
-        // Kiểm tra nếu từ khóa tìm kiếm khớp với thương hiệu
+        // Kiểm tra thương hiệu
         const brandResponse = await fetch(`http://localhost/sportswear-webstore/src/router/searchrouter.php?action=getBrandByName&name=${encodeURIComponent(searchInput)}`);
         const brandData = await brandResponse.json();
+        console.log('Brand API response:', brandData); // Debug: Kiểm tra dữ liệu trả về
+
         if (brandData.status === 200 && brandData.data && brandData.data.ID) {
+            console.log(`Redirecting to brand: ${brandData.data.ID} - ${brandData.data.name}`);
             window.location.href = `/sportswear-webstore/layout/client/search_results.php?brand=${brandData.data.ID}`;
             return;
+        } else {
+            console.log('No matching brand found or invalid response:', brandData.message || 'No message');
         }
 
-        // Kiểm tra nếu từ khóa tìm kiếm khớp với danh mục
+        // Kiểm tra danh mục
         const categoryResponse = await fetch(`http://localhost/sportswear-webstore/src/router/searchrouter.php?action=getCategoryByName&name=${encodeURIComponent(searchInput)}`);
         const categoryData = await categoryResponse.json();
+        console.log('Category API response:', categoryData); // Debug: Kiểm tra dữ liệu trả về
+
         if (categoryData.status === 200 && categoryData.data && categoryData.data.ID) {
+            console.log(`Redirecting to category: ${categoryData.data.ID} - ${categoryData.data.name}`);
             window.location.href = `/sportswear-webstore/layout/client/search_results.php?category=${categoryData.data.ID}`;
             return;
+        } else {
+            console.log('No matching category found or invalid response:', categoryData.message || 'No message');
         }
 
-        // Nếu không khớp thương hiệu hoặc danh mục, thực hiện tìm kiếm thông thường
+        // Tìm kiếm thông thường
+        console.log(`Performing general search for: ${searchInput}`);
         window.location.href = `/sportswear-webstore/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
     } catch (error) {
-        console.error('Lỗi khi tìm kiếm:', error);
+        console.error('Search error:', error);
         alert('Đã xảy ra lỗi khi tìm kiếm. Vui lòng thử lại.');
         window.location.href = `/sportswear-webstore/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
     }
