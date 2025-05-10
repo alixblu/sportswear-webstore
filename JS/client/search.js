@@ -164,14 +164,15 @@ async function updateResults(params = {}) {
                 const imagePath = `/sportswear-webstore/img/products/${product.ID}.jpg`;
                 const defaultImage = '/sportswear-webstore/img/products/default.jpg';
                 const rating = parseFloat(product.rating || 0);
-                const fullStars = Math.floor(rating);
-                const hasHalfStar = rating - fullStars >= 0.5;
+                const scaledRating = rating / 2; // Assuming rating is out of 10, scale to 5 stars
+                const fullStars = Math.floor(scaledRating);
+                const hasHalfStar = scaledRating % 1 >= 0.5;
                 let ratingHtml = '';
                 for (let i = 1; i <= 5; i++) {
                     if (i <= fullStars) {
                         ratingHtml += '<i class="fas fa-star"></i>';
                     } else if (hasHalfStar && i === fullStars + 1) {
-                        ratingHtml += '<i class="fas fa-star-half-alt"></i>';
+                        ratingHtml += '<i class="fas fa-star-half-alt"></i>'; // Use half-star icon
                     } else {
                         ratingHtml += '<i class="far fa-star"></i>';
                     }
@@ -194,7 +195,7 @@ async function updateResults(params = {}) {
                         </div>
                         <div class="product-rating">
                             ${ratingHtml}
-                            <span>(${rating.toFixed(1)})</span>
+                            <span>(${scaledRating.toFixed(1)})</span>
                         </div>
                         <button class="buy-button" ${product.status === 'out_of_stock' ? 'disabled' : ''}>
                             <i class="fas fa-shopping-cart"></i>
@@ -259,7 +260,6 @@ async function updateResults(params = {}) {
         pagination.innerHTML = '';
     }
 }
-
 async function getNameFromId(id, type) {
     try {
         const url = `http://localhost/sportswear-webstore/src/router/searchrouter.php?action=get${type}ById&id=${id}`;

@@ -24,8 +24,8 @@ $initial_params_json = json_encode($initial_params);
     <link rel="stylesheet" href="../../css/header.css">
     <link rel="stylesheet" href="../../css/footer.css">
     <link rel="stylesheet" href="../../css/content.css">
+    <!-- Ensure Font Awesome 6 Free is loaded correctly -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="/sportswear-webstore/js/client/search.js" defer></script>
     <style>
         .page-container {
             margin-top: 40px;
@@ -92,29 +92,31 @@ $initial_params_json = json_encode($initial_params);
         .error-message {
             text-align: center;
             padding: 20px;
-            color: #721c24;
+            smug: #721c24;
             background-color: #f8d7da;
             border: 1px solid #f5c6cb;
             border-radius: 5px;
             margin-bottom: 20px;
-        }
-        .product-rating {
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-        .product-rating i {
-            font-family: "Font Awesome 6 Free" !important;
-            font-style: normal;
-            display: inline-block;
-            font-size: 0.9rem;
         }
         .filter-error {
             color: #721c24;
             font-size: 14px;
             margin-top: 5px;
             display: none;
+        }
+        /* Additional CSS for star ratings */
+        .product-rating i {
+            font-family: "Font Awesome 6 Free" !important;
+            font-style: normal;
+            font-weight: 900; /* Ensure solid icons for filled stars */
+            color: #f39c12;
+            font-size: 0.9rem;
+        }
+        .product-rating .fa-star-half-alt {
+            font-weight: 900; /* Ensure half-star is rendered correctly */
+        }
+        .product-rating .far.fa-star {
+            font-weight: 400; /* Ensure empty stars are regular weight */
         }
     </style>
 </head>
@@ -201,5 +203,6 @@ $initial_params_json = json_encode($initial_params);
             }
         });
     </script>
+    <script src="../../js/client/search.js" defer></script>
 </body>
 </html>
