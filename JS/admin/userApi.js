@@ -222,3 +222,30 @@ const updateUserLogin = async (name, address,birth,phone,gender) => {
         console.error("Lỗi:", err);
     }
 };
+
+const updateUserPassword = async (currentPassword,passWord) => {
+    try {
+        const response = await fetch(`${API_ACCOUNT_URL}`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: "updatePassword",
+                currentPassword: currentPassword,
+                newPassword: passWord,
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        } else {
+            const errorMessage = await response.text();
+            alert("Lỗi khi cập nhật: " + errorMessage);
+        }
+    } catch (err) {
+        console.error("Lỗi:", err);
+    }
+};
+

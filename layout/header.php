@@ -1,6 +1,3 @@
-<?php
-session_start();
-?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -9,20 +6,22 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="./css/header.css">
+    <script src="./js/client/search.js" defer></script>
+</head>
 </head>
 
 <body>
     <header class="header">
         <nav class="nav container">
             <div class="nav__data">
-                <a href="/index.php" class="nav__logo">
+                <a href="/sportswear-webstore/index.php" class="nav__logo">
                     <i class="ri-store-2-fill"></i> Cửa hàng Sportwear
                 </a>
             </div>
-
             <div class="nav__menu" id="nav-menu">
                 <ul class="nav__list">
-                    <li><a href="/index.php" class="nav__link">Trang chủ</a></li>
+                    <li><a href="/sportswear-webstore/index.php" class="nav__link">Trang chủ</a></li>
                     <li class="dropdown__item">
                         <div class="nav__link">
                             Sản phẩm <i class="ri-arrow-down-s-line dropdown__arrow"></i>
@@ -52,7 +51,7 @@ session_start();
                                     <li><a href="/sportswear-webstore/layout/client/search_results.php?category=8&sort=newest" class="dropdown__sublink">
                                             <i class="ri-t-shirt-line"></i> Áo nữ
                                         </a></li>
-                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=9&sort=newest" class="dropdown__sublink">
+                                    <li><a href="/sportswear-webstore/layout/client/search_results.php?category=9&sort=newest" class="dropdown__sublink recourse">
                                             <i class="ri-arrow-up-down-line"></i> Quần nữ
                                         </a></li>
                                     <li><a href="/sportswear-webstore/layout/client/search_results.php?category=10&sort=newest" class="dropdown__sublink">
@@ -114,15 +113,15 @@ session_start();
                     <li><a href="#" class="nav__link">Liên hệ</a></li>
                 </ul>
             </div>
-
             <div class="nav__tools">
                 <div class="search-box">
                     <form id="searchForm" action="/sportswear-webstore/layout/client/search_results.php" method="GET">
                         <i class="ri-search-line"></i>
                         <input type="text" name="search" id="searchInput" placeholder="Tìm kiếm..." required>
+                        <button type="submit" style="display: none;"></button> <!-- Hidden submit button -->
                     </form>
                 </div>
-                <a href="/layout/client/card.php">
+                <a href="/sportswear-webstore/layout/client/card.php">
                     <i class="ri-shopping-cart-2-line nav__cart"></i>
                 </a>
                 <a class="nav__account" id="account"><i class="ri-account-circle-line"></i></a>
@@ -142,30 +141,19 @@ session_start();
                 </div>
                 <ul class="user-menu-list">
                     <?php if (isset($_SESSION['user']['roleid']) && $_SESSION['user']['roleid'] !== '05'): ?>
-                        <li><a href="./layout/admin/index.php"><i class="ri-admin-line"></i> Đi đến trang quản trị</a></li>
+                        <li><a href="/sportswear-webstore/layout/admin/index.php"><i class="ri-admin-line"></i> Đi đến trang quản trị</a></li>
                     <?php endif; ?>
-
                     <?php if (isset($_SESSION['user']['roleid']) && (string)$_SESSION['user']['roleid'] === '05'): ?>
                         <li><a href="#" onclick="userProfileRedirect()"><i class="ri-user-settings-line"></i> Hồ sơ</a></li>
                     <?php endif; ?>
-
-                    <li><a href="#" onclick="handleLogout()"><i class="ri-logout-box-line"></i> Đăng xuất</a></li>
+                    <li><a href="#" onclick="handleLogout(event)"><i class="ri-logout-box-line"></i> Đăng xuất</a></li>
                 </ul>
             </div>
         <?php else: ?>
-            <?php include 'login_regis.php'; ?>
+            <?php include __DIR__ . '/../login_regis.php'; ?>
         <?php endif; ?>
     </div>
     <script>
-        document.getElementById('searchForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const searchInput = document.getElementById('searchInput').value.trim();
-
-            if (!searchInput) return;
-
-            window.location.href = `/layout/client/search_results.php?search=${encodeURIComponent(searchInput)}`;
-        });
-
         const showMenu = (toggleId, navId) => {
             const toggle = document.getElementById(toggleId),
                 nav = document.getElementById(navId);
@@ -182,13 +170,14 @@ session_start();
 
         document.getElementById('loginOverlay').addEventListener('click', (e) => {
             const overlay = document.getElementById('loginOverlay');
-            if (e.target === overlay) { // Check if the click is on the overlay itself
-                overlay.style.display = 'none'; // Hide the overlay
+            if (e.target === overlay) {
+                overlay.style.display = 'none';
             }
         });
 
-        function handleLogout() {
-            fetch('./layout/login_regis.php', {
+        function handleLogout(event) {
+            event.preventDefault();
+            fetch('/sportswear-webstore/layout/login_regis.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -207,8 +196,8 @@ session_start();
 
         function userProfileRedirect() {
             const overlay = document.getElementById('loginOverlay');
-            overlay.style.display = 'none'; // Hide the overlay
-            window.location.href = '/index.php?page=profile';
+            overlay.style.display = 'none';
+            window.location.href = '/sportswear-webstore/index.php?page=profile';
         }
     </script>
 </body>

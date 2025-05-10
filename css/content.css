@@ -13,11 +13,11 @@
 }
 
 /* home Header */
-.home-header{
+.home-header {
     display: flex;
     gap: 10px;
 }
-.home-header h1{
+.home-header h1 {
     color: black;
     font-weight: 500; 
 }
@@ -121,7 +121,6 @@
     transition: transform 0.5s ease;
 }
 
-
 .product-name {
     font-size: 1rem;
     margin: 0.8rem 1rem 0.5rem;
@@ -131,7 +130,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 
 .product-price {
     margin: 0 1rem;
@@ -154,7 +152,17 @@
 .product-rating {
     margin: 0.2rem 1rem;
     color: #f39c12;
-    font-size: 0.7rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.product-rating i {
+    font-family: "Font Awesome 6 Free" !important;
+    font-style: normal;
+    display: inline-block;
+    font-size: 0.9rem;
 }
 
 .buy-button {

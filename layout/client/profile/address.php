@@ -53,7 +53,7 @@ $user = $_SESSION['user'];
             }
         });
 
-        document.querySelector('.form-actions').addEventListener('click', async (e) => {
+        document.querySelector('.edit-address-container').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = {
                 address:document.getElementById('address_line').value

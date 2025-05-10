@@ -32,43 +32,52 @@ class OrderService
         }
     }
 
-    public function updateOrderStatus($orderID, $status)
+    public function updateOrderStatus($ID, $status)
     {
         try {
-            if (!is_numeric($orderID) || $orderID <= 0) {
+            if (!is_numeric($ID) || $ID <= 0) {
                 throw new Exception("Invalid order ID");
             }
-            if (!in_array($status, ['pending', 'processing', 'shipped', 'completed', 'cancelled'])) {
+            if (!in_array($status, ['pending', 'approved', 'delivered', 'canceled'])) {
                 throw new Exception("Invalid order status");
             }
 
-            return $this->orderRepository->updateOrderStatus($orderID, $status);
+            // Get current status
+            $sql = "SELECT status FROM `order` WHERE ID = ?";
+            $conn = ConfigMysqli::connectDatabase();
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $ID);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            $currentStatus = $result['status'] ?? '';
+
+            // Define valid transitions
+            $statusTransitions = [
+                'pending' => ['approved', 'canceled'],
+                'approved' => ['delivered', 'canceled'],
+                'delivered' => [],
+                'canceled' => []
+            ];
+
+            if (!in_array($status, $statusTransitions[$currentStatus] ?? [])) {
+                throw new Exception("Invalid status transition from $currentStatus to $status");
+            }
+
+            return $this->orderRepository->updateOrderStatus($ID, $status);
         } catch (Exception $e) {
             throw new Exception("Failed to update order status: " . $e->getMessage());
         }
     }
 
-    public function updateOrderDetails($orderID, $receiverName, $address, $phone, $email, $paymentMethodID)
-    {
-        try {
-            if (!is_numeric($orderID) || $orderID <= 0 || !is_numeric($paymentMethodID) || $paymentMethodID <= 0) {
-                throw new Exception("Invalid order or payment method ID");
-            }
-            if (empty($receiverName) || empty($address) || empty($phone) || empty($email)) {
-                throw new Exception("Missing billing detail information");
-            }
-
-            return $this->orderRepository->updateOrderDetails($orderID, $receiverName, $address, $phone, $email, $paymentMethodID);
-        } catch (Exception $e) {
-            throw new Exception("Failed to update order details: " . $e->getMessage());
-        }
-    }
-
-    public function searchOrders($orderID = null, $customerName = '', $fromDate = '', $toDate = '')
+    public function searchOrders($orderID = null, $customerName = '', $status = '', $fromDate = '', $toDate = '')
     {
         try {
             if (!empty($orderID) && (!is_numeric($orderID) || $orderID <= 0)) {
                 throw new Exception("Invalid order ID");
+            }
+
+            if (!empty($status) && !in_array($status, ['pending', 'approved', 'delivered', 'canceled'])) {
+                throw new Exception("Invalid status");
             }
 
             if (!empty($fromDate) && !strtotime($fromDate)) {
@@ -79,7 +88,7 @@ class OrderService
                 throw new Exception("Invalid to date");
             }
 
-            return $this->orderRepository->searchOrders($orderID, $customerName, $fromDate, $toDate);
+            return $this->orderRepository->searchOrders($orderID, $customerName, $status, $fromDate, $toDate);
         } catch (Exception $e) {
             throw new Exception("Failed to search orders: " . $e->getMessage());
         }

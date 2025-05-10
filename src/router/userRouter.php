@@ -28,24 +28,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action']) && $_POST['action'] === 'defaultAccount') {
-        $name = $_POST['name'] ?? '';
-        $birthday = $_POST['birthday'] ?? '';
-        $email = $_POST['email'] ?? '';
-        $phone = $_POST['phone'] ?? '';
-        $gender = $_POST['gender'] ?? '';
-        $roleID = $_POST['roleID'] ?? '';
-        $address = $_POST['address'] ?? '';
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (isset($input['action'])) {
+        switch ($input['action']) {
+            case 'createAccount':
+                $username = $input['username'] ?? '';
+                $password = $input['password'] ?? '';
+                $fullname = $input['fullname'] ?? '';
+                $phone = $input['phone'] ?? '';
+                $roleId = $input['roleId'] ?? '';
+                $status = $input['status'] ?? '';
+                $email = $input['email'] ?? null;
+                $address = $input['address'] ?? null;
+                $gender = $input['gender'] ?? null;
+                $dateOfBirth = $input['dateOfBirth'] ?? null;
+                $controller->createAccount($username, $password, $fullname, $phone, $roleId, $status, $email, $address, $gender, $dateOfBirth);
+                break;
 
-        $userController->defaultAccount($name, $email,$address, $phone, $gender, $roleID,$birthday);
-    } else if (isset($_GET['action']) && $_GET['action'] === 'uploadFile'){
-        $file = $_FILES['excel_file']['tmp_name'];
-        $userController->importExcel($file);
-    }
-    else {
-        echo "Invalid POST request.";
+            case 'filterAccounts':
+                $controller->filterAccounts($input);
+                break;
+
+            default:
+                echo json_encode(['status' => 400, 'message' => 'Hành động không hợp lệ'], JSON_UNESCAPED_UNICODE);
+        }
+    } else {
+        echo json_encode(['status' => 400, 'message' => 'Yêu cầu POST không hợp lệ'], JSON_UNESCAPED_UNICODE);
     }
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     if (isset($_GET['action']) && $_GET['action'] === 'deleteUsers' && isset($_GET['userId'])) {
