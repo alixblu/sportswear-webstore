@@ -1,20 +1,6 @@
 <?php
 session_start();
-$initial_params = [];
-foreach ($_GET as $key => $value) {
-    if (!empty($value)) {
-        if ($key === 'price_start') {
-            $initial_params['min_price'] = htmlspecialchars($value);
-        } elseif ($key === 'price_end') {
-            $initial_params['max_price'] = htmlspecialchars($value);
-        } else {
-            $initial_params[$key] = htmlspecialchars($value);
-        }
-    }
-}
-$initial_params_json = json_encode($initial_params);
 ?>
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -194,15 +180,6 @@ $initial_params_json = json_encode($initial_params);
 
     <?php include __DIR__ . '/../footer.php'; ?>
 
-    <script>
-        const initialParams = <?php echo $initial_params_json; ?>;
-        window.addEventListener('DOMContentLoaded', () => {
-            loadFilters();
-            if (Object.keys(initialParams).length > 0) {
-                updateResults(initialParams);
-            }
-        });
-    </script>
     <script src="../../js/client/search.js" defer></script>
 </body>
 </html>

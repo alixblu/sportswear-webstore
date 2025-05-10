@@ -55,6 +55,24 @@ if (searchForm) {
     searchForm.addEventListener('submit', performSearch);
 }
 
+// Lấy tham số từ URL
+function getQueryParams() {
+    const params = {};
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.forEach((value, key) => {
+        if (value) {
+            if (key === 'price_start') {
+                params['min_price'] = value;
+            } else if (key === 'price_end') {
+                params['max_price'] = value;
+            } else {
+                params[key] = value;
+            }
+        }
+    });
+    return params;
+}
+
 async function loadFilters() {
     try {
         const [brandsResponse, categoriesResponse] = await Promise.all([
@@ -69,6 +87,9 @@ async function loadFilters() {
         const categorySelect = document.querySelector('select[name="category"]');
         const brandError = document.getElementById('brand-error');
         const categoryError = document.getElementById('category-error');
+
+        // Lấy tham số từ URL
+        const initialParams = getQueryParams();
 
         if (brandsData.status === 200 && Array.isArray(brandsData.data)) {
             brandSelect.innerHTML = '<option value="">Tất cả thương hiệu</option>';
@@ -103,12 +124,28 @@ async function loadFilters() {
             console.error('Lỗi tải danh mục:', categoriesData.message || 'Không có dữ liệu');
             categoryError.style.display = 'block';
         }
+
+        // Cập nhật giá trị cho các input khác
+        document.querySelector('input[name="min_price"]').value = initialParams.min_price || '';
+        document.querySelector('input[name="max_price"]').value = initialParams.max_price || '';
+        document.querySelector('select[name="status"]').value = initialParams.status || '';
+        document.querySelector('select[name="sort"]').value = initialParams.sort || 'newest';
+
+        // Gọi updateResults với tham số từ URL
+        if (Object.keys(initialParams).length > 0) {
+            updateResults(initialParams);
+        }
     } catch (error) {
         console.error('Lỗi khi tải bộ lọc:', error);
         document.getElementById('brand-error').style.display = 'block';
         document.getElementById('category-error').style.display = 'block';
     }
 }
+
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadFilters();
+});
 
 async function updateResults(params = {}) {
     const itemsPerPage = 12;
