@@ -1,5 +1,5 @@
 const API_URL = '../../src/router/userRouter.php';
-const API_ACCOUNT_URL = '../../src/router/accountrouter.php';
+const API_ACCOUNT_URL = '/sportswear-webstore/src/router/accountrouter.php';
 
 const getAccountByUserId = async (userId) => {
     const response = await fetch(`${API_URL}?action=getAccountByUserId&userId=${userId}`, {

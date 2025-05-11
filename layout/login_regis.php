@@ -1,10 +1,4 @@
 <?php
-ob_start();
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 if($_SERVER['REQUEST_METHOD']==='POST'){
     // Clear any previous output
     ob_clean();
@@ -105,8 +99,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
       <!--=============== REMIXICONS ===============-->
       <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
-      <!--=============== CSS ===============-->
-      <link rel="stylesheet" href="./css/login_regis.css">
+     
 
    </head>
    <body>
@@ -235,7 +228,6 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
         </p>
     </form>
 
-    <script src="./JS/login_regis.js"></script> 
 
    </body>
 </html>

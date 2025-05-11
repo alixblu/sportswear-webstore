@@ -49,7 +49,7 @@ $user = $_SESSION['user'];
         </div>
     </div>
 </body>
-    <script src="../../JS/admin/userApi.js"></script>
+    <script src="/sportswear-webstore/JS/admin/userApi.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             try {

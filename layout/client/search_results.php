@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -176,5 +175,6 @@
     <?php include __DIR__ . '/../footer.php'; ?>
 
     <script src="../../js/client/search.js" defer></script>
+
 </body>
 </html>
