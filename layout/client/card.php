@@ -228,6 +228,29 @@
          padding: 6px;
          box-sizing: border-box;
       }
+
+      #paymentMethod {
+         width: 100%;
+         padding: 8px 12px;
+         font-size: 14px;
+         border: 1px solid #ccc;
+         border-radius: 5px;
+         background-color: #fff;
+         color: #333;
+         appearance: none; 
+         background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2210%22%20height%3D%225%22%20viewBox%3D%220%200%2010%205%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M0%200l5%205%205-5z%22%20fill%3D%22%23333%22/%3E%3C/svg%3E");
+         background-repeat: no-repeat;
+         background-position: right 10px center;
+         background-size: 10px 5px;
+         cursor: pointer;
+         transition: border-color 0.3s ease;
+      }
+
+      #paymentMethod:focus {
+         outline: none;
+         border-color: #007bff;
+         box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+      }
    </style>
 </head>
 
@@ -289,6 +312,7 @@
 <script src="../../JS/client/cartApi.js"></script>
 <script src="../../JS/admin/coupon.js"></script>
 <script src="../../JS/client/cartdetail.js"></script>
+<script src="../../JS/admin/userApi.js"></script>
 
 <script>
    loadCart()
@@ -465,35 +489,50 @@
 
    }
 
-   function showCustomerInfoPopup() {
+   async function showCustomerInfoPopup() {
+      const result = await getInfo();
+      const userData = result.data;
+
       const overlay = document.createElement('div');
       overlay.classList.add('popup-overlay');
 
       const popup = document.createElement('div');
       popup.classList.add('popup-content');
       popup.innerHTML = `
-            <div class="titlePopup">
-               <div>Nhập Thông Tin Khách Hàng</div>
-               <div onclick="closePopup()" style="cursor: pointer;">X</div>
+         <div class="titlePopup">
+            <div>Nhập Thông Tin Khách Hàng</div>
+            <div onclick="closePopup()" style="cursor: pointer;">X</div>
+         </div>
+         <form id="customerForm" onsubmit="submitCustomerInfo(event)">
+            <div class="form-group">
+               <label for="name">Họ tên:</label>
+               <input type="text" id="name" name="name" required />
             </div>
-            <form id="customerForm" onsubmit="submitCustomerInfo(event)">
-               <div class="form-group">
-                  <label for="name">Họ tên:</label>
-                  <input type="text" id="name" name="name" required />
-               </div>
-               <div class="form-group">
-                  <label for="address">Địa chỉ:</label>
-                  <input type="text" id="address" name="address" required />
-               </div>
-               <div class="form-group">
-                  <label for="phone">Số điện thoại:</label>
-                  <input type="tel" id="phone" name="phone" required pattern="\\d{10,11}" />
-               </div>
-               <button type="submit" class="btn-xong">Đặt Hàng</button>
-            </form>
-         `;
+            <div class="form-group">
+               <label for="address">Địa chỉ:</label>
+               <input type="text" id="address" name="address" required />
+            </div>
+            <div class="form-group">
+               <label for="phone">Số điện thoại:</label>
+               <input type="tel" id="phone" name="phone" required pattern="\\d{10,11}" />
+            </div>
+            <div class="form-group">
+               <label for="paymentMethod">Hình thức chi trả:</label>
+               <select id="paymentMethod" name="paymentMethod" required>
+                  <option value="cash">Tiền mặt</option>
+                  <option value="online">Trực tuyến</option>
+               </select>
+            </div>
+            <button type="submit" class="btn-xong">Đặt Hàng</button>
+         </form>
+      `;
+
       overlay.appendChild(popup);
       document.body.appendChild(overlay);
+
+      document.getElementById('name').value = userData.fullname || '';
+      document.getElementById('address').value = userData.address || '';
+      document.getElementById('phone').value = userData.phone || '';
    }
 
    document.querySelector('.btn-buy').addEventListener('click', function() {
