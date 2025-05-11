@@ -226,7 +226,7 @@ async function add() {
         showAll();
     } catch (error) {
         showToast(error.message || 'Lỗi khi thêm tài khoản', 'error');
-        closeModal(); // Đóng modal ngay cả khi có lỗi
+        closeModal();
     }
 }
 
@@ -325,7 +325,7 @@ async function showFormEdit(button, id, type) {
         document.body.appendChild(portalRoot);
     } catch (error) {
         showToast(error.message || 'Lỗi khi lấy thông tin tài khoản', 'error');
-        closeModal(); // Đóng modal ngay cả khi có lỗi
+        closeModal();
     }
 }
 
@@ -356,11 +356,11 @@ async function edit(id, isAdmin) {
     try {
         await AccountService.updateAccount(accountData);
         showToast('Cập nhật tài khoản thành công', 'success');
-        closeModal(); // Đóng modal sau khi lưu thành công
+        closeModal();
         showAll();
     } catch (error) {
         showToast(error.message || 'Lỗi khi cập nhật tài khoản', 'error');
-        closeModal(); // Đóng modal ngay cả khi có lỗi
+        closeModal();
     }
 }
 
@@ -417,7 +417,7 @@ async function showFormFilter(type) {
         document.body.appendChild(portalRoot);
     } catch (error) {
         showToast(error.message || 'Lỗi khi lấy danh sách vai trò', 'error');
-        closeModal(); // Đóng modal ngay cả khi có lỗi
+        closeModal();
     }
 }
 
@@ -483,10 +483,10 @@ async function applyFilter(type) {
             tbody.appendChild(tr);
         });
         
-        closeModal(); // Đóng modal sau khi áp dụng bộ lọc thành công
+        closeModal();
     } catch (error) {
         showToast(error.message || 'Lỗi khi lọc tài khoản', 'error');
-        closeModal(); // Đóng modal ngay cả khi có lỗi
+        closeModal();
     }
 }
 
@@ -658,9 +658,17 @@ document.getElementById("addBtn").onclick = async () => {
         document.body.appendChild(portalRoot);
     } catch (error) {
         showToast(error.message || 'Lỗi khi lấy danh sách vai trò', 'error');
-        closeModal(); // Đóng modal ngay cả khi có lỗi
+        closeModal();
     }
 };
+
+// Add click outside event to close modal
+document.addEventListener('click', function(event) {
+    const portalRoot = document.getElementById('portal-root');
+    if (portalRoot && !portalRoot.contains(event.target)) {
+        closeModal();
+    }
+});
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
