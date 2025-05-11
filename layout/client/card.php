@@ -229,7 +229,7 @@
          box-sizing: border-box;
       }
 
-      #paymentMethod {
+      #paymentMethod,#addressSelect {
          width: 100%;
          padding: 8px 12px;
          font-size: 14px;
@@ -246,7 +246,7 @@
          transition: border-color 0.3s ease;
       }
 
-      #paymentMethod:focus {
+      #paymentMethod:focus ,#addressSelect:focus{
          outline: none;
          border-color: #007bff;
          box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
@@ -280,8 +280,8 @@
             <div class="section-title freeship-note"><img src="/img/coupon.svg" alt="">Khuyến Mãi</div>
             <div class="voucher">
                <div class="voucherItem">
-                  <span>Giảm 15% tối đa 70K</span>
-                  <button class="apply-btn" onclick="toggleApply(this)">Áp Dụng</button>
+                  <!-- <span>Giảm 15% tối đa 70K</span>
+                  <button class="apply-btn" onclick="toggleApply(this)">Áp Dụng</button> -->
                </div>
             </div>
             <!-- <div class="freeship-note" onclick="showPopup()">
@@ -510,7 +510,11 @@
             </div>
             <div class="form-group">
                <label for="address">Địa chỉ:</label>
-               <input type="text" id="address" name="address" required />
+               <select id="addressSelect" name="address" required onchange="handleAddressChange()">
+
+               </select>
+
+               <input type="text" id="newAddressInput" placeholder="Nhập địa chỉ mới" style="display: none; margin-top: 8px;" />
             </div>
             <div class="form-group">
                <label for="phone">Số điện thoại:</label>
@@ -531,8 +535,26 @@
       document.body.appendChild(overlay);
 
       document.getElementById('name').value = userData.fullname || '';
-      document.getElementById('address').value = userData.address || '';
       document.getElementById('phone').value = userData.phone || '';
+
+      addressSelect.innerHTML = '';
+
+      const addresses = userData.address
+      const placeholderOption = new Option('-- Chọn địa chỉ --', '', true, false);
+      addressSelect.appendChild(placeholderOption);
+
+      if (userData.address && !addresses.includes(userData.address)) {
+         addresses.unshift(userData.address);
+      }
+
+      for (const addr of addresses) {
+         const option = new Option(addr, addr, false, userData.address === addr);
+         addressSelect.appendChild(option);
+      }  
+
+      const addNewOption = new Option('+ Thêm địa chỉ mới...', 'new');
+      addressSelect.appendChild(addNewOption);
+      
    }
 
    document.querySelector('.btn-buy').addEventListener('click', function() {
@@ -559,6 +581,19 @@
       alert('Thông tin đã được gửi!');
       closePopup();
    }
+
+   function handleAddressChange() {
+   const addressSelect = document.getElementById('addressSelect');
+   const newAddressInput = document.getElementById('newAddressInput');
+
+   if (addressSelect.value === 'new') {
+      newAddressInput.style.display = 'block';
+      newAddressInput.required = true;
+   } else {
+      newAddressInput.style.display = 'none';
+      newAddressInput.required = false;
+   }
+}
 </script>
 
 </html>
