@@ -563,24 +563,39 @@
 
    function submitCustomerInfo(event) {
       event.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const address = document.getElementById('address').value.trim();
-      const phone = document.getElementById('phone').value.trim();
 
-      if (!name || !address || !phone) {
-         alert('Vui lòng điền đầy đủ thông tin');
-         return;
+      const name = document.getElementById('name').value;
+      const phone = document.getElementById('phone').value;
+      const paymentMethod = document.getElementById('paymentMethod').value;
+
+      const addressSelect = document.getElementById('addressSelect');
+      let address = addressSelect.value;
+
+      if (address === 'new') {
+         const newAddress = document.getElementById('newAddressInput').value.trim();
+         if (newAddress) {
+            address = newAddress;
+
+            const exists = Array.from(addressSelect.options).some(opt => opt.value === newAddress);
+            if (!exists) {
+               const option = new Option(newAddress, newAddress, true, true);
+               addressSelect.insertBefore(option, addressSelect.lastElementChild); 
+            }
+
+            addressSelect.value = newAddress;
+            document.getElementById('newAddressInput').value = '';
+            document.getElementById('newAddressInput').style.display = 'none';
+         } else {
+            alert("Vui lòng nhập địa chỉ mới.");
+            return;
+         }
       }
 
-      console.log({
-         name,
-         address,
-         phone
-      });
+      console.log({ name, phone, address, paymentMethod });
 
-      alert('Thông tin đã được gửi!');
       closePopup();
    }
+
 
    function handleAddressChange() {
    const addressSelect = document.getElementById('addressSelect');
