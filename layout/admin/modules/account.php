@@ -363,22 +363,6 @@
             margin-right: 8px;
         }
 
-        .buttonUserCss {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-        }
-
         .infoCss {
             margin-bottom: 15px;
             font-weight: bold;
@@ -562,6 +546,7 @@
         <div class="tab-container">
             <div class="tab active" onclick="switchTab('staff')">Tài khoản nhân viên</div>
             <div class="tab" onclick="switchTab('customer')">Tài khoản khách hàng</div>
+            <div class="tab" onclick="switchTab('permissions')">Phân quyền</div>
         </div>
 
         <!-- Staff Accounts -->
@@ -634,6 +619,30 @@
                 </div>
             </div>
         </div>
+
+        <!-- Permissions Tab -->
+        <div id="permissions-tab" class="tab-content">
+            <div class="stats-cards">
+                <div class="table-card">
+                    <div class="card-title">
+                        <h3><i class="fa-solid fa-user-shield"></i> Quản lý phân quyền</h3>
+                        <div class="wrapperFilter">
+                            <select class="selectUser" id="roleSelector" onchange="loadPermissions()">
+                                <!-- Roles will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                    <div id="permissions-content">
+                        <!-- Permissions will be populated by JavaScript -->
+                    </div>
+                    <div class="wrapperButton">
+                        <button class="buttonUserCss" onclick="savePermissions()">
+                            <i class="fas fa-save"></i> Lưu quyền hạn
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal Portal -->
@@ -647,6 +656,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             showAll();
             switchTab('staff');
+            loadRolesForPermissions();
         });
     </script>
 </body>

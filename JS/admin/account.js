@@ -101,10 +101,22 @@ const AccountService = {
         return fetchAPI(`${ACCOUNT_API_URL}?action=getPermissions&roleId=${roleId}`);
     },
 
+    getAllModules: async () => {
+        return fetchAPI(`${ACCOUNT_API_URL}?action=getAllModules`);
+    },
+
     filterAccounts: async (filters) => {
         return fetchAPI(ACCOUNT_API_URL, 'POST', {
             action: 'filterAccounts',
             ...filters
+        });
+    },
+
+    updatePermissions: async (roleId, moduleIds) => {
+        return fetchAPI(ACCOUNT_API_URL, 'POST', {
+            action: 'updatePermissions',
+            roleId,
+            moduleIds
         });
     }
 };
@@ -159,9 +171,6 @@ async function showAll() {
                     <td><span class="status ${account.status}"><i class="fas fa-check-circle"></i> ${statusText}</span></td>
                     <td>${createdAt}</td>
                     <td>
-                        <button class="btn btn-outline btn-sm" onclick="showPermissionsModal(this, ${account.roleID})">
-                            <i class="fas fa-user-shield"></i> Quyền hạn
-                        </button>
                         <button class="btn btn-outline btn-sm" onclick="showFormEdit(this, ${account.accountID}, 'staff')">
                             <i class="fa-solid fa-pen"></i> Sửa
                         </button>
@@ -222,14 +231,27 @@ async function add() {
 
 async function showFormEdit(button, id, type) {
     try {
+        console.log(`Fetching account with ID: ${id}, Type: ${type}`);
         const [{ data: account }, { data: roles }] = await Promise.all([
             AccountService.getAccountById(id),
             AccountService.getAllRoles()
         ]);
 
+        // Kiểm tra dữ liệu trả về
+        if (!account) {
+            throw new Error('Không tìm thấy tài khoản');
+        }
+        console.log('Account:', account);
+        console.log('Roles:', roles);
+
         const isStaff = type === 'staff';
         const isAdmin = isStaff && account.roleName === 'Admin';
         
+        // Định dạng dateOfBirth nếu cần
+        const formattedDateOfBirth = account.dateOfBirth 
+            ? new Date(account.dateOfBirth).toISOString().split('T')[0] 
+            : '';
+
         const portalRoot = document.createElement('div');
         portalRoot.id = 'portal-root';
         portalRoot.innerHTML = `
@@ -240,7 +262,7 @@ async function showFormEdit(button, id, type) {
                     
                     <label for="username">Tên đăng nhập</label>
                     <div class="wrapperInputCss">
-                        <input class="inputUserCss" type="text" id="username" value="${account.username}" readonly>
+                        <input class="inputUserCss" type="text" id="username" value="${account.username || ''}" readonly>
                     </div>
                     
                     <label for="new-password">Mật khẩu mới (để trống nếu không đổi)</label>
@@ -251,12 +273,12 @@ async function showFormEdit(button, id, type) {
                     
                     <label for="fullname">Họ và tên</label>
                     <div class="wrapperInputCss">
-                        <input class="inputUserCss" type="text" id="fullname" value="${account.fullname}">
+                        <input class="inputUserCss" type="text" id="fullname" value="${account.fullname || ''}">
                     </div>
                     
                     <label for="phone">Số điện thoại</label>
                     <div class="wrapperInputCss">
-                        <input class="inputUserCss" type="tel" id="phone" value="${account.phone}">
+                        <input class="inputUserCss" type="tel" id="phone" value="${account.phone || ''}">
                     </div>
                     
                     ${isStaff && !isAdmin ? `
@@ -264,7 +286,7 @@ async function showFormEdit(button, id, type) {
                     <div class="wrapperInputCss">
                         <select class="selectUser" id="roleId">
                             ${roles.filter(role => role.ID != 5).map(role => `
-                                <option value="${role.ID}" ${role.ID == account.roleID ? 'selected' : ''}>${role.name}</option>
+                                <option value="${role.ID}" ${role.ID == (account.roleID || '') ? 'selected' : ''}>${role.name}</option>
                             `).join('')}
                         </select>
                     </div>
@@ -301,7 +323,7 @@ async function showFormEdit(button, id, type) {
                     
                     <label for="dateOfBirth">Ngày sinh</label>
                     <div class="wrapperInputCss">
-                        <input class="inputUserCss" type="date" id="dateOfBirth" value="${account.dateOfBirth || ''}">
+                        <input class="inputUserCss" type="date" id="dateOfBirth" value="${formattedDateOfBirth}">
                     </div>
                     
                     <div class="wrapperButton">
@@ -314,6 +336,7 @@ async function showFormEdit(button, id, type) {
         `;
         document.body.appendChild(portalRoot);
     } catch (error) {
+        console.error('Error in showFormEdit:', error);
         showToast(error.message || 'Lỗi khi lấy thông tin tài khoản', 'error');
     }
 }
@@ -433,16 +456,13 @@ async function applyFilter(type) {
 
             if (type === 'staff') {
                 tr.innerHTML = `
-                    <td>${account.username}</td>
+                    <td>${account.username}</ Lakeside
                     <td>${account.fullname}</td>
                     <td>${account.phone}</td>
                     <td>${account.roleName}</td>
                     <td><span class="status ${account.status}"><i class="fas fa-check-circle"></i> ${statusText}</span></td>
                     <td>${createdAt}</td>
                     <td>
-                        <button class="btn btn-outline btn-sm" onclick="showPermissionsModal(this, ${account.roleID})">
-                            <i class="fas fa-user-shield"></i> Quyền hạn
-                        </button>
                         <button class="btn btn-outline btn-sm" onclick="showFormEdit(this, ${account.accountID}, 'staff')">
                             <i class="fa-solid fa-pen"></i> Sửa
                         </button>
@@ -472,84 +492,89 @@ async function applyFilter(type) {
 }
 
 // Permission Functions
-async function showPermissionsModal(button, roleId) {
+async function loadRolesForPermissions() {
     try {
-        const row = button.closest('tr');
-        const cells = row.querySelectorAll('td');
-        const isAdmin = cells[3].innerText.trim() === 'Admin';
+        const { data: roles } = await AccountService.getAllRoles();
+        const roleSelector = document.getElementById('roleSelector');
+        roleSelector.innerHTML = roles
+            .filter(role => role.ID != 5)
+            .map(role => `<option value="${role.ID}">${role.name}</option>`)
+            .join('');
+        
+        // Chỉ gọi loadPermissions sau khi roleSelector có giá trị
+        if (roleSelector.options.length > 0) {
+            loadPermissions();
+        } else {
+            showToast('Không có vai trò nào để phân quyền', 'error');
+        }
+    } catch (error) {
+        showToast(error.message || 'Lỗi khi tải danh sách vai trò', 'error');
+    }
+}
 
+async function loadPermissions() {
+    try {
+        const roleSelector = document.getElementById('roleSelector');
+        const roleId = roleSelector.value;
+
+        if (!roleId) {
+            throw new Error('Không tìm thấy vai trò được chọn');
+        }
+
+        const [{ data: permissions }, { data: modules }] = await Promise.all([
+            AccountService.getPermissions(roleId),
+            AccountService.getAllModules()
+        ]);
+
+        const isAdmin = roleId == 1; // Giả định roleID 1 là Admin
         if (isAdmin) {
-            showToast('Tài khoản Admin có đầy đủ quyền hạn và không thể chỉnh sửa', 'error');
+            document.getElementById('permissions-content').innerHTML = `
+                <div style="color: #f44336; margin: 10px 0;">
+                    Tài khoản Admin có đầy đủ quyền hạn và không thể chỉnh sửa.
+                </div>
+            `;
             return;
         }
 
-        const { data: permissions } = await AccountService.getPermissions(roleId);
-        const accountInfo = {
-            username: cells[0].innerText,
-            fullName: cells[1].innerText,
-            role: cells[3].innerText
-        };
-
-        // Giả định danh sách module (nên thay bằng API getAllModules nếu có)
-        const modules = [
-            { name: "Dashboard", actions: ["view", "export"] },
-            { name: "Employees", actions: ["view", "create", "edit"] },
-            { name: "Products", actions: ["view", "create", "edit"] },
-            { name: "Warehouse", actions: ["view", "create", "edit"] },
-            { name: "Orders", actions: ["view", "create", "edit", "cancel"] },
-            { name: "Coupon & Discount", actions: ["view", "create", "edit"] },
-            { name: "Warranty", actions: ["view", "create", "edit"] },
-            { name: "Account & Access", actions: ["view", "edit"] },
-            { name: "Analytics", actions: ["view", "export"] },
-            { name: "Sales", actions: ["view", "edit"] }
-        ];
-
-        let permissionHTML = modules.map(module => `
+        const permissionHTML = modules.map(module => `
             <div class="permission-group">
                 <div class="permission-group-title">${module.name}</div>
                 <div class="permission-checkboxes">
-                    ${module.actions.map(action => `
-                        <div class="permission-option">
-                            <input type="checkbox" id="perm-${module.name}-${action}" 
-                                   ${permissions.includes(action) ? 'checked' : ''} disabled>
-                            <label for="perm-${module.name}-${action}">${action.charAt(0).toUpperCase() + action.slice(1)}</label>
-                        </div>
-                    `).join('')}
+                    <div class="permission-option">
+                        <input type="checkbox" id="perm-${module.id}" 
+                               ${permissions.includes(module.id) ? 'checked' : ''}>
+                        <label for="perm-${module.id}">Truy cập</label>
+                    </div>
                 </div>
             </div>
         `).join('');
 
-        const portalRoot = document.createElement('div');
-        portalRoot.id = 'portal-root';
-        portalRoot.innerHTML = `
-            <div class="formUserCss">
-                <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeModal()" style="cursor: pointer;"></i></div>
-                <div class="wrapperCss">
-                    <div class="infoCss">Quản lý quyền hạn</div>
-                    <div><strong>Tài khoản:</strong> ${accountInfo.username}</div>
-                    <div><strong>Họ tên:</strong> ${accountInfo.fullName}</div>
-                    <div><strong>Vai trò hiện tại:</strong> ${accountInfo.role}</div>
-                    <div style="color: #f44336; margin: 10px 0;">
-                        Lưu ý: Quyền hạn được quản lý theo vai trò. Để thay đổi quyền, vui lòng thay đổi vai trò của tài khoản trong form chỉnh sửa.
-                    </div>
-                    ${permissionHTML}
-                    <div class="wrapperButton">
-                        <button class="buttonUserCss" onclick="savePermissions(${roleId})">
-                            <i class="fas fa-save"></i> Lưu quyền hạn
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(portalRoot);
+        document.getElementById('permissions-content').innerHTML = permissionHTML;
     } catch (error) {
-        showToast(error.message || 'Lỗi khi lấy quyền hạn', 'error');
+        showToast(error.message || 'Lỗi khi tải quyền hạn', 'error');
     }
 }
 
-async function savePermissions(roleId) {
-    showToast('Không thể lưu quyền hạn. Vui lòng thay đổi vai trò của tài khoản để cập nhật quyền hạn', 'error');
-    closeModal();
+async function savePermissions() {
+    try {
+        const roleId = document.getElementById('roleSelector').value;
+        if (roleId == 1) {
+            showToast('Không thể chỉnh sửa quyền hạn của Admin', 'error');
+            return;
+        }
+
+        const moduleIds = [];
+        document.querySelectorAll('#permissions-content input[type="checkbox"]:checked').forEach(checkbox => {
+            const moduleId = parseInt(checkbox.id.replace('perm-', ''));
+            moduleIds.push(moduleId);
+        });
+
+        await AccountService.updatePermissions(roleId, moduleIds);
+        showToast('Cập nhật quyền hạn thành công', 'success');
+        loadPermissions();
+    } catch (error) {
+        showToast(error.message || 'Lỗi khi lưu quyền hạn', 'error');
+    }
 }
 
 // Initialize
