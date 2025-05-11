@@ -5,8 +5,10 @@ header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Content-Type: application/json; charset=utf-8');
 
 require_once dirname(__FILE__) . '/../controller/accountcontroller.php';
+require_once __DIR__ . '/../controller/authcontroller.php';
 
 $controller = new AccountController();
+$authController = new AuthController();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['action'])) {
@@ -40,7 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             case 'getAllModules':
                 $controller->getAllModules();
                 break;
-
+            case 'info':
+                $authController->info();
+                break;
             default:
                 echo json_encode(['status' => 400, 'message' => 'Hành động GET không hợp lệ']);
         }
