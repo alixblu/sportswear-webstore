@@ -42,6 +42,7 @@ class CouponService
             throw new Exception("Failed to fetch coupons: " . $e->getMessage());
         }
     }
+
     public function getCouponByUserId()
     {
         try {
@@ -97,6 +98,16 @@ class CouponService
     {
         try {
             return $this->couponRepository->findById($Id);
+        } catch (Exception $e) {
+            throw new Exception("Failed to find coupon: " . $e->getMessage());
+        }
+    }
+
+    
+    public function useCoupon($userAccID,$idCoupon)
+    {
+        try {
+            return $this->couponRepository->useCoupon($userAccID,$idCoupon);
         } catch (Exception $e) {
             throw new Exception("Failed to find coupon: " . $e->getMessage());
         }

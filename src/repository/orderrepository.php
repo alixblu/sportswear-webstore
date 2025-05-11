@@ -98,70 +98,95 @@ class OrderRepository
 
     // Tìm kiếm theo ID, tên khách hàng, trạng thái, thời gian
    public function searchOrders($orderID = null, $customerName = '', $status = '', $fromDate = '', $toDate = '')
-{
-    $sql = "
-        SELECT o.ID, o.status, o.totalPrice, o.createdAt, u.fullname AS customerName, pm.name AS paymentMethod
-        FROM `order` o
-        LEFT JOIN user u ON o.customer = u.ID
-        LEFT JOIN payment p ON p.orderID = o.ID
-        LEFT JOIN paymentmethod pm ON pm.ID = p.paymentMethodID
-        WHERE 1=1
-    ";
+    {
+        $sql = "
+            SELECT o.ID, o.status, o.totalPrice, o.createdAt, u.fullname AS customerName, pm.name AS paymentMethod
+            FROM `order` o
+            LEFT JOIN user u ON o.customer = u.ID
+            LEFT JOIN payment p ON p.orderID = o.ID
+            LEFT JOIN paymentmethod pm ON pm.ID = p.paymentMethodID
+            WHERE 1=1
+        ";
 
-    $params = [];
-    $types = "";
+        $params = [];
+        $types = "";
 
-    // Lọc theo orderID nếu có
-    if (!empty($orderID)) {
-        $sql .= " AND o.ID = ?";
-        $types .= "i";
-        $params[] = $orderID;
+        // Lọc theo orderID nếu có
+        if (!empty($orderID)) {
+            $sql .= " AND o.ID = ?";
+            $types .= "i";
+            $params[] = $orderID;
+        }
+
+        // Lọc theo tên khách hàng nếu có
+        if (!empty($customerName)) {
+            $sql .= " AND u.fullname LIKE ?";
+            $types .= "s";
+            $params[] = "%" . $customerName . "%";
+        }
+
+        // Lọc theo trạng thái nếu có
+        if (!empty($status)) {
+            $sql .= " AND o.status = ?";
+            $types .= "s";
+            $params[] = $status;
+        }
+
+        // Lọc theo ngày bắt đầu nếu có
+        if (!empty($fromDate)) {
+            $sql .= " AND DATE(o.createdAt) >= ?";
+            $types .= "s";
+            $params[] = $fromDate;
+        }
+
+        // Lọc theo ngày kết thúc nếu có
+        if (!empty($toDate)) {
+            $sql .= " AND DATE(o.createdAt) <= ?";
+            $types .= "s";
+            $params[] = $toDate;
+        }
+
+        // Sắp xếp theo ngày tạo đơn giảm dần
+        $sql .= " ORDER BY o.createdAt DESC";
+
+        // Chuẩn bị và thực thi câu lệnh SQL
+        $stmt = $this->conn->prepare($sql);
+
+        if ($stmt === false) {
+            throw new Exception("Prepare failed: " . $this->conn->error);
+        }
+
+        // Bind tham số nếu có
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
-
-    // Lọc theo tên khách hàng nếu có
-    if (!empty($customerName)) {
-        $sql .= " AND u.fullname LIKE ?";
-        $types .= "s";
-        $params[] = "%" . $customerName . "%";
+    public function createOrder($customerId, $couponId, $totalPrice)
+    {
+        $query = "INSERT INTO `order` (`customer`, `couponID`, `totalPrice`) VALUES (?, ?, ?)";
+    
+        $stmt = $this->conn->prepare($query);
+        if (!$stmt) {
+            return ['success' => false, 'message' => 'Lỗi chuẩn bị truy vấn: ' . $this->conn->error];
+        }
+    
+        if ($couponId === null) {
+            $couponId = null;
+            $types = "iid";
+            $stmt->bind_param($types, $customerId, $couponId, $totalPrice);
+        } else {
+            $types = "iid"; 
+            $stmt->bind_param($types, $customerId, $couponId, $totalPrice);
+        }
+    
+        if ($stmt->execute()) {
+            return ['success' => true, 'order_id' => $stmt->insert_id]; 
+        } else {
+            return ['success' => false, 'message' => 'Lỗi khi tạo đơn hàng: ' . $stmt->error];
+        }
     }
-
-    // Lọc theo trạng thái nếu có
-    if (!empty($status)) {
-        $sql .= " AND o.status = ?";
-        $types .= "s";
-        $params[] = $status;
-    }
-
-    // Lọc theo ngày bắt đầu nếu có
-    if (!empty($fromDate)) {
-        $sql .= " AND DATE(o.createdAt) >= ?";
-        $types .= "s";
-        $params[] = $fromDate;
-    }
-
-    // Lọc theo ngày kết thúc nếu có
-    if (!empty($toDate)) {
-        $sql .= " AND DATE(o.createdAt) <= ?";
-        $types .= "s";
-        $params[] = $toDate;
-    }
-
-    // Sắp xếp theo ngày tạo đơn giảm dần
-    $sql .= " ORDER BY o.createdAt DESC";
-
-    // Chuẩn bị và thực thi câu lệnh SQL
-    $stmt = $this->conn->prepare($sql);
-
-    if ($stmt === false) {
-        throw new Exception("Prepare failed: " . $this->conn->error);
-    }
-
-    // Bind tham số nếu có
-    if (!empty($params)) {
-        $stmt->bind_param($types, ...$params);
-    }
-
-    $stmt->execute();
-    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-}
+    
 }

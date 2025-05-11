@@ -84,4 +84,14 @@ class OrderController
             ApiResponse::customResponse(null, 500, $e->getMessage());
         }
     }
+
+    public function createOrders($idCoupon)
+    {
+        try {
+            $results = $this->orderService->createOrders($idCoupon);
+            ApiResponse::customResponse($results, 200);
+        } catch (Exception $e) {
+            ApiResponse::customResponse(null, 500, $e->getMessage());
+        }
+    }
 }

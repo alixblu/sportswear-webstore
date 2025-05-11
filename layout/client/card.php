@@ -207,7 +207,7 @@
          background: white;
          padding: 20px;
          border-radius: 8px;
-         width: 300px;
+         width: 500px;
          max-width: 90%;
          box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
       }
@@ -251,6 +251,7 @@
          border-color: #007bff;
          box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
       }
+      
    </style>
 </head>
 
@@ -313,6 +314,7 @@
 <script src="../../JS/admin/coupon.js"></script>
 <script src="../../JS/client/cartdetail.js"></script>
 <script src="../../JS/admin/userApi.js"></script>
+<script src="../../JS/admin/order.js"></script>
 
 <script>
    loadCart()
@@ -386,7 +388,7 @@
 
             coupons.forEach(coupon => {
                const div = document.createElement("div");
-               div.className = "voucherItem";
+               div.className = `voucherItem voucher-${coupon.ID}`; 
                div.innerHTML = `
                      <span>${coupon.name}   </span>
                      <button class="apply-btn" onclick="toggleApply(this, ${total},${coupon.percent})">Áp Dụng</button>
@@ -539,7 +541,7 @@
 
       addressSelect.innerHTML = '';
 
-      const addresses = userData.address
+      const addresses = userData.address ? [userData.address] : [];
       const placeholderOption = new Option('-- Chọn địa chỉ --', '', true, false);
       addressSelect.appendChild(placeholderOption);
 
@@ -593,7 +595,21 @@
 
       console.log({ name, phone, address, paymentMethod });
 
-      closePopup();
+      const activeVoucher = document.querySelector('.voucherItem.active');
+
+      let voucherId =null
+      if (activeVoucher) {
+         const classList = Array.from(activeVoucher.classList);
+         const voucherClass = classList.find(cls => cls.startsWith('voucher-'));
+         voucherId = voucherClass ? voucherClass.replace('voucher-', '') : null;
+      }
+      createOrder(voucherId)
+      .then(data => {
+         console.log('Đơn hàng đã tạo:', data);
+      })
+      .catch(error => {
+         console.error('Lỗi:', error.message);
+      });
    }
 
 
