@@ -81,7 +81,6 @@ class CartRepository {
             }
     
             $stmt->close();
-            $this->conn->close();
             return $carts;
         } catch (Exception $e) {
             error_log("findByUserAccId failed: " . $e->getMessage());

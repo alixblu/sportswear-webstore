@@ -53,3 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         echo json_encode(['error' => 'Yêu cầu PUT không hợp lệ']);
     }
 }
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action']) && $_POST['action'] === 'createOrders') {
+        $idCoupon = $_POST['idCoupon'] ?? null;
+        $orderController->createOrders($idCoupon);
+    } else {
+        echo "Invalid POST request.";
+    }
+}

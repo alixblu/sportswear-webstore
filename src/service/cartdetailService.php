@@ -70,4 +70,15 @@ class CartDetailService
             throw new Exception("Failed to delete cart detail: " . $e->getMessage());
         }
     }
+    public function deleteAllCartDetail($cartID)
+    {
+        try {
+            return $this->cartDetailRepository->deleteAll($cartID);
+        } catch (Exception $e) {
+            throw new Exception("Failed to delete cart detail: " . $e->getMessage());
+        }
+    }
+
+    
+    
 }

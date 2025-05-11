@@ -325,7 +325,7 @@
             dots.forEach(dot => dot.classList.remove('active'));
             dots[slideIndex].classList.add('active');
         }
-
+ 
         setInterval(showSlides, 3000);
 
         dots[0].classList.add('active');

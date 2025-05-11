@@ -207,7 +207,7 @@
          background: white;
          padding: 20px;
          border-radius: 8px;
-         width: 300px;
+         width: 500px;
          max-width: 90%;
          box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
       }
@@ -228,6 +228,30 @@
          padding: 6px;
          box-sizing: border-box;
       }
+
+      #paymentMethod,#addressSelect {
+         width: 100%;
+         padding: 8px 12px;
+         font-size: 14px;
+         border: 1px solid #ccc;
+         border-radius: 5px;
+         background-color: #fff;
+         color: #333;
+         appearance: none; 
+         background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2210%22%20height%3D%225%22%20viewBox%3D%220%200%2010%205%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M0%200l5%205%205-5z%22%20fill%3D%22%23333%22/%3E%3C/svg%3E");
+         background-repeat: no-repeat;
+         background-position: right 10px center;
+         background-size: 10px 5px;
+         cursor: pointer;
+         transition: border-color 0.3s ease;
+      }
+
+      #paymentMethod:focus ,#addressSelect:focus{
+         outline: none;
+         border-color: #007bff;
+         box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+      }
+      
    </style>
 </head>
 
@@ -257,8 +281,8 @@
             <div class="section-title freeship-note"><img src="/img/coupon.svg" alt="">Khuyến Mãi</div>
             <div class="voucher">
                <div class="voucherItem">
-                  <span>Giảm 15% tối đa 70K</span>
-                  <button class="apply-btn" onclick="toggleApply(this)">Áp Dụng</button>
+                  <!-- <span>Giảm 15% tối đa 70K</span>
+                  <button class="apply-btn" onclick="toggleApply(this)">Áp Dụng</button> -->
                </div>
             </div>
             <!-- <div class="freeship-note" onclick="showPopup()">
@@ -289,6 +313,8 @@
 <script src="../../JS/client/cartApi.js"></script>
 <script src="../../JS/admin/coupon.js"></script>
 <script src="../../JS/client/cartdetail.js"></script>
+<script src="../../JS/admin/userApi.js"></script>
+<script src="../../JS/admin/order.js"></script>
 
 <script>
    loadCart()
@@ -362,7 +388,7 @@
 
             coupons.forEach(coupon => {
                const div = document.createElement("div");
-               div.className = "voucherItem";
+               div.className = `voucherItem voucher-${coupon.ID}`; 
                div.innerHTML = `
                      <span>${coupon.name}   </span>
                      <button class="apply-btn" onclick="toggleApply(this, ${total},${coupon.percent})">Áp Dụng</button>
@@ -465,35 +491,72 @@
 
    }
 
-   function showCustomerInfoPopup() {
+   async function showCustomerInfoPopup() {
+      const result = await getInfo();
+      const userData = result.data;
+
       const overlay = document.createElement('div');
       overlay.classList.add('popup-overlay');
 
       const popup = document.createElement('div');
       popup.classList.add('popup-content');
       popup.innerHTML = `
-            <div class="titlePopup">
-               <div>Nhập Thông Tin Khách Hàng</div>
-               <div onclick="closePopup()" style="cursor: pointer;">X</div>
+         <div class="titlePopup">
+            <div>Nhập Thông Tin Khách Hàng</div>
+            <div onclick="closePopup()" style="cursor: pointer;">X</div>
+         </div>
+         <form id="customerForm" onsubmit="submitCustomerInfo(event)">
+            <div class="form-group">
+               <label for="name">Họ tên:</label>
+               <input type="text" id="name" name="name" required />
             </div>
-            <form id="customerForm" onsubmit="submitCustomerInfo(event)">
-               <div class="form-group">
-                  <label for="name">Họ tên:</label>
-                  <input type="text" id="name" name="name" required />
-               </div>
-               <div class="form-group">
-                  <label for="address">Địa chỉ:</label>
-                  <input type="text" id="address" name="address" required />
-               </div>
-               <div class="form-group">
-                  <label for="phone">Số điện thoại:</label>
-                  <input type="tel" id="phone" name="phone" required pattern="\\d{10,11}" />
-               </div>
-               <button type="submit" class="btn-xong">Đặt Hàng</button>
-            </form>
-         `;
+            <div class="form-group">
+               <label for="address">Địa chỉ:</label>
+               <select id="addressSelect" name="address" required onchange="handleAddressChange()">
+
+               </select>
+
+               <input type="text" id="newAddressInput" placeholder="Nhập địa chỉ mới" style="display: none; margin-top: 8px;" />
+            </div>
+            <div class="form-group">
+               <label for="phone">Số điện thoại:</label>
+               <input type="tel" id="phone" name="phone" required pattern="\\d{10,11}" />
+            </div>
+            <div class="form-group">
+               <label for="paymentMethod">Hình thức chi trả:</label>
+               <select id="paymentMethod" name="paymentMethod" required>
+                  <option value="cash">Tiền mặt</option>
+                  <option value="online">Trực tuyến</option>
+               </select>
+            </div>
+            <button type="submit" class="btn-xong">Đặt Hàng</button>
+         </form>
+      `;
+
       overlay.appendChild(popup);
       document.body.appendChild(overlay);
+
+      document.getElementById('name').value = userData.fullname || '';
+      document.getElementById('phone').value = userData.phone || '';
+
+      addressSelect.innerHTML = '';
+
+      const addresses = userData.address ? [userData.address] : [];
+      const placeholderOption = new Option('-- Chọn địa chỉ --', '', true, false);
+      addressSelect.appendChild(placeholderOption);
+
+      if (userData.address && !addresses.includes(userData.address)) {
+         addresses.unshift(userData.address);
+      }
+
+      for (const addr of addresses) {
+         const option = new Option(addr, addr, false, userData.address === addr);
+         addressSelect.appendChild(option);
+      }  
+
+      const addNewOption = new Option('+ Thêm địa chỉ mới...', 'new');
+      addressSelect.appendChild(addNewOption);
+      
    }
 
    document.querySelector('.btn-buy').addEventListener('click', function() {
@@ -502,24 +565,66 @@
 
    function submitCustomerInfo(event) {
       event.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const address = document.getElementById('address').value.trim();
-      const phone = document.getElementById('phone').value.trim();
 
-      if (!name || !address || !phone) {
-         alert('Vui lòng điền đầy đủ thông tin');
-         return;
+      const name = document.getElementById('name').value;
+      const phone = document.getElementById('phone').value;
+      const paymentMethod = document.getElementById('paymentMethod').value;
+
+      const addressSelect = document.getElementById('addressSelect');
+      let address = addressSelect.value;
+
+      if (address === 'new') {
+         const newAddress = document.getElementById('newAddressInput').value.trim();
+         if (newAddress) {
+            address = newAddress;
+
+            const exists = Array.from(addressSelect.options).some(opt => opt.value === newAddress);
+            if (!exists) {
+               const option = new Option(newAddress, newAddress, true, true);
+               addressSelect.insertBefore(option, addressSelect.lastElementChild); 
+            }
+
+            addressSelect.value = newAddress;
+            document.getElementById('newAddressInput').value = '';
+            document.getElementById('newAddressInput').style.display = 'none';
+         } else {
+            alert("Vui lòng nhập địa chỉ mới.");
+            return;
+         }
       }
 
-      console.log({
-         name,
-         address,
-         phone
-      });
+      console.log({ name, phone, address, paymentMethod });
 
-      alert('Thông tin đã được gửi!');
-      closePopup();
+      const activeVoucher = document.querySelector('.voucherItem.active');
+
+      let voucherId =null
+      if (activeVoucher) {
+         const classList = Array.from(activeVoucher.classList);
+         const voucherClass = classList.find(cls => cls.startsWith('voucher-'));
+         voucherId = voucherClass ? voucherClass.replace('voucher-', '') : null;
+      }
+      createOrder(voucherId)
+      .then(data => {
+         console.log('Đơn hàng đã tạo:', data);
+      })
+      .catch(error => {
+         console.error('Lỗi:', error.message);
+      });
    }
+
+
+   function handleAddressChange() {
+   const addressSelect = document.getElementById('addressSelect');
+   const newAddressInput = document.getElementById('newAddressInput');
+
+   if (addressSelect.value === 'new') {
+      newAddressInput.style.display = 'block';
+      newAddressInput.required = true;
+   } else {
+      newAddressInput.style.display = 'none';
+      newAddressInput.required = false;
+   }
+}
 </script>
 
 </html>

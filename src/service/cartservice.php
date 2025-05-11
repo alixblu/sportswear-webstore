@@ -67,4 +67,15 @@ class CartService {
             throw new Exception("Failed to add cart detail: " . $e->getMessage());
         }
     }
+    public function deleteCartByUserId()
+    {
+        try{
+            $userId = $this->userUtils->getUserId();
+            $cartID = $this->cartRepository->findCartIdByUserAccId($userId);
+            return $this->cartDetailService->deleteAllCartDetail($cartID);
+        } catch (Exception $e) {
+            throw new Exception("Failed to add cart detail: " . $e->getMessage());
+        }
+    }
+
 }
