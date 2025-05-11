@@ -26,7 +26,7 @@ class AnalyticsRepository {
                             'createdAt', o.createdAt,
                             'totalPrice', o.totalPrice,
                             'status', o.status
-                        )
+                        ) SEPARATOR '||'
                     ) as orders
                 FROM `order` o
                 JOIN user u ON o.customer = u.ID
@@ -44,7 +44,12 @@ class AnalyticsRepository {
             $result = $stmt->get_result();
             $customers = [];
             while ($row = $result->fetch_assoc()) {
-                $row['orders'] = array_map('json_decode', explode(',', $row['orders']));
+                // Tách các JSON object bằng '||' và decode
+                $ordersString = $row['orders'];
+                $ordersArray = $ordersString ? array_map('json_decode', explode('||', $ordersString)) : [];
+                $row['orders'] = array_filter($ordersArray, function($order) {
+                    return $order !== null && $order !== false;
+                });
                 $customers[] = $row;
             }
             $stmt->close();
@@ -54,7 +59,6 @@ class AnalyticsRepository {
             throw $e;
         }
     }
-
     public function getTotalRevenue($startDate, $endDate) {
         try {
             if (!$this->conn) {
