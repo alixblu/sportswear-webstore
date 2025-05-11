@@ -8,6 +8,20 @@ class AnalyticsService {
         $this->analyticsRepository = new AnalyticsRepository();
     }
 
+    public function getTopCustomers($startDate, $endDate, $limit = 5) {
+        try {
+            if (!$this->validateDateRange($startDate, $endDate)) {
+                throw new Exception("Invalid date range");
+            }
+            if (!is_numeric($limit) || $limit <= 0) {
+                throw new Exception("Limit must be a positive integer");
+            }
+            return $this->analyticsRepository->getTopCustomers($startDate, $endDate, $limit);
+        } catch (Exception $e) {
+            throw new Exception("Failed to fetch top customers: " . $e->getMessage());
+        }
+    }
+
     public function getTotalRevenue($startDate, $endDate) {
         try {
             if (!$this->validateDateRange($startDate, $endDate)) {
@@ -36,7 +50,7 @@ class AnalyticsService {
                 throw new Exception("Invalid date range");
             }
             if (!is_numeric($limit) || $limit <= 0) {
-                throw new Exception("Invalid limit");
+                throw new Exception("Limit must be a positive integer");
             }
             return $this->analyticsRepository->getTopProducts($startDate, $endDate, $limit);
         } catch (Exception $e) {
@@ -55,8 +69,21 @@ class AnalyticsService {
         }
     }
 
+    public function getActiveUsers($startDate, $endDate) {
+        try {
+            if (!$this->validateDateRange($startDate, $endDate)) {
+                throw new Exception("Invalid date range");
+            }
+            return $this->analyticsRepository->getActiveUsers($startDate, $endDate);
+        } catch (Exception $e) {
+            throw new Exception("Failed to fetch active users: " . $e->getMessage());
+        }
+    }
+
     private function validateDateRange($startDate, $endDate) {
-        return strtotime($startDate) && strtotime($endDate) && strtotime($startDate) <= strtotime($endDate);
+        $startTimestamp = strtotime($startDate);
+        $endTimestamp = strtotime($endDate);
+        return $startTimestamp && $endTimestamp && $startTimestamp <= $endTimestamp;
     }
 }
 ?>
