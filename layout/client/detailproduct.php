@@ -353,10 +353,10 @@
             document.querySelector(".description").innerText = product.description;
 
             const mainImg = document.querySelector(".mainImage img");
-            mainImg.src = `/img/products/${product.ID}.jpg`;
+            mainImg.src = `/sportswear-webstore/img/products/${product.ID}.jpg`;
             mainImg.alt = product.name;
             mainImg.onerror = function() {
-               this.src = '/img/products/default.jpg';
+               this.src = '/sportswear-webstore/img/products/default.jpg';
             };
 
             if (product.rating) {
@@ -582,6 +582,8 @@
          }
       }
    }
+   window.themVaoGio = themVaoGio;
+
 </script>
 
 </html>

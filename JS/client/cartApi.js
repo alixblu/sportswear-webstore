@@ -1,4 +1,4 @@
-const CART_API_URL = '../../src/router/cartRouter.php';
+const CART_API_URL = '/sportswear-webstore/src/router/cartRouter.php';
 
 const createCart = async (userId) => {
     const formData = new URLSearchParams();

@@ -521,4 +521,21 @@ class ProductRepository
             throw new Exception("Failed to get discount");
         }
     }
+
+    public function getProductById($id)
+    {
+        try {
+            $query = "SELECT * FROM product WHERE ID = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            return $result->fetch_assoc();
+        } catch (Exception $e) {
+            error_log("Error in getProductById: " . $e->getMessage());
+            throw new Exception("Failed to get product");
+        }
+    }
+
 }

@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="./css/profile.css">
 </head>
 
-<body>
+<body></body>
     <?php include './layout/header.php'; ?>
 
     <div class="page-container">

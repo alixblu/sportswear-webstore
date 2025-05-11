@@ -173,10 +173,10 @@
 
         <div class="pagination" id="pagination"></div>
     </div>
-    <script src="../../JS/client/cartApi.js"></script>
+    <script src="../../sportswear-webstore/JS/client/cartApi.js"></script>
 
     <script type="module">
-        import * as product_api from '../../JS/admin/product/api.js'
+        import * as product_api from '../../sportswear-webstore/JS/admin/product/api.js'
         //Product
         let currentPage = 1;
         const productsPerPage = 18;
@@ -230,10 +230,10 @@
                 const productImage = document.createElement('div');
                 productImage.classList.add('product-image');
                 const img = document.createElement('img');
-                img.src = `/img/products/${product.ID}.jpg`;
+                img.src = `/sportswear-webstore/img/products/${product.ID}.jpg`;
                 img.alt = product.name;
                 img.onerror = function() {
-                    this.src = '/img/products/default.jpg';
+                    this.src = '/sportswear-webstore/img/products/default.jpg';
                 };
                 productImage.appendChild(img);
 
@@ -274,7 +274,7 @@
                 });
 
                 const productLink = document.createElement('a');
-                productLink.href = `/layout/client/detailproduct.php?id=${product.ID}`;
+                productLink.href = `/sportswear-webstore/layout/client/detailproduct.php?id=${product.ID}`;
                 productLink.appendChild(productCard);
 
                 productCard.appendChild(productImage);

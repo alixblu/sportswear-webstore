@@ -243,7 +243,7 @@
                   <th>Quantity</th>
                   <th>Subtotal</th>
                   <th>
-                     <image src="/img/trash.svg" />
+                     <image src="/sportswear-webstore/img/trash.svg" />
                   </th>
                </tr>
             </thead>
@@ -254,7 +254,7 @@
       </div>
       <div class="containerLeft">
          <div class="couponCss">
-            <div class="section-title freeship-note"><img src="/img/coupon.svg" alt="">Khuyến Mãi</div>
+            <div class="section-title freeship-note"><img src="/sportswear-webstore/img/coupon.svg" alt="">Khuyến Mãi</div>
             <div class="voucher">
                <div class="voucherItem">
                   <span>Giảm 15% tối đa 70K</span>
@@ -323,7 +323,7 @@
                   subtotalCell.innerHTML = `${item.quantity * item.productPrice}`;
 
                   const deleteCell = document.createElement("td");
-                  deleteCell.innerHTML = `<img class="delete-icon" src="/img/trash.svg" alt="Xoá" onclick="deleteProduct(${item.detailID})">`;
+                  deleteCell.innerHTML = `<img class="delete-icon" src="/sportswear-webstore/img/trash.svg" alt="Xoá" onclick="deleteProduct(${item.detailID})">`;
 
                   row.appendChild(productCell);
                   row.appendChild(priceCell);
