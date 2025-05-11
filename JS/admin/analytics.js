@@ -84,7 +84,6 @@ async function fetchStats() {
     }
 }
 
-// Fetch and display top customers
 async function fetchTopCustomers() {
     const startDate = document.getElementById('customerStartDate').value || '2024-01-01';
     const endDate = document.getElementById('customerEndDate').value || '2024-12-31';
@@ -106,25 +105,34 @@ async function fetchTopCustomers() {
             }).slice(0, 5);
 
             const tbody = document.querySelector('#topCustomersTable tbody');
-            tbody.innerHTML = customers.map((customer, index) => `
-                <tr>
-                    <td><div class="customer-rank">${index + 1}</div></td>
-                    <td>${customer.fullname || 'N/A'}</td>
-                    <td>${customer.orders?.length || 0}</td>
-                    <td class="total-amount">$${customer.total_purchase?.toFixed(2) || '0.00'}</td>
-                    <td>${customer.orders?.[0]?.createdAt || 'N/A'}</td>
-                    <td><a href="#" class="view-link">View Orders</a></td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = customers.map((customer, index) => {
+                // Lấy ngày đơn hàng gần nhất từ orders
+                const lastOrderDate = customer.orders && customer.orders.length > 0
+                    ? customer.orders.reduce((latest, order) => 
+                        latest.createdAt > order.createdAt ? latest : order
+                    ).createdAt || 'N/A'
+                    : 'N/A';
+
+                return `
+                    <tr>
+                        <td><div class="customer-rank">${index + 1}</div></td>
+                        <td>${customer.fullname || 'N/A'}</td>
+                        <td>${customer.orders?.length || 0}</td>
+                        <td class="total-amount">$${parseFloat(customer.total_purchase || 0).toFixed(2)}</td>
+                        <td>${lastOrderDate}</td>
+                        <td><a href="#" class="view-link">View Orders</a></td>
+                    </tr>
+                `;
+            }).join('');
         } else {
             alert('Error fetching top customers: ' + data.data.error);
+            document.querySelector('#topCustomersTable tbody').innerHTML = '<tr><td colspan="6">Error: ' + data.data.error + '</td></tr>';
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error fetching top customers:', error);
         document.querySelector('#topCustomersTable tbody').innerHTML = '<tr><td colspan="6">Error loading data.</td></tr>';
     }
 }
-
 // Fetch and display top products
 async function fetchTopProducts() {
     const startDate = document.getElementById('productStartDate').value || '2024-01-01';
