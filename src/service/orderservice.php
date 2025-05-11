@@ -128,11 +128,13 @@ class OrderService
                 $totalPrice += $item['quantity'] * $item['productPrice'];
             }   
 
-            return $this->orderRepository->createOrder($userAccID, $couponId, $totalPrice);
-
+            $oder =  $this->orderRepository->createOrder($userAccID, $couponId, $totalPrice);
+            $this->cartService->deleteCartByUserId();
+            return $oder ;
         } catch (Exception $e) {
             throw new Exception("Failed to search orders: " . $e->getMessage());
         }
     }
+
 }
 ?>

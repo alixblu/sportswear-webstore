@@ -81,5 +81,34 @@ class CartDetailRepository {
             return false;
         }
     }
+
+    public function deleteAll($cartID)
+    {
+        try {
+            $stmt = $this->conn->prepare("DELETE FROM cartdetail WHERE cartID = ?");
+            
+            if (!$stmt) {
+                throw new Exception("Failed to prepare query: " . $this->conn->error);
+            }
+            
+            $stmt->bind_param("i", $cartID);
+            $stmt->execute();
+            
+            if ($stmt->affected_rows > 0) {
+                return true;
+            } else {
+                return false;
+            }
+            
+        } catch (Exception $e) {
+            error_log("Delete all cart details failed: " . $e->getMessage());
+            return false;
+        } finally {
+            if ($this->conn) {
+                $stmt->close();
+            }
+        }
+    }
+
 }
 ?>
