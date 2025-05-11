@@ -1,9 +1,9 @@
-const API_URL = '../../../src/router/orderrouter.php';
+const ORDER_API_URL = '../../../src/router/orderrouter.php';
 
 // Lấy tất cả đơn hàng
 const getAllOrders = async () => {
     try {
-        const response = await fetch(`${API_URL}?action=getAllOrders`, {
+        const response = await fetch(`${ORDER_API_URL}?action=getAllOrders`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
@@ -32,7 +32,7 @@ const searchOrders = async ({ orderID = '', status = '', fromDate = '', toDate =
     console.log('API Query:', query.toString()); // Debug
 
     try {
-        const response = await fetch(`${API_URL}?${query.toString()}`, {
+        const response = await fetch(`${ORDER_API_URL}?${query.toString()}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
@@ -55,7 +55,7 @@ const updateOrderStatus = async (ID, status) => {
     formData.append('ID', ID);
     formData.append('status', status);
 
-    const response = await fetch(API_URL, {
+    const response = await fetch(ORDER_API_URL, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -66,6 +66,29 @@ const updateOrderStatus = async (ID, status) => {
     if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Không thể cập nhật trạng thái đơn hàng');
+    }
+
+    return await response.json();
+};
+
+
+
+const createOrder = async (idCoupon) => {
+    const formData = new URLSearchParams();
+    formData.append('action', 'createOrders');
+    formData.append('idCoupon', idCoupon);
+
+    const response = await fetch(ORDER_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString(),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Không thể tạo đơn hàng');
     }
 
     return await response.json();

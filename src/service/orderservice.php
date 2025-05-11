@@ -1,13 +1,24 @@
 <?php
 require_once dirname(__FILE__) . '/../repository/orderrepository.php';
+require_once dirname(__FILE__) . '/../service/orderservice.php';
+require_once dirname(__FILE__) . '/../service/cartservice.php';
+require_once dirname(__FILE__) . '/../service/couponservice.php';
 
 class OrderService
 {
     private $orderRepository;
+    private $couponService;
+    private $cartService;
+    private $userUtils;
 
+    
     public function __construct()
     {
         $this->orderRepository = new OrderRepository();
+        $this->couponService = new CouponService();
+        $this->cartService = new CartService();
+        $this->userUtils = new UserUtils();
+
     }
 
     public function getAllOrders()
@@ -93,5 +104,37 @@ class OrderService
             throw new Exception("Failed to search orders: " . $e->getMessage());
         }
     }
+    public function createOrders($idCoupon)
+    {
+        try {
+            $userAccID = $this->userUtils->getUserId();
+
+            if ($idCoupon !== null && $idCoupon !== '' && strtolower($idCoupon) !== 'null') {
+                $coupon = $this->couponService->getCouponById($idCoupon);
+                //todo: check status coupon
+                if (!$coupon) {
+                    throw new Exception("coupon Error");
+                }
+                $couponId = $idCoupon;
+                $this->couponService->useCoupon($userAccID,$idCoupon);
+            } else {
+                $couponId = null;
+            }
+    
+            $carts = $this->cartService->getCartByUserId();
+            $totalPrice = 0.0;
+
+            foreach ($carts as $item) {
+                $totalPrice += $item['quantity'] * $item['productPrice'];
+            }   
+
+            $oder =  $this->orderRepository->createOrder($userAccID, $couponId, $totalPrice);
+            $this->cartService->deleteCartByUserId();
+            return $oder ;
+        } catch (Exception $e) {
+            throw new Exception("Failed to search orders: " . $e->getMessage());
+        }
+    }
+
 }
 ?>

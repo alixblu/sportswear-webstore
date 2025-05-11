@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../config/mysqli/mysqli.php';
-require_once  dirname(__FILE__) . '/../../src/config/exception/exceptionHandler.php';
+require_once dirname(__FILE__) . '/../../src/config/exception/exceptionHandler.php';
 
 class AccountRepository {
     private $conn;
@@ -69,12 +69,16 @@ class AccountRepository {
             throw $e;
         } finally {
             if ($stmt) $stmt->close();
-            if ($this->conn) $this->conn->close();
+            // Không đóng kết nối để tái sử dụng
         }
     }
 
     public function findAll() {
         try {
+            if (!$this->conn) {
+                throw new Exception("Kết nối cơ sở dữ liệu thất bại");
+            }
+
             $query = "SELECT 
                         ua.ID AS accountID,
                         ua.userID,
@@ -108,12 +112,17 @@ class AccountRepository {
             error_log("Lỗi lấy danh sách tài khoản: " . $e->getMessage());
             throw $e;
         } finally {
-            if ($this->conn) $this->conn->close();
+            // Không đóng kết nối để tái sử dụng
         }
     }
 
     public function findById($accountId) {
+        $stmt = null;
         try {
+            if (!$this->conn) {
+                throw new Exception("Kết nối cơ sở dữ liệu thất bại");
+            }
+
             $query = "SELECT 
                         ua.ID AS accountID,
                         ua.userID,
@@ -140,13 +149,20 @@ class AccountRepository {
             $stmt->execute();
             $result = $stmt->get_result();
             $account = $result->fetch_assoc();
-            $stmt->close();
+
+            if (!$account) {
+                error_log("Không tìm thấy tài khoản với ID: $accountId");
+                throw new Exception("Không tìm thấy tài khoản với ID: $accountId");
+            }
+
+            error_log("Account found: " . json_encode($account));
             return $account;
         } catch (Exception $e) {
             error_log("Lỗi tìm tài khoản theo ID: " . $e->getMessage());
             throw $e;
         } finally {
-            if ($this->conn) $this->conn->close();
+            if ($stmt) $stmt->close();
+            // Không đóng kết nối để tái sử dụng
         }
     }
 
@@ -197,7 +213,7 @@ class AccountRepository {
             throw $e;
         } finally {
             if ($stmt) $stmt->close();
-            if ($this->conn) $this->conn->close();
+            // Không đóng kết nối để tái sử dụng
         }
     }
 
@@ -254,12 +270,17 @@ class AccountRepository {
             throw $e;
         } finally {
             if ($stmt) $stmt->close();
-            if ($this->conn) $this->conn->close();
+            // Không đóng kết nối để tái sử dụng
         }
     }
 
     public function filterAccounts($filters) {
+        $stmt = null;
         try {
+            if (!$this->conn) {
+                throw new Exception("Kết nối cơ sở dữ liệu thất bại");
+            }
+
             $query = "SELECT 
                         ua.ID AS accountID,
                         ua.userID,
@@ -276,29 +297,28 @@ class AccountRepository {
                         r.name AS roleName
                       FROM useraccount ua
                       JOIN user u ON ua.userID = u.ID
-                      JOIN role r ON u.roleID = r.ID";
+                      JOIN role r ON u.roleID = r.ID
+                      WHERE 1=1";
+            
             $params = [];
             $types = '';
-            $conditions = [];
 
-            if (!empty($filters['status'])) {
-                $conditions[] = "ua.status = ?";
+            if ($filters['type'] === 'staff') {
+                $query .= " AND u.roleID != 5";
+            } elseif ($filters['type'] === 'customer') {
+                $query .= " AND u.roleID = 5";
+            }
+
+            if (!empty($filters['status']) && $filters['status'] !== 'all') {
+                $query .= " AND ua.status = ?";
                 $params[] = $filters['status'];
                 $types .= 's';
             }
-            if (!empty($filters['roleID'])) {
-                $conditions[] = "u.roleID = ?";
+
+            if (!empty($filters['roleID']) && $filters['roleID'] !== 'all') {
+                $query .= " AND u.roleID = ?";
                 $params[] = $filters['roleID'];
                 $types .= 'i';
-            }
-            if ($filters['type'] === 'staff') {
-                $conditions[] = "u.roleID != 5";
-            } elseif ($filters['type'] === 'customer') {
-                $conditions[] = "u.roleID = 5";
-            }
-
-            if ($conditions) {
-                $query .= ' WHERE ' . implode(' AND ', $conditions);
             }
 
             $query .= " ORDER BY ua.ID DESC";
@@ -306,92 +326,154 @@ class AccountRepository {
             if (!$stmt) {
                 throw new Exception("Không thể chuẩn bị truy vấn: " . $this->conn->error);
             }
-            if ($params) {
+
+            if (!empty($params)) {
                 $stmt->bind_param($types, ...$params);
             }
+
             $stmt->execute();
             $result = $stmt->get_result();
             $accounts = [];
             while ($row = $result->fetch_assoc()) {
                 $accounts[] = $row;
             }
-            $stmt->close();
             return $accounts;
         } catch (Exception $e) {
             error_log("Lỗi lọc tài khoản: " . $e->getMessage());
             throw $e;
         } finally {
-            if ($this->conn) $this->conn->close();
+            if ($stmt) $stmt->close();
+            // Không đóng kết nối để tái sử dụng
         }
     }
 
     public function getPermissions($roleId) {
+        $stmt = null;
         try {
-            $query = "SELECT moduleID FROM access WHERE roleid = ?";
+            if (!$this->conn) {
+                throw new Exception("Kết nối cơ sở dữ liệu thất bại");
+            }
+
+            $query = "SELECT moduleid FROM access WHERE roleid = ?";
             $stmt = $this->conn->prepare($query);
             if (!$stmt) {
-                throw new Exception("Không thể chuẩn bị truy vấn: " . $this->conn->error);
+                throw new Exception("Không thể chuẩn bị truy vấn permissions: " . $this->conn->error);
             }
             $stmt->bind_param('i', $roleId);
             $stmt->execute();
             $result = $stmt->get_result();
             $permissions = [];
             while ($row = $result->fetch_assoc()) {
-                $permissions[] = $row['moduleID'];
+                $permissions[] = (int)$row['moduleid'];
             }
-            $stmt->close();
             return $permissions;
         } catch (Exception $e) {
             error_log("Lỗi lấy quyền hạn: " . $e->getMessage());
             throw $e;
         } finally {
-            if ($this->conn) $this->conn->close();
+            if ($stmt) $stmt->close();
+            // Không đóng kết nối để tái sử dụng
         }
     }
 
     public function getAllModules() {
         try {
-            $query = "SELECT ID, name, icon FROM module ORDER BY ID";
-            $stmt = $this->conn->prepare($query);
-            if (!$stmt) {
-                throw new Exception("Không thể chuẩn bị truy vấn: " . $this->conn->error);
+            if (!$this->conn) {
+                throw new Exception("Kết nối cơ sở dữ liệu thất bại");
             }
-            $stmt->execute();
-            $result = $stmt->get_result();
+
+            $query = "SELECT id, name, icon, type, page FROM modules ORDER BY id";
+            $result = $this->conn->query($query);
+            if (!$result) {
+                throw new Exception("Truy vấn modules thất bại: " . $this->conn->error);
+            }
+
             $modules = [];
             while ($row = $result->fetch_assoc()) {
                 $modules[] = $row;
             }
-            $stmt->close();
+            $result->close();
             return $modules;
         } catch (Exception $e) {
-            error_log("Lỗi lấy danh sách module: " . $e->getMessage());
+            error_log("Lỗi lấy danh sách modules: " . $e->getMessage());
             throw $e;
         } finally {
-            if ($this->conn) $this->conn->close();
+            // Không đóng kết nối để tái sử dụng
         }
     }
 
     public function getAllRoles() {
         try {
-            $query = "SELECT ID, name, statusRole FROM role";
-            $stmt = $this->conn->prepare($query);
-            if (!$stmt) {
-                throw new Exception("Không thể chuẩn bị truy vấn: " . $this->conn->error);
+            if (!$this->conn) {
+                throw new Exception("Kết nối cơ sở dữ liệu thất bại");
             }
-            $stmt->execute();
-            $result = $stmt->get_result();
+
+            $query = "SELECT ID, name FROM role ORDER BY ID";
+            $result = $this->conn->query($query);
+            if (!$result) {
+                throw new Exception("Truy vấn roles thất bại: " . $this->conn->error);
+            }
+
             $roles = [];
             while ($row = $result->fetch_assoc()) {
                 $roles[] = $row;
             }
-            $stmt->close();
+            $result->close();
             return $roles;
         } catch (Exception $e) {
-            error_log("Lỗi lấy danh sách vai trò: " . $e->getMessage());
+            error_log("Lỗi lấy danh sách roles: " . $e->getMessage());
             throw $e;
         } finally {
-            if ($this->conn) $this->conn->close();
+            // Không đóng kết nối để tái sử dụng
+        }
+    }
+
+    public function updatePermissions($roleId, $moduleIds) {
+        $stmt = null;
+        try {
+            if (!$this->conn) {
+                throw new Exception("Kết nối cơ sở dữ liệu thất bại");
+            }
+
+            $this->conn->begin_transaction();
+
+            // Xóa tất cả quyền hiện tại của role
+            $deleteQuery = "DELETE FROM access WHERE roleid = ?";
+            $stmt = $this->conn->prepare($deleteQuery);
+            if (!$stmt) {
+                throw new Exception("Không thể chuẩn bị truy vấn xóa access: " . $this->conn->error);
+            }
+            $stmt->bind_param('i', $roleId);
+            if (!$stmt->execute()) {
+                throw new Exception("Xóa quyền hiện tại thất bại: " . $stmt->error);
+            }
+            $stmt->close();
+
+            // Thêm các quyền mới
+            if (!empty($moduleIds)) {
+                $insertQuery = "INSERT INTO access (roleid, moduleid) VALUES (?, ?)";
+                $stmt = $this->conn->prepare($insertQuery);
+                if (!$stmt) {
+                    throw new Exception("Không thể chuẩn bị truy vấn thêm access: " . $this->conn->error);
+                }
+                foreach ($moduleIds as $moduleId) {
+                    $stmt->bind_param('ii', $roleId, $moduleId);
+                    if (!$stmt->execute()) {
+                        throw new Exception("Thêm quyền mới thất bại: " . $stmt->error);
+                    }
+                }
+                $stmt->close();
+            }
+
+            $this->conn->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->conn->rollback();
+            error_log("Lỗi cập nhật quyền hạn: " . $e->getMessage());
+            throw $e;
+        } finally {
+            if ($stmt) $stmt->close();
+            // Không đóng kết nối để tái sử dụng
         }
     }
 }

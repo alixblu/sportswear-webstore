@@ -55,6 +55,7 @@ class CouponRepository {
         return $coupons;
     }
 
+    
     public function update($id, $name, $percent, $duration, $status) {
         try {
             $stmt = $this->conn->prepare("UPDATE coupon SET name = ?, percent = ?, duration = ?, status = ? WHERE ID = ?");
@@ -103,7 +104,6 @@ class CouponRepository {
             error_log("Find coupon by ID failed: " . $e->getMessage());
             return null;
         } finally {
-            if ($this->conn) $this->conn->close();
         }
     }
     public function getCouponByUserId($userID) {
@@ -112,7 +112,7 @@ class CouponRepository {
                 SELECT c.*, uc.assignedDate, uc.status AS userCouponStatus
                 FROM user_coupon uc
                 INNER JOIN coupon c ON uc.couponID = c.ID
-                WHERE uc.userID = ?
+                WHERE uc.userID = ? AND uc.status = 'valid'
                 ORDER BY uc.assignedDate DESC
             ");
     
@@ -139,6 +139,31 @@ class CouponRepository {
             if ($this->conn) $this->conn->close();
         }
     }
+
+    public function useCoupon($userAccID, $idCoupon)
+    {
+        $query = "UPDATE `user_coupon` 
+                SET `status` = 'used' 
+                WHERE `userID` = ? AND `couponID` = ? AND `status` = 'valid'";
+
+        $stmt = $this->conn->prepare($query);
+        if (!$stmt) {
+            return ['success' => false, 'message' => 'Lỗi chuẩn bị truy vấn: ' . $this->conn->error];
+        }
+
+        $stmt->bind_param("ii", $userAccID, $idCoupon);
+
+        if ($stmt->execute()) {
+            if ($stmt->affected_rows > 0) {
+                return ['success' => true, 'message' => 'Coupon đã được sử dụng'];
+            } else {
+                return ['success' => false, 'message' => 'Coupon không hợp lệ hoặc đã được sử dụng'];
+            }
+        } else {
+            return ['success' => false, 'message' => 'Lỗi khi cập nhật trạng thái coupon: ' . $stmt->error];
+        }
+    }
+
     
 }
 ?>
