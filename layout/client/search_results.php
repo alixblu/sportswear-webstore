@@ -1,6 +1,4 @@
-<?php
-session_start();
-?>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -137,30 +135,27 @@ session_start();
                         <div class="filter-group">
                             <label class="filter-label">Khoảng giá</label>
                             <div style="display: flex; gap: 10px;">
-                                <input type="number" class="filter-input" name="min_price" placeholder="Từ" value="<?= isset($initial_params['min_price']) ? $initial_params['min_price'] : '' ?>">
-                                <input type="number" class="filter-input" name="max_price" placeholder="Đến" value="<?= isset($initial_params['max_price']) ? $initial_params['max_price'] : '' ?>">
+                                <input type="number" class="filter-input" name="min_price" placeholder="Từ">
+                                <input type="number" class="filter-input" name="max_price" placeholder="Đến">
                             </div>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Trạng thái</label>
                             <select class="filter-select" name="status">
                                 <option value="">Tất cả trạng thái</option>
-                                <option value="in_stock" <?= isset($initial_params['status']) && $initial_params['status'] === 'in_stock' ? 'selected' : '' ?>>Còn hàng</option>
-                                <option value="out_of_stock" <?= isset($initial_params['status']) && $initial_params['status'] === 'out_of_stock' ? 'selected' : '' ?>>Hết hàng</option>
+                                <option value="in_stock">Còn hàng</option>
+                                <option value="out_of_stock">Hết hàng</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Sắp xếp theo</label>
                             <select class="filter-select" name="sort">
-                                <option value="newest" <?= isset($initial_params['sort']) && $initial_params['sort'] === 'newest' ? 'selected' : '' ?>>Mới nhất</option>
-                                <option value="price_asc" <?= isset($initial_params['sort']) && $initial_params['sort'] === 'price_asc' ? 'selected' : '' ?>>Giá: Thấp đến cao</option>
-                                <option value="price_desc" <?= isset($initial_params['sort']) && $initial_params['sort'] === 'price_desc' ? 'selected' : '' ?>>Giá: Cao đến thấp</option>
-                                <option value="rating_desc" <?= isset($initial_params['sort']) && $initial_params['sort'] === 'rating_desc' ? 'selected' : '' ?>>Đánh giá cao nhất</option>
+                                <option value="newest">Mới nhất</option>
+                                <option value="price_asc">Giá: Thấp đến cao</option>
+                                <option value="price_desc">Giá: Cao đến thấp</option>
+                                <option value="rating_desc">Đánh giá cao nhất</option>
                             </select>
                         </div>
-                        <?php if (!empty($initial_params['search'])): ?>
-                            <input type="hidden" name="search" value="<?= htmlspecialchars($initial_params['search']) ?>">
-                        <?php endif; ?>
                     </div>
                 </form>
             </div>
