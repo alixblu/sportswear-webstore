@@ -229,6 +229,18 @@
             flex-wrap: wrap;
         }
 
+        /* Container để căn giữa roleSelector */
+        .role-selector-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0; /* Khoảng cách trên dưới */
+        }
+
+        /* Đặt chiều rộng cố định cho roleSelector */
+        #roleSelector {
+            width: 200px; /* Chiều rộng cố định để căn giữa trông tự nhiên */
+        }
+
         .search-box {
             display: flex;
             align-items: center;
@@ -301,20 +313,20 @@
             padding-bottom: 30px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
         }
 
         .genderCss {
             display: flex;
             margin: 10px 0;
-            gap: 5px;
+            gap: 15px;
         }
 
         .inputUserCss {
             border: none;
             outline: none;
             color: #2d3748;
-            font-size: 17px;
+            font-size: 16px;
         }
 
         .wrapperInputCss {
@@ -323,11 +335,11 @@
             background: rgba(255, 255, 255, 0.1);
             transition: border-bottom 0.3s ease;
             border-bottom: 1px solid silver;
-            padding: 5px 3px;
+            padding: 8px 3px;
         }
 
         .wrapperInputCss:focus-within {
-            border-bottom: 1px solid #00e5ff;
+            border-bottom: 1px solid var(--primary);
         }
 
         .selectUser {
@@ -336,6 +348,16 @@
             border: 1px solid #d1d1d1;
             border-radius: 6px;
             outline: none;
+            font-size: 14px;
+            color: #2d3748;
+            background-color: #fff;
+            transition: var(--transition);
+        }
+
+        .selectUser:disabled {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
         .buttonUserCss {
@@ -347,6 +369,8 @@
             border-radius: 6px;
             cursor: pointer;
             margin-top: 15px;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .buttonUserCss:hover {
@@ -357,6 +381,7 @@
         .wrapperButton {
             display: flex;
             gap: 10px;
+            justify-content: center;
         }
 
         .genderCss input[type="radio"] {
@@ -366,6 +391,8 @@
         .infoCss {
             margin-bottom: 15px;
             font-weight: bold;
+            font-size: 18px;
+            color: var(--dark);
         }
 
         .deleteUserCss {
@@ -394,35 +421,70 @@
 
         .wrapperFilterCss {
             background-color: white;
-            max-width: 500px;
+            max-width: 400px;
+            margin: 0 auto;
             border-radius: 10px;
             font-family: 'Poppins', sans-serif;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+        }
+
+        .wrapperFilterCss .wrapperCss {
+            gap: 20px;
+        }
+
+        .wrapperFilterCss label {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .wrapperFilterCss .selectUser {
+            border-color: #d1d1d1;
             padding: 10px;
         }
 
-        .permission-group {
-            margin: 15px 0;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: var(--border-radius);
+        .wrapperFilterCss .wrapperButton {
+            margin-top: 10px;
         }
 
-        .permission-group-title {
-            font-weight: 600;
-            margin-bottom: 10px;
+        .permissions-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
             color: var(--dark);
         }
 
-        .permission-checkboxes {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
+        .permission-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--primary);
         }
 
-        .permission-option {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .permission-item input[type="checkbox"]:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .permission-item label {
+            cursor: pointer;
+            font-weight: 500;
         }
 
         #toast-portal {
@@ -508,6 +570,28 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            .permissions-list {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .wrapperFilterCss {
+                max-width: 90%;
+            }
+
+            .formUserCss {
+                max-width: 90%;
+            }
+
+            .role-selector-container {
+                margin: 15px 0;
+            }
+
+            #roleSelector {
+                width: 100%; /* Đảm bảo combobox chiếm toàn bộ chiều rộng trên mobile */
+                max-width: 200px; /* Giới hạn chiều rộng tối đa */
+            }
         }
 
         @media (max-width: 576px) {
@@ -525,6 +609,14 @@
             .genderCss {
                 flex-direction: column;
                 gap: 10px;
+            }
+
+            .permission-item {
+                font-size: 13px;
+            }
+
+            .wrapperFilterCss {
+                padding: 15px;
             }
         }
     </style>
@@ -626,13 +718,13 @@
                 <div class="table-card">
                     <div class="card-title">
                         <h3><i class="fa-solid fa-user-shield"></i> Quản lý phân quyền</h3>
-                        <div class="wrapperFilter">
-                            <select class="selectUser" id="roleSelector" onchange="loadPermissions()">
-                                <!-- Roles will be populated by JavaScript -->
-                            </select>
-                        </div>
                     </div>
-                    <div id="permissions-content">
+                    <div class="role-selector-container">
+                        <select class="selectUser" id="roleSelector" onchange="loadPermissions()">
+                            <!-- Roles will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div id="permissions-content" class="permissions-list">
                         <!-- Permissions will be populated by JavaScript -->
                     </div>
                     <div class="wrapperButton">

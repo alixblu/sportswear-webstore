@@ -226,32 +226,20 @@ async function add() {
         showAll();
     } catch (error) {
         showToast(error.message || 'Lỗi khi thêm tài khoản', 'error');
+        closeModal(); // Đóng modal ngay cả khi có lỗi
     }
 }
 
 async function showFormEdit(button, id, type) {
     try {
-        console.log(`Fetching account with ID: ${id}, Type: ${type}`);
         const [{ data: account }, { data: roles }] = await Promise.all([
             AccountService.getAccountById(id),
             AccountService.getAllRoles()
         ]);
 
-        // Kiểm tra dữ liệu trả về
-        if (!account) {
-            throw new Error('Không tìm thấy tài khoản');
-        }
-        console.log('Account:', account);
-        console.log('Roles:', roles);
-
         const isStaff = type === 'staff';
         const isAdmin = isStaff && account.roleName === 'Admin';
         
-        // Định dạng dateOfBirth nếu cần
-        const formattedDateOfBirth = account.dateOfBirth 
-            ? new Date(account.dateOfBirth).toISOString().split('T')[0] 
-            : '';
-
         const portalRoot = document.createElement('div');
         portalRoot.id = 'portal-root';
         portalRoot.innerHTML = `
@@ -262,7 +250,7 @@ async function showFormEdit(button, id, type) {
                     
                     <label for="username">Tên đăng nhập</label>
                     <div class="wrapperInputCss">
-                        <input class="inputUserCss" type="text" id="username" value="${account.username || ''}" readonly>
+                        <input class="inputUserCss" type="text" id="username" value="${account.username}" readonly>
                     </div>
                     
                     <label for="new-password">Mật khẩu mới (để trống nếu không đổi)</label>
@@ -273,12 +261,12 @@ async function showFormEdit(button, id, type) {
                     
                     <label for="fullname">Họ và tên</label>
                     <div class="wrapperInputCss">
-                        <input class="inputUserCss" type="text" id="fullname" value="${account.fullname || ''}">
+                        <input class="inputUserCss" type="text" id="fullname" value="${account.fullname}">
                     </div>
                     
                     <label for="phone">Số điện thoại</label>
                     <div class="wrapperInputCss">
-                        <input class="inputUserCss" type="tel" id="phone" value="${account.phone || ''}">
+                        <input class="inputUserCss" type="tel" id="phone" value="${account.phone}">
                     </div>
                     
                     ${isStaff && !isAdmin ? `
@@ -286,7 +274,7 @@ async function showFormEdit(button, id, type) {
                     <div class="wrapperInputCss">
                         <select class="selectUser" id="roleId">
                             ${roles.filter(role => role.ID != 5).map(role => `
-                                <option value="${role.ID}" ${role.ID == (account.roleID || '') ? 'selected' : ''}>${role.name}</option>
+                                <option value="${role.ID}" ${role.ID == account.roleID ? 'selected' : ''}>${role.name}</option>
                             `).join('')}
                         </select>
                     </div>
@@ -323,7 +311,7 @@ async function showFormEdit(button, id, type) {
                     
                     <label for="dateOfBirth">Ngày sinh</label>
                     <div class="wrapperInputCss">
-                        <input class="inputUserCss" type="date" id="dateOfBirth" value="${formattedDateOfBirth}">
+                        <input class="inputUserCss" type="date" id="dateOfBirth" value="${account.dateOfBirth || ''}">
                     </div>
                     
                     <div class="wrapperButton">
@@ -336,8 +324,8 @@ async function showFormEdit(button, id, type) {
         `;
         document.body.appendChild(portalRoot);
     } catch (error) {
-        console.error('Error in showFormEdit:', error);
         showToast(error.message || 'Lỗi khi lấy thông tin tài khoản', 'error');
+        closeModal(); // Đóng modal ngay cả khi có lỗi
     }
 }
 
@@ -368,10 +356,11 @@ async function edit(id, isAdmin) {
     try {
         await AccountService.updateAccount(accountData);
         showToast('Cập nhật tài khoản thành công', 'success');
-        closeModal();
+        closeModal(); // Đóng modal sau khi lưu thành công
         showAll();
     } catch (error) {
         showToast(error.message || 'Lỗi khi cập nhật tài khoản', 'error');
+        closeModal(); // Đóng modal ngay cả khi có lỗi
     }
 }
 
@@ -408,7 +397,14 @@ async function showFormFilter(type) {
                             `).join('')}
                         </select>
                     </div>
-                    ` : ''}
+                    ` : `
+                    <label for="filter-role">Vai trò</label>
+                    <div class="wrapperInputCss">
+                        <select class="selectUser" id="filter-role" disabled>
+                            <option value="5">Khách hàng</option>
+                        </select>
+                    </div>
+                    `}
                     
                     <div class="wrapperButton">
                         <button class="buttonUserCss" onclick="applyFilter('${type}')">
@@ -421,20 +417,22 @@ async function showFormFilter(type) {
         document.body.appendChild(portalRoot);
     } catch (error) {
         showToast(error.message || 'Lỗi khi lấy danh sách vai trò', 'error');
+        closeModal(); // Đóng modal ngay cả khi có lỗi
     }
 }
 
 async function applyFilter(type) {
     const filters = {
         status: document.getElementById('filter-status').value,
+        roleID: document.getElementById('filter-role').value,
         type: type === 'staff' ? 'staff' : 'customer'
     };
 
-    if (type === 'staff') {
-        const roleValue = document.getElementById('filter-role').value;
-        if (roleValue !== 'all') {
-            filters.roleID = roleValue;
-        }
+    if (filters.status === 'all') {
+        delete filters.status;
+    }
+    if (filters.roleID === 'all') {
+        delete filters.roleID;
     }
 
     try {
@@ -456,7 +454,7 @@ async function applyFilter(type) {
 
             if (type === 'staff') {
                 tr.innerHTML = `
-                    <td>${account.username}</ Lakeside
+                    <td>${account.username}</td>
                     <td>${account.fullname}</td>
                     <td>${account.phone}</td>
                     <td>${account.roleName}</td>
@@ -485,9 +483,10 @@ async function applyFilter(type) {
             tbody.appendChild(tr);
         });
         
-        closeModal();
+        closeModal(); // Đóng modal sau khi áp dụng bộ lọc thành công
     } catch (error) {
         showToast(error.message || 'Lỗi khi lọc tài khoản', 'error');
+        closeModal(); // Đóng modal ngay cả khi có lỗi
     }
 }
 
@@ -501,11 +500,8 @@ async function loadRolesForPermissions() {
             .map(role => `<option value="${role.ID}">${role.name}</option>`)
             .join('');
         
-        // Chỉ gọi loadPermissions sau khi roleSelector có giá trị
         if (roleSelector.options.length > 0) {
             loadPermissions();
-        } else {
-            showToast('Không có vai trò nào để phân quyền', 'error');
         }
     } catch (error) {
         showToast(error.message || 'Lỗi khi tải danh sách vai trò', 'error');
@@ -526,28 +522,25 @@ async function loadPermissions() {
             AccountService.getAllModules()
         ]);
 
-        const isAdmin = roleId == 1; // Giả định roleID 1 là Admin
-        if (isAdmin) {
-            document.getElementById('permissions-content').innerHTML = `
-                <div style="color: #f44336; margin: 10px 0;">
-                    Tài khoản Admin có đầy đủ quyền hạn và không thể chỉnh sửa.
-                </div>
-            `;
-            return;
-        }
+        console.log('Permissions:', permissions);
+        console.log('Modules:', modules);
 
-        const permissionHTML = modules.map(module => `
-            <div class="permission-group">
-                <div class="permission-group-title">${module.name}</div>
-                <div class="permission-checkboxes">
-                    <div class="permission-option">
-                        <input type="checkbox" id="perm-${module.id}" 
-                               ${permissions.includes(module.id) ? 'checked' : ''}>
-                        <label for="perm-${module.id}">Truy cập</label>
-                    </div>
+        const isAdmin = roleId == 1;
+        const permissionHTML = `
+            <div style="font-weight: 600; margin-bottom: 10px;">Modules được phép truy cập:</div>
+            ${modules.map(module => `
+                <div class="permission-item">
+                    <label for="perm-${module.id}">${module.name}</label>
+                    <input type="checkbox" id="perm-${module.id}" 
+                           ${isAdmin ? 'checked disabled' : (permissions.includes(Number(module.id)) ? 'checked' : '')}>
                 </div>
-            </div>
-        `).join('');
+            `).join('')}
+            ${isAdmin ? `
+                <div style="color: #f44336; margin-top: 10px;">
+                    Quyền hạn của Admin được thiết lập cố định và không thể chỉnh sửa.
+                </div>
+            ` : ''}
+        `;
 
         document.getElementById('permissions-content').innerHTML = permissionHTML;
     } catch (error) {
@@ -568,6 +561,8 @@ async function savePermissions() {
             const moduleId = parseInt(checkbox.id.replace('perm-', ''));
             moduleIds.push(moduleId);
         });
+
+        console.log('Saving permissions for roleId:', roleId, 'with moduleIds:', moduleIds);
 
         await AccountService.updatePermissions(roleId, moduleIds);
         showToast('Cập nhật quyền hạn thành công', 'success');
@@ -663,6 +658,7 @@ document.getElementById("addBtn").onclick = async () => {
         document.body.appendChild(portalRoot);
     } catch (error) {
         showToast(error.message || 'Lỗi khi lấy danh sách vai trò', 'error');
+        closeModal(); // Đóng modal ngay cả khi có lỗi
     }
 };
 
