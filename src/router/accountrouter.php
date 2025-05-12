@@ -96,6 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $controller->updatePermissions($data['roleId'], $data['moduleIds']);
                 break;
+            
+            case 'updatePassword':
+                $currentPassword = $data['passwordOld'] ?? '';
+                $newPassword = $data['newPassword'] ?? '';
+                $authController->updatePassword($currentPassword, $newPassword);
+                break;
 
             default:
                 echo json_encode(['status' => 400, 'message' => 'Hành động POST không hợp lệ']);
@@ -106,27 +112,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    if (isset($data['action']) && $data['action'] === 'updateAccount') {
-        if (!isset($data['accountId'], $data['username'], $data['fullname'], $data['phone'], $data['roleId'], $data['status'])) {
-            echo json_encode(['status' => 400, 'message' => 'Thiếu các trường bắt buộc']);
-            exit;
+    $input = json_decode(file_get_contents('php://input'), true);
+
+    if (isset($input['action'])) {
+        switch ($input['action']) {
+            case 'updateAccount':
+                $accountId = $input['accountId'] ?? null;
+                $username = $input['username'] ?? '';
+                $password = $input['password'] ?? '';
+                $fullname = $input['fullname'] ?? '';
+                $phone = $input['phone'] ?? '';
+                $roleId = $input['roleId'] ?? '';
+                $status = $input['status'] ?? '';
+                $email = $input['email'] ?? null;
+                $address = $input['address'] ?? null;
+                $gender = $input['gender'] ?? null;
+                $dateOfBirth = $input['dateOfBirth'] ?? null;
+
+                if ($accountId !== null) {
+                    $controller->updateAccount($accountId, $username, $password, $fullname, $phone, $roleId, $status, $email, $address, $gender, $dateOfBirth);
+                } else {
+                    echo json_encode(['status' => 400, 'message' => 'Thiếu accountId'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
+
+            case 'updateUserLogin':
+                $name = $input['name'] ?? '';
+                $address = $input['address'] ?? '';
+                $birth = $input['birth'] ?? '';
+                $phone = $input['phone'] ?? '';
+                $gender = $input['gender'] ?? '';
+    
+                $authController->updateUserLogin($name, $address, $birth,$phone,$gender);
+                break;
+
+            default:
+                echo json_encode(['status' => 400, 'message' => 'Hành động không hợp lệ'], JSON_UNESCAPED_UNICODE);
         }
-        $controller->updateAccount(
-            $data['accountId'],
-            $data['username'],
-            $data['password'] ?? null,
-            $data['fullname'],
-            $data['phone'],
-            $data['roleId'],
-            $data['status'],
-            $data['email'] ?? null,
-            $data['address'] ?? null,
-            $data['gender'] ?? null,
-            $data['dateOfBirth'] ?? null
-        );
     } else {
-        echo json_encode(['status' => 400, 'message' => 'Hành động PUT không hợp lệ']);
+        echo json_encode(['status' => 400, 'message' => 'Yêu cầu PUT không hợp lệ'], JSON_UNESCAPED_UNICODE);
     }
 }
 
