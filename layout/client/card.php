@@ -94,7 +94,7 @@
                   const productCell = document.createElement("td");
                   productCell.innerHTML = `
                         <div class="product-info">
-                           <img src="/sportswear-webstore/img/products/${item.productID}.jpg" alt="${item.productName}">
+                           <img src="/sportswear-webstore/img/products/${item.ID}.jpg" alt="${item.productName}">
                            <span>${item.productName}</span>
                         </div>
                      `;
