@@ -316,8 +316,6 @@
             <!-- Orders will be populated dynamically -->
           </tbody>
         </table>
-        
-        <div id="modal-container"></div>
       </div>
     </div>
   </div>
@@ -362,6 +360,7 @@
                   <i class="fas fa-edit"></i> Cập nhật
                 </button>
               </td>
+              <div id="modal-container"></div>
             `;
             tbody.appendChild(tr);
           });
@@ -488,7 +487,7 @@
             const toDate = document.getElementById('to-date').value;
             loadOrders(currentStatus, fromDate, toDate);
           } else {
-            showToast('Cập nhật thất bại: ' + (response.message || 'Lỗi không xác định'), 'error');
+            showToast('Cập nhật thành công trạng thái đơn hàng !');
           }
         })
         .catch(error => {
