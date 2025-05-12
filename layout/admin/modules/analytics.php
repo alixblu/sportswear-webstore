@@ -197,13 +197,65 @@
         }
 
         .chart-placeholder {
-            height: 300px;
-            background: #f8fafc;
+            height: 150px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%);
             border-radius: var(--border-radius);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             color: var(--gray);
+            font-size: 16px;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .chart-placeholder:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .chart-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+            opacity: 0.8;
+        }
+
+        .chart-placeholder p {
+            margin: 10px 0;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            color: var(--dark);
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .chart-placeholder i {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        #revenueChart {
+            background: linear-gradient(135deg, #e6f0fa 0%, #d0e3f5 100%);
+        }
+
+        #orderStatsChart {
+            background: linear-gradient(135deg, #e9f7ef 0%, #d1f0e0 100%);
+        }
+
+        #userStats {
+            background: linear-gradient(135deg, #f3e9fa 0%, #e3d3f2 100%);
         }
 
         .customer-stats {
@@ -424,6 +476,19 @@
                 width: 90%;
                 margin: 10% auto;
             }
+
+            .chart-placeholder {
+                height: 120px;
+                font-size: 14px;
+            }
+
+            .chart-placeholder p {
+                font-size: 16px;
+            }
+
+            .chart-placeholder i {
+                font-size: 20px;
+            }
         }
     </style>    
 </head>
@@ -547,7 +612,8 @@
                 </div>
             </div>
             <div class="chart-placeholder" id="revenueChart">
-                Biểu đồ doanh thu sẽ được hiển thị tại đây
+                <i class="fas fa-dollar-sign"></i>
+                <p>Biểu đồ doanh thu sẽ được hiển thị tại đây</p>
             </div>
         </div>
 
@@ -566,7 +632,8 @@
                 </div>
             </div>
             <div class="chart-placeholder" id="orderStatsChart">
-                Biểu đồ thống kê đơn hàng sẽ được hiển thị tại đây
+                <i class="fas fa-shopping-cart"></i>
+                <p>Biểu đồ thống kê đơn hàng sẽ được hiển thị tại đây</p>
             </div>
         </div>
 
@@ -585,7 +652,8 @@
                 </div>
             </div>
             <div class="chart-placeholder" id="userStats">
-                Thống kê người dùng sẽ được hiển thị tại đây
+                <i class="fas fa-users"></i>
+                <p>Thống kê người dùng sẽ được hiển thị tại đây</p>
             </div>
         </div>
 
