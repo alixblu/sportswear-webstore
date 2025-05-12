@@ -4,7 +4,7 @@ const ANALYTICS_API_URL = '../../src/router/AnalyticsRouter.php';
 async function fetchStats() {
     try {
         const defaultStartDate = '2024-01-01';
-        const defaultEndDate = '2024-12-31';
+        const defaultEndDate = new Date().toISOString().split('T')[0];
         const [revenueResponse, orderStatsResponse, activeUsersResponse] = await Promise.all([
             fetch(`${ANALYTICS_API_URL}?action=getTotalRevenue&startDate=${defaultStartDate}&endDate=${defaultEndDate}`),
             fetch(`${ANALYTICS_API_URL}?action=getOrderStats&startDate=${defaultStartDate}&endDate=${defaultEndDate}`),
@@ -86,7 +86,7 @@ async function fetchStats() {
 
 async function fetchTopCustomers() {
     const startDate = document.getElementById('customerStartDate').value || '2024-01-01';
-    const endDate = document.getElementById('customerEndDate').value || '2024-12-31';
+    const endDate = document.getElementById('customerEndDate').value || new Date().toISOString().split('T')[0];
     const sortBtn = document.querySelector('.sort-btn.active');
     const sort = sortBtn ? sortBtn.getAttribute('data-sort') : 'desc';
 
@@ -106,7 +106,6 @@ async function fetchTopCustomers() {
 
             const tbody = document.querySelector('#topCustomersTable tbody');
             tbody.innerHTML = customers.map((customer, index) => {
-                // Lấy ngày đơn hàng gần nhất từ orders
                 const lastOrderDate = customer.orders && customer.orders.length > 0
                     ? customer.orders.reduce((latest, order) => 
                         latest.createdAt > order.createdAt ? latest : order
@@ -120,7 +119,7 @@ async function fetchTopCustomers() {
                         <td>${customer.orders?.length || 0}</td>
                         <td class="total-amount">$${parseFloat(customer.total_purchase || 0).toFixed(2)}</td>
                         <td>${lastOrderDate}</td>
-                        <td><a href="#" class="view-link">View Orders</a></td>
+                        <td><a href="#" class="view-link" onclick="showCustomerOrders('${encodeURIComponent(customer.userID)}', '${encodeURIComponent(startDate)}', '${encodeURIComponent(endDate)}'); return false;">View Orders</a></td>
                     </tr>
                 `;
             }).join('');
@@ -133,10 +132,10 @@ async function fetchTopCustomers() {
         document.querySelector('#topCustomersTable tbody').innerHTML = '<tr><td colspan="6">Error loading data.</td></tr>';
     }
 }
-// Fetch and display top products
+
 async function fetchTopProducts() {
     const startDate = document.getElementById('productStartDate').value || '2024-01-01';
-    const endDate = document.getElementById('productEndDate').value || '2024-12-31';
+    const endDate = document.getElementById('productEndDate').value || new Date().toISOString().split('T')[0];
     const sortBtn = document.querySelector('.sort-btn.active');
     const sort = sortBtn ? sortBtn.getAttribute('data-sort') : 'desc';
 
@@ -155,18 +154,21 @@ async function fetchTopProducts() {
             }).slice(0, 5);
 
             const tbody = document.querySelector('#topProductsTable tbody');
-            tbody.innerHTML = products.map((product, index) => `
-                <tr>
-                    <td><div class="customer-rank">${index + 1}</div></td>
-                    <td>${product.name || 'N/A'}</td>
-                    <td>${product.category || 'N/A'}</td>
-                    <td>${product.total_quantity || 0}</td>
-                    <td class="total-amount">$${parseFloat(product.total_revenue || 0).toFixed(2)}</td>
-                    <td><a href="#" class="view-link">View Details</a></td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = products.map((product, index) => {
+                return `
+                    <tr>
+                        <td><div class="customer-rank">${index + 1}</div></td>
+                        <td>${product.name || 'N/A'}</td>
+                        <td>${product.category || 'N/A'}</td>
+                        <td>${product.total_quantity || 0}</td>
+                        <td class="total-amount">$${parseFloat(product.total_revenue || 0).toFixed(2)}</td>
+                        <td><a href="#" class="view-link" onclick="showProductDetails('${encodeURIComponent(product.productID)}', '${encodeURIComponent(startDate)}', '${encodeURIComponent(endDate)}'); return false;">View Details</a></td>
+                    </tr>
+                `;
+            }).join('');
         } else {
             alert('Error fetching top products: ' + data.data.error);
+            document.querySelector('#topProductsTable tbody').innerHTML = '<tr><td colspan="6">Error: ' + data.data.error + '</td></tr>';
         }
     } catch (error) {
         console.error('Error:', error);
@@ -174,10 +176,9 @@ async function fetchTopProducts() {
     }
 }
 
-// Fetch and display revenue chart
 async function fetchRevenue() {
     const startDate = document.getElementById('revenueStartDate').value || '2024-01-01';
-    const endDate = document.getElementById('revenueEndDate').value || '2024-12-31';
+    const endDate = document.getElementById('revenueEndDate').value || new Date().toISOString().split('T')[0];
     const period = document.querySelector('.chart-filter.active')?.getAttribute('data-period') || 'daily';
 
     if (!startDate || !endDate) {
@@ -202,10 +203,9 @@ async function fetchRevenue() {
     }
 }
 
-// Fetch and display order stats chart
 async function fetchOrderStats() {
     const startDate = document.getElementById('orderStartDate').value || '2024-01-01';
-    const endDate = document.getElementById('orderEndDate').value || '2024-12-31';
+    const endDate = document.getElementById('orderEndDate').value || new Date().toISOString().split('T')[0];
     const period = document.querySelector('.chart-filter.active')?.getAttribute('data-period') || 'daily';
 
     if (!startDate || !endDate) {
@@ -231,10 +231,9 @@ async function fetchOrderStats() {
     }
 }
 
-// Fetch and display active users
 async function fetchActiveUsers() {
     const startDate = document.getElementById('userStartDate').value || '2024-01-01';
-    const endDate = document.getElementById('userEndDate').value || '2024-12-31';
+    const endDate = document.getElementById('userEndDate').value || new Date().toISOString().split('T')[0];
 
     if (!startDate || !endDate) {
         alert('Please select both start and end dates.');
@@ -258,12 +257,109 @@ async function fetchActiveUsers() {
     }
 }
 
-// Event listeners for filter buttons
+// New function to show customer orders in modal
+async function showCustomerOrders(userID, startDate, endDate) {
+    try {
+        const response = await fetch(`${ANALYTICS_API_URL}?action=getCustomerOrderDetails&userID=${userID}&startDate=${startDate}&endDate=${endDate}`);
+        const data = await response.json();
+
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        modalTitle.textContent = 'Customer Order Details';
+
+        if (data.status === 200 && data.data.length > 0) {
+            modalContent.innerHTML = `
+                <table class="modal-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.data.map(order => `
+                            <tr>
+                                <td>${order.orderID || 'N/A'}</td>
+                                <td>${order.product_name || 'N/A'}</td>
+                                <td>${order.quantity || 0}</td>
+                                <td>$${parseFloat(order.price || 0).toFixed(2)}</td>
+                                <td>$${parseFloat((order.quantity * order.price) || 0).toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else {
+            modalContent.innerHTML = '<p>No order details available.</p>';
+        }
+
+        document.getElementById('detailsModal').style.display = 'block';
+    } catch (error) {
+        console.error('Error fetching customer orders:', error);
+        document.getElementById('modalContent').innerHTML = '<p>Error loading order details.</p>';
+        document.getElementById('detailsModal').style.display = 'block';
+    }
+}
+
+// New function to show product details in modal
+async function showProductDetails(productID, startDate, endDate) {
+    try {
+        const response = await fetch(`${ANALYTICS_API_URL}?action=getProductOrderDetails&productID=${productID}&startDate=${startDate}&endDate=${endDate}`);
+        const data = await response.json();
+
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        modalTitle.textContent = 'Product Order Details';
+
+        if (data.status === 200 && data.data.length > 0) {
+            modalContent.innerHTML = `
+                <table class="modal-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.data.map(order => `
+                            <tr>
+                                <td>${order.orderID || 'N/A'}</td>
+                                <td>${order.product_name || 'N/A'}</td>
+                                <td>${order.quantity || 0}</td>
+                                <td>$${parseFloat(order.price || 0).toFixed(2)}</td>
+                                <td>$${parseFloat((order.quantity * order.price) || 0).toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else {
+            modalContent.innerHTML = '<p>No order details available.</p>';
+        }
+
+        document.getElementById('detailsModal').style.display = 'block';
+    } catch (error) {
+        console.error('Error fetching product details:', error);
+        document.getElementById('modalContent').innerHTML = '<p>Error loading order details.</p>';
+        document.getElementById('detailsModal').style.display = 'block';
+    }
+}
+
+// Close modal
+function closeModal() {
+    document.getElementById('detailsModal').style.display = 'none';
+}
+
 document.querySelectorAll('.sort-btn').forEach(button => {
     button.addEventListener('click', function() {
         document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
         this.classList.add('active');
-        // Trigger fetch based on context (e.g., customers or products)
         const section = this.closest('.customer-stats')?.querySelector('.chart-title')?.textContent;
         if (section === 'Top 5 Customers by Purchase Amount') fetchTopCustomers();
         if (section === 'Most Bought Products') fetchTopProducts();
@@ -274,14 +370,12 @@ document.querySelectorAll('.chart-filter').forEach(filter => {
     filter.addEventListener('click', function() {
         this.parentElement.querySelectorAll('.chart-filter').forEach(f => f.classList.remove('active'));
         this.classList.add('active');
-        // Trigger fetch based on context
         const container = this.closest('.chart-container')?.querySelector('.chart-title')?.textContent;
         if (container === 'Revenue Overview') fetchRevenue();
         if (container === 'Order Statistics') fetchOrderStats();
     });
 });
 
-// Initial load with default dates
 document.addEventListener('DOMContentLoaded', () => {
     const defaultDate = new Date().toISOString().split('T')[0];
     document.getElementById('customerStartDate').value = '2024-01-01';
@@ -301,4 +395,11 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchRevenue();
     fetchOrderStats();
     fetchActiveUsers();
+
+    // Add event listener to close modal when clicking outside
+    document.getElementById('detailsModal').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeModal();
+        }
+    });
 });

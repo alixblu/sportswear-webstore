@@ -213,6 +213,81 @@ class AnalyticsRepository {
         }
     }
 
+    public function getCustomerOrderDetails($userID, $startDate, $endDate) {
+        try {
+            if (!$this->conn) {
+                throw new Exception("Database connection failed");
+            }
+            $stmt = $this->conn->prepare("
+                SELECT 
+                    od.orderID,
+                    od.quantity,
+                    pv.price,
+                    p.name as product_name
+                FROM orderdetail od
+                JOIN productvariant pv ON od.productID = pv.ID
+                JOIN product p ON pv.productID = p.ID
+                JOIN `order` o ON od.orderID = o.ID
+                WHERE o.customer = ?
+                AND o.createdAt BETWEEN ? AND ?
+                AND o.status = 'delivered'
+            ");
+            if (!$stmt) {
+                throw new Exception("Failed to prepare query: " . $this->conn->error);
+            }
+            $stmt->bind_param("iss", $userID, $startDate, $endDate);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $orderDetails = [];
+            while ($row = $result->fetch_assoc()) {
+                $orderDetails[] = $row;
+            }
+            $stmt->close();
+            return $orderDetails;
+        } catch (Exception $e) {
+            error_log("Get customer order details failed: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    // New method: Fetch order details for a specific product
+    public function getProductOrderDetails($productID, $startDate, $endDate) {
+        try {
+            if (!$this->conn) {
+                throw new Exception("Database connection failed");
+            }
+            $stmt = $this->conn->prepare("
+                SELECT 
+                    od.orderID,
+                    od.quantity,
+                    pv.price,
+                    p.name as product_name
+                FROM orderdetail od
+                JOIN productvariant pv ON od.productID = pv.ID
+                JOIN product p ON pv.productID = p.ID
+                JOIN `order` o ON od.orderID = o.ID
+                WHERE p.ID = ?
+                AND o.createdAt BETWEEN ? AND ?
+                AND o.status = 'delivered'
+            ");
+            if (!$stmt) {
+                throw new Exception("Failed to prepare query: " . $this->conn->error);
+            }
+            $stmt->bind_param("iss", $productID, $startDate, $endDate);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $orderDetails = [];
+            while ($row = $result->fetch_assoc()) {
+                $orderDetails[] = $row;
+            }
+            $stmt->close();
+            return $orderDetails;
+        } catch (Exception $e) {
+            error_log("Get product order details failed: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
     public function __destruct() {
         if ($this->conn) {
             $this->conn->close();

@@ -76,6 +76,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 }
                 break;
 
+            case 'getCustomerOrderDetails':
+                $userID = $_GET['userID'] ?? null;
+                if ($userID !== null && $startDate !== null && $endDate !== null) {
+                    $analyticsController->getCustomerOrderDetails($userID, $startDate, $endDate);
+                } else {
+                    http_response_code(400);
+                    echo json_encode(['status' => 400, 'data' => ['error' => 'Missing userID, startDate, or endDate']]);
+                }
+                break;
+
+            case 'getProductOrderDetails':
+                $productID = $_GET['productID'] ?? null;
+                if ($productID !== null && $startDate !== null && $endDate !== null) {
+                    $analyticsController->getProductOrderDetails($productID, $startDate, $endDate);
+                } else {
+                    http_response_code(400);
+                    echo json_encode(['status' => 400, 'data' => ['error' => 'Missing productID, startDate, or endDate']]);
+                }
+                break;
+
             default:
                 http_response_code(400);
                 echo json_encode(['status' => 400, 'data' => ['error' => 'Invalid action']]);

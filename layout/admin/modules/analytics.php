@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics</title>
+    <title>Analytics Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* [Giữ nguyên CSS từ file cũ] */
         :root {
             --primary: #4361ee;
             --secondary: #3f37c9;
@@ -165,6 +164,12 @@
             box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
         }
 
+        .date-label {
+            font-size: 14px;
+            color: var(--gray);
+            margin-right: 10px;
+        }
+
         .date-separator {
             color: var(--gray);
         }
@@ -273,6 +278,7 @@
             color: var(--primary);
             text-decoration: none;
             font-weight: 500;
+            cursor: pointer;
         }
 
         .view-link:hover {
@@ -316,6 +322,85 @@
             color: white;
         }
 
+        .error-message {
+            color: #dc2626;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 80%;
+            max-width: 800px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            color: var(--dark);
+        }
+
+        .modal-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .modal-table th,
+        .modal-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .modal-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: var(--gray);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .modal-table td {
+            color: var(--dark);
+        }
+
         @media (max-width: 768px) {
             .chart-header {
                 flex-direction: column;
@@ -342,6 +427,11 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            .modal-content {
+                width: 90%;
+                margin: 10% auto;
+            }
         }
     </style>
 </head>
@@ -366,6 +456,7 @@
                 <div class="filter-group">
                     <label class="filter-label">Date Range</label>
                     <div class="date-range-group">
+                        <span class="date-label">From</span>
                         <input type="date" class="date-input" id="customerStartDate">
                         <span class="date-separator">to</span>
                         <input type="date" class="date-input" id="customerEndDate">
@@ -412,6 +503,7 @@
                 <div class="filter-group">
                     <label class="filter-label">Date Range</label>
                     <div class="date-range-group">
+                        <span class="date-label">From</span>
                         <input type="date" class="date-input" id="productStartDate">
                         <span class="date-separator">to</span>
                         <input type="date" class="date-input" id="productEndDate">
@@ -454,6 +546,7 @@
                 <div class="chart-title">Revenue Overview</div>
                 <div class="chart-filters">
                     <div class="date-range-group">
+                        <span class="date-label">From</span>
                         <input type="date" class="date-input" id="revenueStartDate">
                         <span class="date-separator">to</span>
                         <input type="date" class="date-input" id="revenueEndDate">
@@ -471,12 +564,14 @@
                 Revenue Chart will be displayed here
             </div>
         </div>
+
         <!-- Order Statistics Chart -->
         <div class="chart-container">
             <div class="chart-header">
                 <div class="chart-title">Order Statistics</div>
                 <div class="chart-filters">
                     <div class="date-range-group">
+                        <span class="date-label">From</span>
                         <input type="date" class="date-input" id="orderStartDate">
                         <span class="date-separator">to</span>
                         <input type="date" class="date-input" id="orderEndDate">
@@ -501,6 +596,7 @@
                 <div class="chart-title">User Account Statistics</div>
                 <div class="chart-filters">
                     <div class="date-range-group">
+                        <span class="date-label">From</span>
                         <input type="date" class="date-input" id="userStartDate">
                         <span class="date-separator">to</span>
                         <input type="date" class="date-input" id="userEndDate">
@@ -510,6 +606,19 @@
             </div>
             <div class="chart-placeholder" id="userStats">
                 User Statistics will be displayed here
+            </div>
+        </div>
+
+        <!-- Modal for Order/Product Details -->
+        <div id="detailsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle" class="modal-title"></h2>
+                    <span class="close-btn" onclick="closeModal()">&times;</span>
+                </div>
+                <div id="modalContent">
+                    <!-- Dynamic content will be populated here -->
+                </div>
             </div>
         </div>
     </div>
