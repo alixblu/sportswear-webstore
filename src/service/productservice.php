@@ -43,12 +43,12 @@ class ProductService
      * @param $sort: sort option of product
      * @param $search : name of product
      */
-    public function getFilteredProductsAdmin($search, $category, $brand, $status, $rating)
+    public function getFilteredProductsAdmin($page, $productsPerPage, $search, $category, $brand, $status, $rating)
     {
         try {
-            return $this->productRepository->getFilteredProductsAdmin($search, $category, $brand, $status, $rating);
+            return $this->productRepository->getFilteredProductsAdmin($page, $productsPerPage, $search, $category, $brand, $status, $rating);
         } catch (Exception $e) {
-            error_log('Error at getFilteredProducts service: ' . $e->getMessage());
+            error_log('Error at getFilteredProductsAdmin service: ' . $e->getMessage());
             throw new Exception('Failed to get product - Service' . $e->getMessage());
         }
     }
@@ -340,7 +340,7 @@ class ProductService
                 throw new Exception("Invalid discount ID");
             }
 
-            return $this->productRepository->getDiscountByID($id);
+            return $this->productRepository->deleteProduct($id);
         } catch (Exception $e) {
             error_log("Error in getDiscountByID service: " . $e->getMessage());
             throw new Exception("Failed to getDiscountByID: " . $e->getMessage());

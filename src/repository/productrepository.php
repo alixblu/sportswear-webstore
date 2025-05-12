@@ -82,6 +82,24 @@ class ProductRepository
             throw new Exception("Failed to get products");
         }
     }
+    /**
+     * Get product by id
+     */
+    public function getProductById($id)
+    {
+        try {
+            $query = "SELECT p.*, MIN(pv.price) as basePrice FROM product as p LEFT JOIN productvariant as pv ON p.ID = pv.productID WHERE p.ID = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            return $result->fetch_assoc();
+        } catch (Exception $e) {
+            error_log("Error in getProductById:" . $e->getMessage());
+            throw new Exception("Failed to get product bby id !!!");
+        }
+    }
 
     /**
      *  Get products with options (ADMIN)
@@ -94,53 +112,72 @@ class ProductRepository
      * @param $sort: sort option of product
      * @param $search : name of product
      */
-    public function getFilteredProductsAdmin($search, $category, $brand, $status, $rating)
+    public function getFilteredProductsAdmin($page, $limit, $search, $category, $brand, $status, $rating)
     {
         try {
-            $query = "SELECT p.* FROM product as p WHERE 1=1";
+            $offset = ($page - 1) * $limit;
+            // Get product list
+            $query = "SELECT p.*, MIN(pv.price) as basePrice FROM product as p LEFT JOIN productvariant as pv ON pv.productID=p.ID WHERE 1=1";
             $params = [];
+            // Get total amount
+            $count_query = "SELECT COUNT(DISTINCT p.ID) as total from product as p WHERE 1=1";
+            $count_params = [];
 
             if ($category) {
+                $count_query .= " AND p.categoryID=?";
                 $query .= " AND p.categoryID=?";
-                $params[] = $category;
+                $params[] = $count_params[] = $category;
             }
             if ($brand) {
+                $count_query .= " AND p.brandID=?";
                 $query .= " AND p.brandID=?";
-                $params[] = $brand;
+                $params[] = $count_params[] = $brand;
             }
             if ($status) {
-                $query .= " AND status=?";
-                $params[] = $status;
+                $count_query .= " AND p.status=?";
+                $query .= " AND p.status=?";
+                $params[] = $count_params[] = $status;
             }
             if ($rating) {
+                $count_query .= ($rating == 1) ? " AND p.rating=?" : " AND p.rating>=? AND p.rating<=?";
                 $query .= ($rating == 1) ? " AND p.rating=?" : " AND p.rating>=? AND p.rating<=?";
-                $params[] = $rating - 1;
-                if ($rating != 1) $params[] = $rating;
+                $params[] = $count_params[] = $rating - 1;
+                if ($rating != 1)
+                    $params[] = $count_params[] = $rating;
             }
             if ($search) {
+                $count_query .= " AND p.name LIKE ?";
                 $query .= " AND p.name LIKE ?";
-                $params[] = '%' . $search . '%';
+                $params[] = $count_params[] = '%' . $search . '%';
             }
+            $query .= " GROUP BY p.ID LIMIT ?, ?";
+            $params[] = (int)$offset;
+            $params[] = (int)$limit;
 
-            $stmt = $this->conn->prepare($query);
-            if (!$stmt) {
-                throw new Exception("getFilteredProductsAdmin- Prepare failed: " . $this->conn->error);
-                return [];
-            }
-            if (!$stmt->execute($params)) {
-                throw new Exception("getFilteredProductsAdmin- Execute failed: " . $stmt->error);
-                return [];
-            }
-            $result = $stmt->get_result();
-            if (!$result) {
-                throw new Exception("getFilteredProductsAdmin- Get result failed: " . $stmt->error);
-                return [];
-            }
+            // Execute get poructs query
+            $stmt1 = $this->conn->prepare($query);
+            if (!$stmt1)
+                throw new Exception('Prepare get product list failed!!!');
+            $stmt1->execute($params);
+            $result1 = $stmt1->get_result();
+
             $products = [];
-            while ($row = $result->fetch_assoc()) {
+            while ($row = $result1->fetch_assoc()) {
                 $products[] = $row;
             }
-            return $products;
+            // Execute get amount of poructs query
+            $stmt2 = $this->conn->prepare($count_query);
+            if (!$stmt2)
+                throw new Exception('Prepare get amount of products failed!!!');
+            $stmt2->execute($count_params);
+            $total = ($stmt2->get_result()->fetch_assoc()['total']);
+
+            return [
+                'data' => $products,
+                'total' => $total,
+                'page' => $page,
+                'limit' => $limit
+            ];
         } catch (Exception $e) {
             error_log("Error in getFilteredProductsAdmin: " . $e->getMessage());
             throw new Exception("Failed to get filtered products ADMIN: " . $e->getMessage());
@@ -370,7 +407,7 @@ class ProductRepository
     public function getAllCategories()
     {
         try {
-            $query = "SELECT * FROM category ORDER BY name";
+            $query = "SELECT c.* FROM category as c WHERE c.parent IS NOT NULL ORDER BY name";
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
             $result = $stmt->get_result();
