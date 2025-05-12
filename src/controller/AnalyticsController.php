@@ -99,7 +99,6 @@ class AnalyticsController {
         }
     }
 
-    // New method: Fetch product order details
     public function getProductOrderDetails($productID, $startDate, $endDate): void {
         try {
             if (!$productID || !$startDate || !$endDate) {
@@ -107,6 +106,15 @@ class AnalyticsController {
             }
             $orderDetails = $this->analyticsService->getProductOrderDetails($productID, $startDate, $endDate);
             ApiResponse::customApiResponse($orderDetails, 200);
+        } catch (Exception $e) {
+            ApiResponse::customApiResponse(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function getEarliestOrderDate(): void {
+        try {
+            $earliestDate = $this->analyticsService->getEarliestOrderDate();
+            ApiResponse::customApiResponse(['earliest_date' => $earliestDate], 200);
         } catch (Exception $e) {
             ApiResponse::customApiResponse(['error' => $e->getMessage()], 400);
         }

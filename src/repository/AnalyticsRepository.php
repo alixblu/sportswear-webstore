@@ -44,7 +44,6 @@ class AnalyticsRepository {
             $result = $stmt->get_result();
             $customers = [];
             while ($row = $result->fetch_assoc()) {
-                // Tách các JSON object bằng '||' và decode
                 $ordersString = $row['orders'];
                 $ordersArray = $ordersString ? array_map('json_decode', explode('||', $ordersString)) : [];
                 $row['orders'] = array_filter($ordersArray, function($order) {
@@ -59,6 +58,7 @@ class AnalyticsRepository {
             throw $e;
         }
     }
+
     public function getTotalRevenue($startDate, $endDate) {
         try {
             if (!$this->conn) {
@@ -250,7 +250,6 @@ class AnalyticsRepository {
         }
     }
 
-    // New method: Fetch order details for a specific product
     public function getProductOrderDetails($productID, $startDate, $endDate) {
         try {
             if (!$this->conn) {
@@ -284,6 +283,29 @@ class AnalyticsRepository {
             return $orderDetails;
         } catch (Exception $e) {
             error_log("Get product order details failed: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function getEarliestOrderDate() {
+        try {
+            if (!$this->conn) {
+                throw new Exception("Database connection failed");
+            }
+            $stmt = $this->conn->prepare("
+                SELECT MIN(createdAt) as earliest_date
+                FROM `order`
+            ");
+            if (!$stmt) {
+                throw new Exception("Failed to prepare query: " . $this->conn->error);
+            }
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $data = $result->fetch_assoc();
+            $stmt->close();
+            return $data['earliest_date'] ?? date('Y-m-d');
+        } catch (Exception $e) {
+            error_log("Get earliest order date failed: " . $e->getMessage());
             throw $e;
         }
     }
