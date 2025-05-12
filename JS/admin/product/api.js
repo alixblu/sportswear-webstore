@@ -30,13 +30,11 @@ const getAllProducts = async () => {
     }
 };
 
-const getFilteredProductsAdmin = async (category=null, brand=null, status=null, rating=null, search = null) => {
-    // Không có thì lấy toàn bộ
-    if(search==null && category == null && brand == null && status == null)
-        return data = await getAllProducts();
-
+const getFilteredProductsAdmin = async (page=1, productsPerPage=1, category=null, brand=null, status=null, rating=null, search = null) => {
     try {
         let url = `${API_URL}?action=getFilteredProductsAdmin`
+        if (page) url += `&page=${page}`
+        if (productsPerPage) url += `&productsPerPage=${productsPerPage}`
         if (search) url += `&search=${search}`
         if (category) url += `&category=${category}`
         if (brand) url += `&brand=${brand}`
@@ -104,8 +102,8 @@ const getProductById = async (id) => {
     if (!response.ok) {
         throw new Error('Không thể lấy thông tin sản phẩm');
     }
-
-    return await response.json();
+    const data = await response.json()
+    return data.data;
 };
 
 const getProductVariants = async (id) => {
@@ -122,17 +120,15 @@ const getProductVariants = async (id) => {
 
 // ===================================== Update & Delete product ===================================== 
 const updateProduct = async (product) => {
-    const formData = new URLSearchParams();
-    formData.append('action', 'updateProduct');
+    if(product == null)
+        throw new Error('Không có dữ liệu sản phẩm mới')
 
-    // Dynamically append properties from the product object
-    for (const key in product) {
-        formData.append(key, product[key]);
-    }
-
-    const response = await fetch(API_URL, {
+    const response = await fetch(`${API_URL}?action=updateProduct&id=${product.ID}`, {
         method: 'PUT',
-        body: formData.toString(),
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(product),
     });
 
     if (!response.ok) {
@@ -177,4 +173,6 @@ export {
     getProductVariants,
     getAllProducts,
     getFilteredProductsAdmin,
+    updateProduct,
+    deleteProduct,
 };
