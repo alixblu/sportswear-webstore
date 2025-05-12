@@ -28,15 +28,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $search = $_GET['search'] ?? null;
         $productController->getFilteredProducts($category, $brand, $status, $min_price, $max_price, $sort, $search);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getFilteredProductsAdmin') {
+        $page = $_GET['page'] ?? 1;
+        $productsPerPage = $_GET['productsPerPage'] ?? 1;
         $search = $_GET['search'] ?? null;
         $category = $_GET['category'] ?? null;
         $brand = $_GET['brand'] ?? null;
         $status = $_GET['status'] ?? null;
         $rating = $_GET['rating'] ?? null;
-        if ($rating != null)
-            log($search);
-        else
-            $productController->getFilteredProductsAdmin($search, $category, $brand, $status, $rating);
+
+        $productController->getFilteredProductsAdmin($page, $productsPerPage, $search, $category, $brand, $status, $rating);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getProductById' && isset($_GET['id'])) {
         $productController->getProductById($_GET['id']);
     }
@@ -105,26 +105,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProduct
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-    parse_str(file_get_contents("php://input"), $putData);
+    $putData = json_decode(file_get_contents("php://input"), true);
+    file_put_contents('php://stderr', print_r($putData, true)); // hoặc log ra file
 
-    if (isset($putData['action']) && $putData['action'] === 'updateProduct' && isset($putData['id'])) {
-        $id = $putData['id'];
+    if (!$putData) {
+        echo json_encode(['error' => 'Dữ liệu JSON không hợp lệ !!']);
+        exit;
+    }
+    $action = $_GET['action'] ?? null;
+    $id = $_GET['id'] ?? null;
+
+    if ($action === 'updateProduct' && $id !== null) {
+        $productController->updateProduct($id, $putData);
+    } else if ($action === 'updateProductStock' && $id !== null) {
+        $productController->updateProductStock($id);
+    }
+    /*
+    if (isset($putData['action']) && $putData['action'] === 'updateProduct' && isset($putData['ID'])) {
+        $id = $putData['ID'];
         $data = [
-            'categoryID' => $putData['categoryID'] ?? '',
-            'discountID' => $putData['discountID'] ?? '',
-            'brandID' => $putData['brandID'] ?? '',
-            'name' => $putData['name'] ?? '',
-            'markup_percentage' => $putData['markup_percentage'] ?? '',
-            'rating' => $putData['rating'] ?? '',
-            'image' => $putData['image'] ?? '',
-            'description' => $putData['description'] ?? '',
-            'stock' => $putData['stock'] ?? '',
-            'status' => $putData['status'] ?? ''
+            'categoryID' => $putData['categoryID'] ?? null,
+            'discountID' => $putData['discountID'] ?? null,
+            'brandID' => $putData['brandID'] ?? null,
+            'name' => $putData['name'] ?? null,
+            'markup_percentage' => $putData['markup_percentage'] ?? null,
+            'rating' => $putData['rating'] ?? null,
+            'image' => $putData['image'] ?? null,
+            'description' => $putData['description'] ?? null,
+            'stock' => $putData['stock'] ?? null,
+            'status' => $putData['status'] ?? null
         ];
         $productController->updateProduct($id, $data);
-    } else if (isset($putData['action']) && $putData['action'] === 'updateProductStock' && isset($putData['id'])) {
-        $productController->updateProductStock($putData['id']);
-    } else {
+    } else if (isset($putData['action']) && $putData['action'] === 'updateProductStock' && isset($putData['ID'])) {
+        $productController->updateProductStock($putData['ID']);
+    }
+    */ else {
         echo json_encode(['error' => 'Yêu cầu PUT không hợp lệ']);
     }
 }

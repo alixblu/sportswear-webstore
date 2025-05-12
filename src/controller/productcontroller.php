@@ -36,11 +36,11 @@ class ProductController
      * @param $sort: sort option of product
      * @param $search : name of product
      */
-    public function getFilteredProductsAdmin($search, $category, $brand, $status, $rating)
+    public function getFilteredProductsAdmin($page, $productsPerPage, $search, $category, $brand, $status, $rating)
     {
         $products = null;
         try {
-            $products =  $this->productService->getFilteredProductsAdmin($search, $category, $brand, $status, $rating);
+            $products =  $this->productService->getFilteredProductsAdmin($page, $productsPerPage, $search, $category, $brand, $status, $rating);
             ApiResponse::customApiResponse($products, 200);
             return $products;
         } catch (Exception $e) {
@@ -99,14 +99,7 @@ class ProductController
                 ApiResponse::customResponse($data, 400, 'Invalid product ID');
                 return;
             }
-
             if (empty($data)) {
-                /*
-                $this->sendJsonResponse(400, [
-                    'success' => false,
-                    'message' => 'No data provided for update'
-                ]);
-                */
                 ApiResponse::customResponse(null, 400, 'No data provided for update');
                 return;
             }

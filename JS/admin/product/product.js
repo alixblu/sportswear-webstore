@@ -1,6 +1,8 @@
 import {
     getProductVariants,
     getFilteredProductsAdmin,
+    updateProduct,
+    getProductById,
 } from './api.js'
 import {
     getAllBrands,
@@ -15,54 +17,49 @@ import {
 } from '../discount/api.js'
 
 const IMG_URL = '../../img/products/';
-
 const productsPerPage = 30
 let currentPage = 1
-let filteredProducts = []
-let chosenProduct = null, product = null
+let currentProduct = null
 let categoriesList = [], brandsList = [], discountsList = []
+let formMode = ''
 
-// ===================================== Function to load products with filters ===================================== 
+// ===================================== Load products ===================================== 
+// Load products into page
 const loadProducts = async () => {
     try {
-        let categoryFilter  = document.getElementById('category').value
-        let brandFilter     = document.getElementById('brand').value
-        let statusFilter    = document.getElementById('status').value
-        let ratingFilter    = document.getElementById('rating').value
+        let categoryFilter  = document.getElementById('categoryFilter').value
+        let brandFilter     = document.getElementById('brandFilter').value
+        let statusFilter    = document.getElementById('statusFilter').value
+        let ratingFilter    = document.getElementById('ratingFilter').value
         let searchFilter    = document.getElementById('search').value
-//        let startPriceFilter= document.getElementById('priceStart').value
-//        let endPriceFilter  = document.getElementById('priceEnd').value
-        filteredProducts = await getFilteredProductsAdmin(categoryFilter, brandFilter, statusFilter, ratingFilter, searchFilter);
-        currentPage = filteredProducts.length != 0 ? 1 : 0;
-        displayProduct(currentPage)
-        updatePaginationControls(filteredProducts.length)
+
+        const productRespose = await getFilteredProductsAdmin(currentPage, productsPerPage, categoryFilter, brandFilter, statusFilter, ratingFilter, searchFilter);
+        if(productRespose.data == null){
+            console.warn('Không có sản phẩm nào');
+        }
+        displayProduct(productRespose.data)
+        updatePaginationControls(productRespose.total)
     } catch (error) {
         console.error('Lỗi khi tải sản phẩm:', error);
     }
 };
-
-// ===================================== Diplay products in particular page =====================================
-const displayProduct = (page=1) => {
-    const startIndex = (page -1) * productsPerPage
-    const endIndex = startIndex + productsPerPage
-    const productsList = filteredProducts.slice(startIndex, endIndex)
-
+// Diplay products in particular page
+const displayProduct = (data) => {
     const productGrid = document.getElementById('productGrid')
     productGrid.innerHTML = '';
-    if(filteredProducts.length === 0){
+    if(data.length === 0){
         productGrid.classList.add('no-results')
         productGrid.innerHTML = '<div class="no-products"><i class="fas fa-box-open"></i> Không tìm thấy sản phẩm nào.</div>';
         return;
     } else productGrid.classList.remove('no-results')
 
-
-    productsList.forEach(product => {
+    data.forEach(product => {
         const productCard = document.createElement('div');
         productCard.className = 'product-card';
         productCard.innerHTML = `
             <div class="product-image">
                 <span class="product-id-badge">#${product.ID}</span>
-                <img src="${IMG_URL + product.image}.jpg"></img>
+                <img src="${IMG_URL}/product${product.ID}/${product.image}"></img>
                 <span class="product-badge badge-${product.status === 'in_stock' ? 'in-stock' : 'out-stock'}">
                     ${product.status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
                 </span>
@@ -78,25 +75,16 @@ const displayProduct = (page=1) => {
                     <span class="rating-count">${product.rating ? `(${product.rating})` : '(No rating)'}</span>
                 </div>
                 <div class="product-actions">
-                    <button class="btn btn-primary view-button">
+                    <button class="btn btn-primary view-button" onclick="viewProduct(${product.ID})">
                         <i class="fas fa-eye"></i> View
                     </button>
                 </div>
             </div>
             `;
             productGrid.appendChild(productCard);
-
-            const view_btn = productCard.querySelector('.view-button')
-            if(view_btn)
-                view_btn.addEventListener('click', () => {
-                    chosenProduct = product.ID
-                    viewProduct()
-                })
-            else
-                console.error('Không tìm thấy nút view-button cho sản phẩm', product.ID);
         });
 }
-
+// Update pagiantion
 const updatePaginationControls = (totalProducts) => {
     const paginationContainer = document.getElementById('pagination')
     paginationContainer.innerHTML=''
@@ -104,20 +92,17 @@ const updatePaginationControls = (totalProducts) => {
         paginationContainer.innerHTML += '<button id="prev-page" disabled>1</button>'
         return
     }
-
     const totalPages = Math.ceil(totalProducts / productsPerPage)
-    if(currentPage > 1)
-        paginationContainer.innerHTML += `<button id="prev-page">Previous</button>`
+
+    paginationContainer.innerHTML += `<button id="prev-page" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`
     for(let i=1; i <= totalPages; i++)
-        paginationContainer.innerHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}">${i}</button>`
-    if(currentPage < totalPages)
-        paginationContainer.innerHTML += `<button id="next-page">Next</button>`
+        paginationContainer.innerHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}" ${i === currentPage ? 'disabled': ''}>${i}</button>`
+    paginationContainer.innerHTML += `<button id="next-page" ${currentPage === totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`
 
     document.querySelectorAll('.page-btn').forEach((button) => {
         button.addEventListener('click', () => {
             currentPage = parseInt(button.textContent)
-            displayProduct(currentPage)
-            updatePaginationControls(totalProducts)
+            loadProducts()
         });
     })
 
@@ -126,76 +111,40 @@ const updatePaginationControls = (totalProducts) => {
     if(prevBtn)
         prevBtn.addEventListener('click', () => {
             currentPage --
-            displayProduct(currentPage)
-            updatePaginationControls(totalProducts)
+            loadProducts()
         })
     if(nextBtn)
         nextBtn.addEventListener('click', () => {
             currentPage ++
-            displayProduct(currentPage)
-            updatePaginationControls(totalProducts)
+            loadProducts()
         })
 }
 
-// ===================================== Initialize filters when page loads===================================== 
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        // Populate category & brand filter
-        await Promise.all([
-            populateBrandFilter(),
-            populateCategoryFilter(),
-            populateDiscountFilter(),
-        ]);
-        loadProducts()
-        
-        // Set status filter options
-        const statusSelect = document.getElementById('status');
-        
-        // Keep the first "All Status" option
-        while (statusSelect.options.length > 1) {
-            statusSelect.remove(1);
-        }
-        
-        const statusOptions = [
-            { value: 'in_stock', text: 'Còn hàng' },
-            { value: 'out_of_stock', text: 'Hết hàng' },
-            { value: 'discontinued', text: 'Ngừng kinh doanh' }
-        ];
-        
-        statusOptions.forEach(status => {
-            const option = document.createElement('option');
-            option.value = status.value;
-            option.textContent = status.text;
-            statusSelect.appendChild(option);
-        });
-
-         // Gán sự kiện xử lý bộ lọc
-        ['search', 'category', 'brand', 'status', 'rating', 'priceStart', 'priceEnd'].forEach( id => {
-            const element = document.getElementById(id)
-            if(element){
-                const eventType = (id.includes('price') || id.includes('search') ? 'input' : 'change');
-                element.addEventListener(eventType,loadProducts);
-            }
-        })
-
-     } catch (error) {
-         console.error('Error initializing filters:', error);
-     }
- });
-
- // ================================== View detail of product ==================================
-// Modal functions
-const viewProduct = async () => {
-    if(!chosenProduct)
+ // ================================== View detail of product modal ==================================
+// Open modal to view detail
+const viewProduct = async (id) => {
+    if(!id)
         throw new Error("Chosen product is null !!!")
 
+    // Add display for modal
     const modal = document.getElementById('productModal');
     modal.style.display = 'block';
+    document.getElementById('product-info-section').style.display = 'block';
+    document.querySelector('.product-image-section').style.display = 'flex';
+    
+    // Add header
+    document.getElementById('modal-title').innerText = "Product Details"
     try {
         // Get product details
-        product = filteredProducts.find(val => val.ID === chosenProduct);
+        const product = await getProductById(id);
         if(!product)
             throw new Error("Cannot get product to view detail !!!");
+
+        const openEditBtn = document.querySelector('.open-edit-form');
+        if(openEditBtn){
+            openEditBtn.style.display = 'block'
+            openEditBtn.addEventListener('click', () => showEditForm(product))
+        }
 
         const category = categoriesList.find(ele => ele.ID === product.categoryID)
         const brand = brandsList.find(ele => ele.ID === product.brandID)
@@ -215,6 +164,8 @@ const viewProduct = async () => {
             basePrice: document.getElementById('modal-product-base-price'),
             image: document.getElementById('modal-product-image'),
         };
+        // Format price text
+        const fomartedPrice = new Intl.NumberFormat('vi-VN').format(product.basePrice) + 'VND'
 
         // Update modal with product details
         modalElements.id.textContent = product.ID || '-';
@@ -225,7 +176,7 @@ const viewProduct = async () => {
         modalElements.status.textContent = product.status === 'in_stock' ? 'In Stock' : 'Out of Stock';
         modalElements.description.textContent = product.description || 'No description available';
         modalElements.discountId.textContent = product.discountID || '-';
-        modalElements.basePrice.textContent = product.price || '-';
+        modalElements.basePrice.textContent = fomartedPrice || '-';
         modalElements.category.textContent = category.name || '-';
         modalElements.brand.textContent = brand.name || '-';
         // Set the image source and handle errors using the 'error' event listener
@@ -234,10 +185,11 @@ const viewProduct = async () => {
         };
 
         // Assign the image source
-        modalElements.image.src = `${IMG_URL}${product.ID}.jpg`;
+        modalElements.image.src = `${IMG_URL}/product${product.ID}/${product.image}`;
+        modalElements.image.setAttribute('data-oldname', modalElements.image.src)
 
         // Get and display variants
-        const res = await getProductVariants(chosenProduct);
+        const res = await getProductVariants(product.ID);
         const variants = res.data || [];
         const variantsList = document.getElementById('modal-variants-list');
 
@@ -266,14 +218,7 @@ const viewProduct = async () => {
         alert('Error loading product details: ' + error.message);
     }
 }
-// Close modal
-function closeModal() {
-    cancelEdit();
-    const modal = document.getElementById('productModal');
-    modal.style.display = 'none';
-    product = null
-}
-window.closeModal = closeModal
+window.viewProduct = viewProduct
 // Function to render stars based on rating
 function renderStars(rating) {
     if (!rating) 
@@ -304,57 +249,21 @@ function renderStars(rating) {
     return starsHTML;
 }
 
-// ================================== Open & Close Edit Form ==================================
-async function showEditForm() {
-    if(!chosenProduct)
+// ================================== Edit product modal ==================================
+async function showEditForm(product) {
+    if(!product)
         throw new Error("Chosen product is null !!!")
+    currentProduct = product
     // Hide product info and show edit form
+    formMode = 'update'
     document.getElementById('product-info-section').style.display = 'none';
     document.getElementById('edit-form-section').style.display = 'block';
+    document.getElementById('img-btn').style.display = 'block';
+    document.getElementById('cancel-edit-btn').style.display = 'block';
 
     try {
-        // Get product detailsj
-        product = filteredProducts.find(val => val.ID == chosenProduct)
-
-        // Populate form fields
-        document.getElementById('editName').value = product.name || '';
-        document.getElementById('editMarkup').value = product.markup_percentage || '0';
-        document.getElementById('editDiscount').value = product.discountID || '';
-        document.getElementById('editDescription').value = product.description || '';
-
-        // Load categories
-        const categorySelect = document.getElementById('editCategory');
-        categorySelect.innerHTML = '<option value="">Select Category</option>';
-        categoriesList.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.ID;
-            option.textContent = category.name;
-            option.selected = category.ID === product.categoryID;
-            categorySelect.appendChild(option);
-        });
-
-        // Load brands
-        const brandSelect = document.getElementById('editBrand');
-        brandSelect.innerHTML = '<option value="">Select Brand</option>';
-        brandsList.forEach(brand => {
-            const option = document.createElement('option');
-            option.value = brand.ID;
-            option.textContent = brand.name;
-            option.selected = brand.ID === product.brandID;
-            brandSelect.appendChild(option);
-        });
-
-        // Load discounts 
-        const discountSelect = document.getElementById('editDiscount')
-        discountSelect.innerHTML = '<option value="">Select discount</option>'
-        discountsList.forEach(discount => {
-            const option = document.createElement('option')
-            option.value = discount.ID
-            option.textContent = discount.discountRate + '%' 
-            option.selected = discount.ID === product.discountID
-            discountSelect.appendChild(option)
-        })
-
+        // Fill edit form
+        fillEditForm(product)
     } catch (error) {
         console.error('Error loading edit form:', error);
         alert('Error loading edit form: ' + error.message);
@@ -363,18 +272,151 @@ async function showEditForm() {
 window.showEditForm = showEditForm
 // Cancel editing
 function cancelEdit() {
+    formMode = ''
+    resetForm();
+    const img = document.getElementById('modal-product-image');
+    const oldSrc = img.getAttribute('data-oldname')
+    img.src = oldSrc
     document.getElementById('product-info-section').style.display = 'block';
     document.getElementById('edit-form-section').style.display = 'none';
+    document.getElementById('img-btn').style.display = 'none';
+    document.getElementById('cancel-edit-btn').style.display = 'none';
+}
+// Reset edit form
+function fillEditForm(product) {
+    document.getElementById('edit-name').value = product.name || '';
+    document.getElementById('edit-markup').value = product.markup_percentage || '0';
+    document.getElementById('edit-discount').value = product.discountID || '';
+    document.getElementById('edit-description').value = product.description || '';
+
+    // Load categories
+    const categorySelect = document.getElementById('edit-category');
+    categoriesList.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.ID;
+        option.textContent = category.name;
+        option.selected = category.ID === product.categoryID;
+        categorySelect.appendChild(option);
+    });
+    // Load brands
+    const brandSelect = document.getElementById('edit-brand');
+    brandsList.forEach(brand => {
+        const option = document.createElement('option');
+        option.value = brand.ID;
+        option.textContent = brand.name;
+        option.selected = brand.ID === product.brandID;
+        brandSelect.appendChild(option);
+    });
+    // Load discounts 
+    const discountSelect = document.getElementById('edit-discount')
+    discountsList.forEach(discount => {
+        const option = document.createElement('option')
+        option.value = discount.ID
+        option.textContent = discount.discountRate + '%' 
+        option.selected = discount.ID === product.discountID
+        discountSelect.appendChild(option)
+        })
+}
+// ===================================== Process updating product =====================================
+const proccessUpdating = async () => {
+    if(!currentProduct)
+        throw new Error('Cannot get chosen product !!!')
+    try{
+        const formData = {
+            ID: currentProduct.ID,
+            categoryID: Number(document.getElementById('edit-category').value),
+            discountID: Number(document.getElementById('edit-discount').value) || null,
+            brandID: Number(document.getElementById('edit-brand').value),
+            name: document.getElementById('edit-name').value,
+            markup_percentage: Number(document.getElementById('edit-markup').value),
+            rating: currentProduct.rating,
+            description: document.getElementById('edit-description').value,
+            stock: currentProduct.stock,
+            status: currentProduct.status,
+            // get image
+            image: null,
+        }
+        const img = document.getElementById('modal-product-image');
+        if(img.getAttribute('data-newname') !== '')
+            formData.image = img.getAttribute('data-newname')
+        else
+            formData.image = img.getAttribute('data-oldname').split('/').pop()
+
+        const isChanged = Object.keys(formData).some(key => formData[key] !== currentProduct[key])
+        
+        if(!isChanged){
+            console.error('Product is not changed !!!');
+            return;
+        }
+        // Update product into db
+        const response = await updateProduct(formData);
+        if (response) {
+            alert('Product updated successfully!');
+            await loadProducts(); // Refresh grid
+            await viewProduct(formData.ID); // Refresh view
+            cancelEdit(); // Close edit form
+        } else {
+            throw new Error(response.message || 'Failed to update product');
+        }
+
+    } catch (error){
+        console.error('Error proccessing updating product: ', error);
+        throw new Error("Cannot update product")
+    }
+}
+window.proccessUpdating = proccessUpdating
+// ================================== Create product modal ==================================
+function openCreateModal() {
+    formMode = 'create'
+    document.getElementById('productModal').style.display = 'block';
+    document.getElementById('create-form-section').style.display = 'block';
+    document.querySelector('.product-image-section').style.display = 'flex'
+    document.getElementById('img-btn').style.display = 'block';
+    document.getElementById('reset-btn').style.display = 'block';
+    const img = document.getElementById('modal-product-image')
+    img.src = `${IMG_URL}default.jpg`
+    img.setAttribute('data-newname', '')
+    img.setAttribute('data-oldname', '')
+    document.getElementById('modal-title').innerText = "Add New Product"
+
+    // Load categories
+    const categorySelect = document.getElementById('create-category');
+    categoriesList.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.ID;
+        option.textContent = category.name;
+        categorySelect.appendChild(option);
+    });
+    // Load brands
+    const brandSelect = document.getElementById('create-brand');
+    brandsList.forEach(brand => {
+        const option = document.createElement('option');
+        option.value = brand.ID;
+        option.textContent = brand.name;
+        brandSelect.appendChild(option);
+    });
+    // Load discounts 
+    const discountSelect = document.getElementById('create-discount')
+    discountsList.forEach(discount => {
+        const option = document.createElement('option')
+        option.value = discount.ID
+        option.textContent = discount.discountRate + '%' 
+        discountSelect.appendChild(option)
+        })
+    
+}
+window.openCreateModal = openCreateModal
+function resetCreateForm() {
 
 }
-window.cancelEdit = cancelEdit
 
 // ================================== Get all categories, brands, discounts ==================================
+// Function to generate categories list 
 const populateCategoryFilter = async () => {
     try {
         const response = await getAllCategories();
         categoriesList = response.data || [];
-        const categorySelect = document.getElementById('category');
+        const categorySelect = document.getElementById('categoryFilter');
         
         // Clear existing options except the first one
         while (categorySelect.options.length > 1) {
@@ -392,13 +434,12 @@ const populateCategoryFilter = async () => {
         console.error('Error populating category filter:', error);
     }
 };
-
-// ===================================== Function to populate brand dropdown ===================================== 
+// Function to generate brands list 
 const populateBrandFilter = async () => {
     try {
         const response = await getAllBrands();
         brandsList = response.data || [];
-        const brandSelect = document.getElementById('brand');
+        const brandSelect = document.getElementById('brandFilter');
         
         // Clear existing options except the first one
         while (brandSelect.options.length > 1) {
@@ -416,7 +457,7 @@ const populateBrandFilter = async () => {
         console.error('Error populating brand filter:', error);
     }
 };
-
+// Function to generate discounts list 
 const populateDiscountFilter = async () => {
     try {
         const response = await getAllDiscounts();
@@ -425,3 +466,92 @@ const populateDiscountFilter = async () => {
         console.error('Error populating brand filter:', error);
     }
 }
+
+// ===================================== Initialize filters when page loads===================================== 
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Populate category & brand filter
+        await Promise.all([
+            populateBrandFilter(),
+            populateCategoryFilter(),
+            populateDiscountFilter(),
+        ]);
+        loadProducts()
+        
+        // Set status filter options
+        const statusSelect = document.getElementById('statusFilter');
+        
+        // Keep the first "All Status" option
+        while (statusSelect.options.length > 1) {
+            statusSelect.remove(1);
+        }
+        
+        const statusOptions = [
+            { value: 'in_stock', text: 'Còn hàng' },
+            { value: 'out_of_stock', text: 'Hết hàng' },
+            { value: 'discontinued', text: 'Ngừng kinh doanh' }
+        ];
+        
+        statusOptions.forEach(status => {
+            const option = document.createElement('option');
+            option.value = status.value;
+            option.textContent = status.text;
+            statusSelect.appendChild(option);
+        });
+
+         // Gán sự kiện xử lý bộ lọc
+        ['search', 'categoryFilter', 'brandFilter', 'statusFilter', 'ratingFilter'].forEach( id => {
+            const element = document.getElementById(id)
+            if(element){
+                const eventType = (id.includes('price') || id.includes('search') ? 'input' : 'change');
+                element.addEventListener(eventType, () => {
+                    currentPage = 1
+                    loadProducts()
+                });
+            }
+        })
+     } catch (error) {
+         console.error('Error initializing filters:', error);
+     }
+ });
+
+// ===================================== Others =====================================
+function resetForm() {
+    document.getElementsByClassName('form-name')[0].value = '';
+    document.getElementsByClassName('form-markup')[0].value = null;
+    document.getElementsByClassName('form-category')[0].value = '';
+    document.getElementsByClassName('form-brand')[0].value = '';
+    document.getElementsByClassName('form-discount')[0].value = '';
+    document.getElementsByClassName('form-description')[0].value = '';
+}
+window.resetForm = resetForm
+// Close modal
+async function closeModal() {
+    resetForm()
+    document.getElementById('productModal').style.display = 'none';
+    document.getElementById('edit-form-section').style.display = 'none';
+    document.getElementById('create-form-section').style.display = 'none'
+    document.querySelector('.product-info-section').style.display = 'none'
+    const img = document.getElementById('modal-product-image');
+    img.setAttribute('data-oldname', '')
+    img.setAttribute('data-newname', '')
+    img.setAttribute('src', '')
+    document.getElementById('img-btn').style.display = 'none';
+    document.getElementById('cancel-edit-btn').style.display = 'none';
+    document.getElementById('reset-btn').style.display = 'none';
+}
+window.closeModal = closeModal
+
+
+document.getElementById('createForm').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    await proccessCreating();
+})
+document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries()) 
+    if(currentProduct)
+        await proccessUpdating();
+})
+document.getElementById('cancel-edit-btn').addEventListener('click', () => cancelEdit())

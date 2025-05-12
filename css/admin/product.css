@@ -282,9 +282,25 @@
     height: calc(90vh - 120px);
     overflow: hidden;
 }
+.form-actions{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap:0.5rem
+}
+.form-actions button{
+    padding: 6px 5px;
+}
+
+#create-form-section,
+#edit-form-section,
+.open-edit-form,
+#reset-btn,
+#cancel-edit-btn,
+#cancel-create-btn{
+    display: none;
+}
 
 .product-image-section {
-    display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
@@ -326,6 +342,7 @@
 }
 
 .product-info-section {
+    display: none;
     flex: 1;
     padding: 5px 15px;
     overflow-y: auto;
@@ -651,7 +668,9 @@
     margin-right: 6px;
     font-size: 13px;
 } 
-.edit-form {
+.edit-form,
+.create-product-form
+{
     display: none;
     background: #fff;
     padding: 20px;
@@ -668,13 +687,19 @@
 
 .edit-form input,
 .edit-form select,
-.edit-form textarea {
+.edit-form textarea,
+.create-product-form input,
+.create-product-form select,
+.create-product-form textarea
+{
     width: 100%; /* Ensure inputs within the columns expand */
     padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
-.edit-form textarea {
+.edit-form textarea,
+.create-product-form textarea
+{
     min-height: 150px; /* Increase the height */
     resize: vertical; /* Allow manual resizing vertically if needed */
 }

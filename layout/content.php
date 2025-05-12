@@ -230,7 +230,7 @@
                 const productImage = document.createElement('div');
                 productImage.classList.add('product-image');
                 const img = document.createElement('img');
-                img.src = `/sportswear-webstore/img/products/${product.ID}.jpg`;
+                img.src = `/img/products/product${product.ID}/${product.image}`;
                 img.alt = product.name;
                 img.onerror = function() {
                     this.src = '/sportswear-webstore/img/products/default.jpg';
@@ -325,7 +325,7 @@
             dots.forEach(dot => dot.classList.remove('active'));
             dots[slideIndex].classList.add('active');
         }
- 
+
         setInterval(showSlides, 3000);
 
         dots[0].classList.add('active');
@@ -355,7 +355,6 @@
 
         }
         window.currentSlide = currentSlide;
-
     </script>
 </body>
 
