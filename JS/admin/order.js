@@ -1,4 +1,4 @@
-const ORDER_API_URL = '../../../src/router/orderrouter.php';
+const ORDER_API_URL = '/sportswear-webstore/src/router/orderrouter.php';
 
 // Lấy tất cả đơn hàng
 const getAllOrders = async () => {

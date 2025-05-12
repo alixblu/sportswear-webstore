@@ -70,11 +70,11 @@
          </div>
       </div>
    </div>
-<script src="../../JS/client/cartApi.js"></script>
-<script src="../../JS/admin/coupon.js"></script>
-<script src="../../JS/client/cartdetail.js"></script>
-<script src="../../JS/admin/userApi.js"></script>
-<script src="../../JS/admin/order.js"></script>
+<script src="/sportswear-webstore/JS/client/cartApi.js"></script>
+<script src="/sportswear-webstore/JS/admin/coupon.js"></script>
+<script src="/sportswear-webstore/JS/client/cartdetail.js"></script>
+<script src="/sportswear-webstore/JS/admin/userApi.js"></script>
+<script src="/sportswear-webstore/JS/admin/order.js"></script>
 
 <script>
    loadCart()
@@ -127,41 +127,42 @@
                const priceElement = document.querySelector(".summary-price");
                priceElement.innerText = formatCurrency(total);
 
-
                const summaryElement = document.querySelector(".summary-total");
                summaryElement.innerText = 'Tổng tiền thanh toán ' + formatCurrency(total);
 
+               getCouponByUserId()
+                  .then(result => {
+                     const coupons = result.data;
+                     const container = document.querySelector(".voucher");
+                     container.innerHTML = "";
+
+                     if (!coupons || coupons.length === 0) {
+                        container.innerHTML = "<div class='voucherItem'>Không có mã khuyến mãi</div>";
+                        return;
+                     }
+
+                     coupons.forEach(coupon => {
+                        const div = document.createElement("div");
+                        div.className = `voucherItem voucher-${coupon.ID}`; 
+                        div.innerHTML = `
+                              <span>${coupon.name}   </span>
+                              <button class="apply-btn" onclick="toggleApply(this, ${total},${coupon.percent})">Áp Dụng</button>
+                           `;
+                        container.appendChild(div);
+                     });
+                  })
+                  .catch(error => {
+                     console.error('Lỗi khi gọi API:', error);
+                  });
+
+            }else{
+               alert("Vui Lòng Đăng Nhập")
+               window.location.href = '/sportswear-webstore/index.php';
             }
          })
          .catch(error => console.error('Lỗi khi lấy biến thể sản phẩm:', error));
-
-      getCouponByUserId()
-         .then(result => {
-            const coupons = result.data;
-            const container = document.querySelector(".voucher");
-            container.innerHTML = "";
-
-            if (!coupons || coupons.length === 0) {
-               container.innerHTML = "<div class='voucherItem'>Không có mã khuyến mãi</div>";
-               return;
-            }
-
-            coupons.forEach(coupon => {
-               const div = document.createElement("div");
-               div.className = `voucherItem voucher-${coupon.ID}`; 
-               div.innerHTML = `
-                     <span>${coupon.name}   </span>
-                     <button class="apply-btn" onclick="toggleApply(this, ${total},${coupon.percent})">Áp Dụng</button>
-                  `;
-               container.appendChild(div);
-            });
-         })
-         .catch(error => {
-            console.error('Lỗi khi gọi API:', error);
-         });
-
-
    }
+
    const formatCurrency = (value) => {
       return Number(value).toLocaleString('vi-VN') + '₫';
    };
