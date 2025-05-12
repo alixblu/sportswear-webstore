@@ -188,11 +188,15 @@ class OrderRepository
             return ['success' => false, 'message' => 'Lỗi khi tạo đơn hàng: ' . $stmt->error];
         }
     }
-    public function insertBillingDetail( $orderID, $receiverName, $address, $phone, $email = null)
+    public function insertBillingDetail($orderID, $receiverName, $address, $phone, $email = null)
     {
+        if ($orderID <= 0) {
+            throw new Exception("Invalid orderID: $orderID");
+        }
+
         $stmt = $this->conn->prepare("
-            INSERT INTO billingdetail ( orderID, receiverName, address, phone, email)
-            VALUES ( ?, ?, ?, ?, ?)
+            INSERT INTO billingdetail (orderID, receiverName, address, phone, email)
+            VALUES (?, ?, ?, ?, ?)
         ");
 
         if (!$stmt) {
@@ -207,6 +211,7 @@ class OrderRepository
 
         $stmt->close();
     }
+
 
     public function insertPayment($paymentMethodID, $orderID, $bankAccountID = null, $status = 'pending')
     {
