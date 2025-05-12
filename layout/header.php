@@ -157,7 +157,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 </ul>
             </div>
         <?php else: ?>
-            <?php include __DIR__ . '/../login_regis.php'; ?>
+            <?php              include __DIR__ . '/../layout/login_regis.php';?>
         <?php endif; ?>
     </div>
     <script>
