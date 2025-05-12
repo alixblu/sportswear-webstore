@@ -660,7 +660,7 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Tên đăng nhập</th>
+                                <th>Tên đăng nhập (Email)</th>
                                 <th>Họ và tên</th>
                                 <th>Số điện thoại</th>
                                 <th>Vai trò</th>
@@ -696,7 +696,7 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Tên đăng nhập</th>
+                                <th>Tên đăng nhập (Email)</th>
                                 <th>Họ và tên</th>
                                 <th>Số điện thoại</th>
                                 <th>Trạng thái</th>
