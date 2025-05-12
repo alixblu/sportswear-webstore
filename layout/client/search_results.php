@@ -173,7 +173,7 @@
     </div>
 
     <?php include __DIR__ . '/../footer.php'; ?>
-
+    <script src="../../js/client/cartApi.js" defer></script>
     <script src="../../js/client/search.js" defer></script>
 
 </body>

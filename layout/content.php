@@ -354,6 +354,8 @@
             }
 
         }
+        window.currentSlide = currentSlide;
+
     </script>
 </body>
 
