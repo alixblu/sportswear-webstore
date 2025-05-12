@@ -14,7 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             case 'getAllOrders':
                 $orderController->getAllOrders();
                 break;
-
+            case 'getOrdersByCustomer':
+                $orderController->getOrdersByCustomer();
+                break;
             case 'getOrderDetails':
                 $orderID = $_GET['id'] ?? null;
                 if ($orderID !== null) {
@@ -51,5 +53,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     } else {
         http_response_code(400);
         echo json_encode(['error' => 'Yêu cầu PUT không hợp lệ']);
+    }
+}
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action']) && $_POST['action'] === 'createOrders') {
+        $receiverName = $_POST['receiverName'] ?? '';
+        $address = $_POST['address'] ?? '';
+        $phone = $_POST['phone'] ?? '';
+        $idCoupon = $_POST['idCoupon'] ?? null;
+        $payment = $_POST['payment'] ?? '';
+
+        $orderController->createOrders($receiverName, $address, $phone, $idCoupon, $payment);
+    } else {
+        echo "Invalid POST request.";
     }
 }

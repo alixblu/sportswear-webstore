@@ -45,7 +45,7 @@ $user = $_SESSION['user'];
 
 
 </body>
-    <script src="../../JS/admin/userApi.js"></script>
+    <script src="/sportswear-webstore/JS/admin/userApi.js"></script>
     <script>
         document.querySelector('.change-password-form').addEventListener('submit', async (e) => {
             e.preventDefault(); 

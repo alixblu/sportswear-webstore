@@ -1,16 +1,11 @@
 <?php
-require_once __DIR__ . '/../controller/accountController.php';
-require_once __DIR__ . '/../controller/authcontroller.php';
-
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Content-Type: application/json; charset=utf-8');
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
+require_once dirname(__FILE__) . '/../controller/accountcontroller.php';
+require_once __DIR__ . '/../controller/authcontroller.php';
 
 $controller = new AccountController();
 $authController = new AuthController();
@@ -21,70 +16,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             case 'getAllAccounts':
                 $controller->getAllAccounts();
                 break;
+
             case 'getAccountById':
                 $accountId = $_GET['accountId'] ?? null;
-                if ($accountId !== null) {
-                    $controller->getAccountById($accountId);
+                if ($accountId !== null && is_numeric($accountId)) {
+                    $controller->getAccountById((int)$accountId);
                 } else {
-                    echo json_encode(['status' => 400, 'message' => 'Thiếu accountId'], JSON_UNESCAPED_UNICODE);
+                    echo json_encode(['status' => 400, 'message' => 'Thiếu hoặc accountId không hợp lệ']);
                 }
                 break;
-            case 'getPermissions':
-                $roleId = $_GET['roleId'] ?? null;
-                if ($roleId !== null) {
-                    $controller->getPermissions($roleId);
-                } else {
-                    echo json_encode(['status' => 400, 'message' => 'Thiếu roleId'], JSON_UNESCAPED_UNICODE);
-                }
-                break;
-            case 'getAllModules':
-                $controller->getAllModules();
-                break;
+
             case 'getAllRoles':
                 $controller->getAllRoles();
+                break;
+
+            case 'getPermissions':
+                $roleId = $_GET['roleId'] ?? null;
+                if ($roleId !== null && is_numeric($roleId)) {
+                    $controller->getPermissions((int)$roleId);
+                } else {
+                    echo json_encode(['status' => 400, 'message' => 'Thiếu hoặc roleId không hợp lệ']);
+                }
+                break;
+
+            case 'getAllModules':
+                $controller->getAllModules();
                 break;
             case 'info':
                 $authController->info();
                 break;
             default:
-                echo json_encode(['status' => 400, 'message' => 'Hành động không hợp lệ'], JSON_UNESCAPED_UNICODE);
+                echo json_encode(['status' => 400, 'message' => 'Hành động GET không hợp lệ']);
         }
     } else {
-        echo json_encode(['status' => 400, 'message' => 'Yêu cầu GET không hợp lệ'], JSON_UNESCAPED_UNICODE);
+        echo json_encode(['status' => 400, 'message' => 'Thiếu tham số action']);
     }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    if (isset($input['action'])) {
-        switch ($input['action']) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (isset($data['action'])) {
+        switch ($data['action']) {
             case 'createAccount':
-                $username = $input['username'] ?? '';
-                $password = $input['password'] ?? '';
-                $fullname = $input['fullname'] ?? '';
-                $phone = $input['phone'] ?? '';
-                $roleId = $input['roleId'] ?? '';
-                $status = $input['status'] ?? '';
-                $email = $input['email'] ?? null;
-                $address = $input['address'] ?? null;
-                $gender = $input['gender'] ?? null;
-                $dateOfBirth = $input['dateOfBirth'] ?? null;
-                $controller->createAccount($username, $password, $fullname, $phone, $roleId, $status, $email, $address, $gender, $dateOfBirth);
-                break;
-            case 'filterAccounts':
-                $controller->filterAccounts($input);
+                if (!isset($data['username'], $data['password'], $data['fullname'], $data['phone'], $data['roleId'], $data['status'])) {
+                    echo json_encode(['status' => 400, 'message' => 'Thiếu các trường bắt buộc']);
+                    exit;
+                }
+                $controller->createAccount(
+                    $data['username'],
+                    $data['password'],
+                    $data['fullname'],
+                    $data['phone'],
+                    $data['roleId'],
+                    $data['status'],
+                    $data['email'] ?? null,
+                    $data['address'] ?? null,
+                    $data['gender'] ?? null,
+                    $data['dateOfBirth'] ?? null
+                );
                 break;
 
+            case 'filterAccounts':
+                if (!isset($data['type'])) {
+                    echo json_encode(['status' => 400, 'message' => 'Thiếu loại tài khoản']);
+                    exit;
+                }
+                $filters = [
+                    'type' => $data['type'],
+                    'status' => $data['status'] ?? 'all',
+                    'roleID' => $data['roleID'] ?? 'all'
+                ];
+                $controller->filterAccounts($filters);
+                break;
+
+            case 'updatePermissions':
+                if (!isset($data['roleId'], $data['moduleIds']) || !is_array($data['moduleIds'])) {
+                    echo json_encode(['status' => 400, 'message' => 'Thiếu roleId hoặc danh sách moduleIds không hợp lệ']);
+                    exit;
+                }
+                $controller->updatePermissions($data['roleId'], $data['moduleIds']);
+                break;
+            
             case 'updatePassword':
-                $currentPassword = $input['currentPassword'] ?? '';
-                $newPassword = $input['newPassword'] ?? '';
+                $currentPassword = $data['passwordOld'] ?? '';
+                $newPassword = $data['newPassword'] ?? '';
                 $authController->updatePassword($currentPassword, $newPassword);
                 break;
+
             default:
-                echo json_encode(['status' => 400, 'message' => 'Hành động không hợp lệ'], JSON_UNESCAPED_UNICODE);
+                echo json_encode(['status' => 400, 'message' => 'Hành động POST không hợp lệ']);
         }
     } else {
-        echo json_encode(['status' => 400, 'message' => 'Yêu cầu POST không hợp lệ'], JSON_UNESCAPED_UNICODE);
+        echo json_encode(['status' => 400, 'message' => 'Thiếu tham số action']);
     }
 }
 
@@ -119,8 +142,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
                 $birth = $input['birth'] ?? '';
                 $phone = $input['phone'] ?? '';
                 $gender = $input['gender'] ?? '';
-
-                $authController->updateUserLogin($name, $address, $birth, $phone, $gender);
+    
+                $authController->updateUserLogin($name, $address, $birth,$phone,$gender);
                 break;
 
             default:
@@ -131,11 +154,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     }
 }
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     if (isset($_GET['action']) && $_GET['action'] === 'deleteAccount' && isset($_GET['accountId'])) {
-        $controller->deleteAccount($_GET['accountId']);
+        $accountId = $_GET['accountId'];
+        if (is_numeric($accountId)) {
+            $controller->deleteAccount((int)$accountId);
+        } else {
+            echo json_encode(['status' => 400, 'message' => 'accountId không hợp lệ']);
+        }
     } else {
-        echo json_encode(['status' => 400, 'message' => 'Yêu cầu DELETE không hợp lệ'], JSON_UNESCAPED_UNICODE);
+        echo json_encode(['status' => 400, 'message' => 'Hành động DELETE không hợp lệ']);
     }
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+?>

@@ -49,7 +49,7 @@ $user = $_SESSION['user'];
         </div>
     </div>
 </body>
-    <script src="../../JS/admin/userApi.js"></script>
+    <script src="/sportswear-webstore/JS/admin/userApi.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             try {
@@ -97,7 +97,7 @@ $user = $_SESSION['user'];
                     formData.address,
                     formData.birth,
                     formData.phone,
-                    formData.gender === 'male' ? 0 : gender === 'female' ? 1 : 2,
+                    formData.gender === 'male' ? 0 : formData.gender === 'female' ? 1 : 2,
                 );
                 
                 if (result) {

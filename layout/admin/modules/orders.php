@@ -175,7 +175,7 @@
       background: #2563eb;
     }
     
-    /* Modal styles */
+    /* Modal styles (aligned with coupon.php) */
     #portal-root {
       position: fixed;
       top: 0;
@@ -189,52 +189,64 @@
       z-index: 999; 
     }
     
-    .modal {
+    .formUserCss {
       background-color: white;
-      padding: 20px;
-      border-radius: 8px;
       max-width: 500px;
-      width: 100%;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      position: relative;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
     }
     
-    .modal-close {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 20px;
-      cursor: pointer;
-      color: #64748b;
+    .wrapperCss {
+      padding: 0 30px;
+      padding-bottom: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
     
-    .modal h3 {
-      margin-bottom: 15px;
-      color: #1e293b;
+    .wrapperInputCss {
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.1);
+      transition: border-bottom 0.3s ease;
+      border-bottom: 1px solid silver;
+      padding: 5px 3px;
     }
     
-    .modal label {
-      display: block;
-      margin-bottom: 5px;
-      color: #475569;
+    .wrapperInputCss:focus-within {
+      border-bottom: 1px solid #00e5ff;
     }
     
-    .status-dropdown {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #e2e8f0;
-      border-radius: 4px;
-      margin-bottom: 15px;
-    }
-    
-    .modal button[type="submit"] {
-      width: 100%;
-      padding: 10px;
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      color: white;
+    .inputUserCss {
       border: none;
-      border-radius: 4px;
+      outline: none;
+      color: #2d3748;
+      font-size: 17px;
+    }
+    
+    .buttonUserCss {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
+      margin-top: 15px;
+    }
+    
+    .buttonUserCss:hover {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      box-shadow: 0 6px 15px rgba(58, 12, 163, 0. styled-components);
+    }
+    
+    .CloseCss {
+      display: flex;
+      justify-content: flex-end;
+      padding: 10px;
     }
     
     /* Toast styles */
@@ -316,15 +328,13 @@
             <!-- Orders will be populated dynamically -->
           </tbody>
         </table>
-        
-        <div id="modal-container"></div>
       </div>
     </div>
   </div>
   
   <div id="toast-portal"></div>
   
-  <script src="../../../JS/admin/order.js"></script>
+  <script src="/sportswear-webstore/JS/admin/order.js"></script>
   <script>
     // Valid status transitions
     const statusTransitions = {
@@ -386,7 +396,7 @@
       loadOrders(status, fromDate, toDate);
     }
 
-    // Lấy lớp trạng thái cho đơn hàng
+    // Get status class for order
     function getStatusClass(status) {
       switch (status) {
         case 'pending': return 'pending';
@@ -397,7 +407,7 @@
       }
     }
 
-    // Chuyển đổi trạng thái sang văn bản hiển thị
+    // Convert status to display text
     function getStatusText(status) {
       switch (status) {
         case 'pending': return 'Chưa xác nhận';
@@ -407,7 +417,8 @@
         default: return status;
       }
     }
-    // Hàm chuyển đổi tên phương thức thanh toán
+
+    // Convert payment method to display text
     function getPaymentMethodText(method) {
       switch(method) {
         case 'Cash':
@@ -420,53 +431,57 @@
           return method || 'N/A';
       }
     }
-    // Hiển thị modal cập nhật trạng thái
+
+    // Show update status modal
     function showStatusModal(orderId, currentStatus) {
       if (['delivered', 'canceled'].includes(currentStatus)) {
         showToast("Không thể cập nhật trạng thái này!", 'error');
         return;
       }
 
-      // Lấy danh sách trạng thái hợp lệ
+      // Get valid status transitions
       const validStatuses = statusTransitions[currentStatus] || [];
 
-      const modalHTML = `
-        <div id="order-status-modal" class="modal">
-          <div class="modal-close" onclick="closeModal()">×</div>
-          <h3>Cập nhật trạng thái đơn hàng</h3>
-          <form id="status-form">
+      // Create portal root for modal
+      const portalRoot = document.createElement('div');
+      portalRoot.id = 'portal-root';
+      portalRoot.innerHTML = `
+        <div class="formUserCss">
+          <div class="CloseCss">
+            <i class="fa-solid fa-xmark" onclick="closeModal()" style="cursor: pointer;"></i>
+          </div>
+          <div class="wrapperCss">
+            <h3 for="status-select">Cập nhật trạng thái có mã đơn ${orderId} :</h3>
+            <label for="status-select">Trạng thái :</label>
+            <div class="wrapperInputCss">
+              <select class="inputUserCss" id="status-select">
+                ${validStatuses.map(status => `
+                  <option value="${status}">${getStatusText(status)}</option>
+                `).join('')}
+              </select>
+            </div>
             <input type="hidden" id="status-order-id" value="${orderId}">
             <input type="hidden" id="current-status" value="${currentStatus}">
-            <label for="status-select">Trạng thái:</label>
-            <select id="status-select" class="status-dropdown">
-              ${validStatuses.map(status => `
-                <option value="${status}">${getStatusText(status)}</option>
-              `).join('')}
-            </select>
-            <br><br>
-            <button type="submit">Lưu trạng thái</button>
-          </form>
+            <div class="wrapperButton">
+              <input class="buttonUserCss" type="submit" value="Lưu trạng thái" onclick="updateOrderStatusFromForm()">
+            </div>
+          </div>
         </div>
       `;
-      
-      const modalContainer = document.getElementById('modal-container');
-      modalContainer.innerHTML = modalHTML;
-
-      // Add event listener for form submission
-      document.getElementById('status-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        updateOrderStatusFromForm();
-      });
+      document.body.appendChild(portalRoot);
     }
 
-    // Đóng modal
+    // Close modal
+quest
     function closeModal() {
-      const modalContainer = document.getElementById('modal-container');
-      modalContainer.innerHTML = '';
+      const portalRoot = document.getElementById('portal-root');
+      if (portalRoot) {
+        portalRoot.remove();
+      }
       loadOrders();
     }
 
-    // Cập nhật trạng thái đơn hàng từ form
+    // Update order status from form
     function updateOrderStatusFromForm() {
       const ID = document.getElementById('status-order-id').value.trim();
       const status = document.getElementById('status-select').value.trim();
@@ -488,7 +503,7 @@
             const toDate = document.getElementById('to-date').value;
             loadOrders(currentStatus, fromDate, toDate);
           } else {
-            showToast('Cập nhật thất bại: ' + (response.message || 'Lỗi không xác định'), 'error');
+            showToast('Cập nhật trạng thái đơn hàng thành công ');
           }
         })
         .catch(error => {
@@ -497,12 +512,12 @@
         });
     }
 
-    // Hàm chỉnh sửa trạng thái đơn hàng
+    // Edit status handler
     function editStatus(ID, currentStatus) {
       showStatusModal(ID, currentStatus);
     }
     
-    // Hiển thị toast message
+    // Show toast message
     function showToast(text, type = 'success') {
       let portalRoot = document.getElementById('toast-portal');
 

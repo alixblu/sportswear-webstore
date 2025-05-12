@@ -1,4 +1,4 @@
-const API_URL = '../../src/router/productRouter.php';
+const API_URL = '/sportswear-webstore/src/router/productRouter.php';
 
 // ===================================== GET products ===================================== 
 const getAllProducts = async () => {

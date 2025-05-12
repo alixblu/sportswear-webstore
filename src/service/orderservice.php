@@ -1,13 +1,24 @@
 <?php
 require_once dirname(__FILE__) . '/../repository/orderrepository.php';
+require_once dirname(__FILE__) . '/../service/orderservice.php';
+require_once dirname(__FILE__) . '/../service/cartservice.php';
+require_once dirname(__FILE__) . '/../service/couponservice.php';
 
 class OrderService
 {
     private $orderRepository;
+    private $couponService;
+    private $cartService;
+    private $userUtils;
 
+    
     public function __construct()
     {
         $this->orderRepository = new OrderRepository();
+        $this->couponService = new CouponService();
+        $this->cartService = new CartService();
+        $this->userUtils = new UserUtils();
+
     }
 
     public function getAllOrders()
@@ -18,7 +29,15 @@ class OrderService
             throw new Exception("Failed to retrieve orders: " . $e->getMessage());
         }
     }
-
+    public function getOrdersByCustomer()
+    {
+        try {
+            $customerId = $this->userUtils->getUserId();
+            return $this->orderRepository->getOrdersByCustomer($customerId);
+        } catch (Exception $e) {
+            throw new Exception("Failed to retrieve orders: " . $e->getMessage());
+        }
+    }
     public function getOrderDetails($orderID)
     {
         try {
@@ -93,5 +112,48 @@ class OrderService
             throw new Exception("Failed to search orders: " . $e->getMessage());
         }
     }
+    public function createOrders($receiverName,$address,$phone,$idCoupon,$payment)
+    {
+        try {
+            $userAccID = $this->userUtils->getUserId();
+
+            if ($idCoupon !== null && $idCoupon !== '' && strtolower($idCoupon) !== 'null') {
+                $coupon = $this->couponService->getCouponById($idCoupon);
+                //todo: check status coupon
+                if (!$coupon) {
+                    throw new Exception("coupon Error");
+                }
+                $couponId = $idCoupon;
+                $this->couponService->useCoupon($userAccID,$idCoupon);
+            } else {
+                $couponId = null;
+            }
+    
+            $carts = $this->cartService->getCartByUserId();
+            $totalPrice = 0.0;
+
+            foreach ($carts as $item) {
+                $totalPrice += $item['quantity'] * $item['productPrice'];
+            }   
+
+            $order =  $this->orderRepository->createOrder($userAccID, $couponId, $totalPrice);
+
+            foreach ($carts as $item) {
+                $productID = $item['productID'];
+                $quantity = $item['quantity'];
+                $totalPriceForItem = $item['quantity'] * $item['productPrice'];
+    
+                $this->orderRepository->insertOrderDetail($order['order_id'], $productID, $quantity, $totalPriceForItem);
+            }
+
+            $this->orderRepository->insertBillingDetail($order['order_id'], $receiverName, $address, $phone);
+            $this->orderRepository->insertPayment($payment, $order['order_id']);
+            $this->cartService->deleteCartByUserId();
+            return $order ;
+        } catch (Exception $e) {
+            throw new Exception("Failed to search orders: " . $e->getMessage());
+        }
+    }
+
 }
 ?>

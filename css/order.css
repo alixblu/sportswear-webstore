@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+  .order-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+  }
+
+  .order-table th, .order-table td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .order-table th {
+    background-color: #f0f0f0;
+  }
+
+  .status {
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  .details-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .details-btn:hover {
+    background-color: #0056b3;
+  }
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background-color: #fff;
+  padding: 20px;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow-y: auto;
+  max-height: 80vh;
+  font-family: 'Inter', sans-serif;
+}
+
+.titlePopup {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.titlePopup div {
+  font-size: 1.75rem;
+  color: #ff0000;
+}
+
+
+.close {
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #dc3545;
+}
+.close {
+  cursor: pointer;
+  font-size: 1.5rem; 
+  color: #333;
+  background-color: red; 
+  border-radius: 50%; 
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.close:hover {
+  background-color: #dc3545;
+  color: #fff; 
+}
+.invoice-section p {
+  margin: 10px 0;
+  font-size: 1rem;
+  font-weight: 400; 
+}
+
+.invoice-section hr {
+  margin: 20px 0;
+  border: 1px solid #ddd;
+}
+
+.invoice-items {
+  margin-bottom: 10px;
+}
+
+.invoice-items p {
+  margin: 5px 0;
+  font-size: 1rem;
+  font-weight: 400; 
+}
+
+.total-price {
+  font-size: 1.3rem;
+  font-weight: 600; 
+  margin-top: 20px;
+  color: #333;
+}
+
+.btn-xong {
+  display: block;
+  margin: 20px auto 0;
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-xong:hover {
+  background-color: #218838;
+}

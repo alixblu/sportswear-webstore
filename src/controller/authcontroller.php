@@ -1,4 +1,9 @@
+
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 include dirname(__FILE__) . '/../service/userservice.php';
 include_once  dirname(__FILE__) . '/../config/response/apiresponse.php';
 require_once dirname(__FILE__) . '/../utils/userUtils.php';
@@ -15,6 +20,7 @@ class AuthController
 
     public function login($userName, $passWord)
     {
+
         try {
             if (empty($userName) || empty($passWord)) {
                 throw new Exception("Please enter complete information to login", 400);
@@ -75,20 +81,21 @@ class AuthController
         }
     }
 
-    public function info()
-    {
-        try {
-            $user =  $this->userService->info();
-            ApiResponse::customApiResponse($user, 200);
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
+
     public function updateUserLogin($name, $address, $birth, $phone, $gender)
     {
         try {
             $user =  $this->userService->updateUserLogin($name, $address, $birth, $phone, $gender);
             ApiResponse::customApiResponse($user, 200);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    public function info(){
+        try {
+            $user =  $this->userService->info();
+            ApiResponse::customApiResponse($user, 200);
+
         } catch (Exception $e) {
             throw $e;
         }

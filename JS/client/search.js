@@ -55,6 +55,24 @@ if (searchForm) {
     searchForm.addEventListener('submit', performSearch);
 }
 
+// Lấy tham số từ URL
+function getQueryParams() {
+    const params = {};
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.forEach((value, key) => {
+        if (value) {
+            if (key === 'price_start') {
+                params['min_price'] = value;
+            } else if (key === 'price_end') {
+                params['max_price'] = value;
+            } else {
+                params[key] = value;
+            }
+        }
+    });
+    return params;
+}
+
 async function loadFilters() {
     try {
         const [brandsResponse, categoriesResponse] = await Promise.all([
@@ -69,6 +87,9 @@ async function loadFilters() {
         const categorySelect = document.querySelector('select[name="category"]');
         const brandError = document.getElementById('brand-error');
         const categoryError = document.getElementById('category-error');
+
+        // Lấy tham số từ URL
+        const initialParams = getQueryParams();
 
         if (brandsData.status === 200 && Array.isArray(brandsData.data)) {
             brandSelect.innerHTML = '<option value="">Tất cả thương hiệu</option>';
@@ -103,12 +124,28 @@ async function loadFilters() {
             console.error('Lỗi tải danh mục:', categoriesData.message || 'Không có dữ liệu');
             categoryError.style.display = 'block';
         }
+
+        // Cập nhật giá trị cho các input khác
+        document.querySelector('input[name="min_price"]').value = initialParams.min_price || '';
+        document.querySelector('input[name="max_price"]').value = initialParams.max_price || '';
+        document.querySelector('select[name="status"]').value = initialParams.status || '';
+        document.querySelector('select[name="sort"]').value = initialParams.sort || 'newest';
+
+        // Gọi updateResults với tham số từ URL
+        if (Object.keys(initialParams).length > 0) {
+            updateResults(initialParams);
+        }
     } catch (error) {
         console.error('Lỗi khi tải bộ lọc:', error);
         document.getElementById('brand-error').style.display = 'block';
         document.getElementById('category-error').style.display = 'block';
     }
 }
+
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadFilters();
+});
 
 async function updateResults(params = {}) {
     const itemsPerPage = 12;
@@ -164,14 +201,15 @@ async function updateResults(params = {}) {
                 const imagePath = `/sportswear-webstore/img/products/${product.ID}.jpg`;
                 const defaultImage = '/sportswear-webstore/img/products/default.jpg';
                 const rating = parseFloat(product.rating || 0);
-                const fullStars = Math.floor(rating);
-                const hasHalfStar = rating - fullStars >= 0.5;
+                const scaledRating = rating / 2; // Assuming rating is out of 10, scale to 5 stars
+                const fullStars = Math.floor(scaledRating);
+                const hasHalfStar = scaledRating % 1 >= 0.5;
                 let ratingHtml = '';
                 for (let i = 1; i <= 5; i++) {
                     if (i <= fullStars) {
                         ratingHtml += '<i class="fas fa-star"></i>';
                     } else if (hasHalfStar && i === fullStars + 1) {
-                        ratingHtml += '<i class="fas fa-star-half-alt"></i>';
+                        ratingHtml += '<i class="fas fa-star-half-alt"></i>'; // Use half-star icon
                     } else {
                         ratingHtml += '<i class="far fa-star"></i>';
                     }
@@ -183,7 +221,7 @@ async function updateResults(params = {}) {
                 const formattedPrice = Math.round(sellingPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' ₫';
 
                 return `
-                    <a href="/sportswear-webstore/layout/client/product_detail.php?id=${product.ID}" class="product-card">
+                    <a href="/sportswear-webstore/layout/client/detailproduct.php?id=${product.ID}" class="product-card">
                         ${product.status === 'out_of_stock' ? '<div class="discount-badge">Hết hàng</div>' : ''}
                         <div class="product-image">
                             <img src="${imagePath}" alt="${product.name}" onerror="this.src='${defaultImage}'">
@@ -194,14 +232,16 @@ async function updateResults(params = {}) {
                         </div>
                         <div class="product-rating">
                             ${ratingHtml}
-                            <span>(${rating.toFixed(1)})</span>
+                            <span>(${scaledRating.toFixed(1)})</span>
                         </div>
-                        <button class="buy-button" ${product.status === 'out_of_stock' ? 'disabled' : ''}>
+                        <button class="buy-button" id="idProduct-${product.ID}" ${product.status === 'out_of_stock' ? 'disabled' : ''}>
                             <i class="fas fa-shopping-cart"></i>
                             ${product.status === 'in_stock' ? 'Thêm vào giỏ' : 'Hết hàng'}
                         </button>
+                        
                     </a>
                 `;
+          
             }).join('')
             : `
                 <div class="no-results">
@@ -258,8 +298,40 @@ async function updateResults(params = {}) {
             </div>`;
         pagination.innerHTML = '';
     }
-}
 
+        
+    document.querySelectorAll('.buy-button').forEach(buyButton => {
+        buyButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            const productId = this.id.replace('idProduct-', '');
+            themVaoGio(productId);
+        });
+    });
+    async function themVaoGio(productId) {
+        const quantity = 1;
+        try {
+            const result = await addCartDetail(productId, quantity);
+
+            if (result.status === 200) {
+                alert('Đã thêm sản phẩm vào giỏ');
+            } else {
+                alert('Có lỗi xảy ra: ' + (result.data?.error || 'Không rõ lỗi'));
+            }
+        } catch (error) {
+            const status = error.response?.status;
+            const message = error.response?.data?.error || 'Lỗi không xác định';
+
+            if (status === 400) {
+                alert('Lỗi 400 - Bad Request: ' + message);
+            } else if (status === 401) {
+                alert('Bạn chưa đăng nhập. Vui lòng đăng nhập lại.');
+            } else {
+                alert('Đã xảy ra lỗi: ' + message);
+            }
+        }
+
+    }
+}
 async function getNameFromId(id, type) {
     try {
         const url = `http://localhost/sportswear-webstore/src/router/searchrouter.php?action=get${type}ById&id=${id}`;
@@ -297,3 +369,4 @@ if (filterForm) {
         });
     });
 }
+

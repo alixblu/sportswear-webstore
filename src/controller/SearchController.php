@@ -10,7 +10,7 @@ class SearchController
     {
         $this->searchService = new SearchService();
     }
-
+    
     public function searchProducts($category, $brand, $status, $min_price, $max_price, $sort, $search)
     {
         try {
@@ -117,4 +117,6 @@ class SearchController
             ApiResponse::customApiResponse(null, 500, $e->getMessage());
         }
     }
+
+    
 }

@@ -1,5 +1,5 @@
 const API_URL = '../../src/router/userRouter.php';
-const API_ACCOUNT_URL = '../../src/router/accountrouter.php';
+const API_ACCOUNT_URL = '/sportswear-webstore/src/router/accountrouter.php';
 
 const getAccountByUserId = async (userId) => {
     const response = await fetch(`${API_URL}?action=getAccountByUserId&userId=${userId}`, {
@@ -223,7 +223,7 @@ const updateUserLogin = async (name, address,birth,phone,gender) => {
     }
 };
 
-const updateUserPassword = async (currentPassword,passWord) => {
+const updateUserPassword = async (passwordOld,passWord) => {
     try {
         const response = await fetch(`${API_ACCOUNT_URL}`, {
             method: "POST",
@@ -232,7 +232,7 @@ const updateUserPassword = async (currentPassword,passWord) => {
             },
             body: JSON.stringify({
                 action: "updatePassword",
-                currentPassword: currentPassword,
+                passwordOld: passwordOld,
                 newPassword: passWord,
             }),
         });
@@ -248,4 +248,3 @@ const updateUserPassword = async (currentPassword,passWord) => {
         console.error("Lỗi:", err);
     }
 };
-

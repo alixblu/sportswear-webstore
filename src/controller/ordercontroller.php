@@ -23,7 +23,15 @@ class OrderController
             ApiResponse::customResponse(null, 500, $e->getMessage());
         }
     }
-
+    public function getOrdersByCustomer()
+    {
+        try {
+            $orders = $this->orderService->getOrdersByCustomer();
+            ApiResponse::customResponse($orders, 200);
+        } catch (Exception $e) {
+            ApiResponse::customResponse(null, 500, $e->getMessage());
+        }
+    }
     /**
      * Get order details by ID
      * @param int $orderID
@@ -79,6 +87,16 @@ class OrderController
     {
         try {
             $results = $this->orderService->searchOrders($orderID, $customerName, $status, $fromDate, $toDate);
+            ApiResponse::customResponse($results, 200);
+        } catch (Exception $e) {
+            ApiResponse::customResponse(null, 500, $e->getMessage());
+        }
+    }
+
+    public function createOrders($receiverName,$address,$phone,$idCoupon,$payment)
+    {
+        try {
+            $results = $this->orderService->createOrders($receiverName,$address,$phone,$idCoupon,$payment);
             ApiResponse::customResponse($results, 200);
         } catch (Exception $e) {
             ApiResponse::customResponse(null, 500, $e->getMessage());
