@@ -230,7 +230,7 @@
                 const productImage = document.createElement('div');
                 productImage.classList.add('product-image');
                 const img = document.createElement('img');
-                img.src = `/img/products/${product.ID}.jpg`;
+                img.src = `/img/products/product${product.ID}/${product.image}`;
                 img.alt = product.name;
                 img.onerror = function() {
                     this.src = '/img/products/default.jpg';

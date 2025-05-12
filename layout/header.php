@@ -150,7 +150,7 @@
                 </ul>
             </div>
         <?php else: ?>
-            <?php include __DIR__ . '/../login_regis.php'; ?>
+            <?php include __DIR__ . '/login_regis.php'; ?>
         <?php endif; ?>
     </div>
     <script>
