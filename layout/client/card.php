@@ -11,7 +11,8 @@
    <!-- font -->
    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
    <style>
-      
+  
+
    </style>
 </head>
 <body>
@@ -86,7 +87,20 @@
             if (res.status === 200) {
                const cartItems = res.data;
                const cartTableBody = document.querySelector(".cart-table tbody");
+               const cartContainer = document.querySelector(".cart-container");
+
                cartTableBody.innerHTML = "";
+
+               
+               if (!cartItems || cartItems.length === 0) {
+                  cartContainer.innerHTML = `
+                     <div class="empty-cart-message">
+                        <image src="/sportswear-webstore/img/emptycart.png" />
+                        <p>Giỏ hàng của bạn đang trống!</p>
+                     </div>
+                  `;
+               }
+
 
                cartItems.forEach(item => {
                   const row = document.createElement("tr");
@@ -366,13 +380,64 @@
       }
       createOrder(voucherId)
       .then(data => {
-         console.log('Đơn hàng đã tạo:', data);
+         closePopup()
+         showhoadon()
       })
       .catch(error => {
          console.error('Lỗi:', error.message);
       });
    }
+   function showhoadon() {
+      showInvoiceDetailPopup()
+   }
 
+   async function showInvoiceDetailPopup() {
+      const result = await getInfo();
+      const userData = result.data;
+
+      const overlay = document.createElement('div');
+      overlay.classList.add('popup-overlay');
+
+      const popup = document.createElement('div');
+      popup.classList.add('popup-content');
+      popup.innerHTML = `
+         <div class="titlePopup">
+            <div>Chi Tiết Hóa Đơn</div>
+            <div onclick="closePopup()" style="cursor: pointer;">X</div>
+         </div>
+         <div class="invoice-section">
+            <p><strong>Họ tên:</strong> ${userData.fullname || '---'}</p>
+            <p><strong>Địa chỉ:</strong> ${userData.address || '---'}</p>
+            <p><strong>Số điện thoại:</strong> ${userData.phone || '---'}</p>
+            <p><strong>Hình thức thanh toán:</strong> ${userData.paymentMethod === 'online' ? 'Trực tuyến' : 'Tiền mặt'}</p>
+            <hr/>
+            <div class="invoice-items">
+               <!-- Giả sử bạn có hàm getCartItems() để lấy danh sách sản phẩm -->
+            </div>
+            <p class="total-price"><strong>Tổng cộng:</strong> <span id="totalPrice">0₫</span></p>
+            <button onclick="closePopup()" class="btn-xong">Đóng</button>
+         </div>
+      `;
+
+      overlay.appendChild(popup);
+      document.body.appendChild(overlay);
+
+      const cartItems = await getCartItems(); // Gọi API hoặc lấy từ biến có sẵn
+      const itemsContainer = popup.querySelector('.invoice-items');
+
+      let total = 0;
+      cartItems.forEach(item => {
+         const itemEl = document.createElement('div');
+         itemEl.classList.add('item');
+         itemEl.innerHTML = `
+            <p>${item.name} x ${item.quantity} - ${item.price.toLocaleString()}₫</p>
+         `;
+         itemsContainer.appendChild(itemEl);
+         total += item.quantity * item.price;
+      });
+
+      popup.querySelector('#totalPrice').textContent = `${total.toLocaleString()}₫`;
+   }
 
    function handleAddressChange() {
    const addressSelect = document.getElementById('addressSelect');

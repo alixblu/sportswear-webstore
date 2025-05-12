@@ -237,3 +237,27 @@ body {
     border-color: #007bff;
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
  }
+ .empty-cart-message {
+   text-align: center;
+   padding: 40px 20px;
+   color: #666;
+   font-size: 20px;
+   font-style: italic;
+   background-color: #f9f9f9;
+   border-radius: 10px;
+   margin: 20px auto;
+   max-width: 500px;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.empty-cart-message img {
+   width: 500px;
+   height: auto;
+   margin-bottom: 20px;
+   opacity: 0.8;
+}
+
+.empty-cart-message p {
+   margin: 0;
+   justify-content: center;
+}
