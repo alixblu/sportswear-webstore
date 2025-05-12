@@ -268,7 +268,7 @@
         </div>
     </div>
 </body>
-<script src="../JS/admin/coupon.js"></script>
+<script src="/sportswear-webstore/JS/admin/coupon.js"></script>
 <script>
     showAll();
     function showAll() {

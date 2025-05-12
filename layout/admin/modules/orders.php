@@ -324,7 +324,7 @@
   
   <div id="toast-portal"></div>
   
-  <script src="../../../JS/admin/order.js"></script>
+  <script src="/sportswear-webstore/JS/admin/order.js"></script>
   <script>
     // Valid status transitions
     const statusTransitions = {
