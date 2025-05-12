@@ -14,7 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             case 'getAllOrders':
                 $orderController->getAllOrders();
                 break;
-
+            case 'getOrdersByCustomer':
+                $orderController->getOrdersByCustomer();
+                break;
             case 'getOrderDetails':
                 $orderID = $_GET['id'] ?? null;
                 if ($orderID !== null) {

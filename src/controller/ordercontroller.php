@@ -23,7 +23,15 @@ class OrderController
             ApiResponse::customResponse(null, 500, $e->getMessage());
         }
     }
-
+    public function getOrdersByCustomer()
+    {
+        try {
+            $orders = $this->orderService->getOrdersByCustomer();
+            ApiResponse::customResponse($orders, 200);
+        } catch (Exception $e) {
+            ApiResponse::customResponse(null, 500, $e->getMessage());
+        }
+    }
     /**
      * Get order details by ID
      * @param int $orderID

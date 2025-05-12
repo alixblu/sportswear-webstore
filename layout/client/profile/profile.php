@@ -97,7 +97,7 @@ $user = $_SESSION['user'];
                     formData.address,
                     formData.birth,
                     formData.phone,
-                    formData.gender === 'male' ? 0 : gender === 'female' ? 1 : 2,
+                    formData.gender === 'male' ? 0 : formData.gender === 'female' ? 1 : 2,
                 );
                 
                 if (result) {

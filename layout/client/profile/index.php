@@ -33,32 +33,8 @@ $user = $_SESSION['user'];
             <div class="sidebar">
         
 
-                <div class="section">
-                    <div class="section-title">
-                        <i class="ri-shopping-bag-line" style="color: #000;"></i>
-                        Shopping
-                    </div>
-                    <div class="section-items">
-                        <div class="sidebar-item">
-                            <i class="ri-heart-line" style="color: #000;"></i>
-                            My Wishlist
-                        </div>
-                        <div class="sidebar-item">
-                            <i class="ri-shopping-cart-line" style="color: #000;"></i>
-                            My Orders
-                        </div>
-                        <div class="sidebar-item">
-                            <i class="ri-arrow-left-right-line" style="color: #000;"></i>
-                            My Returns
-                        </div>
-                        <div class="sidebar-item">
-                            <i class="ri-close-circle-line" style="color: #000;"></i>
-                            My Cancellations
-                        </div>
-                    </div>
-                </div>
 
-                <div class="section">
+                <!-- <div class="section">
                     <div class="section-title">
                         <i class="ri-feedback-line" style="color: #000;"></i>
                         Feedback
@@ -73,7 +49,7 @@ $user = $_SESSION['user'];
                             My Questions
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div class="section">
                     <div class="section-title">
                         <i class="ri-user-settings-line" style="color: #000;"></i>
@@ -98,6 +74,31 @@ $user = $_SESSION['user'];
                         </div>
                     </div>
                 </div>
+                
+                <div class="section">
+                    <div class="section-title">
+                        <i class="ri-shopping-bag-line" style="color: #000;"></i>
+                        Shopping
+                    </div>
+                    <div class="section-items">
+                        <!-- <div class="sidebar-item">
+                            <i class="ri-heart-line" style="color: #000;"></i>
+                            My Wishlist
+                        </div> -->
+                        <div class="sidebar-item" data-profile="order">
+                            <i class="ri-shopping-cart-line" style="color: #000;"></i>
+                            My Orders
+                        </div>
+                        <!-- <div class="sidebar-item">
+                            <i class="ri-arrow-left-right-line" style="color: #000;"></i>
+                            My Returns
+                        </div>
+                        <div class="sidebar-item">
+                            <i class="ri-close-circle-line" style="color: #000;"></i>
+                            My Cancellations
+                        </div> -->
+                    </div>
+                </div>
             </div>
 
             <div class="profile-container">
@@ -108,7 +109,7 @@ $user = $_SESSION['user'];
                         'profile' => 'profile.php',
                         'address' => 'address.php',
                         'password' => 'password.php',
-
+                        'order' => 'order.php',
                     ];
 
                     if (array_key_exists($id, $allowedPages)) {

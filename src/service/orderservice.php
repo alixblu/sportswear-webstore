@@ -29,7 +29,15 @@ class OrderService
             throw new Exception("Failed to retrieve orders: " . $e->getMessage());
         }
     }
-
+    public function getOrdersByCustomer()
+    {
+        try {
+            $customerId = $this->userUtils->getUserId();
+            return $this->orderRepository->getOrdersByCustomer($customerId);
+        } catch (Exception $e) {
+            throw new Exception("Failed to retrieve orders: " . $e->getMessage());
+        }
+    }
     public function getOrderDetails($orderID)
     {
         try {

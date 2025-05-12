@@ -396,7 +396,7 @@
          .then(data => {
                console.log('Chi tiết đơn hàng:', data);
                const orderList = data.data;
-               const firstItem = orderList[0]; // Dùng để lấy thông tin người nhận, vì giống nhau
+               const firstItem = orderList[0];
 
                const overlay = document.createElement('div');
                overlay.classList.add('popup-overlay');
@@ -404,7 +404,6 @@
                const popup = document.createElement('div');
                popup.classList.add('popup-content');
 
-               // Render tất cả sản phẩm
                let productsHTML = '';
                let totalAmount = 0;
 
@@ -420,7 +419,6 @@
                   totalAmount += Number(item.productTotal);
                });
 
-               // Kiểm tra mã giảm giá
                const couponSection = firstItem.couponName ? `
                   <p><strong>Mã giảm giá:</strong> ${firstItem.couponName}</p>
                   <p><strong>Giảm giá:</strong> ${firstItem.couponPercent}%</p>
@@ -428,7 +426,6 @@
                   <p><strong>Trạng thái:</strong> ${firstItem.couponStatus === 'active' ? 'Kích hoạt' : 'Không kích hoạt'}</p>
                ` : '';
 
-               // Tính tổng sau giảm (nếu có)
                let finalTotal = totalAmount;
                if (firstItem.couponPercent && firstItem.couponStatus === 'active') {
                   finalTotal = totalAmount * (1 - firstItem.couponPercent / 100);
@@ -437,7 +434,7 @@
                popup.innerHTML = `
                   <div class="titlePopup">
                      <div>Chi Tiết Hóa Đơn</div>
-                     <div onclick="closePopup()" style="cursor: pointer;">X</div>
+                     <div onclick="window.location.href='/sportswear-webstore/index.php'" style="cursor: pointer;">X</div>
                   </div>
                   <div class="invoice-section">
                      <p><strong>Họ tên:</strong> ${firstItem.receiverName || '---'}</p>
@@ -448,7 +445,7 @@
                      ${productsHTML}
                      ${couponSection}
                      <p class="total-price"><strong>Tổng cộng:</strong> <span id="totalPrice">${finalTotal.toLocaleString()}₫</span></p>
-                     <button onclick="closePopup()" class="btn-xong">Đóng</button>
+                     <button onclick="window.location.href='/sportswear-webstore/index.php'" class="btn-xong">Đóng</button>
                   </div>
                `;
 
