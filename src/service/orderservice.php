@@ -104,7 +104,7 @@ class OrderService
             throw new Exception("Failed to search orders: " . $e->getMessage());
         }
     }
-    public function createOrders($idCoupon)
+    public function createOrders($receiverName,$address,$phone,$idCoupon,$payment)
     {
         try {
             $userAccID = $this->userUtils->getUserId();
@@ -129,6 +129,8 @@ class OrderService
             }   
 
             $oder =  $this->orderRepository->createOrder($userAccID, $couponId, $totalPrice);
+            $this->orderRepository->insertBillingDetail($oder['order_id'], $receiverName, $address, $phone);
+            $this->orderRepository->insertPayment($payment, $oder['order_id']);
             $this->cartService->deleteCartByUserId();
             return $oder ;
         } catch (Exception $e) {

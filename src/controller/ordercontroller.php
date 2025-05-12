@@ -85,10 +85,10 @@ class OrderController
         }
     }
 
-    public function createOrders($idCoupon)
+    public function createOrders($receiverName,$address,$phone,$idCoupon,$payment)
     {
         try {
-            $results = $this->orderService->createOrders($idCoupon);
+            $results = $this->orderService->createOrders($receiverName,$address,$phone,$idCoupon,$payment);
             ApiResponse::customResponse($results, 200);
         } catch (Exception $e) {
             ApiResponse::customResponse(null, 500, $e->getMessage());

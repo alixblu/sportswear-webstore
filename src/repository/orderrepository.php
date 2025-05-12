@@ -55,14 +55,14 @@ class OrderRepository
                 b.address, 
                 b.phone, 
                 b.email, 
-                pr.name AS productName,     
+                pr.fullname AS productName,     
                 od.quantity, 
                 od.totalPrice AS productTotal, 
                 pm.name AS paymentMethod                 
             FROM `order` o
             LEFT JOIN billingdetail b ON o.ID = b.orderID
             LEFT JOIN orderdetail od ON o.ID = od.orderID
-            LEFT JOIN product pr ON od.productID = pr.ID
+            LEFT JOIN productvariant pr ON od.productID = pr.ID
             LEFT JOIN payment p ON o.ID = p.orderID
             LEFT JOIN paymentmethod pm ON pm.ID = p.paymentMethodID
             WHERE o.ID = ?
@@ -188,5 +188,45 @@ class OrderRepository
             return ['success' => false, 'message' => 'Lỗi khi tạo đơn hàng: ' . $stmt->error];
         }
     }
-    
+    public function insertBillingDetail( $orderID, $receiverName, $address, $phone, $email = null)
+    {
+        $stmt = $this->conn->prepare("
+            INSERT INTO billingdetail ( orderID, receiverName, address, phone, email)
+            VALUES ( ?, ?, ?, ?, ?)
+        ");
+
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $this->conn->error);
+        }
+
+        $stmt->bind_param("issss", $orderID, $receiverName, $address, $phone, $email);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+
+        $stmt->close();
+    }
+
+    public function insertPayment($paymentMethodID, $orderID, $bankAccountID = null, $status = 'pending')
+    {
+        $query = "
+            INSERT INTO payment (paymentMethodID, orderID, bankAccountID, status)
+            VALUES (?, ?, ?, ?)
+        ";
+
+        $stmt = $this->conn->prepare($query);
+        if (!$stmt) {
+            return ['success' => false, 'message' => 'Lỗi chuẩn bị truy vấn: ' . $this->conn->error];
+        }
+
+        $stmt->bind_param("iiis", $paymentMethodID, $orderID, $bankAccountID, $status);
+
+        if ($stmt->execute()) {
+            return ['success' => true, 'payment_id' => $stmt->insert_id];
+        } else {
+            return ['success' => false, 'message' => 'Lỗi khi thêm thanh toán: ' . $stmt->error];
+        }
+    }
+
 }

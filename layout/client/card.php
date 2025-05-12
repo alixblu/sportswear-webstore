@@ -300,8 +300,8 @@
             <div class="form-group">
                <label for="paymentMethod">Hình thức chi trả:</label>
                <select id="paymentMethod" name="paymentMethod" required>
-                  <option value="cash">Tiền mặt</option>
-                  <option value="online">Trực tuyến</option>
+                  <option value="1">Tiền mặt</option>
+                  <option value="2">Trực tuyến</option>
                </select>
             </div>
             <button type="submit" class="btn-xong">Đặt Hàng</button>
@@ -378,22 +378,33 @@
          const voucherClass = classList.find(cls => cls.startsWith('voucher-'));
          voucherId = voucherClass ? voucherClass.replace('voucher-', '') : null;
       }
-      createOrder(voucherId)
+      createOrder(name, address, phone, voucherId, paymentMethod)
+      .then(response => {
+         const orderId = response.data.order_id;
+
+         closePopup();
+         showInvoiceDetailPopup(orderId);
+      })
+      .catch(error => {
+         console.error('Lỗi tạo đơn hàng:', error.message);
+      });
+   }
+
+
+   async function showInvoiceDetailPopup(orderId) {
+
+      const resultOrder  = await getOrderDetails(orderId)
       .then(data => {
-         closePopup()
-         showhoadon()
+         console.log('Chi tiết đơn hàng:', data);
       })
       .catch(error => {
          console.error('Lỗi:', error.message);
       });
-   }
-   function showhoadon() {
-      showInvoiceDetailPopup()
-   }
-
-   async function showInvoiceDetailPopup() {
+      
       const result = await getInfo();
+
       const userData = result.data;
+      const orderData = result.data;
 
       const overlay = document.createElement('div');
       overlay.classList.add('popup-overlay');
@@ -412,7 +423,6 @@
             <p><strong>Hình thức thanh toán:</strong> ${userData.paymentMethod === 'online' ? 'Trực tuyến' : 'Tiền mặt'}</p>
             <hr/>
             <div class="invoice-items">
-               <!-- Giả sử bạn có hàm getCartItems() để lấy danh sách sản phẩm -->
             </div>
             <p class="total-price"><strong>Tổng cộng:</strong> <span id="totalPrice">0₫</span></p>
             <button onclick="closePopup()" class="btn-xong">Đóng</button>
@@ -421,22 +431,6 @@
 
       overlay.appendChild(popup);
       document.body.appendChild(overlay);
-
-      const cartItems = await getCartItems(); // Gọi API hoặc lấy từ biến có sẵn
-      const itemsContainer = popup.querySelector('.invoice-items');
-
-      let total = 0;
-      cartItems.forEach(item => {
-         const itemEl = document.createElement('div');
-         itemEl.classList.add('item');
-         itemEl.innerHTML = `
-            <p>${item.name} x ${item.quantity} - ${item.price.toLocaleString()}₫</p>
-         `;
-         itemsContainer.appendChild(itemEl);
-         total += item.quantity * item.price;
-      });
-
-      popup.querySelector('#totalPrice').textContent = `${total.toLocaleString()}₫`;
    }
 
    function handleAddressChange() {

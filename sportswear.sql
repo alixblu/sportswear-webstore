@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS `bankaccount` (
 --
 
 CREATE TABLE IF NOT EXISTS `billingdetail` (
-  `ID` int(10) NOT NULL,
+  `ID` int(10) PRIMARY KEY AUTO_INCREMENT,
   `orderID` int(10) NOT NULL,
   `receiverName` varchar(50) NOT NULL,
   `address` text NOT NULL,
