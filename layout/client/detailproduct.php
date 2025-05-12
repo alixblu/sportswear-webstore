@@ -94,14 +94,13 @@
    if (id) {
       product_api.getProductById(id)
          .then(res => {
-            const product = res.data;
-
+            const product = res
             document.querySelector(".product-title").innerText = product.name;
 
             document.querySelector(".description").innerText = product.description;
 
             const mainImg = document.querySelector(".mainImage img");
-            mainImg.src = `/sportswear-webstore/img/products/${product.ID}.jpg`;
+            mainImg.src = `/sportswear-webstore/img/products/product${product.ID}/${product.ID}.jpg`;
             mainImg.alt = product.name;
             mainImg.onerror = function() {
                this.src = '/sportswear-webstore/img/products/default.jpg';
