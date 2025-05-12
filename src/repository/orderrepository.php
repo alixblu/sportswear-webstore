@@ -258,5 +258,40 @@ class OrderRepository
 
         $stmt->close();
     }
-
+    public function getOrdersByCustomer($customerId)
+    {
+        $query = "
+            SELECT 
+                o.*, 
+                c.name AS couponName, 
+                c.percent AS couponPercent, 
+                c.duration AS couponDuration, 
+                c.status AS couponStatus
+            FROM `order` o
+            LEFT JOIN coupon c ON o.couponID = c.ID
+            WHERE o.customer = ?
+        ";
+    
+        if ($stmt = $this->conn->prepare($query)) {
+            $stmt->bind_param("i", $customerId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+    
+            if ($result->num_rows > 0) {
+                $orders = [];
+                while ($row = $result->fetch_assoc()) {
+                    $orders[] = $row;
+                }
+                return $orders;
+            } else {
+                return null;
+            }
+    
+            $stmt->close();
+        } else {
+            return null;
+        }
+    }
+    
+    
 }

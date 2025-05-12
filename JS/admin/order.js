@@ -18,6 +18,26 @@ const getAllOrders = async () => {
     }
 };
 
+
+const getOrdersByCustomer = async () => {
+    try {
+        const response = await fetch(`${ORDER_API_URL}?action=getOrdersByCustomer`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!response.ok) throw new Error('Không thể lấy danh sách đơn hàng');
+
+        const data = await response.json();
+        return Array.isArray(data) ? data : data.data;
+    } catch (error) {
+        console.error('Error in getOrdersByCustomer:', error);
+        throw error;
+    }
+};
+
+
+
 // Tìm kiếm đơn hàng theo nhiều tiêu chí
 const searchOrders = async ({ orderID = '', status = '', fromDate = '', toDate = '' }) => {
     const query = new URLSearchParams({
