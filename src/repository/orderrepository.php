@@ -58,15 +58,21 @@ class OrderRepository
                 pr.fullname AS productName,     
                 od.quantity, 
                 od.totalPrice AS productTotal, 
-                pm.name AS paymentMethod                 
+                pm.name AS paymentMethod,
+                c.name AS couponName,                  
+                c.percent AS couponPercent,           
+                c.duration AS couponDuration,         
+                c.status AS couponStatus              
             FROM `order` o
             LEFT JOIN billingdetail b ON o.ID = b.orderID
             LEFT JOIN orderdetail od ON o.ID = od.orderID
             LEFT JOIN productvariant pr ON od.productID = pr.ID
             LEFT JOIN payment p ON o.ID = p.orderID
             LEFT JOIN paymentmethod pm ON pm.ID = p.paymentMethodID
+            LEFT JOIN coupon c ON o.couponID = c.ID   -- Kết nối với bảng coupon
             WHERE o.ID = ?
         ";
+    
 
         // Chuẩn bị và thực thi câu lệnh SQL
         $stmt = $this->conn->prepare($sql);
@@ -232,6 +238,25 @@ class OrderRepository
         } else {
             return ['success' => false, 'message' => 'Lỗi khi thêm thanh toán: ' . $stmt->error];
         }
+    }
+    public function insertOrderDetail($orderID, $productID, $quantity, $totalPrice)
+    {
+        $stmt = $this->conn->prepare("
+            INSERT INTO orderdetail (orderID, productID, quantity, totalPrice)
+            VALUES (?, ?, ?, ?)
+        ");
+
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $this->conn->error);
+        }
+
+        $stmt->bind_param("iiid", $orderID, $productID, $quantity, $totalPrice);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+
+        $stmt->close();
     }
 
 }

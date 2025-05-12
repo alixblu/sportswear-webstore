@@ -128,11 +128,20 @@ class OrderService
                 $totalPrice += $item['quantity'] * $item['productPrice'];
             }   
 
-            $oder =  $this->orderRepository->createOrder($userAccID, $couponId, $totalPrice);
-            $this->orderRepository->insertBillingDetail($oder['order_id'], $receiverName, $address, $phone);
-            $this->orderRepository->insertPayment($payment, $oder['order_id']);
+            $order =  $this->orderRepository->createOrder($userAccID, $couponId, $totalPrice);
+
+            foreach ($carts as $item) {
+                $productID = $item['productID'];
+                $quantity = $item['quantity'];
+                $totalPriceForItem = $item['quantity'] * $item['productPrice'];
+    
+                $this->orderRepository->insertOrderDetail($order['order_id'], $productID, $quantity, $totalPriceForItem);
+            }
+
+            $this->orderRepository->insertBillingDetail($order['order_id'], $receiverName, $address, $phone);
+            $this->orderRepository->insertPayment($payment, $order['order_id']);
             $this->cartService->deleteCartByUserId();
-            return $oder ;
+            return $order ;
         } catch (Exception $e) {
             throw new Exception("Failed to search orders: " . $e->getMessage());
         }

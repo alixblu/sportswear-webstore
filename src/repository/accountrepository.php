@@ -72,7 +72,24 @@ class AccountRepository {
             // Không đóng kết nối để tái sử dụng
         }
     }
-
+    public function getUserAccountIdByUserId($userID) {
+        $query = "SELECT ID FROM useraccount WHERE userID = ?";
+        $stmt = $this->conn->prepare($query);
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $this->conn->error);
+        }
+    
+        $stmt->bind_param("i", $userID);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        if ($row = $result->fetch_assoc()) {
+            return $row['ID'];
+        } else {
+            return null; // Không tìm thấy userID tương ứng
+        }
+    }
+    
     public function findAll() {
         try {
             if (!$this->conn) {

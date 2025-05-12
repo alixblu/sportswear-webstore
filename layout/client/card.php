@@ -392,46 +392,74 @@
 
 
    async function showInvoiceDetailPopup(orderId) {
+      getOrderDetails(orderId)
+         .then(data => {
+               console.log('Chi tiết đơn hàng:', data);
+               const orderList = data.data;
+               const firstItem = orderList[0]; // Dùng để lấy thông tin người nhận, vì giống nhau
 
-      const resultOrder  = await getOrderDetails(orderId)
-      .then(data => {
-         console.log('Chi tiết đơn hàng:', data);
-      })
-      .catch(error => {
-         console.error('Lỗi:', error.message);
-      });
-      
-      const result = await getInfo();
+               const overlay = document.createElement('div');
+               overlay.classList.add('popup-overlay');
 
-      const userData = result.data;
-      const orderData = result.data;
+               const popup = document.createElement('div');
+               popup.classList.add('popup-content');
 
-      const overlay = document.createElement('div');
-      overlay.classList.add('popup-overlay');
+               // Render tất cả sản phẩm
+               let productsHTML = '';
+               let totalAmount = 0;
 
-      const popup = document.createElement('div');
-      popup.classList.add('popup-content');
-      popup.innerHTML = `
-         <div class="titlePopup">
-            <div>Chi Tiết Hóa Đơn</div>
-            <div onclick="closePopup()" style="cursor: pointer;">X</div>
-         </div>
-         <div class="invoice-section">
-            <p><strong>Họ tên:</strong> ${userData.fullname || '---'}</p>
-            <p><strong>Địa chỉ:</strong> ${userData.address || '---'}</p>
-            <p><strong>Số điện thoại:</strong> ${userData.phone || '---'}</p>
-            <p><strong>Hình thức thanh toán:</strong> ${userData.paymentMethod === 'online' ? 'Trực tuyến' : 'Tiền mặt'}</p>
-            <hr/>
-            <div class="invoice-items">
-            </div>
-            <p class="total-price"><strong>Tổng cộng:</strong> <span id="totalPrice">0₫</span></p>
-            <button onclick="closePopup()" class="btn-xong">Đóng</button>
-         </div>
-      `;
+               orderList.forEach(item => {
+                  productsHTML += `
+                     <div class="invoice-items">
+                           <p><strong>Sản phẩm:</strong> ${item.productName}</p>
+                           <p><strong>Số lượng:</strong> ${item.quantity}</p>
+                           <p><strong>Tổng tiền sản phẩm:</strong> ${Number(item.productTotal).toLocaleString()}₫</p>
+                           <hr/>
+                     </div>
+                  `;
+                  totalAmount += Number(item.productTotal);
+               });
 
-      overlay.appendChild(popup);
-      document.body.appendChild(overlay);
+               // Kiểm tra mã giảm giá
+               const couponSection = firstItem.couponName ? `
+                  <p><strong>Mã giảm giá:</strong> ${firstItem.couponName}</p>
+                  <p><strong>Giảm giá:</strong> ${firstItem.couponPercent}%</p>
+                  <p><strong>Thời gian hiệu lực:</strong> ${firstItem.couponDuration} ngày</p>
+                  <p><strong>Trạng thái:</strong> ${firstItem.couponStatus === 'active' ? 'Kích hoạt' : 'Không kích hoạt'}</p>
+               ` : '';
+
+               // Tính tổng sau giảm (nếu có)
+               let finalTotal = totalAmount;
+               if (firstItem.couponPercent && firstItem.couponStatus === 'active') {
+                  finalTotal = totalAmount * (1 - firstItem.couponPercent / 100);
+               }
+
+               popup.innerHTML = `
+                  <div class="titlePopup">
+                     <div>Chi Tiết Hóa Đơn</div>
+                     <div onclick="closePopup()" style="cursor: pointer;">X</div>
+                  </div>
+                  <div class="invoice-section">
+                     <p><strong>Họ tên:</strong> ${firstItem.receiverName || '---'}</p>
+                     <p><strong>Địa chỉ:</strong> ${firstItem.address || '---'}</p>
+                     <p><strong>Số điện thoại:</strong> ${firstItem.phone || '---'}</p>
+                     <p><strong>Hình thức thanh toán:</strong> ${firstItem.paymentMethod === 'online' ? 'Trực tuyến' : 'Tiền mặt'}</p>
+                     <hr/>
+                     ${productsHTML}
+                     ${couponSection}
+                     <p class="total-price"><strong>Tổng cộng:</strong> <span id="totalPrice">${finalTotal.toLocaleString()}₫</span></p>
+                     <button onclick="closePopup()" class="btn-xong">Đóng</button>
+                  </div>
+               `;
+
+               overlay.appendChild(popup);
+               document.body.appendChild(overlay);
+         })
+         .catch(error => {
+               console.error('Lỗi:', error.message);
+         });
    }
+
 
    function handleAddressChange() {
    const addressSelect = document.getElementById('addressSelect');
