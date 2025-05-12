@@ -86,5 +86,30 @@ class AnalyticsController {
             ApiResponse::customApiResponse(['error' => $e->getMessage()], 400);
         }
     }
+
+    public function getCustomerOrderDetails($userID, $startDate, $endDate): void {
+        try {
+            if (!$userID || !$startDate || !$endDate) {
+                throw new Exception("Missing userID, startDate, or endDate");
+            }
+            $orderDetails = $this->analyticsService->getCustomerOrderDetails($userID, $startDate, $endDate);
+            ApiResponse::customApiResponse($orderDetails, 200);
+        } catch (Exception $e) {
+            ApiResponse::customApiResponse(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    // New method: Fetch product order details
+    public function getProductOrderDetails($productID, $startDate, $endDate): void {
+        try {
+            if (!$productID || !$startDate || !$endDate) {
+                throw new Exception("Missing productID, startDate, or endDate");
+            }
+            $orderDetails = $this->analyticsService->getProductOrderDetails($productID, $startDate, $endDate);
+            ApiResponse::customApiResponse($orderDetails, 200);
+        } catch (Exception $e) {
+            ApiResponse::customApiResponse(['error' => $e->getMessage()], 400);
+        }
+    }
 }
 ?>

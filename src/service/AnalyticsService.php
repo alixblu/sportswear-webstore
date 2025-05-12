@@ -80,6 +80,36 @@ class AnalyticsService {
         }
     }
 
+    // New method: Fetch customer order details
+    public function getCustomerOrderDetails($userID, $startDate, $endDate) {
+        try {
+            if (!$this->validateDateRange($startDate, $endDate)) {
+                throw new Exception("Invalid date range");
+            }
+            if (!is_numeric($userID) || $userID <= 0) {
+                throw new Exception("Invalid user ID");
+            }
+            return $this->analyticsRepository->getCustomerOrderDetails($userID, $startDate, $endDate);
+        } catch (Exception $e) {
+            throw new Exception("Failed to fetch customer order details: " . $e->getMessage());
+        }
+    }
+
+    // New method: Fetch product order details
+    public function getProductOrderDetails($productID, $startDate, $endDate) {
+        try {
+            if (!$this->validateDateRange($startDate, $endDate)) {
+                throw new Exception("Invalid date range");
+            }
+            if (!is_numeric($productID) || $productID <= 0) {
+                throw new Exception("Invalid product ID");
+            }
+            return $this->analyticsRepository->getProductOrderDetails($productID, $startDate, $endDate);
+        } catch (Exception $e) {
+            throw new Exception("Failed to fetch product order details: " . $e->getMessage());
+        }
+    }
+
     private function validateDateRange($startDate, $endDate) {
         $startTimestamp = strtotime($startDate);
         $endTimestamp = strtotime($endDate);
