@@ -2,16 +2,19 @@
 require_once dirname(__FILE__) . '/../repository/cartrepository.php';
 require_once dirname(__FILE__) . '/../utils/userUtils.php';
 require_once dirname(__FILE__) . '/../service/cartdetailService.php';
+require_once dirname(__FILE__) . '/../service/accountservice.php';
 
 class CartService {
     private $cartRepository;
     private $userUtils;
     private $cartDetailService;
+    private $accountService;
 
     public function __construct() {
         $this->cartRepository = new CartRepository();
         $this->userUtils = new UserUtils();
         $this->cartDetailService = new CartDetailService();
+        $this->accountService = new AccountService();
 
     }
 
@@ -29,7 +32,8 @@ class CartService {
     public function getCartByUserId() {
         try {
             $userAccID = $this->userUtils->getUserId();
-            return $this->cartRepository->findByUserAccId($userAccID);
+            $accountId = $this->accountService->getAccountByUserID($userAccID);
+            return $this->cartRepository->findByUserAccId($accountId);
         } catch (Exception $e) {
             throw new Exception("Failed to get cart: " . $e->getMessage());
         }
@@ -56,8 +60,8 @@ class CartService {
                 throw new Exception("Invalid quantity");
             }
             $userId = $this->userUtils->getUserId();
-            $cartID = $this->cartRepository->findCartIdByUserAccId($userId);
-
+            $accountId = $this->accountService->getAccountByUserID($userId);
+            $cartID = $this->cartRepository->findCartIdByUserAccId($accountId);
             if ($cartID === null) {
                 $cartData = $this->cartRepository->save($userId);
                 $cartID = $cartData['cartID'];
@@ -71,7 +75,8 @@ class CartService {
     {
         try{
             $userId = $this->userUtils->getUserId();
-            $cartID = $this->cartRepository->findCartIdByUserAccId($userId);
+            $accountId = $this->accountService->getAccountByUserID($userId);
+            $cartID = $this->cartRepository->findCartIdByUserAccId($accountId);
             return $this->cartDetailService->deleteAllCartDetail($cartID);
         } catch (Exception $e) {
             throw new Exception("Failed to add cart detail: " . $e->getMessage());

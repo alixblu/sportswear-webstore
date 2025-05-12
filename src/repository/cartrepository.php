@@ -64,8 +64,8 @@ class CartRepository {
                     cartdetail.productID,
                     cartdetail.quantity,
                     productvariant.fullName as productName,
-                    productvariant.price as productPrice
-
+                    productvariant.price as productPrice,
+                    productvariant.productID as ID
                 FROM cart
                 INNER JOIN cartdetail ON cart.ID = cartdetail.cartID
                 INNER JOIN productvariant ON cartdetail.productID = productvariant.ID

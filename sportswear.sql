@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS `bankaccount` (
 --
 
 CREATE TABLE IF NOT EXISTS `billingdetail` (
-  `ID` int(10) NOT NULL,
+  `ID` int(10) NOT NULL AUTO_INCREMENT,
   `orderID` int(10) NOT NULL,
   `receiverName` varchar(50) NOT NULL,
   `address` text NOT NULL,
@@ -846,8 +846,8 @@ INSERT INTO `modules` (`id`, `name`, `icon`, `type`, `page`) VALUES
 CREATE TABLE IF NOT EXISTS `order` (
   `ID` int(10) NOT NULL AUTO_INCREMENT,
   `customer` int(5) NOT NULL,
-  `approver` int(5) NOT NULL,
-  `couponID` int(5) NOT NULL,
+  `approver` int(5) DEFAULT NULL,
+  `couponID` int(5) DEFAULT NULL,
   `totalPrice` double NOT NULL DEFAULT 0,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `status` enum('pending','approved','canceled','delivered') NOT NULL DEFAULT 'pending',
