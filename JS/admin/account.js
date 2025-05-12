@@ -207,7 +207,6 @@ async function add() {
         phone: document.getElementById('phone').value.trim(),
         roleId: document.getElementById('roleId').value.trim(),
         status: document.querySelector('input[name="status"]:checked').value,
-        email: document.getElementById('email').value.trim() || null,
         address: document.getElementById('address').value.trim() || null,
         gender: document.getElementById('gender').value.trim() || null,
         dateOfBirth: document.getElementById('dateOfBirth').value.trim() || null
@@ -248,7 +247,7 @@ async function showFormEdit(button, id, type) {
                 <div class="wrapperCss">
                     <div class="infoCss">Chỉnh sửa tài khoản ${isStaff ? 'nhân viên' : 'khách hàng'}</div>
                     
-                    <label for="username">Tên đăng nhập</label>
+                    <label for="username">Tên đăng nhập (Email)</label>
                     <div class="wrapperInputCss">
                         <input class="inputUserCss" type="text" id="username" value="${account.username}" readonly>
                     </div>
@@ -282,18 +281,18 @@ async function showFormEdit(button, id, type) {
                     
                     <label>Trạng thái</label>
                     <div class="genderCss">
-                        <input type="radio" id="active" name="status" value="active" ${account.status === 'active' ? 'checked' : ''}>
+                        <input type="radio" id="active" name="status" value="active" ${account.status === 'active' ? 'checked' : ''} ${isAdmin ? 'disabled' : ''}>
                         <label for="active">Hoạt động</label>
-                        <input type="radio" id="inactive" name="status" value="inactive" ${account.status === 'inactive' ? 'checked' : ''}>
+                        <input type="radio" id="inactive" name="status" value="inactive" ${account.status === 'inactive' ? 'checked' : ''} ${isAdmin ? 'disabled' : ''}>
                         <label for="inactive">Không hoạt động</label>
-                        <input type="radio" id="banned" name="status" value="banned" ${account.status === 'banned' ? 'checked' : ''}>
+                        <input type="radio" id="banned" name="status" value="banned" ${account.status === 'banned' ? 'checked' : ''} ${isAdmin ? 'disabled' : ''}>
                         <label for="banned">Bị cấm</label>
                     </div>
-                    
-                    <label for="email">Email</label>
-                    <div class="wrapperInputCss">
-                        <input class="inputUserCss" type="email" id="email" value="${account.email || ''}">
-                    </div>
+                    ${isAdmin ? `
+                        <div style="color: #f44336; margin-top: 10px;">
+                            Trạng thái của Admin không thể chỉnh sửa.
+                        </div>
+                    ` : ''}
                     
                     <label for="address">Địa chỉ</label>
                     <div class="wrapperInputCss">
@@ -337,7 +336,6 @@ async function edit(id, isAdmin) {
         phone: document.getElementById('phone').value.trim(),
         roleId: isAdmin ? 1 : document.getElementById('roleId')?.value.trim() || 5,
         status: document.querySelector('input[name="status"]:checked').value,
-        email: document.getElementById('email').value.trim() || null,
         address: document.getElementById('address').value.trim() || null,
         gender: document.getElementById('gender').value.trim() || null,
         dateOfBirth: document.getElementById('dateOfBirth').value.trim() || null
@@ -585,7 +583,7 @@ document.getElementById("addBtn").onclick = async () => {
                 <div class="wrapperCss">
                     <div class="infoCss">Thêm tài khoản mới</div>
                     
-                    <label for="username">Tên đăng nhập</label>
+                    <label for="username">Tên đăng nhập (Email)</label>
                     <div class="wrapperInputCss">
                         <input class="inputUserCss" placeholder="Nhập tên đăng nhập" type="text" id="username">
                     </div>
@@ -623,10 +621,7 @@ document.getElementById("addBtn").onclick = async () => {
                         <label for="banned">Bị cấm</label>
                     </div>
                     
-                    <label for="email">Email</label>
-                    <div class="wrapperInputCss">
-                        <input class="inputUserCss" placeholder="Nhập email" type="email" id="email">
-                    </div>
+
                     
                     <label for="address">Địa chỉ</label>
                     <div class="wrapperInputCss">

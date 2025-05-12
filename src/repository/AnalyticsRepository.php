@@ -192,11 +192,13 @@ class AnalyticsRepository {
                 throw new Exception("Database connection failed");
             }
             $stmt = $this->conn->prepare("
-                SELECT COUNT(DISTINCT u.ID) as active_users
-                FROM user u
-                JOIN `order` o ON u.ID = o.customer
-                WHERE o.createdAt BETWEEN ? AND ?
-                AND o.status = 'delivered'
+                SELECT COUNT(*) AS totalActiveAccounts
+                FROM useraccount ua
+                JOIN user u ON ua.userID = u.ID
+                JOIN role r ON u.roleID = r.ID
+                WHERE ua.status = 'active' 
+                AND r.ID = 5
+                AND ua.createdAt BETWEEN ? AND ?
             ");
             if (!$stmt) {
                 throw new Exception("Failed to prepare query: " . $this->conn->error);
@@ -206,7 +208,7 @@ class AnalyticsRepository {
             $result = $stmt->get_result();
             $data = $result->fetch_assoc();
             $stmt->close();
-            return ['active_users' => $data['active_users'] ?? 0];
+            return ['active_users' => $data['totalActiveAccounts'] ?? 0];
         } catch (Exception $e) {
             error_log("Get active users failed: " . $e->getMessage());
             throw $e;
