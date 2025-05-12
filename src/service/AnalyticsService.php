@@ -80,7 +80,6 @@ class AnalyticsService {
         }
     }
 
-    // New method: Fetch customer order details
     public function getCustomerOrderDetails($userID, $startDate, $endDate) {
         try {
             if (!$this->validateDateRange($startDate, $endDate)) {
@@ -95,7 +94,6 @@ class AnalyticsService {
         }
     }
 
-    // New method: Fetch product order details
     public function getProductOrderDetails($productID, $startDate, $endDate) {
         try {
             if (!$this->validateDateRange($startDate, $endDate)) {
@@ -107,6 +105,14 @@ class AnalyticsService {
             return $this->analyticsRepository->getProductOrderDetails($productID, $startDate, $endDate);
         } catch (Exception $e) {
             throw new Exception("Failed to fetch product order details: " . $e->getMessage());
+        }
+    }
+
+    public function getEarliestOrderDate() {
+        try {
+            return $this->analyticsRepository->getEarliestOrderDate();
+        } catch (Exception $e) {
+            throw new Exception("Failed to fetch earliest order date: " . $e->getMessage());
         }
     }
 

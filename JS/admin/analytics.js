@@ -1,9 +1,29 @@
 const ANALYTICS_API_URL = '../../src/router/AnalyticsRouter.php';
 
+// Utility function to format numbers in Vietnamese style
+function formatVND(amount) {
+    return Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' ₫';
+}
+
+// Fetch the earliest order date
+async function fetchEarliestOrderDate() {
+    try {
+        const response = await fetch(`${ANALYTICS_API_URL}?action=getEarliestOrderDate`);
+        const data = await response.json();
+        if (data.status === 200 && data.data.earliest_date) {
+            return data.data.earliest_date.split(' ')[0]; // Extract YYYY-MM-DD
+        }
+        return '2024-01-01'; // Fallback date
+    } catch (error) {
+        console.error('Error fetching earliest order date:', error);
+        return '2024-01-01';
+    }
+}
+
 // Fetch and display stats cards
 async function fetchStats() {
     try {
-        const defaultStartDate = '2024-01-01';
+        const defaultStartDate = await fetchEarliestOrderDate();
         const defaultEndDate = new Date().toISOString().split('T')[0];
         const [revenueResponse, orderStatsResponse, activeUsersResponse] = await Promise.all([
             fetch(`${ANALYTICS_API_URL}?action=getTotalRevenue&startDate=${defaultStartDate}&endDate=${defaultEndDate}`),
@@ -20,7 +40,7 @@ async function fetchStats() {
             <div class="stat-card">
                 <div class="card-header">
                     <div>
-                        <div class="card-value">$${revenueData.data?.total_revenue?.toFixed(2) || '0.00'}</div>
+                        <div class="card-value">${formatVND(revenueData.data?.total_revenue || 0)}</div>
                         <div class="card-label">Total Revenue</div>
                     </div>
                     <div class="card-icon blue">
@@ -85,7 +105,7 @@ async function fetchStats() {
 }
 
 async function fetchTopCustomers() {
-    const startDate = document.getElementById('customerStartDate').value || '2024-01-01';
+    const startDate = document.getElementById('customerStartDate').value || await fetchEarliestOrderDate();
     const endDate = document.getElementById('customerEndDate').value || new Date().toISOString().split('T')[0];
     const sortBtn = document.querySelector('.sort-btn.active');
     const sort = sortBtn ? sortBtn.getAttribute('data-sort') : 'desc';
@@ -117,7 +137,7 @@ async function fetchTopCustomers() {
                         <td><div class="customer-rank">${index + 1}</div></td>
                         <td>${customer.fullname || 'N/A'}</td>
                         <td>${customer.orders?.length || 0}</td>
-                        <td class="total-amount">$${parseFloat(customer.total_purchase || 0).toFixed(2)}</td>
+                        <td class="total-amount">${formatVND(customer.total_purchase || 0)}</td>
                         <td>${lastOrderDate}</td>
                         <td><a href="#" class="view-link" onclick="showCustomerOrders('${encodeURIComponent(customer.userID)}', '${encodeURIComponent(startDate)}', '${encodeURIComponent(endDate)}'); return false;">View Orders</a></td>
                     </tr>
@@ -134,7 +154,7 @@ async function fetchTopCustomers() {
 }
 
 async function fetchTopProducts() {
-    const startDate = document.getElementById('productStartDate').value || '2024-01-01';
+    const startDate = document.getElementById('productStartDate').value || await fetchEarliestOrderDate();
     const endDate = document.getElementById('productEndDate').value || new Date().toISOString().split('T')[0];
     const sortBtn = document.querySelector('.sort-btn.active');
     const sort = sortBtn ? sortBtn.getAttribute('data-sort') : 'desc';
@@ -161,7 +181,7 @@ async function fetchTopProducts() {
                         <td>${product.name || 'N/A'}</td>
                         <td>${product.category || 'N/A'}</td>
                         <td>${product.total_quantity || 0}</td>
-                        <td class="total-amount">$${parseFloat(product.total_revenue || 0).toFixed(2)}</td>
+                        <td class="total-amount">${formatVND(product.total_revenue || 0)}</td>
                         <td><a href="#" class="view-link" onclick="showProductDetails('${encodeURIComponent(product.productID)}', '${encodeURIComponent(startDate)}', '${encodeURIComponent(endDate)}'); return false;">View Details</a></td>
                     </tr>
                 `;
@@ -177,7 +197,7 @@ async function fetchTopProducts() {
 }
 
 async function fetchRevenue() {
-    const startDate = document.getElementById('revenueStartDate').value || '2024-01-01';
+    const startDate = document.getElementById('revenueStartDate').value || await fetchEarliestOrderDate();
     const endDate = document.getElementById('revenueEndDate').value || new Date().toISOString().split('T')[0];
     const period = document.querySelector('.chart-filter.active')?.getAttribute('data-period') || 'daily';
 
@@ -192,7 +212,7 @@ async function fetchRevenue() {
 
         if (data.status === 200) {
             document.getElementById('revenueChart').innerHTML = `
-                <p>Total Revenue: $${data.data?.total_revenue?.toFixed(2) || '0.00'} (${period.charAt(0).toUpperCase() + period.slice(1)})</p>
+                <p>Total Revenue: ${formatVND(data.data?.total_revenue || 0)} (${period.charAt(0).toUpperCase() + period.slice(1)})</p>
             `;
         } else {
             document.getElementById('revenueChart').innerHTML = '<p>Error loading revenue data.</p>';
@@ -204,7 +224,7 @@ async function fetchRevenue() {
 }
 
 async function fetchOrderStats() {
-    const startDate = document.getElementById('orderStartDate').value || '2024-01-01';
+    const startDate = document.getElementById('orderStartDate').value || await fetchEarliestOrderDate();
     const endDate = document.getElementById('orderEndDate').value || new Date().toISOString().split('T')[0];
     const period = document.querySelector('.chart-filter.active')?.getAttribute('data-period') || 'daily';
 
@@ -232,7 +252,7 @@ async function fetchOrderStats() {
 }
 
 async function fetchActiveUsers() {
-    const startDate = document.getElementById('userStartDate').value || '2024-01-01';
+    const startDate = document.getElementById('userStartDate').value || await fetchEarliestOrderDate();
     const endDate = document.getElementById('userEndDate').value || new Date().toISOString().split('T')[0];
 
     if (!startDate || !endDate) {
@@ -257,7 +277,6 @@ async function fetchActiveUsers() {
     }
 }
 
-// New function to show customer orders in modal
 async function showCustomerOrders(userID, startDate, endDate) {
     try {
         const response = await fetch(`${ANALYTICS_API_URL}?action=getCustomerOrderDetails&userID=${userID}&startDate=${startDate}&endDate=${endDate}`);
@@ -285,8 +304,8 @@ async function showCustomerOrders(userID, startDate, endDate) {
                                 <td>${order.orderID || 'N/A'}</td>
                                 <td>${order.product_name || 'N/A'}</td>
                                 <td>${order.quantity || 0}</td>
-                                <td>$${parseFloat(order.price || 0).toFixed(2)}</td>
-                                <td>$${parseFloat((order.quantity * order.price) || 0).toFixed(2)}</td>
+                                <td>${formatVND(order.price || 0)}</td>
+                                <td>${formatVND((order.quantity * order.price) || 0)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -304,7 +323,6 @@ async function showCustomerOrders(userID, startDate, endDate) {
     }
 }
 
-// New function to show product details in modal
 async function showProductDetails(productID, startDate, endDate) {
     try {
         const response = await fetch(`${ANALYTICS_API_URL}?action=getProductOrderDetails&productID=${productID}&startDate=${startDate}&endDate=${endDate}`);
@@ -332,8 +350,8 @@ async function showProductDetails(productID, startDate, endDate) {
                                 <td>${order.orderID || 'N/A'}</td>
                                 <td>${order.product_name || 'N/A'}</td>
                                 <td>${order.quantity || 0}</td>
-                                <td>$${parseFloat(order.price || 0).toFixed(2)}</td>
-                                <td>$${parseFloat((order.quantity * order.price) || 0).toFixed(2)}</td>
+                                <td>${formatVND(order.price || 0)}</td>
+                                <td>${formatVND((order.quantity * order.price) || 0)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -351,7 +369,6 @@ async function showProductDetails(productID, startDate, endDate) {
     }
 }
 
-// Close modal
 function closeModal() {
     document.getElementById('detailsModal').style.display = 'none';
 }
@@ -376,18 +393,20 @@ document.querySelectorAll('.chart-filter').forEach(filter => {
     });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const defaultDate = new Date().toISOString().split('T')[0];
-    document.getElementById('customerStartDate').value = '2024-01-01';
-    document.getElementById('customerEndDate').value = defaultDate;
-    document.getElementById('productStartDate').value = '2024-01-01';
-    document.getElementById('productEndDate').value = defaultDate;
-    document.getElementById('revenueStartDate').value = '2024-01-01';
-    document.getElementById('revenueEndDate').value = defaultDate;
-    document.getElementById('orderStartDate').value = '2024-01-01';
-    document.getElementById('orderEndDate').value = defaultDate;
-    document.getElementById('userStartDate').value = '2024-01-01';
-    document.getElementById('userEndDate').value = defaultDate;
+document.addEventListener('DOMContentLoaded', async () => {
+    const defaultStartDate = await fetchEarliestOrderDate();
+    const defaultEndDate = new Date().toISOString().split('T')[0];
+
+    document.getElementById('customerStartDate').value = defaultStartDate;
+    document.getElementById('customerEndDate').value = defaultEndDate;
+    document.getElementById('productStartDate').value = defaultStartDate;
+    document.getElementById('productEndDate').value = defaultEndDate;
+    document.getElementById('revenueStartDate').value = defaultStartDate;
+    document.getElementById('revenueEndDate').value = defaultEndDate;
+    document.getElementById('orderStartDate').value = defaultStartDate;
+    document.getElementById('orderEndDate').value = defaultEndDate;
+    document.getElementById('userStartDate').value = defaultStartDate;
+    document.getElementById('userEndDate').value = defaultEndDate;
 
     fetchStats();
     fetchTopCustomers();
@@ -396,7 +415,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchOrderStats();
     fetchActiveUsers();
 
-    // Add event listener to close modal when clicking outside
     document.getElementById('detailsModal').addEventListener('click', function(event) {
         if (event.target === this) {
             closeModal();

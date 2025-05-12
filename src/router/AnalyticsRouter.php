@@ -96,6 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 }
                 break;
 
+            case 'getEarliestOrderDate':
+                $analyticsController->getEarliestOrderDate();
+                break;
+
             default:
                 http_response_code(400);
                 echo json_encode(['status' => 400, 'data' => ['error' => 'Invalid action']]);
