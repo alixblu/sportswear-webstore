@@ -11,7 +11,8 @@
    <!-- font -->
    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
    <style>
-      
+  
+
    </style>
 </head>
 <body>
@@ -70,11 +71,11 @@
          </div>
       </div>
    </div>
-<script src="../../JS/client/cartApi.js"></script>
-<script src="../../JS/admin/coupon.js"></script>
-<script src="../../JS/client/cartdetail.js"></script>
-<script src="../../JS/admin/userApi.js"></script>
-<script src="../../JS/admin/order.js"></script>
+<script src="/sportswear-webstore/JS/client/cartApi.js"></script>
+<script src="/sportswear-webstore/JS/admin/coupon.js"></script>
+<script src="/sportswear-webstore/JS/client/cartdetail.js"></script>
+<script src="/sportswear-webstore/JS/admin/userApi.js"></script>
+<script src="/sportswear-webstore/JS/admin/order.js"></script>
 
 <script>
    loadCart()
@@ -86,7 +87,20 @@
             if (res.status === 200) {
                const cartItems = res.data;
                const cartTableBody = document.querySelector(".cart-table tbody");
+               const cartContainer = document.querySelector(".cart-container");
+
                cartTableBody.innerHTML = "";
+
+               
+               if (!cartItems || cartItems.length === 0) {
+                  cartContainer.innerHTML = `
+                     <div class="empty-cart-message">
+                        <image src="/sportswear-webstore/img/emptycart.png" />
+                        <p>Giỏ hàng của bạn đang trống!</p>
+                     </div>
+                  `;
+               }
+
 
                cartItems.forEach(item => {
                   const row = document.createElement("tr");
@@ -94,7 +108,7 @@
                   const productCell = document.createElement("td");
                   productCell.innerHTML = `
                         <div class="product-info">
-                           <img src="/sportswear-webstore/img/products/${item.productID}.jpg" alt="${item.productName}">
+                           <img src="/sportswear-webstore/img/products/${item.ID}.jpg" alt="${item.productName}">
                            <span>${item.productName}</span>
                         </div>
                      `;
@@ -127,41 +141,42 @@
                const priceElement = document.querySelector(".summary-price");
                priceElement.innerText = formatCurrency(total);
 
-
                const summaryElement = document.querySelector(".summary-total");
                summaryElement.innerText = 'Tổng tiền thanh toán ' + formatCurrency(total);
 
+               getCouponByUserId()
+                  .then(result => {
+                     const coupons = result.data;
+                     const container = document.querySelector(".voucher");
+                     container.innerHTML = "";
+
+                     if (!coupons || coupons.length === 0) {
+                        container.innerHTML = "<div class='voucherItem'>Không có mã khuyến mãi</div>";
+                        return;
+                     }
+
+                     coupons.forEach(coupon => {
+                        const div = document.createElement("div");
+                        div.className = `voucherItem voucher-${coupon.ID}`; 
+                        div.innerHTML = `
+                              <span>${coupon.name}   </span>
+                              <button class="apply-btn" onclick="toggleApply(this, ${total},${coupon.percent})">Áp Dụng</button>
+                           `;
+                        container.appendChild(div);
+                     });
+                  })
+                  .catch(error => {
+                     console.error('Lỗi khi gọi API:', error);
+                  });
+
+            }else{
+               alert("Vui Lòng Đăng Nhập")
+               window.location.href = '/sportswear-webstore/index.php';
             }
          })
          .catch(error => console.error('Lỗi khi lấy biến thể sản phẩm:', error));
-
-      getCouponByUserId()
-         .then(result => {
-            const coupons = result.data;
-            const container = document.querySelector(".voucher");
-            container.innerHTML = "";
-
-            if (!coupons || coupons.length === 0) {
-               container.innerHTML = "<div class='voucherItem'>Không có mã khuyến mãi</div>";
-               return;
-            }
-
-            coupons.forEach(coupon => {
-               const div = document.createElement("div");
-               div.className = `voucherItem voucher-${coupon.ID}`; 
-               div.innerHTML = `
-                     <span>${coupon.name}   </span>
-                     <button class="apply-btn" onclick="toggleApply(this, ${total},${coupon.percent})">Áp Dụng</button>
-                  `;
-               container.appendChild(div);
-            });
-         })
-         .catch(error => {
-            console.error('Lỗi khi gọi API:', error);
-         });
-
-
    }
+
    const formatCurrency = (value) => {
       return Number(value).toLocaleString('vi-VN') + '₫';
    };
@@ -285,8 +300,8 @@
             <div class="form-group">
                <label for="paymentMethod">Hình thức chi trả:</label>
                <select id="paymentMethod" name="paymentMethod" required>
-                  <option value="cash">Tiền mặt</option>
-                  <option value="online">Trực tuyến</option>
+                  <option value="1">Tiền mặt</option>
+                  <option value="2">Trực tuyến</option>
                </select>
             </div>
             <button type="submit" class="btn-xong">Đặt Hàng</button>
@@ -363,13 +378,86 @@
          const voucherClass = classList.find(cls => cls.startsWith('voucher-'));
          voucherId = voucherClass ? voucherClass.replace('voucher-', '') : null;
       }
-      createOrder(voucherId)
-      .then(data => {
-         console.log('Đơn hàng đã tạo:', data);
+      createOrder(name, address, phone, voucherId, paymentMethod)
+      .then(response => {
+         const orderId = response.data.order_id;
+
+         closePopup();
+         showInvoiceDetailPopup(orderId);
       })
       .catch(error => {
-         console.error('Lỗi:', error.message);
+         console.error('Lỗi tạo đơn hàng:', error.message);
       });
+   }
+
+
+   async function showInvoiceDetailPopup(orderId) {
+      getOrderDetails(orderId)
+         .then(data => {
+               console.log('Chi tiết đơn hàng:', data);
+               const orderList = data.data;
+               const firstItem = orderList[0]; // Dùng để lấy thông tin người nhận, vì giống nhau
+
+               const overlay = document.createElement('div');
+               overlay.classList.add('popup-overlay');
+
+               const popup = document.createElement('div');
+               popup.classList.add('popup-content');
+
+               // Render tất cả sản phẩm
+               let productsHTML = '';
+               let totalAmount = 0;
+
+               orderList.forEach(item => {
+                  productsHTML += `
+                     <div class="invoice-items">
+                           <p><strong>Sản phẩm:</strong> ${item.productName}</p>
+                           <p><strong>Số lượng:</strong> ${item.quantity}</p>
+                           <p><strong>Tổng tiền sản phẩm:</strong> ${Number(item.productTotal).toLocaleString()}₫</p>
+                           <hr/>
+                     </div>
+                  `;
+                  totalAmount += Number(item.productTotal);
+               });
+
+               // Kiểm tra mã giảm giá
+               const couponSection = firstItem.couponName ? `
+                  <p><strong>Mã giảm giá:</strong> ${firstItem.couponName}</p>
+                  <p><strong>Giảm giá:</strong> ${firstItem.couponPercent}%</p>
+                  <p><strong>Thời gian hiệu lực:</strong> ${firstItem.couponDuration} ngày</p>
+                  <p><strong>Trạng thái:</strong> ${firstItem.couponStatus === 'active' ? 'Kích hoạt' : 'Không kích hoạt'}</p>
+               ` : '';
+
+               // Tính tổng sau giảm (nếu có)
+               let finalTotal = totalAmount;
+               if (firstItem.couponPercent && firstItem.couponStatus === 'active') {
+                  finalTotal = totalAmount * (1 - firstItem.couponPercent / 100);
+               }
+
+               popup.innerHTML = `
+                  <div class="titlePopup">
+                     <div>Chi Tiết Hóa Đơn</div>
+                     <div onclick="closePopup()" style="cursor: pointer;">X</div>
+                  </div>
+                  <div class="invoice-section">
+                     <p><strong>Họ tên:</strong> ${firstItem.receiverName || '---'}</p>
+                     <p><strong>Địa chỉ:</strong> ${firstItem.address || '---'}</p>
+                     <p><strong>Số điện thoại:</strong> ${firstItem.phone || '---'}</p>
+                     <p><strong>Hình thức thanh toán:</strong> ${firstItem.paymentMethod === 'online' ? 'Trực tuyến' : 'Tiền mặt'}</p>
+                     <hr/>
+                     ${productsHTML}
+                     ${couponSection}
+                     <p class="total-price"><strong>Tổng cộng:</strong> <span id="totalPrice">${finalTotal.toLocaleString()}₫</span></p>
+                     <button onclick="closePopup()" class="btn-xong">Đóng</button>
+                  </div>
+               `;
+
+               overlay.appendChild(popup);
+               document.body.appendChild(overlay);
+         })
+         .catch(error => {
+               console.error('Lỗi:', error.message);
+         });
    }
 
 

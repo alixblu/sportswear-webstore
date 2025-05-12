@@ -57,8 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'createOrders') {
+        $receiverName = $_POST['receiverName'] ?? '';
+        $address = $_POST['address'] ?? '';
+        $phone = $_POST['phone'] ?? '';
         $idCoupon = $_POST['idCoupon'] ?? null;
-        $orderController->createOrders($idCoupon);
+        $payment = $_POST['payment'] ?? '';
+
+        $orderController->createOrders($receiverName, $address, $phone, $idCoupon, $payment);
     } else {
         echo "Invalid POST request.";
     }

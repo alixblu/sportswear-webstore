@@ -67,6 +67,20 @@ class AccountService {
         }
     }
 
+    public function getAccountByUserID($accountId) {
+        try {
+            if (!is_numeric($accountId) || $accountId <= 0) {
+                throw new Exception("ID tài khoản không hợp lệ");
+            }
+            $account = $this->accountRepository->getUserAccountIdByUserId($accountId);
+            if (!$account) {
+                throw new Exception("Không tìm thấy tài khoản với ID: $accountId");
+            }
+            return $account;
+        } catch (Exception $e) {
+            throw new Exception("Lấy thông tin tài khoản thất bại: " . $e->getMessage());
+        }
+    }
     public function getAccountById($accountId) {
         try {
             if (!is_numeric($accountId) || $accountId <= 0) {
@@ -81,7 +95,6 @@ class AccountService {
             throw new Exception("Lấy thông tin tài khoản thất bại: " . $e->getMessage());
         }
     }
-
     public function updateAccount($accountId, $username, $password, $fullname, $phone, $roleId, $status, $email = null, $address = null, $gender = null, $dateOfBirth = null) {
         try {
             // Xác thực đầu vào

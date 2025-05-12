@@ -1,4 +1,4 @@
-const ORDER_API_URL = '../../../src/router/orderrouter.php';
+const ORDER_API_URL = '/sportswear-webstore/src/router/orderrouter.php';
 
 // Lấy tất cả đơn hàng
 const getAllOrders = async () => {
@@ -73,10 +73,14 @@ const updateOrderStatus = async (ID, status) => {
 
 
 
-const createOrder = async (idCoupon) => {
+const createOrder = async (receiverName, address, phone, idCoupon = '', payment = '') => {
     const formData = new URLSearchParams();
     formData.append('action', 'createOrders');
+    formData.append('receiverName', receiverName);
+    formData.append('address', address);
+    formData.append('phone', phone);
     formData.append('idCoupon', idCoupon);
+    formData.append('payment',payment);
 
     const response = await fetch(ORDER_API_URL, {
         method: 'POST',
@@ -89,6 +93,23 @@ const createOrder = async (idCoupon) => {
     if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Không thể tạo đơn hàng');
+    }
+
+    return await response.json();
+};
+
+
+
+const getOrderDetails = async (orderID) => {
+    const url = `${ORDER_API_URL}?action=getOrderDetails&id=${orderID}`;
+
+    const response = await fetch(url, {
+        method: 'GET',
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Không thể lấy chi tiết đơn hàng');
     }
 
     return await response.json();
