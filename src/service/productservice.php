@@ -346,4 +346,15 @@ class ProductService
             throw new Exception("Failed to getDiscountByID: " . $e->getMessage());
         }
     }
+
+
+    public function createProduct($postData)
+    {
+        try {
+            return $this->productRepository->createProduct($postData);
+        } catch (Exception $e) {
+            error_log("Error in createProduct service: " . $e->getMessage());
+            throw new Exception("Failed to create product: " . $e->getMessage());
+        }
+    }
 }

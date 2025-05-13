@@ -71,7 +71,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 
-
+/*
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($_POST['action'] === 'createProduct') {
+        $postData = [
+            'name'              => $_POST['name'] ?? '',
+            'categoryID'        => $_POST['categoryID'] ?? '',
+            'brandID'           => $_POST['brandID'] ?? '',
+            'discountID'        => ($_POST['discountID'] === '') ? null : $_POST['discountID'],
+            'markup_percentage' => $_POST['markup_percentage'] ?? 0,
+            'description'       => $_POST['description'] ?? '',
+            'image'             => $_POST['image'] ?? '',
+        ];
+        $productController->createProduct($postData);
+    } else if ($_POST['action'] === 'createProductVariants') {
+    } else {
+        echo json_encode(['error' => 'Yêu cầu POST không hợp lệ']);
+    }
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProductImage') {
     $productId = $_POST['product_id'];
     if (isset($_FILES['image']) && $productId) {
@@ -103,6 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProduct
     }
     exit;
 }
+*/
 
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $putData = json_decode(file_get_contents("php://input"), true);

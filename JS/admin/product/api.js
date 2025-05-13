@@ -118,6 +118,7 @@ const getProductVariants = async (id) => {
     return await response.json();
 };
 
+
 // ===================================== Update & Delete product ===================================== 
 const updateProduct = async (product) => {
     if(product == null)
@@ -166,6 +167,45 @@ const deleteProduct = async (id) => {
 
     return await response.json();
 };
+
+// ===================================== Create product ===================================== 
+/*
+const createProduct = async (data) => {
+    try{
+        const response = await fetch(`${API_URL}?action=createProduct`, {
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+
+        if(!response.ok)
+            throw new Error("Không thể tạo sản phẩm")
+        
+        const data = await response.json()
+        return data
+    }catch (error) {
+        console.error('Lỗi, không thể thêm sản phẩm !!!', error)
+        throw error
+    }
+}
+const createProductVariants = async (productId) => {
+    const response = await fetch(`${API_URL}?action=createProductVariants&id=${productId}`, {
+        method: 'POST',
+        headers:{
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+
+    if(!response.ok)
+        throw new Error("Không thể tạo sản phẩm")
+    
+    const data = await response.json()
+    return data
+}
+*/
 
 export {
     getFilteredProducts,

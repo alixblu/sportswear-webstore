@@ -323,4 +323,18 @@ class ProductController
             ApiResponse::customApiResponse(null, 500, $e->getMessage());
         }
     }
+    /**
+     * Create product
+     * @param int $id
+     * @return void
+     */
+    public function createProduct($postData)
+    {
+        try {
+            $producID = $this->productService->createProduct($postData);
+            ApiResponse::customApiResponse($producID, 200);
+        } catch (Exception $e) {
+            ApiResponse::customApiResponse(null, 500, $e->getMessage());
+        }
+    }
 }

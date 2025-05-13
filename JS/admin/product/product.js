@@ -16,7 +16,7 @@ import {
     getAllDiscounts
 } from '../discount/api.js'
 
-const IMG_URL = '../../img/products/';
+const IMG_URL = '/sportswear-webstore/img/products';
 const productsPerPage = 30
 let currentPage = 1
 let currentProduct = null
@@ -406,8 +406,8 @@ function openCreateModal() {
     
 }
 window.openCreateModal = openCreateModal
-function resetCreateForm() {
-
+const proccessCreating = async () => {
+    
 }
 
 // ================================== Get all categories, brands, discounts ==================================

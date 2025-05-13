@@ -559,20 +559,32 @@ class ProductRepository
         }
     }
 
-    public function getProductById($id)
+    public function createProduct($data)
     {
         try {
-            $query = "SELECT * FROM product WHERE ID = ?";
+            $query = "INSERT INTO product (name, categoryID, brandID, discountID, markup_percentage, description, image)
+                  VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt = $this->conn->prepare($query);
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            return $result->fetch_assoc();
+            $stmt->bind_param(
+                "siiidss",
+                $data['name'],
+                $data['categoryID'],
+                $data['brandID'],
+                $data['discountID'],
+                $data['markup_percentage'],
+                $data['description'],
+                $data['image']
+            );
+            if ($stmt->execute()) {
+                // Get the last inserted ID (product ID)
+                $productID = $this->conn->insert_id;
+                return $productID; // Return the new product ID
+            } else {
+                throw new Exception("Error inserting product: " . $stmt->error);
+            }
         } catch (Exception $e) {
-            error_log("Error in getProductById: " . $e->getMessage());
-            throw new Exception("Failed to get product");
+            error_log("Error in getDiscountByID: " . $e->getMessage());
+            throw new Exception("Failed to get discount");
         }
     }
-
 }
