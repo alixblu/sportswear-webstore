@@ -14,6 +14,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="/sportswear-webstore/css/login_regis.css">
     <script src="/sportswear-webstore/JS/login_regis.js"></script>
+    <script src="./js/client/search.js" defer></script>
 
 </head>
 </head>
