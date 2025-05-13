@@ -229,16 +229,14 @@
             flex-wrap: wrap;
         }
 
-        /* Container để căn giữa roleSelector */
         .role-selector-container {
             display: flex;
             justify-content: center;
-            margin: 20px 0; /* Khoảng cách trên dưới */
+            margin: 20px 0;
         }
 
-        /* Đặt chiều rộng cố định cho roleSelector */
         #roleSelector {
-            width: 200px; /* Chiều rộng cố định để căn giữa trông tự nhiên */
+            width: 200px;
         }
 
         .search-box {
@@ -589,8 +587,8 @@
             }
 
             #roleSelector {
-                width: 100%; /* Đảm bảo combobox chiếm toàn bộ chiều rộng trên mobile */
-                max-width: 200px; /* Giới hạn chiều rộng tối đa */
+                width: 100%;
+                max-width: 200px;
             }
         }
 
@@ -718,6 +716,11 @@
                 <div class="table-card">
                     <div class="card-title">
                         <h3><i class="fa-solid fa-user-shield"></i> Quản lý phân quyền</h3>
+                        <div class="wrapperFilter">
+                            <button class="btn btn-primary" onclick="showCreateRoleForm()">
+                                <i class="fas fa-plus"></i> Thêm vai trò mới
+                            </button>
+                        </div>
                     </div>
                     <div class="role-selector-container">
                         <select class="selectUser" id="roleSelector" onchange="loadPermissions()">
