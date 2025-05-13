@@ -407,7 +407,7 @@ class ProductRepository
     public function getAllCategories()
     {
         try {
-            $query = "SELECT c.* FROM category as c WHERE c.parent IS NOT NULL ORDER BY name";
+            $query = "SELECT c.* FROM category as c ORDER BY name";
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
             $result = $stmt->get_result();

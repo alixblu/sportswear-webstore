@@ -177,8 +177,8 @@ const viewProduct = async (id) => {
         modalElements.description.textContent = product.description || 'No description available';
         modalElements.discountId.textContent = product.discountID || '-';
         modalElements.basePrice.textContent = fomartedPrice || '-';
-        modalElements.category.textContent = category.name || '-';
-        modalElements.brand.textContent = brand.name || '-';
+        modalElements.category.textContent = category && category.name ? category.name : '-';
+        modalElements.brand.textContent = brand && brand.name ? brand.name : '-';
         // Set the image source and handle errors using the 'error' event listener
         modalElements.image.onerror = function() {
             this.src = `${IMG_URL}default.jpg`;
@@ -472,11 +472,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Populate category & brand filter
         await Promise.all([
-            populateBrandFilter(),
             populateCategoryFilter(),
+            populateBrandFilter(),
             populateDiscountFilter(),
         ]);
-        loadProducts()
+        
+        // Then load products
+        await loadProducts()
         
         // Set status filter options
         const statusSelect = document.getElementById('statusFilter');
@@ -510,10 +512,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             }
         })
-     } catch (error) {
-         console.error('Error initializing filters:', error);
-     }
- });
+    } catch (error) {
+        console.error('Error initializing filters:', error);
+        alert('Error loading product data: ' + error.message);
+    }
+});
 
 // ===================================== Others =====================================
 function resetForm() {
