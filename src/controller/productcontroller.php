@@ -137,9 +137,15 @@ class ProductController
             $result = $this->productService->deleteProduct($id);
 
             if ($result) {
-                ApiResponse::customResponse($id, 200, 'Product deleted successfully');
+                if (isset($result['action']) && $result['action'] === 'discontinued') {
+                    ApiResponse::customResponse(['id' => $id, 'action' => 'discontinued'], 200, 
+                        'Product marked as discontinued because it exists in order history');
+                } else {
+                    ApiResponse::customResponse(['id' => $id, 'action' => 'deleted'], 200, 
+                        'Product deleted successfully');
+                }
             } else {
-                ApiResponse::customResponse($id, 500, 'Failed to delete product');
+                ApiResponse::customResponse($id, 500, 'Failed to process product');
             }
         } catch (Exception $e) {
             ApiResponse::customResponse($id, 500, $e->getMessage());

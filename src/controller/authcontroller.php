@@ -31,6 +31,10 @@ class AuthController
             if (!$user) {
                 throw new Exception("Invalid username or password", 401);
             }
+            if($user['status'] !== 'active'){
+                throw new Exception("Your account has been locked", 403);
+            }
+            
             $_SESSION['user'] = [
                 'id' => $user['userID'],
                 'username' => $user['username'],

@@ -227,4 +227,37 @@
     top: 13px;
     font-weight: var(--font-medium);
     transition: top 0.3s, font-size 0.3s;
+}
+
+.nav__account-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.nav__username {
+    font-size: 0.7rem;
+    color: var(--white-color);
+    text-shadow: 
+        -0.3px -0.3px 0 #000,
+        0.3px -0.3px 0 #000,
+        -0.3px 0.3px 0 #000,
+        0.3px 0.3px 0 #000;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.nav__account {
+    font-size: 1.5rem;
+    color: var(--white-color);
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.nav__account:hover {
+    color: #4361ee;
 } 

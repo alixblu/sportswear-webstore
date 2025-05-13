@@ -94,15 +94,18 @@
    if (id) {
       product_api.getProductById(id)
          .then(res => {
-            const product = res.data;
-
-            document.querySelector(".product-title").innerText = product.name;
-
-            document.querySelector(".description").innerText = product.description;
+            const product = res
+            if (!product) {
+               console.error('Product data is undefined or null');
+               return;
+            }
+            
+            document.querySelector(".product-title").innerText = product.name || 'Product Name Unavailable';
+            document.querySelector(".description").innerText = product.description || 'No description available';
 
             const mainImg = document.querySelector(".mainImage img");
-            mainImg.src = `/sportswear-webstore/img/products/${product.ID}.jpg`;
-            mainImg.alt = product.name;
+            mainImg.src = `/sportswear-webstore/img/products/product${product.ID}/${product.ID}.jpg`;
+            mainImg.alt = product.name || 'Product Image';
             mainImg.onerror = function() {
                this.src = '/sportswear-webstore/img/products/default.jpg';
             };
@@ -170,6 +173,11 @@
 
    function renderColors(variants) {
       const colorContainer = document.querySelector('.colors');
+      if (!variants || !Array.isArray(variants) || variants.length === 0) {
+         colorContainer.innerHTML = '<p>No color options available</p>';
+         return;
+      }
+      
       const colors = [...new Set(variants.map(v => v.color))];
       colorContainer.innerHTML = '';
 
@@ -198,6 +206,11 @@
 
    function renderSizes(variants) {
       const sizeContainer = document.querySelector('.sizes');
+      if (!variants || !Array.isArray(variants) || variants.length === 0) {
+         sizeContainer.innerHTML = '<p>No size options available</p>';
+         return;
+      }
+      
       const filtered = selectedColor ?
          variants.filter(v => v.color === selectedColor) :
          variants;
@@ -230,6 +243,12 @@
    function updatePriceStock(variants) {
       const priceEl = document.querySelector('.price');
       const stockEl = document.querySelector('.in-stock');
+      
+      if (!variants || !Array.isArray(variants) || variants.length === 0) {
+         priceEl.textContent = 'Price unavailable';
+         stockEl.textContent = 'Stock unavailable';
+         return;
+      }
 
       const match = variants.find(v =>
          (!selectedColor || v.color === selectedColor) &&
@@ -242,6 +261,9 @@
             currency: 'VND'
          }).format(match.price);
          stockEl.textContent = match.quantity > 0 ? `Còn ${match.quantity} sản phẩm` : 'Hết hàng';
+      } else {
+         priceEl.textContent = 'Price unavailable';
+         stockEl.textContent = 'Stock unavailable';
       }
    }
 

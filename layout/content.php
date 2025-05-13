@@ -232,9 +232,7 @@
                 const img = document.createElement('img');
                 img.src = `/sportswear-webstore/img/products/product${product.ID}/${product.image}`;
                 img.alt = product.name;
-                img.onerror = function() {
-                    this.src = '/sportswear-webstore/img/products/default.jpg';
-                };
+
                 productImage.appendChild(img);
 
                 const productName = document.createElement('div');

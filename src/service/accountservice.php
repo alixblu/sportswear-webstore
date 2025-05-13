@@ -132,6 +132,14 @@ class AccountService {
                 throw new Exception("Ngày sinh không đúng định dạng (YYYY-MM-DD)");
             }
 
+            // Kiểm tra nếu tài khoản là Admin (roleId = 1)
+            $account = $this->accountRepository->findById($accountId);
+            if ($account['roleID'] == 1) {
+                if ($status !== $account['status']) {
+                    throw new Exception("Không thể thay đổi trạng thái của tài khoản Admin");
+                }
+            }
+
             // Kiểm tra username đã tồn tại cho tài khoản khác
             $existingAccounts = $this->accountRepository->findAll();
             foreach ($existingAccounts as $account) {

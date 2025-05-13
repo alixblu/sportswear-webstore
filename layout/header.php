@@ -14,6 +14,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="/sportswear-webstore/css/login_regis.css">
     <script src="/sportswear-webstore/JS/login_regis.js"></script>
+    <script src="./js/client/search.js" defer></script>
 
 </head>
 </head>
@@ -125,13 +126,21 @@ if (session_status() === PHP_SESSION_NONE) {
                     <form id="searchForm" action="/sportswear-webstore/layout/client/search_results.php" method="GET">
                         <i class="ri-search-line"></i>
                         <input type="text" name="search" id="searchInput" placeholder="Tìm kiếm..." required>
-                        <button type="submit" style="display: none;"></button> <!-- Hidden submit button -->
+                        <button type="submit" style="display: none;"></button>
                     </form>
                 </div>
                 <a href="/sportswear-webstore/layout/client/card.php">
                     <i class="ri-shopping-cart-2-line nav__cart"></i>
                 </a>
-                <a class="nav__account" id="account"><i class="ri-account-circle-line"></i></a>
+                <div class="nav__account-container">
+                    <a class="nav__account" id="account"><i class="ri-account-circle-line"></i></a>
+                    <?php if (isset($_SESSION['user'])): ?>
+                        <span class="nav__username"><?php 
+                            $email = $_SESSION['user']['username'];
+                            echo explode('@', $email)[0]; 
+                        ?></span>
+                    <?php endif; ?>
+                </div>
                 <div class="nav__toggle" id="nav-toggle">
                     <i class="ri-menu-line nav__burger"></i>
                     <i class="ri-close-line nav__close"></i>
@@ -157,7 +166,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 </ul>
             </div>
         <?php else: ?>
-            <?php include __DIR__ . '/../login_regis.php'; ?>
+            <?php              include __DIR__ . '/../layout/login_regis.php';?>
         <?php endif; ?>
     </div>
     <script>
