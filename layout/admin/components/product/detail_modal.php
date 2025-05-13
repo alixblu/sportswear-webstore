@@ -74,7 +74,6 @@
             <div class="info-value" id="modal-product-description">-</div>
         </div>
     </div>
-
     <div id="variants-tab" class="tab-content">
         <table class="variants-table">
             <thead>
@@ -96,6 +95,10 @@
 </div>
 <!-- Edit Form Section (hidden by default) -->
 <div id="edit-form-section" class="edit-form">
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('details')">Details</div>
+        <div class="tab" onclick="switchTab('variants')">Variants</div>
+    </div>
     <form id="editForm">
         <div class="form-group">
             <label for="name">Name</label>

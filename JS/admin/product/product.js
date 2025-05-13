@@ -3,6 +3,8 @@ import {
     getFilteredProductsAdmin,
     updateProduct,
     getProductById,
+    uploadProductImageRequest,
+    createProductRequest
 } from './api.js'
 import {
     getAllBrands,
@@ -59,7 +61,7 @@ const displayProduct = (data) => {
         productCard.innerHTML = `
             <div class="product-image">
                 <span class="product-id-badge">#${product.ID}</span>
-                <img src="${IMG_URL}/product${product.ID}/${product.ID}.jpg"></img>
+                <img src="${IMG_URL}/product${product.ID}/${product.image}"></img>
                 <span class="product-badge badge-${product.status === 'in_stock' ? 'in-stock' : 'out-stock'}">
                     ${product.status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
                 </span>
@@ -185,7 +187,7 @@ const viewProduct = async (id) => {
         // };
 
         // Assign the image source
-        modalElements.image.src = `${IMG_URL}/product${product.ID}/${product.ID}.jpg`;
+        modalElements.image.src = `${IMG_URL}/product${product.ID}/${product.image}`;
         modalElements.image.setAttribute('data-oldname', modalElements.image.src)
 
         // Get and display variants
@@ -336,18 +338,22 @@ const proccessUpdating = async () => {
             // get image
             image: null,
         }
-        const img = document.getElementById('modal-product-image');
-        if(img.getAttribute('data-newname') !== '')
-            formData.image = img.getAttribute('data-newname')
-        else
-            formData.image = img.getAttribute('data-oldname').split('/').pop()
-
         const isChanged = Object.keys(formData).some(key => formData[key] !== currentProduct[key])
         
         if(!isChanged){
             console.error('Product is not changed !!!');
             return;
         }
+        // Proccess image
+        const img = document.getElementById('modal-product-image');
+        const imgInput = document.getElementById('changeImageInput');
+        if(img.getAttribute('data-newname') !== ''){
+            await uploadProductImage(currentProduct.ID, imgInput.files[0])
+            formData.image = img.getAttribute('data-newname')
+        }
+        else
+            formData.image = img.getAttribute('data-oldname').split('/').pop()
+
         // Update product into db
         const response = await updateProduct(formData);
         if (response) {
@@ -406,8 +412,52 @@ function openCreateModal() {
     
 }
 window.openCreateModal = openCreateModal
-function resetCreateForm() {
 
+const createProduct = async () => {
+    try{
+        const formData = {
+            ID: currentProduct.ID,
+            categoryID: Number(document.getElementById('edit-category').value),
+            discountID: Number(document.getElementById('edit-discount').value) || null,
+            brandID: Number(document.getElementById('edit-brand').value),
+            name: document.getElementById('edit-name').value,
+            markup_percentage: Number(document.getElementById('edit-markup').value),
+            rating: currentProduct.rating,
+            description: document.getElementById('edit-description').value,
+            stock: currentProduct.stock,
+            status: currentProduct.status,
+            // get image
+            image: null,
+        }
+        const isChanged = Object.keys(formData).some(key => formData[key] !== currentProduct[key])
+        
+        if(!isChanged){
+            console.error('Product is not changed !!!');
+            return;
+        }
+        // Proccess image
+        const img = document.getElementById('modal-product-image');
+        const imgInput = document.getElementById('changeImageInput');
+        if(img.getAttribute('data-newname') !== ''){
+            await uploadProductImage(currentProduct.ID, imgInput.files[0])
+            formData.image = img.getAttribute('data-newname')
+        }
+        else
+            formData.image = img.getAttribute('data-oldname').split('/').pop()
+
+        // Update product into db
+        const response = await updateProduct(formData);
+        if (response) {
+            alert('Product updated successfully!');
+            await loadProducts(); // Refresh grid
+            closeModal()
+        } else {
+            throw new Error(response.message || 'Failed to create product');
+        }
+    } catch (error){
+        console.error('Error proccessing creating product: ', error);
+        throw new Error("Cannot create product")
+    }
 }
 
 // ================================== Get all categories, brands, discounts ==================================
@@ -558,3 +608,11 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
         await proccessUpdating();
 })
 document.getElementById('cancel-edit-btn').addEventListener('click', () => cancelEdit())
+
+async function uploadProductImage(productID, imageFile) {
+    const formData = new FormData()
+    formData.append('action', 'uploadProductImage')
+    formData.append('product_id', productID)
+    formData.append('image', imageFile)
+    await uploadProductImageRequest(formData)
+}
