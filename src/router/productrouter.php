@@ -72,22 +72,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProductImage') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $productId = $_POST['product_id'];
-    if (isset($_FILES['image']) && $productId) {
-        $targetDir = $_SERVER['DOCUMENT_ROOT'] . "/sportswear-webstore/img/products/";
-        $targetFile = $targetDir . $productId . ".jpg"; // Sử dụng .jpg thay vì .png
-
-        // Remove old file if exists
-        if (file_exists($targetFile)) {
-            unlink($targetFile);
+    if ($_POST['action'] === 'uploadProductImage') {
+        if (!$productId || !isset($_FILES['image'])) {
+            echo json_encode([
+                "status" => 400,
+                "message" => "Thiếu ID sản phẩm hoặc file ảnh"
+            ]);
+            exit;
         }
+        // Tạo thư mục nếu chưa tồn tại
+        $targetDir = $_SERVER['DOCUMENT_ROOT'] . "/sportswear-webstore/img/products/product" . $productId . "/";
+        if (!is_dir($targetDir)) {
+            if (!mkdir($targetDir, 0755, true)) {
+                echo json_encode([
+                    "status" => 500,
+                    "message" => "Không thể tạo thư mục lưu ảnh"
+                ]);
+                exit;
+            }
+        }
+        // Upload ảnh
+        $image = $_FILES['image'];
+        $fileName = basename($image['name']);
+        $targetFile = $targetDir . $fileName;
 
-        // Move uploaded file
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
+        if (move_uploaded_file($image['tmp_name'], $targetFile)) {
             echo json_encode([
                 "status" => 200,
-                "message" => "Hình ảnh được tải lên thành công"
+                "message" => "Hình ảnh đã được tải lên thành công"
             ]);
         } else {
             echo json_encode([
@@ -98,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProduct
     } else {
         echo json_encode([
             "status" => 400,
-            "message" => "Không có hình ảnh hoặc ID sản phẩm được cung cấp"
+            "message" => "Không thể thực hiện POST"
         ]);
     }
     exit;

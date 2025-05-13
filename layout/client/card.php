@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,10 +12,11 @@
    <!-- font -->
    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
    <style>
-  
+
 
    </style>
 </head>
+
 <body>
    <?php include __DIR__ . '/../header.php'; ?>
    <div class="mainContainer">
@@ -71,154 +73,154 @@
          </div>
       </div>
    </div>
-<script src="/sportswear-webstore/JS/client/cartApi.js"></script>
-<script src="/sportswear-webstore/JS/admin/coupon.js"></script>
-<script src="/sportswear-webstore/JS/client/cartdetail.js"></script>
-<script src="/sportswear-webstore/JS/admin/userApi.js"></script>
-<script src="/sportswear-webstore/JS/admin/order.js"></script>
+   <script src="/sportswear-webstore/JS/client/cartApi.js"></script>
+   <script src="/sportswear-webstore/JS/admin/coupon.js"></script>
+   <script src="/sportswear-webstore/JS/client/cartdetail.js"></script>
+   <script src="/sportswear-webstore/JS/admin/userApi.js"></script>
+   <script src="/sportswear-webstore/JS/admin/order.js"></script>
 
-<script>
-   loadCart()
+   <script>
+      loadCart()
 
-   function loadCart() {
-      let total = 0;
-      getCartByUserId()
-         .then(res => {
-            if (res.status === 200) {
-               const cartItems = res.data;
-               const cartTableBody = document.querySelector(".cart-table tbody");
-               const cartContainer = document.querySelector(".cart-container");
+      function loadCart() {
+         let total = 0;
+         getCartByUserId()
+            .then(res => {
+               if (res.status === 200) {
+                  const cartItems = res.data;
+                  const cartTableBody = document.querySelector(".cart-table tbody");
+                  const cartContainer = document.querySelector(".cart-container");
 
-               cartTableBody.innerHTML = "";
+                  cartTableBody.innerHTML = "";
 
-               
-               if (!cartItems || cartItems.length === 0) {
-                  cartContainer.innerHTML = `
+
+                  if (!cartItems || cartItems.length === 0) {
+                     cartContainer.innerHTML = `
                      <div class="empty-cart-message">
                         <image src="/sportswear-webstore/img/emptycart.png" />
                         <p>Giỏ hàng của bạn đang trống!</p>
                      </div>
                   `;
-               }
+                  }
 
 
-               cartItems.forEach(item => {
-                  const row = document.createElement("tr");
+                  cartItems.forEach(item => {
+                     const row = document.createElement("tr");
 
-                  const productCell = document.createElement("td");
-                  productCell.innerHTML = `
+                     const productCell = document.createElement("td");
+                     productCell.innerHTML = `
                         <div class="product-info">
-                           <img src="/sportswear-webstore/img/products/${item.ID}.jpg" alt="${item.productName}">
+                           <img src="/sportswear-webstore/img/products/product${item.ID}/${item.image}" alt="${item.productName}">
                            <span>${item.productName}</span>
                         </div>
                      `;
 
-                  const priceCell = document.createElement("td");
-                  priceCell.innerHTML = item.productPrice;
+                     const priceCell = document.createElement("td");
+                     priceCell.innerHTML = item.productPrice;
 
-                  const quantityCell = document.createElement("td");
-                  quantityCell.innerHTML = item.quantity < 10 ? `0${item.quantity}` : item.quantity;
+                     const quantityCell = document.createElement("td");
+                     quantityCell.innerHTML = item.quantity < 10 ? `0${item.quantity}` : item.quantity;
 
-                  const subtotalCell = document.createElement("td");
-                  subtotalCell.innerHTML = `${item.quantity * item.productPrice}`;
+                     const subtotalCell = document.createElement("td");
+                     subtotalCell.innerHTML = `${item.quantity * item.productPrice}`;
 
-                  const deleteCell = document.createElement("td");
-                  deleteCell.innerHTML = `<img class="delete-icon" src="/sportswear-webstore/img/trash.svg" alt="Xoá" onclick="deleteProduct(${item.detailID})">`;
+                     const deleteCell = document.createElement("td");
+                     deleteCell.innerHTML = `<img class="delete-icon" src="/sportswear-webstore/img/trash.svg" alt="Xoá" onclick="deleteProduct(${item.detailID})">`;
 
-                  row.appendChild(productCell);
-                  row.appendChild(priceCell);
-                  row.appendChild(quantityCell);
-                  row.appendChild(subtotalCell);
-                  row.appendChild(deleteCell);
+                     row.appendChild(productCell);
+                     row.appendChild(priceCell);
+                     row.appendChild(quantityCell);
+                     row.appendChild(subtotalCell);
+                     row.appendChild(deleteCell);
 
-                  cartTableBody.appendChild(row);
-               });
+                     cartTableBody.appendChild(row);
+                  });
 
-               cartItems.forEach(item => {
-                  total += Number(item.productPrice) * Number(item.quantity);
-               });
+                  cartItems.forEach(item => {
+                     total += Number(item.productPrice) * Number(item.quantity);
+                  });
 
-               const priceElement = document.querySelector(".summary-price");
-               priceElement.innerText = formatCurrency(total);
+                  const priceElement = document.querySelector(".summary-price");
+                  priceElement.innerText = formatCurrency(total);
 
-               const summaryElement = document.querySelector(".summary-total");
-               summaryElement.innerText = 'Tổng tiền thanh toán ' + formatCurrency(total);
+                  const summaryElement = document.querySelector(".summary-total");
+                  summaryElement.innerText = 'Tổng tiền thanh toán ' + formatCurrency(total);
 
-               getCouponByUserId()
-                  .then(result => {
-                     const coupons = result.data;
-                     const container = document.querySelector(".voucher");
-                     container.innerHTML = "";
+                  getCouponByUserId()
+                     .then(result => {
+                        const coupons = result.data;
+                        const container = document.querySelector(".voucher");
+                        container.innerHTML = "";
 
-                     if (!coupons || coupons.length === 0) {
-                        container.innerHTML = "<div class='voucherItem'>Không có mã khuyến mãi</div>";
-                        return;
-                     }
+                        if (!coupons || coupons.length === 0) {
+                           container.innerHTML = "<div class='voucherItem'>Không có mã khuyến mãi</div>";
+                           return;
+                        }
 
-                     coupons.forEach(coupon => {
-                        const div = document.createElement("div");
-                        div.className = `voucherItem voucher-${coupon.ID}`; 
-                        div.innerHTML = `
+                        coupons.forEach(coupon => {
+                           const div = document.createElement("div");
+                           div.className = `voucherItem voucher-${coupon.ID}`;
+                           div.innerHTML = `
                               <span>${coupon.name}   </span>
                               <button class="apply-btn" onclick="toggleApply(this, ${total},${coupon.percent})">Áp Dụng</button>
                            `;
-                        container.appendChild(div);
+                           container.appendChild(div);
+                        });
+                     })
+                     .catch(error => {
+                        console.error('Lỗi khi gọi API:', error);
                      });
-                  })
-                  .catch(error => {
-                     console.error('Lỗi khi gọi API:', error);
-                  });
 
-            }else{
-               alert("Vui Lòng Đăng Nhập")
-               window.location.href = '/sportswear-webstore/index.php';
-            }
-         })
-         .catch(error => console.error('Lỗi khi lấy biến thể sản phẩm:', error));
-   }
-
-   const formatCurrency = (value) => {
-      return Number(value).toLocaleString('vi-VN') + '₫';
-   };
-
-   function deleteProduct($id) {
-      deleteCartDetail($id)
-      loadCart()
-   }
-
-   function toggleApply(button, total, percent) {
-      const voucherItem = button.closest('.voucherItem');
-      const isActive = voucherItem.classList.toggle('active');
-
-
-      if (isActive == true) {
-         button.textContent = 'Bỏ Chọn';
-         const couponElement = document.querySelector(".summary-coupon");
-         couponElement.innerText = formatCurrency(-total * percent / 100);
-
-         const summaryElement = document.querySelector(".summary-total");
-         summaryElement.innerText = 'Tổng tiền thanh toán ' + formatCurrency(total - (total * percent / 100));
-      }
-      if (isActive == false) {
-         button.textContent = 'Áp Dụng';
-         const couponElement = document.querySelector(".summary-coupon");
-         couponElement.innerText = '-0.000₫';
-
-
-         const summaryElement = document.querySelector(".summary-total");
-         summaryElement.innerText = 'Tổng tiền thanh toán ' + formatCurrency(total);
+               } else {
+                  alert("Vui Lòng Đăng Nhập")
+                  window.location.href = '/sportswear-webstore/index.php';
+               }
+            })
+            .catch(error => console.error('Lỗi khi lấy biến thể sản phẩm:', error));
       }
 
+      const formatCurrency = (value) => {
+         return Number(value).toLocaleString('vi-VN') + '₫';
+      };
 
-   }
+      function deleteProduct($id) {
+         deleteCartDetail($id)
+         loadCart()
+      }
 
-   function showPopup() {
-      const overlay = document.createElement('div');
-      overlay.classList.add('popup-overlay');
+      function toggleApply(button, total, percent) {
+         const voucherItem = button.closest('.voucherItem');
+         const isActive = voucherItem.classList.toggle('active');
 
-      const popup = document.createElement('div');
-      popup.classList.add('popup-content');
-      popup.innerHTML = `
+
+         if (isActive == true) {
+            button.textContent = 'Bỏ Chọn';
+            const couponElement = document.querySelector(".summary-coupon");
+            couponElement.innerText = formatCurrency(-total * percent / 100);
+
+            const summaryElement = document.querySelector(".summary-total");
+            summaryElement.innerText = 'Tổng tiền thanh toán ' + formatCurrency(total - (total * percent / 100));
+         }
+         if (isActive == false) {
+            button.textContent = 'Áp Dụng';
+            const couponElement = document.querySelector(".summary-coupon");
+            couponElement.innerText = '-0.000₫';
+
+
+            const summaryElement = document.querySelector(".summary-total");
+            summaryElement.innerText = 'Tổng tiền thanh toán ' + formatCurrency(total);
+         }
+
+
+      }
+
+      function showPopup() {
+         const overlay = document.createElement('div');
+         overlay.classList.add('popup-overlay');
+
+         const popup = document.createElement('div');
+         popup.classList.add('popup-content');
+         popup.innerHTML = `
             <div class="titlePopup">
                <div>Khuyến Mãi</div>
                <div onclick="closePopup()" style="cursor: pointer;">X</div>
@@ -232,50 +234,50 @@
             </div>
             <button class="btn-xong" onclick="closePopup()">Xong</button>
          `;
-      overlay.appendChild(popup);
-      document.body.appendChild(overlay);
-   }
+         overlay.appendChild(popup);
+         document.body.appendChild(overlay);
+      }
 
-   function closePopup() {
-      const overlay = document.querySelector('.popup-overlay');
-      if (overlay) overlay.remove();
-   }
+      function closePopup() {
+         const overlay = document.querySelector('.popup-overlay');
+         if (overlay) overlay.remove();
+      }
 
-   function toggleApplyForm(button) {
-      const voucher = document.querySelector('.voucher');
-      const voucherItem = button.closest('.voucherItem');
-      const isActive = voucherItem.classList.toggle('active');
+      function toggleApplyForm(button) {
+         const voucher = document.querySelector('.voucher');
+         const voucherItem = button.closest('.voucherItem');
+         const isActive = voucherItem.classList.toggle('active');
 
-      if (isActive == true) {
-         button.textContent = 'Bỏ Chọn';
-         voucher.innerHTML = `
+         if (isActive == true) {
+            button.textContent = 'Bỏ Chọn';
+            voucher.innerHTML = `
             <div class="voucherItem active">
                <span>Giảm 15% tối đa 70K</span>
                <button class="apply-btn" onclick="toggleApplyForm(this)">Bỏ Chọn</button>
             </div>`;
-      }
-      if (isActive == false) {
-         button.textContent = 'Áp Dụng';
-         voucher.innerHTML = `
+         }
+         if (isActive == false) {
+            button.textContent = 'Áp Dụng';
+            voucher.innerHTML = `
             <div class="voucherItem">
                <span>Giảm 15% tối đa 70K</span>
                <button class="apply-btn" onclick="toggleApplyForm(this)">Áp Dụng</button>
             </div>`;
+         }
+
+
       }
 
+      async function showCustomerInfoPopup() {
+         const result = await getInfo();
+         const userData = result.data;
 
-   }
+         const overlay = document.createElement('div');
+         overlay.classList.add('popup-overlay');
 
-   async function showCustomerInfoPopup() {
-      const result = await getInfo();
-      const userData = result.data;
-
-      const overlay = document.createElement('div');
-      overlay.classList.add('popup-overlay');
-
-      const popup = document.createElement('div');
-      popup.classList.add('popup-content');
-      popup.innerHTML = `
+         const popup = document.createElement('div');
+         popup.classList.add('popup-content');
+         popup.innerHTML = `
          <div class="titlePopup">
             <div>Nhập Thông Tin Khách Hàng</div>
             <div onclick="closePopup()" style="cursor: pointer;">X</div>
@@ -308,92 +310,97 @@
          </form>
       `;
 
-      overlay.appendChild(popup);
-      document.body.appendChild(overlay);
+         overlay.appendChild(popup);
+         document.body.appendChild(overlay);
 
-      document.getElementById('name').value = userData.fullname || '';
-      document.getElementById('phone').value = userData.phone || '';
+         document.getElementById('name').value = userData.fullname || '';
+         document.getElementById('phone').value = userData.phone || '';
 
-      addressSelect.innerHTML = '';
+         addressSelect.innerHTML = '';
 
-      const addresses = userData.address ? [userData.address] : [];
-      const placeholderOption = new Option('-- Chọn địa chỉ --', '', true, false);
-      addressSelect.appendChild(placeholderOption);
+         const addresses = userData.address ? [userData.address] : [];
+         const placeholderOption = new Option('-- Chọn địa chỉ --', '', true, false);
+         addressSelect.appendChild(placeholderOption);
 
-      if (userData.address && !addresses.includes(userData.address)) {
-         addresses.unshift(userData.address);
-      }
-
-      for (const addr of addresses) {
-         const option = new Option(addr, addr, false, userData.address === addr);
-         addressSelect.appendChild(option);
-      }  
-
-      const addNewOption = new Option('+ Thêm địa chỉ mới...', 'new');
-      addressSelect.appendChild(addNewOption);
-      
-   }
-
-   document.querySelector('.btn-buy').addEventListener('click', function() {
-      showCustomerInfoPopup()
-   });
-
-   function submitCustomerInfo(event) {
-      event.preventDefault();
-
-      const name = document.getElementById('name').value;
-      const phone = document.getElementById('phone').value;
-      const paymentMethod = document.getElementById('paymentMethod').value;
-
-      const addressSelect = document.getElementById('addressSelect');
-      let address = addressSelect.value;
-
-      if (address === 'new') {
-         const newAddress = document.getElementById('newAddressInput').value.trim();
-         if (newAddress) {
-            address = newAddress;
-
-            const exists = Array.from(addressSelect.options).some(opt => opt.value === newAddress);
-            if (!exists) {
-               const option = new Option(newAddress, newAddress, true, true);
-               addressSelect.insertBefore(option, addressSelect.lastElementChild); 
-            }
-
-            addressSelect.value = newAddress;
-            document.getElementById('newAddressInput').value = '';
-            document.getElementById('newAddressInput').style.display = 'none';
-         } else {
-            alert("Vui lòng nhập địa chỉ mới.");
-            return;
+         if (userData.address && !addresses.includes(userData.address)) {
+            addresses.unshift(userData.address);
          }
+
+         for (const addr of addresses) {
+            const option = new Option(addr, addr, false, userData.address === addr);
+            addressSelect.appendChild(option);
+         }
+
+         const addNewOption = new Option('+ Thêm địa chỉ mới...', 'new');
+         addressSelect.appendChild(addNewOption);
+
       }
 
-      console.log({ name, phone, address, paymentMethod });
-
-      const activeVoucher = document.querySelector('.voucherItem.active');
-
-      let voucherId =null
-      if (activeVoucher) {
-         const classList = Array.from(activeVoucher.classList);
-         const voucherClass = classList.find(cls => cls.startsWith('voucher-'));
-         voucherId = voucherClass ? voucherClass.replace('voucher-', '') : null;
-      }
-      createOrder(name, address, phone, voucherId, paymentMethod)
-      .then(response => {
-         const orderId = response.data.order_id;
-
-         closePopup();
-         showInvoiceDetailPopup(orderId);
-      })
-      .catch(error => {
-         console.error('Lỗi tạo đơn hàng:', error.message);
+      document.querySelector('.btn-buy').addEventListener('click', function() {
+         showCustomerInfoPopup()
       });
-   }
+
+      function submitCustomerInfo(event) {
+         event.preventDefault();
+
+         const name = document.getElementById('name').value;
+         const phone = document.getElementById('phone').value;
+         const paymentMethod = document.getElementById('paymentMethod').value;
+
+         const addressSelect = document.getElementById('addressSelect');
+         let address = addressSelect.value;
+
+         if (address === 'new') {
+            const newAddress = document.getElementById('newAddressInput').value.trim();
+            if (newAddress) {
+               address = newAddress;
+
+               const exists = Array.from(addressSelect.options).some(opt => opt.value === newAddress);
+               if (!exists) {
+                  const option = new Option(newAddress, newAddress, true, true);
+                  addressSelect.insertBefore(option, addressSelect.lastElementChild);
+               }
+
+               addressSelect.value = newAddress;
+               document.getElementById('newAddressInput').value = '';
+               document.getElementById('newAddressInput').style.display = 'none';
+            } else {
+               alert("Vui lòng nhập địa chỉ mới.");
+               return;
+            }
+         }
+
+         console.log({
+            name,
+            phone,
+            address,
+            paymentMethod
+         });
+
+         const activeVoucher = document.querySelector('.voucherItem.active');
+
+         let voucherId = null
+         if (activeVoucher) {
+            const classList = Array.from(activeVoucher.classList);
+            const voucherClass = classList.find(cls => cls.startsWith('voucher-'));
+            voucherId = voucherClass ? voucherClass.replace('voucher-', '') : null;
+         }
+         createOrder(name, address, phone, voucherId, paymentMethod)
+            .then(response => {
+               const orderId = response.data.order_id;
+
+               closePopup();
+               showInvoiceDetailPopup(orderId);
+            })
+            .catch(error => {
+               console.error('Lỗi tạo đơn hàng:', error.message);
+            });
+      }
 
 
-   async function showInvoiceDetailPopup(orderId) {
-      getOrderDetails(orderId)
-         .then(data => {
+      async function showInvoiceDetailPopup(orderId) {
+         getOrderDetails(orderId)
+            .then(data => {
                console.log('Chi tiết đơn hàng:', data);
                const orderList = data.data;
                const firstItem = orderList[0];
@@ -451,26 +458,26 @@
 
                overlay.appendChild(popup);
                document.body.appendChild(overlay);
-         })
-         .catch(error => {
+            })
+            .catch(error => {
                console.error('Lỗi:', error.message);
-         });
-   }
+            });
+      }
 
 
-   function handleAddressChange() {
-   const addressSelect = document.getElementById('addressSelect');
-   const newAddressInput = document.getElementById('newAddressInput');
+      function handleAddressChange() {
+         const addressSelect = document.getElementById('addressSelect');
+         const newAddressInput = document.getElementById('newAddressInput');
 
-   if (addressSelect.value === 'new') {
-      newAddressInput.style.display = 'block';
-      newAddressInput.required = true;
-   } else {
-      newAddressInput.style.display = 'none';
-      newAddressInput.required = false;
-   }
-}
-</script>
+         if (addressSelect.value === 'new') {
+            newAddressInput.style.display = 'block';
+            newAddressInput.required = true;
+         } else {
+            newAddressInput.style.display = 'none';
+            newAddressInput.required = false;
+         }
+      }
+   </script>
 </body>
 
 </html>

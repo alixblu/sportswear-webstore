@@ -88,6 +88,10 @@
                             <i class="fas fa-edit"></i>
                             Edit
                         </button>
+                        <button class="btn btn-danger delete-product-btn" onclick="confirmDeleteProduct()">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
                         <input type="file" id="changeImageInput" accept="image/*" style="display:none;">
                         <div id="img-btn" style="display: none;">
                             <button class="btn btn-outline" id="img-btn" onclick="triggerImageUpload()">
@@ -113,7 +117,7 @@
 
         document.getElementById('changeImageInput').addEventListener('change', function(event) {
             const file = event.target.files[0]
-            const productImg = document.getElementById('modal-product-image')
+            productImg = document.getElementById('modal-product-image')
             productImg.setAttribute('data-oldname', productImg.src)
             if (file) {
                 // Add preview version of image being switched
@@ -123,8 +127,6 @@
                 // Get name of that image
                 productImg.setAttribute('data-newname', file.name)
             }
-            console.log(productImg.getAttribute('data-oldname'));
-            console.log(productImg.getAttribute('data-newname'));
         })
     </script>
 </body>

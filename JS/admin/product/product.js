@@ -3,6 +3,9 @@ import {
     getFilteredProductsAdmin,
     updateProduct,
     getProductById,
+    deleteProduct,
+    uploadProductImageRequest,
+    createProductRequest
 } from './api.js'
 import {
     getAllBrands,
@@ -59,7 +62,7 @@ const displayProduct = (data) => {
         productCard.innerHTML = `
             <div class="product-image">
                 <span class="product-id-badge">#${product.ID}</span>
-                <img src="${IMG_URL}/product${product.ID}/${product.ID}.jpg"></img>
+                <img src="${IMG_URL}/product${product.ID}/${product.image}"></img>
                 <span class="product-badge badge-${product.status === 'in_stock' ? 'in-stock' : 'out-stock'}">
                     ${product.status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
                 </span>
@@ -185,7 +188,7 @@ const viewProduct = async (id) => {
         // };
 
         // Assign the image source
-        modalElements.image.src = `${IMG_URL}/product${product.ID}/${product.ID}.jpg`;
+        modalElements.image.src = `${IMG_URL}/product${product.ID}/${product.image}`;
         modalElements.image.setAttribute('data-oldname', modalElements.image.src)
 
         // Get and display variants
@@ -289,32 +292,32 @@ function fillEditForm(product) {
     document.getElementById('edit-discount').value = product.discountID || '';
     document.getElementById('edit-description').value = product.description || '';
 
-    // Load categories
+        // Load categories
     const categorySelect = document.getElementById('edit-category');
-    categoriesList.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category.ID;
-        option.textContent = category.name;
-        option.selected = category.ID === product.categoryID;
-        categorySelect.appendChild(option);
-    });
-    // Load brands
+        categoriesList.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.ID;
+            option.textContent = category.name;
+            option.selected = category.ID === product.categoryID;
+            categorySelect.appendChild(option);
+        });
+        // Load brands
     const brandSelect = document.getElementById('edit-brand');
-    brandsList.forEach(brand => {
-        const option = document.createElement('option');
-        option.value = brand.ID;
-        option.textContent = brand.name;
-        option.selected = brand.ID === product.brandID;
-        brandSelect.appendChild(option);
-    });
-    // Load discounts 
+        brandsList.forEach(brand => {
+            const option = document.createElement('option');
+            option.value = brand.ID;
+            option.textContent = brand.name;
+            option.selected = brand.ID === product.brandID;
+            brandSelect.appendChild(option);
+        });
+        // Load discounts 
     const discountSelect = document.getElementById('edit-discount')
-    discountsList.forEach(discount => {
-        const option = document.createElement('option')
-        option.value = discount.ID
-        option.textContent = discount.discountRate + '%' 
-        option.selected = discount.ID === product.discountID
-        discountSelect.appendChild(option)
+        discountsList.forEach(discount => {
+            const option = document.createElement('option')
+            option.value = discount.ID
+            option.textContent = discount.discountRate + '%' 
+            option.selected = discount.ID === product.discountID
+            discountSelect.appendChild(option)
         })
 }
 // ===================================== Process updating product =====================================
@@ -336,18 +339,22 @@ const proccessUpdating = async () => {
             // get image
             image: null,
         }
-        const img = document.getElementById('modal-product-image');
-        if(img.getAttribute('data-newname') !== '')
-            formData.image = img.getAttribute('data-newname')
-        else
-            formData.image = img.getAttribute('data-oldname').split('/').pop()
-
         const isChanged = Object.keys(formData).some(key => formData[key] !== currentProduct[key])
         
         if(!isChanged){
             console.error('Product is not changed !!!');
             return;
         }
+        // Proccess image
+        const img = document.getElementById('modal-product-image');
+        const imgInput = document.getElementById('changeImageInput');
+        if(img.getAttribute('data-newname') !== ''){
+            await uploadProductImage(currentProduct.ID, imgInput.files[0])
+            formData.image = img.getAttribute('data-newname')
+        }
+        else
+            formData.image = img.getAttribute('data-oldname').split('/').pop()
+
         // Update product into db
         const response = await updateProduct(formData);
         if (response) {
@@ -406,8 +413,52 @@ function openCreateModal() {
     
 }
 window.openCreateModal = openCreateModal
-function resetCreateForm() {
 
+const createProduct = async () => {
+    try{
+        const formData = {
+            ID: currentProduct.ID,
+            categoryID: Number(document.getElementById('edit-category').value),
+            discountID: Number(document.getElementById('edit-discount').value) || null,
+            brandID: Number(document.getElementById('edit-brand').value),
+            name: document.getElementById('edit-name').value,
+            markup_percentage: Number(document.getElementById('edit-markup').value),
+            rating: currentProduct.rating,
+            description: document.getElementById('edit-description').value,
+            stock: currentProduct.stock,
+            status: currentProduct.status,
+            // get image
+            image: null,
+        }
+        const isChanged = Object.keys(formData).some(key => formData[key] !== currentProduct[key])
+        
+        if(!isChanged){
+            console.error('Product is not changed !!!');
+            return;
+        }
+        // Proccess image
+        const img = document.getElementById('modal-product-image');
+        const imgInput = document.getElementById('changeImageInput');
+        if(img.getAttribute('data-newname') !== ''){
+            await uploadProductImage(currentProduct.ID, imgInput.files[0])
+            formData.image = img.getAttribute('data-newname')
+        }
+        else
+            formData.image = img.getAttribute('data-oldname').split('/').pop()
+
+        // Update product into db
+        const response = await updateProduct(formData);
+        if (response) {
+            alert('Product updated successfully!');
+            await loadProducts(); // Refresh grid
+            closeModal()
+        } else {
+            throw new Error(response.message || 'Failed to create product');
+        }
+    } catch (error){
+        console.error('Error proccessing creating product: ', error);
+        throw new Error("Cannot create product")
+    }
 }
 
 // ================================== Get all categories, brands, discounts ==================================
@@ -558,3 +609,106 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
         await proccessUpdating();
 })
 document.getElementById('cancel-edit-btn').addEventListener('click', () => cancelEdit())
+
+// ===================================== Delete Product =====================================
+async function confirmDeleteProduct() {
+    // Always get the product ID directly from the modal that's currently open
+    const productIdElement = document.getElementById('modal-product-id');
+    let productId = null;
+    
+    if (!productIdElement || !productIdElement.textContent || productIdElement.textContent === '-') {
+        alert('No product selected for deletion!');
+        return;
+    }
+    
+    try {
+        productId = parseInt(productIdElement.textContent);
+        if (isNaN(productId)) {
+            alert('Invalid product ID!');
+            return;
+        }
+        
+        // Fetch fresh product details from the backend to ensure we have the correct information
+        const productDetails = await getProductById(productId);
+        if (!productDetails) {
+            alert('Could not retrieve product details. Please try again.');
+            return;
+        }
+        
+        // Set the current product with the freshly fetched details
+        currentProduct = productDetails;
+        
+        // Now proceed with the deletion dialog
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmMessage = document.getElementById('confirmMessage');
+        
+        if (confirmModal && confirmMessage) {
+            confirmMessage.textContent = `Are you sure you want to delete product "${currentProduct.name}" (ID: ${currentProduct.ID})?`;
+            
+            // Use the helper function from confirm_modal.php
+            if (typeof showConfirmModal === 'function') {
+                showConfirmModal();
+            } else {
+                confirmModal.style.display = 'flex';
+            }
+            
+            // Set up confirm button action
+            const confirmBtn = document.getElementById('confirmBtn');
+            if (confirmBtn) {
+                // Remove any existing event listeners
+                const newConfirmBtn = confirmBtn.cloneNode(true);
+                confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+                
+                // Add new event listener
+                newConfirmBtn.addEventListener('click', async () => {
+                    try {
+                        const result = await deleteProduct(currentProduct.ID);
+                        
+                        if (result.action === 'discontinued') {
+                            alert('Product has been marked as discontinued because it exists in order history.');
+                        } else {
+                            alert('Product has been successfully deleted from the database.');
+                        }
+                        
+                        closeModal(); // Close the product details modal
+                        confirmModal.style.display = 'none'; // Close the confirm modal
+                        loadProducts(); // Refresh the product list
+                    } catch (error) {
+                        console.error('Error processing product deletion:', error);
+                        alert('Error processing product: ' + error.message);
+                    }
+                });
+            }
+        } else {
+            // Fallback if modal elements aren't found
+            if (confirm(`Are you sure you want to delete product "${currentProduct.name}" (ID: ${currentProduct.ID})?`)) {
+                try {
+                    const result = await deleteProduct(currentProduct.ID);
+                    
+                    if (result.action === 'discontinued') {
+                        alert('Product has been marked as discontinued because it exists in order history.');
+                    } else {
+                        alert('Product has been successfully deleted from the database.');
+                    }
+                    
+                    closeModal();
+                    loadProducts();
+                } catch (error) {
+                    console.error('Error processing product deletion:', error);
+                    alert('Error processing product: ' + error.message);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error preparing for product deletion:', error);
+        alert('An error occurred while preparing to delete the product. Please try again.');
+    }
+}
+window.confirmDeleteProduct = confirmDeleteProduct;
+async function uploadProductImage(productID, imageFile) {
+    const formData = new FormData()
+    formData.append('action', 'uploadProductImage')
+    formData.append('product_id', productID)
+    formData.append('image', imageFile)
+    await uploadProductImageRequest(formData)
+}

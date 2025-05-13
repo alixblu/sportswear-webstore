@@ -1,33 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <!--=============== REMIXICONS ===============-->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  
+
   <title>Quản lý đơn hàng</title>
   <style>
     /* Common styles */
     .main-content {
       padding: 20px;
     }
-    
+
     .page-title {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
     }
-    
+
     .title {
       font-size: 24px;
       font-weight: 600;
       color: #2d3748;
     }
-    
+
     .action-buttons .btn {
       padding: 8px 16px;
       border-radius: 6px;
@@ -36,27 +37,27 @@
       align-items: center;
       gap: 8px;
     }
-    
+
     .btn-primary {
       background: linear-gradient(135deg, #3b82f6, #1d4ed8);
       color: white;
       border: none;
     }
-    
+
     .stats-cards {
       background: white;
       border-radius: 10px;
       padding: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
-    
+
     .card-title {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
     }
-    
+
     .card-title h3 {
       font-size: 18px;
       color: #4a5568;
@@ -64,28 +65,29 @@
       align-items: center;
       gap: 10px;
     }
-    
+
     .data-table {
       width: 100%;
       border-collapse: collapse;
     }
-    
-    .data-table th, .data-table td {
+
+    .data-table th,
+    .data-table td {
       padding: 12px 15px;
       text-align: left;
       border-bottom: 1px solid #e2e8f0;
     }
-    
+
     .data-table th {
       background-color: #f7fafc;
       color: #4a5568;
       font-weight: 600;
     }
-    
+
     .data-table tr:hover {
       background-color: #f8fafc;
     }
-    
+
     .btn-outline {
       background: transparent;
       border: 1px solid #e2e8f0;
@@ -97,16 +99,16 @@
       align-items: center;
       gap: 5px;
     }
-    
+
     .btn-outline:hover {
       background-color: #f8fafc;
     }
-    
+
     .btn-sm {
       font-size: 13px;
       padding: 5px 10px;
     }
-    
+
     /* Status styles */
     .status {
       padding: 5px 10px;
@@ -116,52 +118,52 @@
       align-items: center;
       gap: 5px;
     }
-    
+
     .status.pending {
       background-color: rgba(234, 179, 8, 0.15);
       color: #d97706;
       border: 1px solid rgba(234, 179, 8, 0.3);
     }
-    
+
     .status.approved {
       background-color: rgba(59, 130, 246, 0.15);
       color: #2563eb;
       border: 1px solid rgba(59, 130, 246, 0.3);
     }
-    
+
     .status.delivered {
       background-color: rgba(16, 185, 129, 0.15);
       color: #059669;
       border: 1px solid rgba(16, 185, 129, 0.3);
     }
-    
+
     .status.canceled {
       background-color: rgba(239, 68, 68, 0.15);
       color: #dc2626;
       border: 1px solid rgba(239, 68, 68, 0.3);
     }
-    
+
     .status.active {
       background-color: rgba(76, 201, 240, 0.15);
       color: #0891b2;
       border: 1px solid rgba(76, 201, 240, 0.3);
     }
-    
+
     /* Filter styles */
     .filter-container {
       display: flex;
       gap: 10px;
       align-items: center;
     }
-    
-    .filter-container select, 
+
+    .filter-container select,
     .filter-container input {
       padding: 8px 12px;
       border: 1px solid #e2e8f0;
       border-radius: 6px;
       outline: none;
     }
-    
+
     .filter-container button {
       padding: 8px 16px;
       background: #3b82f6;
@@ -170,11 +172,11 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    
+
     .filter-container button:hover {
       background: #2563eb;
     }
-    
+
     /* Modal styles (aligned with coupon.php) */
     #portal-root {
       position: fixed;
@@ -186,9 +188,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 999; 
+      z-index: 999;
     }
-    
+
     .formUserCss {
       background-color: white;
       max-width: 500px;
@@ -198,7 +200,7 @@
       border-radius: 10px;
       font-family: 'Poppins', sans-serif;
     }
-    
+
     .wrapperCss {
       padding: 0 30px;
       padding-bottom: 30px;
@@ -206,7 +208,7 @@
       flex-direction: column;
       gap: 10px;
     }
-    
+
     .wrapperInputCss {
       display: flex;
       flex-direction: column;
@@ -215,18 +217,18 @@
       border-bottom: 1px solid silver;
       padding: 5px 3px;
     }
-    
+
     .wrapperInputCss:focus-within {
       border-bottom: 1px solid #00e5ff;
     }
-    
+
     .inputUserCss {
       border: none;
       outline: none;
       color: #2d3748;
       font-size: 17px;
     }
-    
+
     .buttonUserCss {
       width: 100%;
       padding: 12px;
@@ -237,18 +239,18 @@
       cursor: pointer;
       margin-top: 15px;
     }
-    
+
     .buttonUserCss:hover {
       background: linear-gradient(135deg, #3b82f6, #1d4ed8);
       box-shadow: 0 6px 15px rgba(58, 12, 163, 0. styled-components);
     }
-    
+
     .CloseCss {
       display: flex;
       justify-content: flex-end;
       padding: 10px;
     }
-    
+
     /* Toast styles */
     #toast-portal {
       position: fixed;
@@ -259,41 +261,57 @@
       gap: 10px;
       z-index: 9999;
     }
-    
+
     .toast {
       min-width: 250px;
       padding: 12px 18px;
       color: #fff;
       border-radius: 8px;
       font-size: 15px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
       opacity: 0;
       transform: translateY(20px);
       animation: fadeInOut 3s ease forwards;
     }
-    
+
     .toast.success {
       background-color: #4caf50;
     }
-    
+
     .toast.error {
       background-color: #f44336;
     }
-    
+
     @keyframes fadeInOut {
-      0%   { opacity: 0; transform: translateY(20px); }
-      10%  { opacity: 1; transform: translateY(0); }
-      90%  { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(20px); }
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      10% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      90% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="main-content">
     <div id="pageTitle" class="page-title">
       <div class="title">Quản lý đơn hàng</div>
     </div>
-    
+
     <div class="stats-cards">
       <div class="table-card">
         <div class="card-title">
@@ -311,7 +329,7 @@
             <button onclick="applyFilter()">Lọc</button>
           </div>
         </div>
-        
+
         <table class="data-table">
           <thead>
             <tr>
@@ -331,9 +349,9 @@
       </div>
     </div>
   </div>
-  
+
   <div id="toast-portal"></div>
-  
+
   <script src="/sportswear-webstore/JS/admin/order.js"></script>
   <script>
     // Valid status transitions
@@ -351,7 +369,11 @@
 
     // Function to load orders with optional filters
     function loadOrders(status = '', fromDate = '', toDate = '') {
-      searchOrders({ status, fromDate, toDate })
+      searchOrders({
+          status,
+          fromDate,
+          toDate
+        })
         .then(result => {
           const orders = Array.isArray(result) ? result : result.data;
           const tbody = document.querySelector("#order-table-body");
@@ -387,40 +409,50 @@
       const status = document.getElementById('filter-status').value;
       const fromDate = document.getElementById('from-date').value;
       const toDate = document.getElementById('to-date').value;
-      
+
       if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
         showToast("Ngày bắt đầu không thể lớn hơn ngày kết thúc!", 'error');
         return;
       }
-      
+
       loadOrders(status, fromDate, toDate);
     }
 
     // Get status class for order
     function getStatusClass(status) {
       switch (status) {
-        case 'pending': return 'pending';
-        case 'approved': return 'approved';
-        case 'delivered': return 'delivered';
-        case 'canceled': return 'canceled';
-        default: return '';
+        case 'pending':
+          return 'pending';
+        case 'approved':
+          return 'approved';
+        case 'delivered':
+          return 'delivered';
+        case 'canceled':
+          return 'canceled';
+        default:
+          return '';
       }
     }
 
     // Convert status to display text
     function getStatusText(status) {
       switch (status) {
-        case 'pending': return 'Chưa xác nhận';
-        case 'approved': return 'Đã xác nhận';
-        case 'delivered': return 'Đã giao';
-        case 'canceled': return 'Hủy đơn';
-        default: return status;
+        case 'pending':
+          return 'Chưa xác nhận';
+        case 'approved':
+          return 'Đã xác nhận';
+        case 'delivered':
+          return 'Đã giao';
+        case 'canceled':
+          return 'Hủy đơn';
+        default:
+          return status;
       }
     }
 
     // Convert payment method to display text
     function getPaymentMethodText(method) {
-      switch(method) {
+      switch (method) {
         case 'Cash':
           return 'Tiền mặt';
         case 'Credit/Debit Card':
@@ -472,7 +504,6 @@
     }
 
     // Close modal
-quest
     function closeModal() {
       const portalRoot = document.getElementById('portal-root');
       if (portalRoot) {
@@ -516,7 +547,7 @@ quest
     function editStatus(ID, currentStatus) {
       showStatusModal(ID, currentStatus);
     }
-    
+
     // Show toast message
     function showToast(text, type = 'success') {
       let portalRoot = document.getElementById('toast-portal');
@@ -542,4 +573,5 @@ quest
     }
   </script>
 </body>
+
 </html>

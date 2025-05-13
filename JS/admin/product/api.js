@@ -118,7 +118,29 @@ const getProductVariants = async (id) => {
     return await response.json();
 };
 
-// ===================================== Update & Delete product ===================================== 
+// ===================================== Create product ===================================== 
+const createProductRequest = async (product) => {
+    if(product == null)
+        throw new Error('Không có dữ liệu sản phẩm mới')
+    try{
+        const response = await fetch(`${API_URL}?action=updateProduct&id=${product.ID}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(product),
+        });
+        if (!response.ok) {
+            throw new Error('Không thể tạo sản phẩm');
+        }
+        const data = await response.json();
+        return data;
+    } catch(error) {
+        console.error('Lỗi, không thể thêm sp !!!', error)
+        throw error
+    }
+}
+// ===================================== Update product ===================================== 
 const updateProduct = async (product) => {
     if(product == null)
         throw new Error('Không có dữ liệu sản phẩm mới')
@@ -155,18 +177,54 @@ const updateProductStock = async (id) => {
     return await response.json();
 };
 
+// ===================================== Delete product ===================================== 
 const deleteProduct = async (id) => {
-    const response = await fetch(`${API_URL}?action=deleteProduct&id=${id}`, {
-        method: 'DELETE',
-    });
+    try {
+        const response = await fetch(`${API_URL}?action=deleteProduct&id=${id}`, {
+            method: 'DELETE',
+        });
 
-    if (!response.ok) {
-        throw new Error('Không thể xoá sản phẩm');
+        if (!response.ok) {
+            throw new Error('Không thể xoá sản phẩm');
+        }
+
+        const result = await response.json();
+        
+        // Check if the product was deleted or just marked as discontinued
+        if (result.data && result.data.action === 'discontinued') {
+            return {
+                success: true,
+                action: 'discontinued',
+                message: 'Sản phẩm đã được đánh dấu là ngừng kinh doanh vì đã có trong đơn hàng'
+            };
+        }
+        
+        return {
+            success: true,
+            action: 'deleted',
+            message: 'Sản phẩm đã được xóa thành công'
+        };
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        throw error;
     }
-
-    return await response.json();
 };
 
+// ========================================================================= Upload image of product  =========================================================================
+const uploadProductImageRequest = async (data) => {
+    try{
+        const response = await fetch(`${API_URL}`,{
+            method: "POST",
+            body: data
+        })
+        if(!response.ok)
+            throw new Error('Không thể upload ảnh');
+        return await response.json()
+    } catch (error) {
+        console.error('Lỗi, không thể upload ảnh !!!', error)
+        throw error
+    }
+}
 export {
     getFilteredProducts,
     getProductById,
@@ -175,4 +233,6 @@ export {
     getFilteredProductsAdmin,
     updateProduct,
     deleteProduct,
+    uploadProductImageRequest,
+    createProductRequest,
 };
