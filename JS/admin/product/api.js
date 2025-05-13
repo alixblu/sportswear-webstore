@@ -179,15 +179,35 @@ const updateProductStock = async (id) => {
 
 // ===================================== Delete product ===================================== 
 const deleteProduct = async (id) => {
-    const response = await fetch(`${API_URL}?action=deleteProduct&id=${id}`, {
-        method: 'DELETE',
-    });
+    try {
+        const response = await fetch(`${API_URL}?action=deleteProduct&id=${id}`, {
+            method: 'DELETE',
+        });
 
-    if (!response.ok) {
-        throw new Error('Không thể xoá sản phẩm');
+        if (!response.ok) {
+            throw new Error('Không thể xoá sản phẩm');
+        }
+
+        const result = await response.json();
+        
+        // Check if the product was deleted or just marked as discontinued
+        if (result.data && result.data.action === 'discontinued') {
+            return {
+                success: true,
+                action: 'discontinued',
+                message: 'Sản phẩm đã được đánh dấu là ngừng kinh doanh vì đã có trong đơn hàng'
+            };
+        }
+        
+        return {
+            success: true,
+            action: 'deleted',
+            message: 'Sản phẩm đã được xóa thành công'
+        };
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        throw error;
     }
-
-    return await response.json();
 };
 
 // ========================================================================= Upload image of product  =========================================================================
