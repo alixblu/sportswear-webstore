@@ -406,13 +406,26 @@
 
     // Apply filter button click handler
     function applyFilter() {
-      const status = document.getElementById('filter-status').value;
+      const status = document.getElementById('filter-status').value.trim();;
       const fromDate = document.getElementById('from-date').value;
       const toDate = document.getElementById('to-date').value;
-      const address = document.getElementById('address').value;
+      const address = document.getElementById('address').value.trim();;
       if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
         showToast("Ngày bắt đầu không thể lớn hơn ngày kết thúc!", 'error');
         return;
+      }
+      const regex = /[!@#$%^&*()]/;
+
+      if (regex.test(address)) {
+        showToast("Không được nhập ký tự đặc biệt trong địa chỉ!", 'error');
+      }
+      if ( address.length < 5) {
+          showToast("Địa chỉ giao hàng không hợp lệ!, địa chỉ phải có 5 ký tự trở lên ", 'error');
+          return;
+      }
+      if (address.length > 30) {
+          showToast("Địa chỉ giao hàng không hợp lệ!, địa chỉ không được quá 30 ký tự", 'error');
+          return;
       }
       
       loadOrders(status, address,fromDate, toDate);
