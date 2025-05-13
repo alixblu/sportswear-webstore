@@ -305,7 +305,8 @@
               <option value="approved">Đã xác nhận</option>
               <option value="delivered">Đã giao</option>
               <option value="canceled">Hủy đơn</option>
-            </select>
+            </select> 
+            <input type="text" id="address" name="address" placeholder="Nhập Địa chỉ giao hàng">
             <input type="date" id="from-date" placeholder="Từ ngày">
             <input type="date" id="to-date" placeholder="Đến ngày">
             <button onclick="applyFilter()">Lọc</button>
@@ -321,6 +322,7 @@
               <th>Tổng tiền</th>
               <th>Phương thức TT</th>
               <th>Trạng thái</th>
+              <th>Địa chỉ giao hàng </th>
               <th>Thao tác</th>
             </tr>
           </thead>
@@ -350,8 +352,8 @@
     });
 
     // Function to load orders with optional filters
-    function loadOrders(status = '', fromDate = '', toDate = '') {
-      searchOrders({ status, fromDate, toDate })
+    function loadOrders(status = '',address = '' ,fromDate = '', toDate = '') {
+      searchOrders({ status,address ,fromDate, toDate })
         .then(result => {
           const orders = Array.isArray(result) ? result : result.data;
           const tbody = document.querySelector("#order-table-body");
@@ -367,10 +369,12 @@
               <td>${order.totalPrice}₫</td>
               <td>${getPaymentMethodText(order.paymentMethod)}</td>
               <td><span class="status ${statusClass}">${getStatusText(order.status)}</span></td>
+              <td>${order.address}</td>
               <td>
                 <button class="btn btn-outline btn-sm" onclick="editStatus('${order.ID}', '${order.status}')">
                   <i class="fas fa-edit"></i> Cập nhật
                 </button>
+                
               </td>
             `;
             tbody.appendChild(tr);
@@ -387,13 +391,14 @@
       const status = document.getElementById('filter-status').value;
       const fromDate = document.getElementById('from-date').value;
       const toDate = document.getElementById('to-date').value;
-      
+      const address = document.getElementById('address').value;
+      console.log('Address:', address);
       if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
         showToast("Ngày bắt đầu không thể lớn hơn ngày kết thúc!", 'error');
         return;
       }
       
-      loadOrders(status, fromDate, toDate);
+      loadOrders(status, address,fromDate, toDate);
     }
 
     // Get status class for order
@@ -540,6 +545,7 @@ quest
         }
       }, 3000);
     }
+    
   </script>
 </body>
 </html>

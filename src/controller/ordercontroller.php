@@ -83,10 +83,10 @@ class OrderController
     /**
      * Search orders with filters
      */
-    public function searchOrders($orderID = null, $customerName = '', $status = '', $fromDate = '', $toDate = '')
+    public function searchOrders( $status = '',$address = '' ,$fromDate = '', $toDate = '')
     {
         try {
-            $results = $this->orderService->searchOrders($orderID, $customerName, $status, $fromDate, $toDate);
+            $results = $this->orderService->searchOrders($status,$address,$fromDate, $toDate);
             ApiResponse::customResponse($results, 200);
         } catch (Exception $e) {
             ApiResponse::customResponse(null, 500, $e->getMessage());
