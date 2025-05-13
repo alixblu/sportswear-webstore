@@ -40,7 +40,6 @@ const getOrdersByCustomer = async () => {
 
 // Tìm kiếm đơn hàng theo nhiều tiêu chí
 const searchOrders = async ({status = '', address = '', fromDate = '', toDate = '' }) => {
-    console.log('Sending search with address:', address); // Debug
     const query = new URLSearchParams({
         action: 'searchOrders',
         status,

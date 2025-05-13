@@ -410,7 +410,6 @@
       const fromDate = document.getElementById('from-date').value;
       const toDate = document.getElementById('to-date').value;
       const address = document.getElementById('address').value;
-      console.log('Address:', address);
       if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
         showToast("Ngày bắt đầu không thể lớn hơn ngày kết thúc!", 'error');
         return;
