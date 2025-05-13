@@ -16,7 +16,7 @@ import {
     getAllDiscounts
 } from '../discount/api.js'
 
-const IMG_URL = '../../img/products/';
+const IMG_URL = '/sportswear-webstore/img/products';
 const productsPerPage = 30
 let currentPage = 1
 let currentProduct = null
@@ -59,7 +59,7 @@ const displayProduct = (data) => {
         productCard.innerHTML = `
             <div class="product-image">
                 <span class="product-id-badge">#${product.ID}</span>
-                <img src="${IMG_URL}/product${product.ID}/${product.image}"></img>
+                <img src="${IMG_URL}/product${product.ID}/${product.ID}.jpg"></img>
                 <span class="product-badge badge-${product.status === 'in_stock' ? 'in-stock' : 'out-stock'}">
                     ${product.status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
                 </span>
@@ -180,12 +180,12 @@ const viewProduct = async (id) => {
         modalElements.category.textContent = category && category.name ? category.name : '-';
         modalElements.brand.textContent = brand && brand.name ? brand.name : '-';
         // Set the image source and handle errors using the 'error' event listener
-        modalElements.image.onerror = function() {
-            this.src = `${IMG_URL}default.jpg`;
-        };
+        // modalElements.image.onerror = function() {
+        //     this.src = `${IMG_URL}default.jpg`;
+        // };
 
         // Assign the image source
-        modalElements.image.src = `${IMG_URL}/product${product.ID}/${product.image}`;
+        modalElements.image.src = `${IMG_URL}/product${product.ID}/${product.ID}.jpg`;
         modalElements.image.setAttribute('data-oldname', modalElements.image.src)
 
         // Get and display variants
