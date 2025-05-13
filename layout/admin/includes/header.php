@@ -4,10 +4,6 @@
     <div class="dashboard_open" id="dashboard_switch" onclick="toggle_sidebar()">
       <i class="fas fa-bars fa-xl"></i>
     </div>
-    <div class="search-bar">
-      <i class="fas fa-search"></i>
-      <input type="text" placeholder="Search..." />
-    </div>
   </div>
   <div class="header-actions">
     <div class="notification">
