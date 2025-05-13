@@ -96,7 +96,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $controller->updatePermissions($data['roleId'], $data['moduleIds']);
                 break;
-            
+
+            case 'createRole':
+                if (!isset($data['name'], $data['moduleIds']) || !is_array($data['moduleIds'])) {
+                    echo json_encode(['status' => 400, 'message' => 'Thiếu tên vai trò hoặc danh sách moduleIds không hợp lệ']);
+                    exit;
+                }
+                $controller->createRole($data['name'], $data['moduleIds']);
+                break;
+
             case 'updatePassword':
                 $currentPassword = $data['passwordOld'] ?? '';
                 $newPassword = $data['newPassword'] ?? '';
@@ -142,8 +150,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
                 $birth = $input['birth'] ?? '';
                 $phone = $input['phone'] ?? '';
                 $gender = $input['gender'] ?? '';
-    
-                $authController->updateUserLogin($name, $address, $birth,$phone,$gender);
+
+                $authController->updateUserLogin($name, $address, $birth, $phone, $gender);
                 break;
 
             default:

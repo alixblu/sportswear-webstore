@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard</title>
+    <title>Bảng Điều Khiển Phân Tích</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -197,13 +197,65 @@
         }
 
         .chart-placeholder {
-            height: 300px;
-            background: #f8fafc;
+            height: 150px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%);
             border-radius: var(--border-radius);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             color: var(--gray);
+            font-size: 16px;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .chart-placeholder:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .chart-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+            opacity: 0.8;
+        }
+
+        .chart-placeholder p {
+            margin: 10px 0;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            color: var(--dark);
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .chart-placeholder i {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        #revenueChart {
+            background: linear-gradient(135deg, #e6f0fa 0%, #d0e3f5 100%);
+        }
+
+        #orderStatsChart {
+            background: linear-gradient(135deg, #e9f7ef 0%, #d1f0e0 100%);
+        }
+
+        #userStats {
+            background: linear-gradient(135deg, #f3e9fa 0%, #e3d3f2 100%);
         }
 
         .customer-stats {
@@ -243,8 +295,7 @@
             font-size: 14px;
         }
 
-        .sort-btn:hover,
-        .sort-btn.active {
+        .sort-btn:hover, .sort-btn.active {
             background: var(--primary);
             color: white;
             border-color: var(--primary);
@@ -352,13 +403,6 @@
             position: relative;
         }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
         .modal-title {
             font-size: 20px;
             font-weight: 600;
@@ -432,45 +476,58 @@
                 width: 90%;
                 margin: 10% auto;
             }
+
+            .chart-placeholder {
+                height: 120px;
+                font-size: 14px;
+            }
+
+            .chart-placeholder p {
+                font-size: 16px;
+            }
+
+            .chart-placeholder i {
+                font-size: 20px;
+            }
         }
-    </style>
+    </style>    
 </head>
 <body>
     <div class="main-content">
         <div class="page-title">
-            <div class="title">Analytics Dashboard</div>
+            <div class="title">THỐNG KÊ DỮ LIỆU </div>
         </div>
 
-        <!-- Stats Cards -->
+        <!-- Thẻ Thống Kê -->
         <div class="stats-cards" id="statsCards">
-            <!-- Data will be populated dynamically -->
+            <!-- Dữ liệu sẽ được điền động -->
         </div>
 
-        <!-- Top Customers Statistics -->
+        <!-- Thống Kê Khách Hàng Hàng Đầu -->
         <div class="customer-stats">
             <div class="chart-header">
-                <div class="chart-title">Top 5 Customers by Purchase Amount</div>
+                <div class="chart-title">Top 5 Khách Hàng Theo Giá Trị Mua Hàng</div>
             </div>
             
             <div class="filter-row">
                 <div class="filter-group">
-                    <label class="filter-label">Date Range</label>
+                    <label class="filter-label">Khoảng Thời Gian</label>
                     <div class="date-range-group">
-                        <span class="date-label">From</span>
+                        <span class="date-label">Từ</span>
                         <input type="date" class="date-input" id="customerStartDate">
-                        <span class="date-separator">to</span>
+                        <span class="date-separator">đến</span>
                         <input type="date" class="date-input" id="customerEndDate">
-                        <button class="filter-btn" onclick="fetchTopCustomers()">Apply</button>
+                        <button class="filter-btn" onclick="fetchTopCustomers()">Áp Dụng</button>
                     </div>
                 </div>
                 <div class="filter-group" style="flex: 0 0 auto;">
-                    <label class="filter-label">Sort By</label>
+                    <label class="filter-label">Sắp Xếp Theo</label>
                     <div class="sort-options">
                         <button class="sort-btn active" data-sort="desc" onclick="fetchTopCustomers()">
-                            <i class="fas fa-sort-amount-down"></i> Highest to Lowest
+                            <i class="fas fa-sort-amount-down"></i> Cao đến Thấp
                         </button>
                         <button class="sort-btn" data-sort="asc" onclick="fetchTopCustomers()">
-                            <i class="fas fa-sort-amount-up"></i> Lowest to Highest
+                            <i class="fas fa-sort-amount-up"></i> Thấp đến Cao
                         </button>
                     </div>
                 </div>
@@ -479,45 +536,45 @@
             <table class="customer-table" id="topCustomersTable">
                 <thead>
                     <tr>
-                        <th>Rank</th>
-                        <th>Customer Name</th>
-                        <th>Total Orders</th>
-                        <th>Total Amount</th>
-                        <th>Last Order Date</th>
-                        <th>Actions</th>
+                        <th>Xếp Hạng</th>
+                        <th>Tên Khách Hàng</th>
+                        <th>Tổng Đơn Hàng</th>
+                        <th>Tổng Giá Trị</th>
+                        <th>Ngày Đặt Hàng Cuối</th>
+                        <th>Hành Động</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Data will be populated dynamically -->
+                    <!-- Dữ liệu sẽ được điền động -->
                 </tbody>
             </table>
         </div>
 
-        <!-- Most Bought Products Statistics -->
+        <!-- Thống Kê Sản Phẩm Bán Chạy -->
         <div class="customer-stats">
             <div class="chart-header">
-                <div class="chart-title">Most Bought Products</div>
+                <div class="chart-title">Sản Phẩm Bán Chạy Nhất</div>
             </div>
             
             <div class="filter-row">
                 <div class="filter-group">
-                    <label class="filter-label">Date Range</label>
+                    <label class="filter-label">Khoảng Thời Gian</label>
                     <div class="date-range-group">
-                        <span class="date-label">From</span>
+                        <span class="date-label">Từ</span>
                         <input type="date" class="date-input" id="productStartDate">
-                        <span class="date-separator">to</span>
+                        <span class="date-separator">đến</span>
                         <input type="date" class="date-input" id="productEndDate">
-                        <button class="filter-btn" onclick="fetchTopProducts()">Apply</button>
+                        <button class="filter-btn" onclick="fetchTopProducts()">Áp Dụng</button>
                     </div>
                 </div>
                 <div class="filter-group" style="flex: 0 0 auto;">
-                    <label class="filter-label">Sort By</label>
+                    <label class="filter-label">Sắp Xếp Theo</label>
                     <div class="sort-options">
                         <button class="sort-btn active" data-sort="desc" onclick="fetchTopProducts()">
-                            <i class="fas fa-sort-amount-down"></i> Highest to Lowest
+                            <i class="fas fa-sort-amount-down"></i> Cao đến Thấp
                         </button>
                         <button class="sort-btn" data-sort="asc" onclick="fetchTopProducts()">
-                            <i class="fas fa-sort-amount-up"></i> Lowest to Highest
+                            <i class="fas fa-sort-amount-up"></i> Thấp đến Cao
                         </button>
                     </div>
                 </div>
@@ -526,90 +583,81 @@
             <table class="customer-table" id="topProductsTable">
                 <thead>
                     <tr>
-                        <th>Rank</th>
-                        <th>Product Name</th>
-                        <th>Category</th>
-                        <th>Units Sold</th>
-                        <th>Total Revenue</th>
-                        <th>Actions</th>
+                        <th>Xếp Hạng</th>
+                        <th>Tên Sản Phẩm</th>
+                        <th>Danh Mục</th>
+                        <th>Số Lượng Bán</th>
+                        <th>Tổng Doanh Thu</th>
+                        <th>Hành Động</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Data will be populated dynamically -->
+                    <!-- Dữ liệu sẽ được điền động -->
                 </tbody>
             </table>
         </div>
         
-        <!-- Revenue Chart -->
+        <!-- Biểu Đồ Doanh Thu -->
         <div class="chart-container">
             <div class="chart-header">
-                <div class="chart-title">Revenue Overview</div>
+                <div class="chart-title">Tổng Quan Doanh Thu</div>
                 <div class="chart-filters">
                     <div class="date-range-group">
-                        <span class="date-label">From</span>
+                        <span class="date-label">Từ</span>
                         <input type="date" class="date-input" id="revenueStartDate">
-                        <span class="date-separator">to</span>
+                        <span class="date-separator">đến</span>
                         <input type="date" class="date-input" id="revenueEndDate">
-                        <button class="filter-btn" onclick="fetchRevenue()">Apply</button>
-                    </div>
-                    <div class="chart-period">
-                        <div class="chart-filter active" data-period="daily" onclick="fetchRevenue()">Daily</div>
-                        <div class="chart-filter" data-period="weekly" onclick="fetchRevenue()">Weekly</div>
-                        <div class="chart-filter" data-period="monthly" onclick="fetchRevenue()">Monthly</div>
-                        <div class="chart-filter" data-period="yearly" onclick="fetchRevenue()">Yearly</div>
+                        <button class="filter-btn" onclick="fetchRevenue()">Áp Dụng</button>
                     </div>
                 </div>
             </div>
             <div class="chart-placeholder" id="revenueChart">
-                Revenue Chart will be displayed here
+                <i class="fas fa-dollar-sign"></i>
+                <p>Biểu đồ doanh thu sẽ được hiển thị tại đây</p>
             </div>
         </div>
 
-        <!-- Order Statistics Chart -->
+        <!-- Biểu Đồ Thống Kê Đơn Hàng -->
         <div class="chart-container">
             <div class="chart-header">
-                <div class="chart-title">Order Statistics</div>
+                <div class="chart-title">Thống Kê Đơn Hàng</div>
                 <div class="chart-filters">
                     <div class="date-range-group">
-                        <span class="date-label">From</span>
+                        <span class="date-label">Từ</span>
                         <input type="date" class="date-input" id="orderStartDate">
-                        <span class="date-separator">to</span>
+                        <span class="date-separator">đến</span>
                         <input type="date" class="date-input" id="orderEndDate">
-                        <button class="filter-btn" onclick="fetchOrderStats()">Apply</button>
-                    </div>
-                    <div class="chart-period">
-                        <div class="chart-filter active" data-period="daily" onclick="fetchOrderStats()">Daily</div>
-                        <div class="chart-filter" data-period="weekly" onclick="fetchOrderStats()">Weekly</div>
-                        <div class="chart-filter" data-period="monthly" onclick="fetchOrderStats()">Monthly</div>
-                        <div class="chart-filter" data-period="yearly" onclick="fetchOrderStats()">Yearly</div>
+                        <button class="filter-btn" onclick="fetchOrderStats()">Áp Dụng</button>
                     </div>
                 </div>
             </div>
             <div class="chart-placeholder" id="orderStatsChart">
-                Order Statistics Chart will be displayed here
+                <i class="fas fa-shopping-cart"></i>
+                <p>Biểu đồ thống kê đơn hàng sẽ được hiển thị tại đây</p>
             </div>
         </div>
 
-        <!-- User Account Statistics -->
+        <!-- Thống Kê Tài Khoản Người Dùng -->
         <div class="chart-container">
             <div class="chart-header">
-                <div class="chart-title">User Account Statistics</div>
+                <div class="chart-title">Thống Kê Tài Khoản Người Dùng</div>
                 <div class="chart-filters">
                     <div class="date-range-group">
-                        <span class="date-label">From</span>
+                        <span class="date-label">Từ</span>
                         <input type="date" class="date-input" id="userStartDate">
-                        <span class="date-separator">to</span>
+                        <span class="date-separator">đến</span>
                         <input type="date" class="date-input" id="userEndDate">
-                        <button class="filter-btn" onclick="fetchActiveUsers()">Apply</button>
+                        <button class="filter-btn" onclick="fetchActiveUsers()">Áp Dụng</button>
                     </div>
                 </div>
             </div>
             <div class="chart-placeholder" id="userStats">
-                User Statistics will be displayed here
+                <i class="fas fa-users"></i>
+                <p>Thống kê người dùng sẽ được hiển thị tại đây</p>
             </div>
         </div>
 
-        <!-- Modal for Order/Product Details -->
+        <!-- Modal cho Chi Tiết Đơn Hàng/Sản Phẩm -->
         <div id="detailsModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -617,7 +665,7 @@
                     <span class="close-btn" onclick="closeModal()">&times;</span>
                 </div>
                 <div id="modalContent">
-                    <!-- Dynamic content will be populated here -->
+                    <!-- Nội dung động sẽ được điền tại đây -->
                 </div>
             </div>
         </div>

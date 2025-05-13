@@ -28,15 +28,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $search = $_GET['search'] ?? null;
         $productController->getFilteredProducts($category, $brand, $status, $min_price, $max_price, $sort, $search);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getFilteredProductsAdmin') {
+        $page = $_GET['page'] ?? 1;
+        $productsPerPage = $_GET['productsPerPage'] ?? 1;
         $search = $_GET['search'] ?? null;
         $category = $_GET['category'] ?? null;
         $brand = $_GET['brand'] ?? null;
         $status = $_GET['status'] ?? null;
         $rating = $_GET['rating'] ?? null;
-        if ($rating != null)
-            log($search);
-        else
-            $productController->getFilteredProductsAdmin($search, $category, $brand, $status, $rating);
+
+        $productController->getFilteredProductsAdmin($page, $productsPerPage, $search, $category, $brand, $status, $rating);
     } else if (isset($_GET['action']) && $_GET['action'] === 'getProductById' && isset($_GET['id'])) {
         $productController->getProductById($_GET['id']);
     }
@@ -72,22 +72,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProductImage') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $productId = $_POST['product_id'];
-    if (isset($_FILES['image']) && $productId) {
-        $targetDir = $_SERVER['DOCUMENT_ROOT'] . "/sportswear-webstore/img/products/";
-        $targetFile = $targetDir . $productId . ".jpg"; // Sử dụng .jpg thay vì .png
-
-        // Remove old file if exists
-        if (file_exists($targetFile)) {
-            unlink($targetFile);
+    if ($_POST['action'] === 'uploadProductImage') {
+        if (!$productId || !isset($_FILES['image'])) {
+            echo json_encode([
+                "status" => 400,
+                "message" => "Thiếu ID sản phẩm hoặc file ảnh"
+            ]);
+            exit;
         }
+        // Tạo thư mục nếu chưa tồn tại
+        $targetDir = $_SERVER['DOCUMENT_ROOT'] . "/sportswear-webstore/img/products/product" . $productId . "/";
+        if (!is_dir($targetDir)) {
+            if (!mkdir($targetDir, 0755, true)) {
+                echo json_encode([
+                    "status" => 500,
+                    "message" => "Không thể tạo thư mục lưu ảnh"
+                ]);
+                exit;
+            }
+        }
+        // Upload ảnh
+        $image = $_FILES['image'];
+        $fileName = basename($image['name']);
+        $targetFile = $targetDir . $fileName;
 
-        // Move uploaded file
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
+        if (move_uploaded_file($image['tmp_name'], $targetFile)) {
             echo json_encode([
                 "status" => 200,
-                "message" => "Hình ảnh được tải lên thành công"
+                "message" => "Hình ảnh đã được tải lên thành công"
             ]);
         } else {
             echo json_encode([
@@ -98,33 +112,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProduct
     } else {
         echo json_encode([
             "status" => 400,
-            "message" => "Không có hình ảnh hoặc ID sản phẩm được cung cấp"
+            "message" => "Không thể thực hiện POST"
         ]);
     }
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-    parse_str(file_get_contents("php://input"), $putData);
+    $putData = json_decode(file_get_contents("php://input"), true);
+    file_put_contents('php://stderr', print_r($putData, true)); // hoặc log ra file
 
-    if (isset($putData['action']) && $putData['action'] === 'updateProduct' && isset($putData['id'])) {
-        $id = $putData['id'];
+    if (!$putData) {
+        echo json_encode(['error' => 'Dữ liệu JSON không hợp lệ !!']);
+        exit;
+    }
+    $action = $_GET['action'] ?? null;
+    $id = $_GET['id'] ?? null;
+
+    if ($action === 'updateProduct' && $id !== null) {
+        $productController->updateProduct($id, $putData);
+    } else if ($action === 'updateProductStock' && $id !== null) {
+        $productController->updateProductStock($id);
+    }
+    /*
+    if (isset($putData['action']) && $putData['action'] === 'updateProduct' && isset($putData['ID'])) {
+        $id = $putData['ID'];
         $data = [
-            'categoryID' => $putData['categoryID'] ?? '',
-            'discountID' => $putData['discountID'] ?? '',
-            'brandID' => $putData['brandID'] ?? '',
-            'name' => $putData['name'] ?? '',
-            'markup_percentage' => $putData['markup_percentage'] ?? '',
-            'rating' => $putData['rating'] ?? '',
-            'image' => $putData['image'] ?? '',
-            'description' => $putData['description'] ?? '',
-            'stock' => $putData['stock'] ?? '',
-            'status' => $putData['status'] ?? ''
+            'categoryID' => $putData['categoryID'] ?? null,
+            'discountID' => $putData['discountID'] ?? null,
+            'brandID' => $putData['brandID'] ?? null,
+            'name' => $putData['name'] ?? null,
+            'markup_percentage' => $putData['markup_percentage'] ?? null,
+            'rating' => $putData['rating'] ?? null,
+            'image' => $putData['image'] ?? null,
+            'description' => $putData['description'] ?? null,
+            'stock' => $putData['stock'] ?? null,
+            'status' => $putData['status'] ?? null
         ];
         $productController->updateProduct($id, $data);
-    } else if (isset($putData['action']) && $putData['action'] === 'updateProductStock' && isset($putData['id'])) {
-        $productController->updateProductStock($putData['id']);
-    } else {
+    } else if (isset($putData['action']) && $putData['action'] === 'updateProductStock' && isset($putData['ID'])) {
+        $productController->updateProductStock($putData['ID']);
+    }
+    */ else {
         echo json_encode(['error' => 'Yêu cầu PUT không hợp lệ']);
     }
 }

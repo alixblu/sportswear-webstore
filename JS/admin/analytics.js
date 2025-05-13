@@ -5,6 +5,28 @@ function formatVND(amount) {
     return Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' ₫';
 }
 
+// Utility function to show toast notifications
+function showToast(text, type = 'success') {
+    let portalRoot = document.getElementById('toast-portal');
+    if (!portalRoot) {
+        portalRoot = document.createElement('div');
+        portalRoot.id = 'toast-portal';
+        document.body.appendChild(portalRoot);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerText = text;
+    portalRoot.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+        if (portalRoot.children.length === 0) {
+            portalRoot.remove();
+        }
+    }, 3000);
+}
+
 // Fetch the earliest order date
 async function fetchEarliestOrderDate() {
     try {
@@ -15,8 +37,31 @@ async function fetchEarliestOrderDate() {
         }
         return '2024-01-01'; // Fallback date
     } catch (error) {
-        console.error('Error fetching earliest order date:', error);
+        console.error('Lỗi khi lấy ngày đặt hàng sớm nhất:', error);
+        showToast('Không thể lấy ngày đặt hàng sớm nhất', 'error');
         return '2024-01-01';
+    }
+}
+
+// Generic API fetch function
+async function fetchAPI(endpoint, method = 'GET', body = null) {
+    try {
+        const options = {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+        };
+        if (body) {
+            options.body = JSON.stringify(body);
+        }
+        const response = await fetch(endpoint, options);
+        const data = await response.json();
+        if (!response.ok || data.error) {
+            throw new Error(data.error || 'Yêu cầu thất bại');
+        }
+        return data;
+    } catch (error) {
+        console.error(`Lỗi API (${endpoint}):`, error);
+        throw error;
     }
 }
 
@@ -26,84 +71,55 @@ async function fetchStats() {
         const defaultStartDate = await fetchEarliestOrderDate();
         const defaultEndDate = new Date().toISOString().split('T')[0];
         const [revenueResponse, orderStatsResponse, activeUsersResponse] = await Promise.all([
-            fetch(`${ANALYTICS_API_URL}?action=getTotalRevenue&startDate=${defaultStartDate}&endDate=${defaultEndDate}`),
-            fetch(`${ANALYTICS_API_URL}?action=getOrderStats&startDate=${defaultStartDate}&endDate=${defaultEndDate}`),
-            fetch(`${ANALYTICS_API_URL}?action=getActiveUsers&startDate=${defaultStartDate}&endDate=${defaultEndDate}`)
+            fetchAPI(`${ANALYTICS_API_URL}?action=getTotalRevenue&startDate=${defaultStartDate}&endDate=${defaultEndDate}`),
+            fetchAPI(`${ANALYTICS_API_URL}?action=getOrderStats&startDate=${defaultStartDate}&endDate=${defaultEndDate}`),
+            fetchAPI(`${ANALYTICS_API_URL}?action=getActiveUsers&startDate=${defaultStartDate}&endDate=${defaultEndDate}`)
         ]);
-
-        const revenueData = await revenueResponse.json();
-        const orderStatsData = await orderStatsResponse.json();
-        const activeUsersData = await activeUsersResponse.json();
 
         const statsCards = document.getElementById('statsCards');
         statsCards.innerHTML = `
             <div class="stat-card">
                 <div class="card-header">
                     <div>
-                        <div class="card-value">${formatVND(revenueData.data?.total_revenue || 0)}</div>
-                        <div class="card-label">Total Revenue</div>
+                        <div class="card-value">${formatVND(revenueResponse.data?.total_revenue || 0)}</div>
+                        <div class="card-label">Tổng Doanh Thu</div>
                     </div>
                     <div class="card-icon blue">
                         <i class="fas fa-dollar-sign"></i>
                     </div>
                 </div>
-                <div class="card-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>12.5% from last month</span>
-                </div>
             </div>
             <div class="stat-card">
                 <div class="card-header">
                     <div>
-                        <div class="card-value">${orderStatsData.data['delivered'] || 0}</div>
-                        <div class="card-label">Total Orders</div>
+                        <div class="card-value">${orderStatsResponse.data['delivered'] || 0}</div>
+                        <div class="card-label">Tổng Đơn Hàng</div>
                     </div>
                     <div class="card-icon green">
                         <i class="fas fa-shopping-cart"></i>
                     </div>
                 </div>
-                <div class="card-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>8.2% from last month</span>
-                </div>
             </div>
             <div class="stat-card">
                 <div class="card-header">
                     <div>
-                        <div class="card-value">${activeUsersData.data?.active_users || 0}</div>
-                        <div class="card-label">Active Users</div>
+                        <div class="card-value">${activeUsersResponse.data?.active_users || 0}</div>
+                        <div class="card-label">Người Dùng Hoạt Động</div>
                     </div>
                     <div class="card-icon purple">
                         <i class="fas fa-users"></i>
                     </div>
                 </div>
-                <div class="card-change negative">
-                    <i class="fas fa-arrow-down"></i>
-                    <span>3.1% from last month</span>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="card-header">
-                    <div>
-                        <div class="card-value">92%</div>
-                        <div class="card-label">Conversion Rate</div>
-                    </div>
-                    <div class="card-icon orange">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                </div>
-                <div class="card-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>4.6% from last month</span>
-                </div>
             </div>
         `;
     } catch (error) {
-        console.error('Error fetching stats:', error);
-        document.getElementById('statsCards').innerHTML = '<p>Error loading stats.</p>';
+        console.error('Lỗi khi lấy thống kê:', error);
+        showToast('Không thể tải thống kê', 'error');
+        document.getElementById('statsCards').innerHTML = '<p>Lỗi khi tải thống kê.</p>';
     }
 }
 
+// Fetch and display top customers
 async function fetchTopCustomers() {
     const startDate = document.getElementById('customerStartDate').value || await fetchEarliestOrderDate();
     const endDate = document.getElementById('customerEndDate').value || new Date().toISOString().split('T')[0];
@@ -111,48 +127,43 @@ async function fetchTopCustomers() {
     const sort = sortBtn ? sortBtn.getAttribute('data-sort') : 'desc';
 
     if (!startDate || !endDate) {
-        alert('Please select both start and end dates.');
+        showToast('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc', 'error');
         return;
     }
 
     try {
-        const response = await fetch(`${ANALYTICS_API_URL}?action=getTopCustomers&startDate=${startDate}&endDate=${endDate}&limit=5`);
-        const data = await response.json();
+        const data = await fetchAPI(`${ANALYTICS_API_URL}?action=getTopCustomers&startDate=${startDate}&endDate=${endDate}&limit=5`);
+        const customers = data.data.sort((a, b) => {
+            return sort === 'desc' ? b.total_purchase - a.total_purchase : a.total_purchase - b.total_purchase;
+        }).slice(0, 5);
 
-        if (data.status === 200) {
-            const customers = data.data.sort((a, b) => {
-                return sort === 'desc' ? b.total_purchase - a.total_purchase : a.total_purchase - b.total_purchase;
-            }).slice(0, 5);
+        const tbody = document.querySelector('#topCustomersTable tbody');
+        tbody.innerHTML = customers.map((customer, index) => {
+            const lastOrderDate = customer.orders && customer.orders.length > 0
+                ? customer.orders.reduce((latest, order) => 
+                    latest.createdAt > order.createdAt ? latest : order
+                ).createdAt || 'Không có'
+                : 'Không có';
 
-            const tbody = document.querySelector('#topCustomersTable tbody');
-            tbody.innerHTML = customers.map((customer, index) => {
-                const lastOrderDate = customer.orders && customer.orders.length > 0
-                    ? customer.orders.reduce((latest, order) => 
-                        latest.createdAt > order.createdAt ? latest : order
-                    ).createdAt || 'N/A'
-                    : 'N/A';
-
-                return `
-                    <tr>
-                        <td><div class="customer-rank">${index + 1}</div></td>
-                        <td>${customer.fullname || 'N/A'}</td>
-                        <td>${customer.orders?.length || 0}</td>
-                        <td class="total-amount">${formatVND(customer.total_purchase || 0)}</td>
-                        <td>${lastOrderDate}</td>
-                        <td><a href="#" class="view-link" onclick="showCustomerOrders('${encodeURIComponent(customer.userID)}', '${encodeURIComponent(startDate)}', '${encodeURIComponent(endDate)}'); return false;">View Orders</a></td>
-                    </tr>
-                `;
-            }).join('');
-        } else {
-            alert('Error fetching top customers: ' + data.data.error);
-            document.querySelector('#topCustomersTable tbody').innerHTML = '<tr><td colspan="6">Error: ' + data.data.error + '</td></tr>';
-        }
+            return `
+                <tr>
+                    <td><div class="customer-rank">${index + 1}</div></td>
+                    <td>${customer.fullname || 'Không có'}</td>
+                    <td>${customer.orders?.length || 0}</td>
+                    <td class="total-amount">${formatVND(customer.total_purchase || 0)}</td>
+                    <td>${lastOrderDate}</td>
+                    <td><a href="#" class="view-link" onclick="showCustomerOrders('${encodeURIComponent(customer.userID)}', '${encodeURIComponent(startDate)}', '${encodeURIComponent(endDate)}'); return false;">Xem Đơn Hàng</a></td>
+                </tr>
+            `;
+        }).join('');
     } catch (error) {
-        console.error('Error fetching top customers:', error);
-        document.querySelector('#topCustomersTable tbody').innerHTML = '<tr><td colspan="6">Error loading data.</td></tr>';
+        console.error('Lỗi khi lấy danh sách khách hàng hàng đầu:', error);
+        showToast('Không thể tải danh sách khách hàng hàng đầu', 'error');
+        document.querySelector('#topCustomersTable tbody').innerHTML = '<tr><td colspan="6">Lỗi khi tải dữ liệu.</td></tr>';
     }
 }
 
+// Fetch and display top products
 async function fetchTopProducts() {
     const startDate = document.getElementById('productStartDate').value || await fetchEarliestOrderDate();
     const endDate = document.getElementById('productEndDate').value || new Date().toISOString().split('T')[0];
@@ -160,149 +171,128 @@ async function fetchTopProducts() {
     const sort = sortBtn ? sortBtn.getAttribute('data-sort') : 'desc';
 
     if (!startDate || !endDate) {
-        alert('Please select both start and end dates.');
+        showToast('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc', 'error');
         return;
     }
 
     try {
-        const response = await fetch(`${ANALYTICS_API_URL}?action=getTopProducts&startDate=${startDate}&endDate=${endDate}&limit=5`);
-        const data = await response.json();
+        const data = await fetchAPI(`${ANALYTICS_API_URL}?action=getTopProducts&startDate=${startDate}&endDate=${endDate}&limit=5`);
+        const products = data.data.sort((a, b) => {
+            return sort === 'desc' ? parseFloat(b.total_revenue) - parseFloat(a.total_revenue) : parseFloat(a.total_revenue) - parseFloat(b.total_revenue);
+        }).slice(0, 5);
 
-        if (data.status === 200) {
-            const products = data.data.sort((a, b) => {
-                return sort === 'desc' ? parseFloat(b.total_revenue) - parseFloat(a.total_revenue) : parseFloat(a.total_revenue) - parseFloat(b.total_revenue);
-            }).slice(0, 5);
-
-            const tbody = document.querySelector('#topProductsTable tbody');
-            tbody.innerHTML = products.map((product, index) => {
-                return `
-                    <tr>
-                        <td><div class="customer-rank">${index + 1}</div></td>
-                        <td>${product.name || 'N/A'}</td>
-                        <td>${product.category || 'N/A'}</td>
-                        <td>${product.total_quantity || 0}</td>
-                        <td class="total-amount">${formatVND(product.total_revenue || 0)}</td>
-                        <td><a href="#" class="view-link" onclick="showProductDetails('${encodeURIComponent(product.productID)}', '${encodeURIComponent(startDate)}', '${encodeURIComponent(endDate)}'); return false;">View Details</a></td>
-                    </tr>
-                `;
-            }).join('');
-        } else {
-            alert('Error fetching top products: ' + data.data.error);
-            document.querySelector('#topProductsTable tbody').innerHTML = '<tr><td colspan="6">Error: ' + data.data.error + '</td></tr>';
-        }
+        const tbody = document.querySelector('#topProductsTable tbody');
+        tbody.innerHTML = products.map((product, index) => {
+            return `
+                <tr>
+                    <td><div class="customer-rank">${index + 1}</div></td>
+                    <td>${product.name || 'Không có'}</td>
+                    <td>${product.category || 'Không có'}</td>
+                    <td>${product.total_quantity || 0}</td>
+                    <td class="total-amount">${formatVND(product.total_revenue || 0)}</td>
+                    <td><a href="#" class="view-link" onclick="showProductDetails('${encodeURIComponent(product.productID)}', '${encodeURIComponent(startDate)}', '${encodeURIComponent(endDate)}'); return false;">Xem Chi Tiết</a></td>
+                </tr>
+            `;
+        }).join('');
     } catch (error) {
-        console.error('Error:', error);
-        document.querySelector('#topProductsTable tbody').innerHTML = '<tr><td colspan="6">Error loading data.</td></tr>';
+        console.error('Lỗi khi lấy danh sách sản phẩm hàng đầu:', error);
+        showToast('Không thể tải danh sách sản phẩm hàng đầu', 'error');
+        document.querySelector('#topProductsTable tbody').innerHTML = '<tr><td colspan="6">Lỗi khi tải dữ liệu.</td></tr>';
     }
 }
 
+// Fetch and display revenue
 async function fetchRevenue() {
     const startDate = document.getElementById('revenueStartDate').value || await fetchEarliestOrderDate();
     const endDate = document.getElementById('revenueEndDate').value || new Date().toISOString().split('T')[0];
-    const period = document.querySelector('.chart-filter.active')?.getAttribute('data-period') || 'daily';
 
     if (!startDate || !endDate) {
-        alert('Please select both start and end dates.');
+        showToast('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc', 'error');
         return;
     }
 
     try {
-        const response = await fetch(`${ANALYTICS_API_URL}?action=getTotalRevenue&startDate=${startDate}&endDate=${endDate}`);
-        const data = await response.json();
-
-        if (data.status === 200) {
-            document.getElementById('revenueChart').innerHTML = `
-                <p>Total Revenue: ${formatVND(data.data?.total_revenue || 0)} (${period.charAt(0).toUpperCase() + period.slice(1)})</p>
-            `;
-        } else {
-            document.getElementById('revenueChart').innerHTML = '<p>Error loading revenue data.</p>';
-        }
+        const data = await fetchAPI(`${ANALYTICS_API_URL}?action=getTotalRevenue&startDate=${startDate}&endDate=${endDate}`);
+        document.getElementById('revenueChart').innerHTML = `
+            <p>Tổng Doanh Thu: ${formatVND(data.data?.total_revenue || 0)}</p>
+        `;
     } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('revenueChart').innerHTML = '<p>Error loading revenue data.</p>';
+        console.error('Lỗi khi lấy dữ liệu doanh thu:', error);
+        showToast('Không thể tải dữ liệu doanh thu', 'error');
+        document.getElementById('revenueChart').innerHTML = '<p>Lỗi khi tải dữ liệu doanh thu.</p>';
     }
 }
 
+// Fetch and display order statistics
 async function fetchOrderStats() {
     const startDate = document.getElementById('orderStartDate').value || await fetchEarliestOrderDate();
     const endDate = document.getElementById('orderEndDate').value || new Date().toISOString().split('T')[0];
-    const period = document.querySelector('.chart-filter.active')?.getAttribute('data-period') || 'daily';
 
     if (!startDate || !endDate) {
-        alert('Please select both start and end dates.');
+        showToast('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc', 'error');
         return;
     }
 
     try {
-        const response = await fetch(`${ANALYTICS_API_URL}?action=getOrderStats&startDate=${startDate}&endDate=${endDate}`);
-        const data = await response.json();
-
-        if (data.status === 200) {
-            const stats = data.data;
-            document.getElementById('orderStatsChart').innerHTML = `
-                <p>Total Orders: ${stats['delivered'] || 0} (Delivered) / ${stats['pending'] || 0} (Pending) (${period.charAt(0).toUpperCase() + period.slice(1)})</p>
-            `;
-        } else {
-            document.getElementById('orderStatsChart').innerHTML = '<p>Error loading order stats.</p>';
-        }
+        const data = await fetchAPI(`${ANALYTICS_API_URL}?action=getOrderStats&startDate=${startDate}&endDate=${endDate}`);
+        const stats = data.data;
+        document.getElementById('orderStatsChart').innerHTML = `
+            <p>Tổng Đơn Hàng: ${stats['delivered'] || 0} (Đã Giao) / ${stats['pending'] || 0} (Đang Chờ)</p>
+        `;
     } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('orderStatsChart').innerHTML = '<p>Error loading order stats.</p>';
+        console.error('Lỗi khi lấy thống kê đơn hàng:', error);
+        showToast('Không thể tải thống kê đơn hàng', 'error');
+        document.getElementById('orderStatsChart').innerHTML = '<p>Lỗi khi tải thống kê đơn hàng.</p>';
     }
 }
 
+// Fetch and display active users
 async function fetchActiveUsers() {
     const startDate = document.getElementById('userStartDate').value || await fetchEarliestOrderDate();
     const endDate = document.getElementById('userEndDate').value || new Date().toISOString().split('T')[0];
 
     if (!startDate || !endDate) {
-        alert('Please select both start and end dates.');
+        showToast('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc', 'error');
         return;
     }
 
     try {
-        const response = await fetch(`${ANALYTICS_API_URL}?action=getActiveUsers&startDate=${startDate}&endDate=${endDate}`);
-        const data = await response.json();
-
-        if (data.status === 200) {
-            document.getElementById('userStats').innerHTML = `
-                <p>Active Users: ${data.data?.active_users || 0}</p>
-            `;
-        } else {
-            document.getElementById('userStats').innerHTML = '<p>Error loading user stats.</p>';
-        }
+        const data = await fetchAPI(`${ANALYTICS_API_URL}?action=getActiveUsers&startDate=${startDate}&endDate=${endDate}`);
+        document.getElementById('userStats').innerHTML = `
+            <p>Người Dùng Hoạt Động: ${data.data?.active_users || 0}</p>
+        `;
     } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('userStats').innerHTML = '<p>Error loading user stats.</p>';
+        console.error('Lỗi khi lấy thống kê người dùng:', error);
+        showToast('Không thể tải thống kê người dùng', 'error');
+        document.getElementById('userStats').innerHTML = '<p>Lỗi khi tải thống kê người dùng.</p>';
     }
 }
 
+// Show customer order details in modal
 async function showCustomerOrders(userID, startDate, endDate) {
     try {
-        const response = await fetch(`${ANALYTICS_API_URL}?action=getCustomerOrderDetails&userID=${userID}&startDate=${startDate}&endDate=${endDate}`);
-        const data = await response.json();
-
+        const data = await fetchAPI(`${ANALYTICS_API_URL}?action=getCustomerOrderDetails&userID=${userID}&startDate=${startDate}&endDate=${endDate}`);
         const modalTitle = document.getElementById('modalTitle');
         const modalContent = document.getElementById('modalContent');
-        modalTitle.textContent = 'Customer Order Details';
+        modalTitle.textContent = 'Chi Tiết Đơn Hàng Khách Hàng';
 
         if (data.status === 200 && data.data.length > 0) {
             modalContent.innerHTML = `
                 <table class="modal-table">
                     <thead>
                         <tr>
-                            <th>Order ID</th>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Total</th>
+                            <th>Mã Đơn Hàng</th>
+                            <th>Tên Sản Phẩm</th>
+                            <th>Số Lượng</th>
+                            <th>Giá</th>
+                            <th>Tổng</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${data.data.map(order => `
                             <tr>
-                                <td>${order.orderID || 'N/A'}</td>
-                                <td>${order.product_name || 'N/A'}</td>
+                                <td>${order.orderID || 'Không có'}</td>
+                                <td>${order.product_name || 'Không có'}</td>
                                 <td>${order.quantity || 0}</td>
                                 <td>${formatVND(order.price || 0)}</td>
                                 <td>${formatVND((order.quantity * order.price) || 0)}</td>
@@ -312,43 +302,43 @@ async function showCustomerOrders(userID, startDate, endDate) {
                 </table>
             `;
         } else {
-            modalContent.innerHTML = '<p>No order details available.</p>';
+            modalContent.innerHTML = '<p>Không có chi tiết đơn hàng.</p>';
         }
 
         document.getElementById('detailsModal').style.display = 'block';
     } catch (error) {
-        console.error('Error fetching customer orders:', error);
-        document.getElementById('modalContent').innerHTML = '<p>Error loading order details.</p>';
+        console.error('Lỗi khi lấy chi tiết đơn hàng khách hàng:', error);
+        showToast('Không thể tải chi tiết đơn hàng', 'error');
+        document.getElementById('modalContent').innerHTML = '<p>Lỗi khi tải chi tiết đơn hàng.</p>';
         document.getElementById('detailsModal').style.display = 'block';
     }
 }
 
+// Show product order details in modal
 async function showProductDetails(productID, startDate, endDate) {
     try {
-        const response = await fetch(`${ANALYTICS_API_URL}?action=getProductOrderDetails&productID=${productID}&startDate=${startDate}&endDate=${endDate}`);
-        const data = await response.json();
-
+        const data = await fetchAPI(`${ANALYTICS_API_URL}?action=getProductOrderDetails&productID=${productID}&startDate=${startDate}&endDate=${endDate}`);
         const modalTitle = document.getElementById('modalTitle');
         const modalContent = document.getElementById('modalContent');
-        modalTitle.textContent = 'Product Order Details';
+        modalTitle.textContent = 'Chi Tiết Đơn Hàng Sản Phẩm';
 
         if (data.status === 200 && data.data.length > 0) {
             modalContent.innerHTML = `
                 <table class="modal-table">
                     <thead>
                         <tr>
-                            <th>Order ID</th>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Total</th>
+                            <th>Mã Đơn Hàng</th>
+                            <th>Tên Sản Phẩm</th>
+                            <th>Số Lượng</th>
+                            <th>Giá</th>
+                            <th>Tổng</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${data.data.map(order => `
                             <tr>
-                                <td>${order.orderID || 'N/A'}</td>
-                                <td>${order.product_name || 'N/A'}</td>
+                                <td>${order.orderID || 'Không có'}</td>
+                                <td>${order.product_name || 'Không có'}</td>
                                 <td>${order.quantity || 0}</td>
                                 <td>${formatVND(order.price || 0)}</td>
                                 <td>${formatVND((order.quantity * order.price) || 0)}</td>
@@ -358,45 +348,40 @@ async function showProductDetails(productID, startDate, endDate) {
                 </table>
             `;
         } else {
-            modalContent.innerHTML = '<p>No order details available.</p>';
+            modalContent.innerHTML = '<p>Không có chi tiết đơn hàng.</p>';
         }
 
         document.getElementById('detailsModal').style.display = 'block';
     } catch (error) {
-        console.error('Error fetching product details:', error);
-        document.getElementById('modalContent').innerHTML = '<p>Error loading order details.</p>';
+        console.error('Lỗi khi lấy chi tiết sản phẩm:', error);
+        showToast('Không thể tải chi tiết đơn hàng', 'error');
+        document.getElementById('modalContent').innerHTML = '<p>Lỗi khi tải chi tiết đơn hàng.</p>';
         document.getElementById('detailsModal').style.display = 'block';
     }
 }
 
+// Close modal
 function closeModal() {
     document.getElementById('detailsModal').style.display = 'none';
 }
 
+// Event listeners for sort buttons
 document.querySelectorAll('.sort-btn').forEach(button => {
     button.addEventListener('click', function() {
         document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
         this.classList.add('active');
         const section = this.closest('.customer-stats')?.querySelector('.chart-title')?.textContent;
-        if (section === 'Top 5 Customers by Purchase Amount') fetchTopCustomers();
-        if (section === 'Most Bought Products') fetchTopProducts();
+        if (section === 'Top 5 Khách Hàng Theo Giá Trị Mua Hàng') fetchTopCustomers();
+        if (section === 'Sản Phẩm Bán Chạy Nhất') fetchTopProducts();
     });
 });
 
-document.querySelectorAll('.chart-filter').forEach(filter => {
-    filter.addEventListener('click', function() {
-        this.parentElement.querySelectorAll('.chart-filter').forEach(f => f.classList.remove('active'));
-        this.classList.add('active');
-        const container = this.closest('.chart-container')?.querySelector('.chart-title')?.textContent;
-        if (container === 'Revenue Overview') fetchRevenue();
-        if (container === 'Order Statistics') fetchOrderStats();
-    });
-});
-
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
     const defaultStartDate = await fetchEarliestOrderDate();
     const defaultEndDate = new Date().toISOString().split('T')[0];
 
+    // Set default dates for inputs
     document.getElementById('customerStartDate').value = defaultStartDate;
     document.getElementById('customerEndDate').value = defaultEndDate;
     document.getElementById('productStartDate').value = defaultStartDate;
@@ -408,6 +393,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('userStartDate').value = defaultStartDate;
     document.getElementById('userEndDate').value = defaultEndDate;
 
+    // Fetch all data
     fetchStats();
     fetchTopCustomers();
     fetchTopProducts();
@@ -415,6 +401,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     fetchOrderStats();
     fetchActiveUsers();
 
+    // Modal close event
     document.getElementById('detailsModal').addEventListener('click', function(event) {
         if (event.target === this) {
             closeModal();

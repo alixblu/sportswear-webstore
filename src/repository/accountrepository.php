@@ -69,9 +69,9 @@ class AccountRepository {
             throw $e;
         } finally {
             if ($stmt) $stmt->close();
-            // Không đóng kết nối để tái sử dụng
         }
     }
+
     public function getUserAccountIdByUserId($userID) {
         $query = "SELECT ID FROM useraccount WHERE userID = ?";
         $stmt = $this->conn->prepare($query);
@@ -86,7 +86,7 @@ class AccountRepository {
         if ($row = $result->fetch_assoc()) {
             return $row['ID'];
         } else {
-            return null; // Không tìm thấy userID tương ứng
+            return null;
         }
     }
     
@@ -128,8 +128,6 @@ class AccountRepository {
         } catch (Exception $e) {
             error_log("Lỗi lấy danh sách tài khoản: " . $e->getMessage());
             throw $e;
-        } finally {
-            // Không đóng kết nối để tái sử dụng
         }
     }
 
@@ -179,7 +177,6 @@ class AccountRepository {
             throw $e;
         } finally {
             if ($stmt) $stmt->close();
-            // Không đóng kết nối để tái sử dụng
         }
     }
 
@@ -230,7 +227,6 @@ class AccountRepository {
             throw $e;
         } finally {
             if ($stmt) $stmt->close();
-            // Không đóng kết nối để tái sử dụng
         }
     }
 
@@ -287,7 +283,6 @@ class AccountRepository {
             throw $e;
         } finally {
             if ($stmt) $stmt->close();
-            // Không đóng kết nối để tái sử dụng
         }
     }
 
@@ -360,7 +355,6 @@ class AccountRepository {
             throw $e;
         } finally {
             if ($stmt) $stmt->close();
-            // Không đóng kết nối để tái sử dụng
         }
     }
 
@@ -389,7 +383,6 @@ class AccountRepository {
             throw $e;
         } finally {
             if ($stmt) $stmt->close();
-            // Không đóng kết nối để tái sử dụng
         }
     }
 
@@ -414,8 +407,6 @@ class AccountRepository {
         } catch (Exception $e) {
             error_log("Lỗi lấy danh sách modules: " . $e->getMessage());
             throw $e;
-        } finally {
-            // Không đóng kết nối để tái sử dụng
         }
     }
 
@@ -440,8 +431,6 @@ class AccountRepository {
         } catch (Exception $e) {
             error_log("Lỗi lấy danh sách roles: " . $e->getMessage());
             throw $e;
-        } finally {
-            // Không đóng kết nối để tái sử dụng
         }
     }
 
@@ -490,7 +479,55 @@ class AccountRepository {
             throw $e;
         } finally {
             if ($stmt) $stmt->close();
-            // Không đóng kết nối để tái sử dụng
+        }
+    }
+
+    public function createRole($name, $moduleIds) {
+        $stmt = null;
+        try {
+            if (!$this->conn) {
+                throw new Exception("Kết nối cơ sở dữ liệu thất bại");
+            }
+
+            $this->conn->begin_transaction();
+
+            // Thêm vai trò mới vào bảng role
+            $roleQuery = "INSERT INTO role (name) VALUES (?)";
+            $stmt = $this->conn->prepare($roleQuery);
+            if (!$stmt) {
+                throw new Exception("Không thể chuẩn bị truy vấn role: " . $this->conn->error);
+            }
+            $stmt->bind_param('s', $name);
+            if (!$stmt->execute()) {
+                throw new Exception("Thêm vai trò thất bại: " . $stmt->error);
+            }
+            $roleId = $this->conn->insert_id;
+            $stmt->close();
+
+            // Thêm quyền truy cập vào bảng access
+            if (!empty($moduleIds)) {
+                $accessQuery = "INSERT INTO access (roleid, moduleid) VALUES (?, ?)";
+                $stmt = $this->conn->prepare($accessQuery);
+                if (!$stmt) {
+                    throw new Exception("Không thể chuẩn bị truy vấn access: " . $this->conn->error);
+                }
+                foreach ($moduleIds as $moduleId) {
+                    $stmt->bind_param('ii', $roleId, $moduleId);
+                    if (!$stmt->execute()) {
+                        throw new Exception("Thêm quyền truy cập thất bại: " . $stmt->error);
+                    }
+                }
+                $stmt->close();
+            }
+
+            $this->conn->commit();
+            return ['ID' => $roleId, 'name' => $name];
+        } catch (Exception $e) {
+            $this->conn->rollback();
+            error_log("Lỗi tạo vai trò: " . $e->getMessage());
+            throw $e;
+        } finally {
+            if ($stmt) $stmt->close();
         }
     }
 }

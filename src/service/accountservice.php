@@ -81,6 +81,7 @@ class AccountService {
             throw new Exception("Lấy thông tin tài khoản thất bại: " . $e->getMessage());
         }
     }
+
     public function getAccountById($accountId) {
         try {
             if (!is_numeric($accountId) || $accountId <= 0) {
@@ -95,6 +96,7 @@ class AccountService {
             throw new Exception("Lấy thông tin tài khoản thất bại: " . $e->getMessage());
         }
     }
+
     public function updateAccount($accountId, $username, $password, $fullname, $phone, $roleId, $status, $email = null, $address = null, $gender = null, $dateOfBirth = null) {
         try {
             // Xác thực đầu vào
@@ -130,6 +132,14 @@ class AccountService {
             }
             if ($dateOfBirth && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateOfBirth)) {
                 throw new Exception("Ngày sinh không đúng định dạng (YYYY-MM-DD)");
+            }
+
+            // Kiểm tra nếu tài khoản là Admin (roleId = 1)
+            $account = $this->accountRepository->findById($accountId);
+            if ($account['roleID'] == 1) {
+                if ($status !== $account['status']) {
+                    throw new Exception("Không thể thay đổi trạng thái của tài khoản Admin");
+                }
             }
 
             // Kiểm tra username đã tồn tại cho tài khoản khác
@@ -222,6 +232,41 @@ class AccountService {
             return $this->accountRepository->updatePermissions($roleId, $moduleIds);
         } catch (Exception $e) {
             throw new Exception("Cập nhật quyền hạn thất bại: " . $e->getMessage());
+        }
+    }
+
+    public function createRole($name, $moduleIds) {
+        try {
+            if (empty($name)) {
+                throw new Exception("Tên vai trò là bắt buộc");
+            }
+            if (strlen($name) < 3) {
+                throw new Exception("Tên vai trò phải có ít nhất 3 ký tự");
+            }
+            if (!is_array($moduleIds)) {
+                throw new Exception("Danh sách module không hợp lệ");
+            }
+
+            // Xác thực moduleIds
+            $validModules = $this->accountRepository->getAllModules();
+            $validModuleIds = array_column($validModules, 'id');
+            foreach ($moduleIds as $moduleId) {
+                if (!in_array($moduleId, $validModuleIds)) {
+                    throw new Exception("ID module không hợp lệ: $moduleId");
+                }
+            }
+
+            // Kiểm tra tên vai trò đã tồn tại
+            $existingRoles = $this->accountRepository->getAllRoles();
+            foreach ($existingRoles as $role) {
+                if (strtolower($role['name']) === strtolower($name)) {
+                    throw new Exception("Tên vai trò đã tồn tại");
+                }
+            }
+
+            return $this->accountRepository->createRole($name, $moduleIds);
+        } catch (Exception $e) {
+            throw new Exception("Tạo vai trò thất bại: " . $e->getMessage());
         }
     }
 }

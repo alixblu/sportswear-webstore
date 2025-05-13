@@ -36,11 +36,11 @@ class ProductController
      * @param $sort: sort option of product
      * @param $search : name of product
      */
-    public function getFilteredProductsAdmin($search, $category, $brand, $status, $rating)
+    public function getFilteredProductsAdmin($page, $productsPerPage, $search, $category, $brand, $status, $rating)
     {
         $products = null;
         try {
-            $products =  $this->productService->getFilteredProductsAdmin($search, $category, $brand, $status, $rating);
+            $products =  $this->productService->getFilteredProductsAdmin($page, $productsPerPage, $search, $category, $brand, $status, $rating);
             ApiResponse::customApiResponse($products, 200);
             return $products;
         } catch (Exception $e) {
@@ -99,14 +99,7 @@ class ProductController
                 ApiResponse::customResponse($data, 400, 'Invalid product ID');
                 return;
             }
-
             if (empty($data)) {
-                /*
-                $this->sendJsonResponse(400, [
-                    'success' => false,
-                    'message' => 'No data provided for update'
-                ]);
-                */
                 ApiResponse::customResponse(null, 400, 'No data provided for update');
                 return;
             }
@@ -144,9 +137,15 @@ class ProductController
             $result = $this->productService->deleteProduct($id);
 
             if ($result) {
-                ApiResponse::customResponse($id, 200, 'Product deleted successfully');
+                if (isset($result['action']) && $result['action'] === 'discontinued') {
+                    ApiResponse::customResponse(['id' => $id, 'action' => 'discontinued'], 200, 
+                        'Product marked as discontinued because it exists in order history');
+                } else {
+                    ApiResponse::customResponse(['id' => $id, 'action' => 'deleted'], 200, 
+                        'Product deleted successfully');
+                }
             } else {
-                ApiResponse::customResponse($id, 500, 'Failed to delete product');
+                ApiResponse::customResponse($id, 500, 'Failed to process product');
             }
         } catch (Exception $e) {
             ApiResponse::customResponse($id, 500, $e->getMessage());

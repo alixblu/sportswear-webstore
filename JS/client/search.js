@@ -198,7 +198,7 @@ async function updateResults(params = {}) {
 
         productList.innerHTML = paginatedProducts.length > 0
             ? paginatedProducts.map(product => {
-                const imagePath = `/sportswear-webstore/img/products/${product.ID}.jpg`;
+                const imagePath = `/sportswear-webstore/img/products/product${product.ID}/${product.ID}.jpg`;
                 const defaultImage = '/sportswear-webstore/img/products/default.jpg';
                 const rating = parseFloat(product.rating || 0);
                 const scaledRating = rating / 2; // Assuming rating is out of 10, scale to 5 stars

@@ -118,6 +118,13 @@ const AccountService = {
             roleId,
             moduleIds
         });
+    },
+
+    createRole: async (roleData) => {
+        return fetchAPI(ACCOUNT_API_URL, 'POST', {
+            action: 'createRole',
+            ...roleData
+        });
     }
 };
 
@@ -207,7 +214,6 @@ async function add() {
         phone: document.getElementById('phone').value.trim(),
         roleId: document.getElementById('roleId').value.trim(),
         status: document.querySelector('input[name="status"]:checked').value,
-        email: document.getElementById('email').value.trim() || null,
         address: document.getElementById('address').value.trim() || null,
         gender: document.getElementById('gender').value.trim() || null,
         dateOfBirth: document.getElementById('dateOfBirth').value.trim() || null
@@ -248,7 +254,7 @@ async function showFormEdit(button, id, type) {
                 <div class="wrapperCss">
                     <div class="infoCss">Chỉnh sửa tài khoản ${isStaff ? 'nhân viên' : 'khách hàng'}</div>
                     
-                    <label for="username">Tên đăng nhập</label>
+                    <label for="username">Tên đăng nhập (Email)</label>
                     <div class="wrapperInputCss">
                         <input class="inputUserCss" type="text" id="username" value="${account.username}" readonly>
                     </div>
@@ -282,18 +288,18 @@ async function showFormEdit(button, id, type) {
                     
                     <label>Trạng thái</label>
                     <div class="genderCss">
-                        <input type="radio" id="active" name="status" value="active" ${account.status === 'active' ? 'checked' : ''}>
+                        <input type="radio" id="active" name="status" value="active" ${account.status === 'active' ? 'checked' : ''} ${isAdmin ? 'disabled' : ''}>
                         <label for="active">Hoạt động</label>
-                        <input type="radio" id="inactive" name="status" value="inactive" ${account.status === 'inactive' ? 'checked' : ''}>
+                        <input type="radio" id="inactive" name="status" value="inactive" ${account.status === 'inactive' ? 'checked' : ''} ${isAdmin ? 'disabled' : ''}>
                         <label for="inactive">Không hoạt động</label>
-                        <input type="radio" id="banned" name="status" value="banned" ${account.status === 'banned' ? 'checked' : ''}>
+                        <input type="radio" id="banned" name="status" value="banned" ${account.status === 'banned' ? 'checked' : ''} ${isAdmin ? 'disabled' : ''}>
                         <label for="banned">Bị cấm</label>
                     </div>
-                    
-                    <label for="email">Email</label>
-                    <div class="wrapperInputCss">
-                        <input class="inputUserCss" type="email" id="email" value="${account.email || ''}">
-                    </div>
+                    ${isAdmin ? `
+                        <div style="color: #f44336; margin-top: 10px;">
+                            Trạng thái của Admin không thể chỉnh sửa.
+                        </div>
+                    ` : ''}
                     
                     <label for="address">Địa chỉ</label>
                     <div class="wrapperInputCss">
@@ -337,7 +343,6 @@ async function edit(id, isAdmin) {
         phone: document.getElementById('phone').value.trim(),
         roleId: isAdmin ? 1 : document.getElementById('roleId')?.value.trim() || 5,
         status: document.querySelector('input[name="status"]:checked').value,
-        email: document.getElementById('email').value.trim() || null,
         address: document.getElementById('address').value.trim() || null,
         gender: document.getElementById('gender').value.trim() || null,
         dateOfBirth: document.getElementById('dateOfBirth').value.trim() || null
@@ -572,6 +577,81 @@ async function savePermissions() {
     }
 }
 
+// Trong file account.js
+
+// Hiển thị form thêm vai trò mới
+async function showCreateRoleForm() {
+    try {
+        const { data: modules } = await AccountService.getAllModules();
+        console.log('Modules:', modules); // Log danh sách modules
+        
+        const portalRoot = document.createElement('div');
+        portalRoot.id = 'portal-root';
+        portalRoot.innerHTML = `
+            <div class="formUserCss">
+                <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeModal()" style="cursor: pointer;"></i></div>
+                <div class="wrapperCss">
+                    <div class="infoCss">Thêm vai trò mới</div>
+                    
+                    <label for="roleName">Tên vai trò</label>
+                    <div class="wrapperInputCss">
+                        <input class="inputUserCss" type="text" id="roleName" placeholder="Nhập tên vai trò">
+                    </div>
+                    
+                    <label>Modules được phép truy cập</label>
+                    <div class="wrapperInputCss" style="max-height: 200px; overflow-y: auto;">
+                        ${modules.map(module => `
+                            <div class="permission-item">
+                                <label for="module-${module.id}">${module.name}</label>
+                                <input type="checkbox" id="module-${module.id}" value="${module.id}">
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="wrapperButton">
+                        <button class="buttonUserCss" onclick="addRole()">
+                            <i class="fas fa-plus"></i> Thêm vai trò
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(portalRoot);
+    } catch (error) {
+        showToast(error.message || 'Lỗi khi lấy danh sách modules', 'error');
+        closeModal();
+    }
+}
+
+// Thêm vai trò mới
+async function addRole() {
+    const roleName = document.getElementById('roleName').value.trim();
+    const checkboxes = document.querySelectorAll('.permission-item input[type="checkbox"]:checked');
+    const moduleIds = Array.from(checkboxes)
+        .map(checkbox => {
+            console.log('Checkbox value:', checkbox.value); // Log giá trị value
+            return parseInt(checkbox.value);
+        })
+        .filter(id => !isNaN(id) && id > 0); // Lọc bỏ NaN và ID không hợp lệ
+
+    console.log('Filtered moduleIds:', moduleIds);
+
+    if (!roleName) {
+        showToast('Vui lòng nhập tên vai trò', 'error');
+        return;
+    }
+
+    try {
+        const response = await AccountService.createRole({ name: roleName, moduleIds });
+        showToast('Thêm vai trò thành công', 'success');
+        closeModal();
+        loadRolesForPermissions();
+    } catch (error) {
+        showToast(error.message || 'Lỗi khi thêm vai trò', 'error');
+        closeModal();
+    }
+}
+
 // Initialize
 document.getElementById("addBtn").onclick = async () => {
     try {
@@ -585,7 +665,7 @@ document.getElementById("addBtn").onclick = async () => {
                 <div class="wrapperCss">
                     <div class="infoCss">Thêm tài khoản mới</div>
                     
-                    <label for="username">Tên đăng nhập</label>
+                    <label for="username">Tên đăng nhập (Email)</label>
                     <div class="wrapperInputCss">
                         <input class="inputUserCss" placeholder="Nhập tên đăng nhập" type="text" id="username">
                     </div>
@@ -621,11 +701,6 @@ document.getElementById("addBtn").onclick = async () => {
                         <label for="inactive">Không hoạt động</label>
                         <input type="radio" id="banned" name="status" value="banned">
                         <label for="banned">Bị cấm</label>
-                    </div>
-                    
-                    <label for="email">Email</label>
-                    <div class="wrapperInputCss">
-                        <input class="inputUserCss" placeholder="Nhập email" type="email" id="email">
                     </div>
                     
                     <label for="address">Địa chỉ</label>
