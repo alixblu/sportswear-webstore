@@ -88,6 +88,10 @@
                             <i class="fas fa-edit"></i>
                             Edit
                         </button>
+                        <button class="btn btn-danger delete-product-btn" onclick="confirmDeleteProduct()">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
                         <input type="file" id="changeImageInput" accept="image/*" style="display:none;">
                         <div id="img-btn" style="display: none;">
                             <button class="btn btn-outline" id="img-btn" onclick="triggerImageUpload()">
