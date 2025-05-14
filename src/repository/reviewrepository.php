@@ -198,6 +198,51 @@
                 $this->conn->close();
             }
         }
+
+        public function getPendingReviews($userId) {
+            $sql = "
+                SELECT 
+                    pv.ID AS variantID,
+                    pv.fullName,
+                    pv.color,
+                    pv.size,
+                    pv.price,
+                    p.image,
+                    p.ID AS productID
+                FROM `order` o
+                JOIN orderdetail od ON o.ID = od.orderID
+                LEFT JOIN review r 
+                    ON r.productID = od.productID 
+                    AND r.userAccID = o.customer
+                JOIN productvariant pv ON pv.ID = od.productID
+                JOIN product p ON pv.productID = p.ID
+                WHERE o.customer = ?
+                AND o.status = 'delivered'
+                AND r.ID IS NULL
+                GROUP BY od.productID
+            ";
+
+        
+            $stmt = $this->conn->prepare($sql);
+            if (!$stmt) {
+                die("Prepare failed: " . $this->conn->error);
+            }
+        
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+        
+            $result = $stmt->get_result();
+            $data = [];
+        
+            while ($row = $result->fetch_assoc()) {
+                $data[] = $row;
+            }
+        
+            $stmt->close();
+            return $data;
+        }
+        
+        
     }
         
 ?>

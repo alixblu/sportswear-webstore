@@ -22,7 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     echo "Thiếu productId.";
                 }
                 break;
-
+            case 'getPendingReviews':
+                $reviewController->getPendingReviews();
             default:
                 echo "Invalid GET action.";
         }

@@ -1,4 +1,4 @@
-const REVIEW_API_URL = '../../src/router/reviewRouter.php';
+const REVIEW_API_URL = '/sportswear-webstore/src/router/reviewRouter.php';
 
 const getAllReviews = async () => {
     const response = await fetch(`${REVIEW_API_URL}?action=getAllReviews`, {
@@ -80,5 +80,15 @@ const deleteReview = async (reviewId) => {
         throw new Error('Không thể xóa đánh giá');
     }
 
+    return await response.json();
+};
+
+const getPendingReviews = async () => {
+    const response = await fetch(`${REVIEW_API_URL}?action=getPendingReviews`, {
+        method: 'GET',
+    });
+    if (!response.ok) {
+        throw new Error('Không thể xóa đánh giá');
+    }
     return await response.json();
 };

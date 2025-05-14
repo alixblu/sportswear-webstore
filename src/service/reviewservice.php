@@ -1,13 +1,18 @@
 <?php
 require_once dirname(__FILE__) . '/../repository/reviewrepository.php';
+require_once dirname(__FILE__) . '/../utils/userUtils.php';
+require_once dirname(__FILE__) . '/../utils/userUtils.php';
 
 class ReviewService
 {
     private $reviewRepository;
+    private $userUtils;
 
     public function __construct()
     {
         $this->reviewRepository = new ReviewRepository();
+        $this->userUtils = new UserUtils();
+
     }
 
     public function createReview($userId, $productId, $rating, $commentContent = null)
@@ -71,6 +76,17 @@ class ReviewService
             }
 
             return $this->reviewRepository->delete($id);
+        } catch (Exception $e) {
+            throw new Exception("Failed to delete review: " . $e->getMessage());
+        }
+    }
+
+
+    public function getPendingReviews() {
+
+        try {
+            $userid = $this->userUtils->getUserId();
+            return $this->reviewRepository->getPendingReviews($userid);
         } catch (Exception $e) {
             throw new Exception("Failed to delete review: " . $e->getMessage());
         }
