@@ -202,24 +202,26 @@
         public function getPendingReviews($userId) {
             $sql = "
                 SELECT 
+                    p.ID AS productID,
+                    p.name,
+                    p.image,
                     pv.ID AS variantID,
                     pv.fullName,
                     pv.color,
                     pv.size,
-                    pv.price,
-                    p.image,
-                    p.ID AS productID
+                    pv.price
                 FROM `order` o
                 JOIN orderdetail od ON o.ID = od.orderID
-                LEFT JOIN review r 
-                    ON r.productID = od.productID 
-                    AND r.userAccID = o.customer
                 JOIN productvariant pv ON pv.ID = od.productID
                 JOIN product p ON pv.productID = p.ID
+                JOIN useraccount ua ON ua.userID = o.customer
+                LEFT JOIN review r 
+                    ON r.productID = p.ID AND r.userAccID = ua.ID
                 WHERE o.customer = ?
                 AND o.status = 'delivered'
                 AND r.ID IS NULL
-                GROUP BY od.productID
+                GROUP BY p.ID
+
             ";
 
         
