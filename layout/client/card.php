@@ -119,7 +119,12 @@
                      priceCell.innerHTML = item.productPrice;
 
                      const quantityCell = document.createElement("td");
-                     quantityCell.innerHTML = item.quantity < 10 ? `0${item.quantity}` : item.quantity;
+                     quantityCell.innerHTML = `
+                     <div class="quantity-control" data-id="${item.ID}">
+                        <input type="number" class="quantity-input" value="${item.quantity}" min="1" style="width: 50px; text-align: center;">
+                     </div>
+                     `;
+
 
                      const subtotalCell = document.createElement("td");
                      subtotalCell.innerHTML = `${item.quantity * item.productPrice}`;
@@ -134,6 +139,21 @@
                      row.appendChild(deleteCell);
 
                      cartTableBody.appendChild(row);
+
+
+                     const input = quantityCell.querySelector(".quantity-input");
+                     input.addEventListener("change", () => {
+                        let newQuantity = parseInt(input.value);
+                        if (isNaN(newQuantity) || newQuantity < 1) {
+                           newQuantity = 1;
+                           input.value = 1;
+                        }
+                        
+                        updateCartDetailQuantity(item.detailID, newQuantity).then(() => {
+                           loadCart();
+                        });
+                     });
+                     
                   });
 
                   cartItems.forEach(item => {
@@ -171,6 +191,7 @@
                         console.error('Lỗi khi gọi API:', error);
                      });
 
+                     
                } else {
                   alert("Vui Lòng Đăng Nhập")
                   window.location.href = '/sportswear-webstore/index.php';
@@ -477,6 +498,9 @@
             newAddressInput.required = false;
          }
       }
+
+     
+
    </script>
 </body>
 
