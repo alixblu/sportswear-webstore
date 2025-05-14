@@ -138,7 +138,9 @@
                     SELECT r.*, c.content AS commentContent 
                     FROM review r
                     LEFT JOIN comment c ON r.commentID = c.ID
-                    WHERE r.productID = ?
+                    INNER JOIN productVariant pv ON r.productID = pv.ID
+                    INNER JOIN product p ON pv.productID = p.ID
+                    WHERE p.ID = ?
                     ORDER BY r.createdAt DESC
                 ");
         
@@ -164,6 +166,7 @@
                 return [];
             }
         }
+        
         
         public function delete($reviewID) {
             try {
