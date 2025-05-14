@@ -251,7 +251,7 @@
                                                 <p><strong>Size:</strong> ${item.size || 'Không có'}</p>
                                                 <p><strong>Giá:</strong> ${Number(item.price).toLocaleString()}₫</p>
                                             </div>
-                                            <button onclick="startReview(${item.productID})" style="margin-top: 10px; padding: 6px 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                            <button onclick="startReview(${item.variantID})" style="margin-top: 10px; padding: 6px 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
                                                 Đánh giá
                                             </button>
                                         </div>
@@ -273,13 +273,40 @@
             function fetchReviewedProducts() {
                 const content = document.getElementById('reviewed-content');
                 content.textContent = 'Đang tải...';
-                fetch('/api/reviews/reviewed')
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.length === 0) {
+
+                getReviewedProducts()
+                    .then(response => {
+                        console.log(response);
+                        const data = response.data;
+
+                        if (!Array.isArray(data) || data.length === 0) {
                             content.textContent = 'Bạn chưa đánh giá sản phẩm nào.';
                         } else {
-                            content.innerHTML = data.map(item => `<li>${item.productName}</li>`).join('');
+                            content.innerHTML = `
+                                <div class="product-container">
+                                    ${data.map(item => `
+                                        <div class="product-card-review">
+                                            <img 
+                                                src="/sportswear-webstore/img/products/product${item.productID}/${item.image}" 
+                                                alt="${item.fullName}" 
+                                                style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
+                                            
+                                            <div class="product-header">
+                                                <strong>${item.fullName}</strong>
+                                            </div>
+                                            
+                                            <div class="product-details">
+                                                <p><strong>Màu:</strong> ${item.color || 'Không có'}</p>
+                                                <p><strong>Size:</strong> ${item.size || 'Không có'}</p>
+                                                <p><strong>Giá:</strong> ${Number(item.price).toLocaleString()}₫</p>
+                                                <p><strong>Đánh giá:</strong> ${'⭐'.repeat(item.rating)}</p>
+                                                ${item.content ? `<p><strong>Nhận xét:</strong> ${item.content}</p>` : ''}
+                                                <p><strong>Ngày đánh giá:</strong> ${new Date(item.createdAt).toLocaleString()}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `;
                         }
                     })
                     .catch(err => {
@@ -287,6 +314,7 @@
                         console.error(err);
                     });
             }
+
 
             function startReview(productID) {
                 document.getElementById('review-product-id').value = productID;

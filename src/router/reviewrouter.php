@@ -24,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 break;
             case 'getPendingReviews':
                 $reviewController->getPendingReviews();
+            case 'getReviewedProducts':
+                $reviewController->getReviewedProducts();
             default:
                 echo "Invalid GET action.";
         }

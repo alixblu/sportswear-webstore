@@ -41,4 +41,8 @@ class ReviewController
         $result = $this->reviewService->getPendingReviews();
         ApiResponse::customApiResponse($result, 200);
     }
+    public function getReviewedProducts() {
+        $result = $this->reviewService->getReviewedProducts();
+        ApiResponse::customApiResponse($result, 200);
+    }
 }

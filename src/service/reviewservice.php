@@ -93,5 +93,14 @@ class ReviewService
             throw new Exception("Failed to delete review: " . $e->getMessage());
         }
     }
+    public function getReviewedProducts() {
 
+        try {
+            $userid = $this->userUtils->getUserId();
+            $accountId = $this->accountService->getAccountByUserID($userid);
+            return $this->reviewRepository->getReviewedProducts($accountId);
+        } catch (Exception $e) {
+            throw new Exception("Failed to delete review: " . $e->getMessage());
+        }
+    }
 }
