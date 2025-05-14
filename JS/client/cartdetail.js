@@ -1,26 +1,5 @@
 const CART_DETAIL_API_URL = '/sportswear-webstore/src/router/cartdetailrouter.php';
 
-// const addCartDetail = async (productID, quantity, cartID) => {
-//     const formData = new URLSearchParams();
-//     formData.append('action', 'addCartDetail');
-//     formData.append('productID', productID);
-//     formData.append('quantity', quantity);
-//     formData.append('cartID', cartID);
-
-//     const response = await fetch(CART_DETAIL_API_URL, {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/x-www-form-urlencoded',
-//         },
-//         body: formData.toString(),
-//     });
-
-//     if (!response.ok) {
-//         throw new Error('Không thể thêm sản phẩm vào giỏ hàng');
-//     }
-
-//     return await response.json();
-// };
 
 const getCartDetailsByCartID = async (cartID) => {
     const response = await fetch(`${CART_DETAIL_API_URL}?action=getCartDetailsByCartID&cartID=${cartID}`, {
