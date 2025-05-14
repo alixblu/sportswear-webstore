@@ -34,22 +34,22 @@ $user = $_SESSION['user'];
         
 
 
-                <!-- <div class="section">
+                 <div class="section">
                     <div class="section-title">
                         <i class="ri-feedback-line" style="color: #000;"></i>
                         Feedback
                     </div>
                     <div class="section-items">
-                        <div class="sidebar-item">
+                        <div class="sidebar-item" data-profile="reviews">
                             <i class="ri-star-line" style="color: #000;"></i>
                             My Reviews
                         </div>
-                        <div class="sidebar-item">
+                        <!-- <div class="sidebar-item">
                             <i class="ri-question-line" style="color: #000;"></i>
                             My Questions
-                        </div>
+                        </div> -->
                     </div>
-                </div> -->
+                </div>
                 <div class="section">
                     <div class="section-title">
                         <i class="ri-user-settings-line" style="color: #000;"></i>
@@ -110,6 +110,7 @@ $user = $_SESSION['user'];
                         'address' => 'address.php',
                         'password' => 'password.php',
                         'order' => 'order.php',
+                        'reviews' => 'reviews.php',
                     ];
 
                     if (array_key_exists($id, $allowedPages)) {

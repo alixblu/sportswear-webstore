@@ -17,9 +17,9 @@ class ReviewController
         ApiResponse::customApiResponse($reviews, 200);
     }
 
-    public function createReview($userId, $productId, $rating, $commentContent)
+    public function createReview($productId, $rating, $commentContent)
     {
-        $result = $this->reviewService->createReview($userId, $productId, $rating, $commentContent);
+        $result = $this->reviewService->createReview($productId, $rating, $commentContent);
         ApiResponse::customApiResponse($result, 200);
     }
     public function updateReview($id,  $rating, $commentContent)
@@ -37,5 +37,12 @@ class ReviewController
         $result = $this->reviewService->getReviewByProductId($productId);
         ApiResponse::customApiResponse($result, 200);
     }
-    
+    public function getPendingReviews() {
+        $result = $this->reviewService->getPendingReviews();
+        ApiResponse::customApiResponse($result, 200);
+    }
+    public function getReviewedProducts() {
+        $result = $this->reviewService->getReviewedProducts();
+        ApiResponse::customApiResponse($result, 200);
+    }
 }
