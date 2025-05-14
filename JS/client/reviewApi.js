@@ -29,10 +29,9 @@ const getReviewsByProductId = async (productId) => {
     return await response.json();
 };
 
-const createReview = async (userId, productId, rating, commentContent) => {
+const createReview = async (productId, rating, commentContent) => {
     const formData = new URLSearchParams();
     formData.append('action', 'createReview');
-    formData.append('userId', userId);
     formData.append('productId', productId);
     formData.append('rating', rating);
     formData.append('commentContent', commentContent);
