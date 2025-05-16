@@ -210,6 +210,56 @@ const deleteProduct = async (id) => {
     }
 };
 
+// ===================================== Restore product ===================================== 
+const restoreProduct = async (id) => {
+    try {
+        const formData = new FormData();
+        formData.append('action', 'restoreProduct');
+        formData.append('id', id);
+
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: formData
+        });
+
+        // First check if the response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Non-JSON response:', text);
+            throw new Error('Server returned non-JSON response');
+        }
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.message || 'Không thể khôi phục sản phẩm');
+        }
+
+        if (result.data && result.data.action === 'restored') {
+            return {
+                success: true,
+                action: 'restored',
+                message: 'Restored product successfully'
+            };
+        } else if (result.data && result.data.action === 'not_discontinued') {
+            return {
+                success: false,
+                action: 'not_discontinued',
+                message: 'Sản phẩm không ở trạng thái ngừng kinh doanh'
+            };
+        } else {
+            throw new Error(result.message || 'Không thể khôi phục sản phẩm');
+        }
+    } catch (error) {
+        console.error('Error restoring product:', error);
+        if (error.message === 'Server returned non-JSON response') {
+            throw new Error('Server error occurred. Please try again later.');
+        }
+        throw error;
+    }
+};
+
 // ========================================================================= Upload image of product  =========================================================================
 const uploadProductImageRequest = async (data) => {
     try{
@@ -235,4 +285,5 @@ export {
     deleteProduct,
     uploadProductImageRequest,
     createProductRequest,
+    restoreProduct
 };

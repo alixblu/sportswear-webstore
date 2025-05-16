@@ -153,6 +153,55 @@ class ProductController
     }
 
     /**
+     * Handle POST request to restore a discontinued product
+     * @param int $id Product ID
+     */
+    public function restoreProduct($id)
+    {
+        try {
+            if (!isset($id) || !is_numeric($id)) {
+                ApiResponse::customResponse($id, 400, 'Invalid product ID');
+                return;
+            }
+
+            $product = $this->productService->getProductById($id);
+            if (!$product) {
+                ApiResponse::customResponse($id, 404, 'Product not found');
+                return;
+            }
+
+            $result = $this->productService->restoreProduct($id);
+
+            if ($result) {
+                if (isset($result['action'])) {
+                    switch ($result['action']) {
+                        case 'restored':
+                            ApiResponse::customResponse(['id' => $id, 'action' => 'restored'], 200, 
+                                'Product restored successfully');
+                            break;
+                        case 'not_discontinued':
+                            ApiResponse::customResponse(['id' => $id, 'action' => 'not_discontinued'], 400, 
+                                'Product is not discontinued');
+                            break;
+                        case 'not_found':
+                            ApiResponse::customResponse(['id' => $id, 'action' => 'not_found'], 404, 
+                                'Product not found');
+                            break;
+                        default:
+                            ApiResponse::customResponse($id, 500, 'Unknown action result');
+                    }
+                } else {
+                    ApiResponse::customResponse($id, 500, 'Invalid response from service');
+                }
+            } else {
+                ApiResponse::customResponse($id, 500, 'Failed to restore product');
+            }
+        } catch (Exception $e) {
+            ApiResponse::customResponse($id, 500, $e->getMessage());
+        }
+    }
+
+    /**
      * Handle PUT request to update product stock
      * @param int $productId Product ID
      */

@@ -5,7 +5,8 @@ import {
     getProductById,
     deleteProduct,
     uploadProductImageRequest,
-    createProductRequest
+    createProductRequest,
+    restoreProduct,
 } from './api.js'
 import {
     getAllBrands,
@@ -64,7 +65,9 @@ const displayProduct = (data) => {
                 <span class="product-id-badge">#${product.ID}</span>
                 <img src="${IMG_URL}/product${product.ID}/${product.image}"></img>
                 <span class="product-badge badge-${product.status === 'in_stock' ? 'in-stock' : 'out-stock'}">
-                    ${product.status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
+                    ${product.status === 'in_stock' ? 'In Stock' : 
+                      product.status === 'out_of_stock' ? 'Out of Stock' : 
+                      'Discontinued'}
                 </span>
             </div>
             <div class="product-info">
@@ -83,9 +86,9 @@ const displayProduct = (data) => {
                     </button>
                 </div>
             </div>
-            `;
-            productGrid.appendChild(productCard);
-        });
+        `;
+        productGrid.appendChild(productCard);
+    });
 }
 // Update pagiantion
 const updatePaginationControls = (totalProducts) => {
@@ -137,11 +140,26 @@ const viewProduct = async (id) => {
     
     // Add header
     document.getElementById('modal-title').innerText = "Product Details"
+    
     try {
         // Get product details
         const product = await getProductById(id);
         if(!product)
             throw new Error("Cannot get product to view detail !!!");
+
+        // Handle button visibility based on product status
+        const deleteBtn = document.querySelector('.delete-product-btn[onclick="confirmDeleteProduct()"]');
+        const restoreBtn = document.querySelector('.delete-product-btn[onclick="confirmRestoreProduct()"]');
+        
+        if (deleteBtn && restoreBtn) {
+            if (product.status === 'discontinued') {
+                deleteBtn.style.display = 'none';
+                restoreBtn.style.display = 'block';
+            } else {
+                deleteBtn.style.display = 'block';
+                restoreBtn.style.display = 'none';
+            }
+        }
 
         const openEditBtn = document.querySelector('.open-edit-form');
         if(openEditBtn){
@@ -176,7 +194,9 @@ const viewProduct = async (id) => {
         modalElements.markup.textContent = (product.markup_percentage || '0') + '%';
         modalElements.rating.innerHTML = renderStars(product.rating);
         modalElements.stock.textContent = product.stock || '0';
-        modalElements.status.textContent = product.status === 'in_stock' ? 'In Stock' : 'Out of Stock';
+        modalElements.status.textContent = product.status === 'in_stock' ? 'In Stock' : 
+                                         product.status === 'out_of_stock' ? 'Out of Stock' : 
+                                         'Discontinued';
         modalElements.description.textContent = product.description || 'No description available';
         modalElements.discountId.textContent = product.discountID || '-';
         modalElements.basePrice.textContent = fomartedPrice || '-';
@@ -647,7 +667,7 @@ async function confirmDeleteProduct() {
             
             // Use the helper function from confirm_modal.php
             if (typeof showConfirmModal === 'function') {
-                showConfirmModal();
+                showConfirmModal("delete");
             } else {
                 confirmModal.style.display = 'flex';
             }
@@ -665,9 +685,7 @@ async function confirmDeleteProduct() {
                         const result = await deleteProduct(currentProduct.ID);
                         
                         if (result.action === 'discontinued') {
-                            alert('Product has been marked as discontinued because it exists in order history.');
-                        } else {
-                            alert('Product has been successfully deleted from the database.');
+                            alert('Product has been marked as discontinued');
                         }
                         
                         closeModal(); // Close the product details modal
@@ -679,32 +697,90 @@ async function confirmDeleteProduct() {
                     }
                 });
             }
-        } else {
-            // Fallback if modal elements aren't found
-            if (confirm(`Are you sure you want to delete product "${currentProduct.name}" (ID: ${currentProduct.ID})?`)) {
-                try {
-                    const result = await deleteProduct(currentProduct.ID);
-                    
-                    if (result.action === 'discontinued') {
-                        alert('Product has been marked as discontinued because it exists in order history.');
-                    } else {
-                        alert('Product has been successfully deleted from the database.');
-                    }
-                    
-                    closeModal();
-                    loadProducts();
-                } catch (error) {
-                    console.error('Error processing product deletion:', error);
-                    alert('Error processing product: ' + error.message);
-                }
-            }
-        }
+        } 
     } catch (error) {
         console.error('Error preparing for product deletion:', error);
         alert('An error occurred while preparing to delete the product. Please try again.');
     }
 }
 window.confirmDeleteProduct = confirmDeleteProduct;
+
+async function confirmRestoreProduct() {
+    // Always get the product ID directly from the modal that's currently open
+    const productIdElement = document.getElementById('modal-product-id');
+    let productId = null;
+    
+    if (!productIdElement || !productIdElement.textContent || productIdElement.textContent === '-') {
+        alert('No product selected to restore!');
+        return;
+    }
+    
+    try {
+        productId = parseInt(productIdElement.textContent);
+        if (isNaN(productId)) {
+            alert('Invalid product ID!');
+            return;
+        }
+        
+        // Fetch fresh product details from the backend to ensure we have the correct information
+        const productDetails = await getProductById(productId);
+        if (!productDetails) {
+            alert('Could not retrieve product details. Please try again.');
+            return;
+        }
+        
+        // Set the current product with the freshly fetched details
+        currentProduct = productDetails;
+        
+        // Now proceed with the deletion dialog
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmMessage = document.getElementById('confirmMessage');
+        
+        if (confirmModal && confirmMessage) {
+            confirmMessage.textContent = `Are you sure you want to restore product "${currentProduct.name}" (ID: ${currentProduct.ID})?`;
+            
+            // Use the helper function from confirm_modal.php
+            if (typeof showConfirmModal === 'function') {
+                showConfirmModal("restore");
+            } else {
+                confirmModal.style.display = 'flex';
+            }
+            
+            // Set up confirm button action
+            const confirmBtn = document.getElementById('confirmBtn');
+            if (confirmBtn) {
+                // Remove any existing event listeners
+                const newConfirmBtn = confirmBtn.cloneNode(true);
+                confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+                
+                // Add new event listener
+                newConfirmBtn.addEventListener('click', async () => {
+                    try {
+                        const result = await restoreProduct(currentProduct.ID);
+                        
+                        if (result.success) {
+                            alert(result.message);
+                            confirmModal.style.display = 'none'; // Close the confirm modal
+                            await loadProducts(); // Refresh grid
+                            closeModal(); // Close the product details modal
+
+                        } else {
+                            alert(result.message);
+                        }
+                    } catch (error) {
+                        console.error('Error processing product restore:', error);
+                        alert(error.message || 'Error processing product restore');
+                    }
+                });
+            }
+        } 
+    } catch (error) {
+        console.error('Error preparing for product restore:', error);
+        alert('An error occurred while preparing to restore the product. Please try again.');
+    }
+}
+window.confirmRestoreProduct = confirmRestoreProduct;
+
 async function uploadProductImage(productID, imageFile) {
     const formData = new FormData()
     formData.append('action', 'uploadProductImage')

@@ -73,46 +73,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $productId = $_POST['product_id'];
-    if ($_POST['action'] === 'uploadProductImage') {
-        if (!$productId || !isset($_FILES['image'])) {
-            echo json_encode([
-                "status" => 400,
-                "message" => "Thiếu ID sản phẩm hoặc file ảnh"
-            ]);
-            exit;
-        }
-        // Tạo thư mục nếu chưa tồn tại
-        $targetDir = $_SERVER['DOCUMENT_ROOT'] . "/sportswear-webstore/img/products/product" . $productId . "/";
-        if (!is_dir($targetDir)) {
-            if (!mkdir($targetDir, 0755, true)) {
+    // Disable error reporting to prevent HTML errors from being output
+    error_reporting(0);
+    ini_set('display_errors', 0);
+    
+    header('Content-Type: application/json');
+    
+    try {
+        $productId = $_POST['product_id'] ?? null;
+        if ($_POST['action'] === 'uploadProductImage') {
+            if (!$productId || !isset($_FILES['image'])) {
                 echo json_encode([
-                    "status" => 500,
-                    "message" => "Không thể tạo thư mục lưu ảnh"
+                    "status" => 400,
+                    "message" => "Thiếu ID sản phẩm hoặc file ảnh"
                 ]);
                 exit;
             }
-        }
-        // Upload ảnh
-        $image = $_FILES['image'];
-        $fileName = basename($image['name']);
-        $targetFile = $targetDir . $fileName;
+            // Tạo thư mục nếu chưa tồn tại
+            $targetDir = $_SERVER['DOCUMENT_ROOT'] . "/sportswear-webstore/img/products/product" . $productId . "/";
+            if (!is_dir($targetDir)) {
+                if (!mkdir($targetDir, 0755, true)) {
+                    echo json_encode([
+                        "status" => 500,
+                        "message" => "Không thể tạo thư mục lưu ảnh"
+                    ]);
+                    exit;
+                }
+            }
+            // Upload ảnh
+            $image = $_FILES['image'];
+            $fileName = basename($image['name']);
+            $targetFile = $targetDir . $fileName;
 
-        if (move_uploaded_file($image['tmp_name'], $targetFile)) {
-            echo json_encode([
-                "status" => 200,
-                "message" => "Hình ảnh đã được tải lên thành công"
-            ]);
+            if (move_uploaded_file($image['tmp_name'], $targetFile)) {
+                echo json_encode([
+                    "status" => 200,
+                    "message" => "Hình ảnh đã được tải lên thành công"
+                ]);
+            } else {
+                echo json_encode([
+                    "status" => 500,
+                    "message" => "Không thể di chuyển tệp đã tải lên"
+                ]);
+            }
+        } else if ($_POST['action'] === 'restoreProduct' && isset($_POST['id'])) {
+            $productController->restoreProduct($_POST['id']);
         } else {
             echo json_encode([
-                "status" => 500,
-                "message" => "Không thể di chuyển tệp đã tải lên"
+                "status" => 400,
+                "message" => "Không thể thực hiện POST"
             ]);
         }
-    } else {
+    } catch (Exception $e) {
+        error_log("Error in product router: " . $e->getMessage());
         echo json_encode([
-            "status" => 400,
-            "message" => "Không thể thực hiện POST"
+            "status" => 500,
+            "message" => "Server error occurred. Please try again later."
         ]);
     }
     exit;

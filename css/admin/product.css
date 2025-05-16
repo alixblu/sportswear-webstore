@@ -511,6 +511,12 @@
     border: 1px solid rgba(247, 37, 133, 0.3);
 }
 
+.status-discontinued {
+    background-color: rgba(156, 163, 175, 0.15);
+    color: #4b5563;
+    border: 1px solid rgba(156, 163, 175, 0.3);
+}
+
 /* Button Styles */
 .btn {
     padding: 6px 12px;
