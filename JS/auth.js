@@ -1,21 +1,50 @@
+// Function to validate email format
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Function to validate phone number
+function validatePhone(phone) {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(phone);
+}
+
+// Function to validate password
+function validatePassword(password) {
+    return password.length >= 6;
+}
+
 // Function to handle login form submission
 function handleLogin(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
+    const email = formData.get('login-username');
+    const password = formData.get('login-password');
+
+    // Frontend validation
+    if (!email || !password) {
+        alert('Please enter both email and password');
+        return false;
+    }
+
+    if (!validateEmail(email)) {
+        alert('Please enter a valid email address');
+        return false;
+    }
+
     formData.append('submitLogin', '1');
     
-    fetch('/sportswear-webstore/layout/login_regis.php', {
+    fetch('/sportswear-webstore/layout/auth.php', {
         method: 'POST',
         body: formData
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // alert(JSON.stringify(data, null, 2));
             if(data.user.roleID == 5) {
                 window.location.reload(); 
             } else {
-                // Redirect non-customers
                 window.location.href = './layout/admin/index.php';
             }
         } else {
@@ -33,9 +62,44 @@ function handleLogin(event) {
 function handleRegister(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
+    
+    // Get form values
+    const name = formData.get('register-name');
+    const email = formData.get('register-email');
+    const password = formData.get('register-password');
+    const confirmPassword = formData.get('register-confirm-pass');
+    const phone = formData.get('register-phone');
+    const gender = formData.get('register-gender');
+
+    // Frontend validation
+    if (!name || !email || !password || !confirmPassword || !phone || !gender) {
+        alert('All fields are required');
+        return false;
+    }
+
+    if (!validateEmail(email)) {
+        alert('Please enter a valid email address');
+        return false;
+    }
+
+    if (!validatePhone(phone)) {
+        alert('Please enter a valid 10-digit phone number');
+        return false;
+    }
+
+    if (!validatePassword(password)) {
+        alert('Password must be at least 6 characters long');
+        return false;
+    }
+
+    if (password !== confirmPassword) {
+        alert('Passwords do not match');
+        return false;
+    }
+
     formData.append('submitRegister', '1');
     
-    fetch('./layout/login_regis.php', {
+    fetch('./layout/auth.php', {
         method: 'POST',
         body: formData
     })
@@ -50,7 +114,7 @@ function handleRegister(event) {
     .then(data => {
         if (data.success) {
             alert(data.message);
-            displayform('login'); // Switch to login form after successful registration
+            displayform('login');
         } else {
             alert('Registration failed: ' + data.message);
         }

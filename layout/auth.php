@@ -19,10 +19,6 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
             $userName = $_POST['login-username'];
             $passWord = $_POST['login-password'];
             
-            if (empty($userName) || empty($passWord)) {
-                throw new Exception("Please enter both username and password", 400);
-            }
-            
             $authcontroller->login($userName, $passWord);
         }else if(isset($_POST['submitRegister'])){
             $name = $_POST['register-name'];
@@ -30,33 +26,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
             $passWord = $_POST['register-password'];
             $phone = $_POST['register-phone'];
             $gender = $_POST['register-gender'];
-            $confirmPassWord = $_POST['register-confirm-pass'];
             
-            // Validate required fields
-            if(empty($name) || empty($email) || empty($passWord) || empty($phone) || empty($gender) || empty($confirmPassWord)) {
-                throw new Exception("All fields are required", 400);
-            }
-
-            // Validate email format
-            if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                throw new Exception("Please enter a valid email address", 400);
-            }
-
-            // Validate phone number
-            if(!preg_match("/^[0-9]{10}$/", $phone)) {
-                throw new Exception("Please enter a valid 10-digit phone number", 400);
-            }
-
-            // Validate password match
-            if($passWord !== $confirmPassWord){
-                throw new Exception("Passwords do not match", 400);
-            }
-
-            // Validate password length
-            if(strlen($passWord) < 6) {
-                throw new Exception("Password must be at least 6 characters long", 400);
-            }
-
             // Call signup with all required fields
             $roleID = 5; // Default role ID for new users
             $result = $authcontroller->signup($name, $email, $passWord, $phone, $gender, $roleID);
