@@ -97,6 +97,10 @@
                             <i class="fas fa-trash"></i>
                             Delete
                         </button>
+                        <button class="btn btn-danger delete-product-btn" onclick="confirmRestoreProduct()" display="none">
+                            <i class="fas fa-undo"></i>
+                            Restore
+                        </button>
                         <button class="btn btn-primary" id="submit-update-btn">Save</button>
                         <input type="file" id="changeImageInput" accept="image/*" style="display:none;">
                     </div>

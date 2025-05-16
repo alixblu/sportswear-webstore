@@ -530,5 +530,33 @@ class AccountRepository {
             if ($stmt) $stmt->close();
         }
     }
+
+    public function getRole($roleId) {
+        try {
+            if (!$this->conn) {
+                throw new Exception("Kết nối cơ sở dữ liệu thất bại");
+            }
+
+            $query = "SELECT name FROM role WHERE ID = ?";
+            $stmt = $this->conn->prepare($query);
+            if (!$stmt) {
+                throw new Exception("Không thể chuẩn bị truy vấn role: " . $this->conn->error);
+            }
+            
+            $stmt->bind_param('i', $roleId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($row = $result->fetch_assoc()) {
+                return $row['name'];
+            }
+            return "Unknown Role";
+        } catch (Exception $e) {
+            error_log("Error in getRole: " . $e->getMessage());
+            return "Error";
+        } finally {
+            if ($stmt) $stmt->close();
+        }
+    }
 }
 ?>

@@ -1,6 +1,9 @@
 import {
     getFilteredProductsAdmin,
     deleteProduct,
+    uploadProductImageRequest,
+    createProductRequest,
+    restoreProduct,
     loadModal,
 } from './api.js'
 import {
@@ -70,7 +73,9 @@ const displayProduct = (data) => {
                 <span class="product-id-badge">#${product.ID}</span>
                 <img src="${IMG_URL}/product${product.ID}/${product.image}"></img>
                 <span class="product-badge badge-${product.status === 'in_stock' ? 'in-stock' : 'out-stock'}">
-                    ${product.status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
+                    ${product.status === 'in_stock' ? 'In Stock' : 
+                      product.status === 'out_of_stock' ? 'Out of Stock' : 
+                      'Discontinued'}
                 </span>
             </div>
             <div class="product-info">
@@ -89,9 +94,9 @@ const displayProduct = (data) => {
                     </button>
                 </div>
             </div>
-            `;
-            productGrid.appendChild(productCard);
-        });
+        `;
+        productGrid.appendChild(productCard);
+    });
 }
 // Update pagiantion
 const updatePaginationControls = (totalProducts) => {

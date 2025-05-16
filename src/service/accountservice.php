@@ -246,21 +246,13 @@ class AccountService {
             if (!is_array($moduleIds)) {
                 throw new Exception("Danh sách module không hợp lệ");
             }
-
+            
             // Xác thực moduleIds
             $validModules = $this->accountRepository->getAllModules();
             $validModuleIds = array_column($validModules, 'id');
             foreach ($moduleIds as $moduleId) {
                 if (!in_array($moduleId, $validModuleIds)) {
                     throw new Exception("ID module không hợp lệ: $moduleId");
-                }
-            }
-
-            // Kiểm tra tên vai trò đã tồn tại
-            $existingRoles = $this->accountRepository->getAllRoles();
-            foreach ($existingRoles as $role) {
-                if (strtolower($role['name']) === strtolower($name)) {
-                    throw new Exception("Tên vai trò đã tồn tại");
                 }
             }
 
