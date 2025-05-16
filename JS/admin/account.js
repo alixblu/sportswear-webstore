@@ -118,6 +118,13 @@ const AccountService = {
             roleId,
             moduleIds
         });
+    },
+
+    createRole: async (roleData) => {
+        return fetchAPI(ACCOUNT_API_URL, 'POST', {
+            action: 'createRole',
+            ...roleData
+        });
     }
 };
 
@@ -570,6 +577,94 @@ async function savePermissions() {
     }
 }
 
+// Trong file account.js
+
+// Hiển thị form thêm vai trò mới
+async function showCreateRoleForm() {
+    try {
+        const { data: modules } = await AccountService.getAllModules();
+        console.log('Modules:', modules); // Log danh sách modules
+        
+        const portalRoot = document.createElement('div');
+        portalRoot.id = 'portal-root';
+        portalRoot.innerHTML = `
+            <div class="formUserCss">
+                <div class="CloseCss"><i class="fa-solid fa-xmark" onclick="closeModal()" style="cursor: pointer;"></i></div>
+                <div class="wrapperCss">
+                    <div class="infoCss">Thêm vai trò mới</div>
+                    
+                    <label for="roleName">Tên vai trò</label>
+                    <div class="wrapperInputCss">
+                        <input class="inputUserCss" type="text" id="roleName" placeholder="Nhập tên vai trò">
+                    </div>
+                    
+                    <label>Modules được phép truy cập</label>
+                    <div class="wrapperInputCss" style="max-height: 200px; overflow-y: auto;">
+                        ${modules.map(module => `
+                            <div class="permission-item">
+                                <label for="module-${module.id}">${module.name}</label>
+                                <input type="checkbox" id="module-${module.id}" value="${module.id}">
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="wrapperButton">
+                        <button class="buttonUserCss" onclick="addRole()">
+                            <i class="fas fa-plus"></i> Thêm vai trò
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(portalRoot);
+    } catch (error) {
+        showToast(error.message || 'Lỗi khi lấy danh sách modules', 'error');
+        closeModal();
+    }
+}
+
+// Thêm vai trò mới
+async function addRole() {
+    const roleName = document.getElementById('roleName').value.trim();
+    const checkboxes = document.querySelectorAll('.permission-item input[type="checkbox"]:checked');
+    const moduleIds = Array.from(checkboxes)
+        .map(checkbox => {
+            console.log('Checkbox value:', checkbox.value); // Log giá trị value
+            return parseInt(checkbox.value);
+        })
+        .filter(id => !isNaN(id) && id > 0); // Lọc bỏ NaN và ID không hợp lệ
+
+    console.log('Filtered moduleIds:', moduleIds);
+
+    if (!roleName) {
+        showToast('Vui lòng nhập tên vai trò', 'error');
+        return;
+    }
+
+    try {
+        // Get existing roles first
+        const { data: existingRoles } = await AccountService.getAllRoles();
+        const roleExists = existingRoles.some(role => role.name.toLowerCase() === roleName.toLowerCase());
+        if (roleExists) {
+            showToast('Tên vai trò đã tồn tại', 'error');
+            return;
+        }
+
+        if(moduleIds.length === 0) {
+            showToast('Vui lòng chọn ít nhất một module', 'error');
+            return;
+        }
+
+        const response = await AccountService.createRole({ name: roleName, moduleIds });
+        showToast('Thêm vai trò thành công', 'success');
+        closeModal();
+        loadRolesForPermissions();
+    } catch (error) {
+        showToast(error.message || 'Lỗi khi thêm vai trò', 'error');
+        closeModal();
+    }
+}
+
 // Initialize
 document.getElementById("addBtn").onclick = async () => {
     try {
@@ -620,8 +715,6 @@ document.getElementById("addBtn").onclick = async () => {
                         <input type="radio" id="banned" name="status" value="banned">
                         <label for="banned">Bị cấm</label>
                     </div>
-                    
-
                     
                     <label for="address">Địa chỉ</label>
                     <div class="wrapperInputCss">

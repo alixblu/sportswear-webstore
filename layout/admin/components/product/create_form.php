@@ -2,20 +2,20 @@
     <form id="createForm">
         <div class="form-group">
             <label for="name">Name</label>
-            <input type="text" id="create-name" name="name" class="form-name" placeholder="Enter product's name ..." required>
+            <input type="text" id="name" name="name" class="create-form-item form-name" placeholder="Enter product's name .." required>
         </div>
         <div class="form-row">
             <div class="form-group">
                 <label for="category">Category</label>
-                <select id="create-category" name="category" class="form-category" required>
-                    <option value="">Select category</option>
+                <select id="category" name="category" class="create-form-item form-category" required>
+                    <option value="">Select category ..</option>
                     <!-- Categories populated dynamically -->
                 </select>
             </div>
             <div class="form-group">
                 <label for="brand">Brand</label>
-                <select id="create-brand" name="brand" class="form-brand" required>
-                    <option value="">Select brand</option>
+                <select id="brand" name="brand" class="create-form-item form-brand" required>
+                    <option value="">Select brand ..</option>
                     <!-- Brands populated dynamically -->
                 </select>
             </div>
@@ -23,11 +23,11 @@
         <div class="form-row">
             <div class="form-group">
                 <label for="markup">Markup Percentage</label>
-                <input type="number" id="create-markup" name="markup" class="form-markup" min="0" step="0.1" required>
+                <input type="number" id="markup" name="markup" class="create-form-item form-markup" min="0" step="0.1" max="70" required placeholder="Enter markup % ..">
             </div>
             <div class="form-group">
                 <label for="discount">Discount ID</label>
-                <select name="discount" id="create-discount" class="form-discount">
+                <select name="discount" id="discount" class="create-form-item form-discount">
                     <option value="">Select discount</option>
                     <!-- Discounts selection here -->
                 </select>
@@ -35,12 +35,12 @@
         </div>
         <div class="form-group">
             <label for="description">Description</label>
-            <textarea id="description" name="create-description" class="form-description" placeholder="Enter a detailed description for producct ..." required></textarea>
+            <textarea id="description" name="description" class="create-form-item form-description" placeholder="Enter a detailed description for producct .." required></textarea>
         </div>
 
         <div class="form-actions">
-            <button type="button" class="btn btn-outline" id="reset-btn" onclick="resetForm()">Reset</button>
-            <button type="submit" class="btn btn-primary" id="form-submit-btn">Save</button>
+            <button type="button" class="btn btn-outline" id="reset-btn" onclick="clearCreateModal()">Reset</button>
+            <button type="submit" class="btn btn-primary">Save</button>
         </div>
     </form>
 </div>

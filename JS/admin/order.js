@@ -39,15 +39,14 @@ const getOrdersByCustomer = async () => {
 
 
 // Tìm kiếm đơn hàng theo nhiều tiêu chí
-const searchOrders = async ({ orderID = '', status = '', fromDate = '', toDate = '' }) => {
+const searchOrders = async ({status = '', address = '', fromDate = '', toDate = '' }) => {
     const query = new URLSearchParams({
         action: 'searchOrders',
         status,
-        fromDate: fromDate || '', // Gửi cả khi rỗng
-        toDate: toDate || ''      // Gửi cả khi rỗng
+        address: address.trim(), // Loại bỏ khoảng trắng thừa
+        fromDate: fromDate || '',
+        toDate: toDate || ''
     });
-
-    if (orderID) query.append('orderID', orderID);
 
     console.log('API Query:', query.toString()); // Debug
 

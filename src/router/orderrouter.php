@@ -27,12 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 break;
 
             case 'searchOrders':
-                $orderID = $_GET['orderID'] ?? null;
-                $customerName = $_GET['customerName'] ?? '';
                 $status = $_GET['status'] ?? '';
+                $address = $_GET['address']  ?? '';
                 $fromDate = $_GET['fromDate'] ?? '';
                 $toDate = $_GET['toDate'] ?? '';
-                $orderController->searchOrders($orderID, $customerName, $status, $fromDate, $toDate);
+                $orderController->searchOrders($status,$address,$fromDate, $toDate);
                 break;
 
             default:

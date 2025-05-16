@@ -245,6 +245,13 @@
     box-shadow: var(--shadow);
 }
 
+#modal-content-placeholder{
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+    margin: 0 20px;
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -290,13 +297,17 @@
 .form-actions button{
     padding: 6px 5px;
 }
-
+#modal-product-name{
+    width: 100%;
+}
 #create-form-section,
 #edit-form-section,
 .open-edit-form,
-#reset-btn,
 #cancel-edit-btn,
-#cancel-create-btn{
+#cancel-create-btn,
+#submit-update-btn,
+.delete-product-btn,
+#img-btn{
     display: none;
 }
 
@@ -306,14 +317,14 @@
     padding: 20px;
     background: var(--light);
     border-right: 1px solid var(--border);
-    width: 240px;
+    width: 200px;
     position: relative;
     height: 100%;
 }
 
 .product-image-large {
-    width: 220px;   /* or your preferred width */
-    height: 220px;  /* or your preferred height */
+    width: 180px;   /* or your preferred width */
+    height: 180px;  /* or your preferred height */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -343,6 +354,7 @@
 
 .product-info-section {
     display: none;
+    width: 100%;
     flex: 1;
     padding: 5px 15px;
     overflow-y: auto;
@@ -390,6 +402,13 @@
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
 }
+.info-item.description{
+    grid-column: span 2;
+    margin-bottom: 20px;
+}
+.info-item.description textarea{
+    width: 100%;
+}
 
 .info-label {
     font-size: 11px;
@@ -399,9 +418,19 @@
 }
 
 .info-value {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--text);
     font-weight: 500;
+}
+.info-value:disabled{
+    border: none !important;
+    outline:  none !important;
+    appearance: none;         /* Cho trình duyệt hiện đại */
+    -webkit-appearance: none; /* Cho Safari/Chrome */
+    -moz-appearance: none;    /* Cho Firefox */
+    background-image: none;   /* Xoá mũi tên mặc định */
+    background: none;
+    color: var(--text);
 }
 
 .info-item[style*="margin-top"] {
@@ -464,9 +493,9 @@
 }
 
 /* Set specific column widths */
-.variants-table th:nth-child(1), .variants-table td:nth-child(1) { width: 8%; } /* Code */
+.variants-table th:nth-child(1), .variants-table td:nth-child(1) { width: 10%; } /* Code */
 .variants-table th:nth-child(2), .variants-table td:nth-child(2) { 
-    width: 20%; 
+    width: 40%; 
     text-align: left;
     padding-left: 10px;
     white-space: normal;
@@ -479,6 +508,7 @@
 .variants-table th:nth-child(7), .variants-table td:nth-child(7) { width: 8%; } /* Status */
 
 #variants-tab {
+    width: 100%;
     overflow-x: auto;
     padding-right: 4px;
 }
@@ -509,6 +539,12 @@
     background-color: rgba(247, 37, 133, 0.15);
     color: #db2777;
     border: 1px solid rgba(247, 37, 133, 0.3);
+}
+
+.status-discontinued {
+    background-color: rgba(156, 163, 175, 0.15);
+    color: #4b5563;
+    border: 1px solid rgba(156, 163, 175, 0.3);
 }
 
 /* Button Styles */

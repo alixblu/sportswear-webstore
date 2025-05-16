@@ -16,19 +16,21 @@ class OrderRepository
         try {
             $query = "
             SELECT 
-                o.ID, 
-                o.status, 
-                o.totalPrice, 
-                o.createdAt,
-                customer.fullname AS customerName, 
-                approver.fullname AS approverName, 
-                pm.name AS paymentMethod
-            FROM `order` o
-            LEFT JOIN user customer ON o.customer = customer.ID
-            LEFT JOIN user approver ON o.approver = approver.ID
-            LEFT JOIN payment p ON p.orderID = o.ID
-            LEFT JOIN paymentmethod pm ON pm.ID = p.paymentMethodID
-            ORDER BY o.createdAt DESC
+                    o.ID, 
+                    o.status, 
+                    o.totalPrice, 
+                    o.createdAt,
+                    customer.fullname AS customerName, 
+                    approver.fullname AS approverName, 
+                    pm.name AS paymentMethod,
+                    b.address
+                FROM `order` o
+                LEFT JOIN user customer ON o.customer = customer.ID
+                LEFT JOIN user approver ON o.approver = approver.ID
+                LEFT JOIN payment p ON p.orderID = o.ID
+                LEFT JOIN paymentmethod pm ON pm.ID = p.paymentMethodID
+                LEFT JOIN billingdetail b ON o.ID = b.orderID
+                ORDER BY o.createdAt DESC
         ";
             $result = $this->conn->query($query);
 
@@ -102,35 +104,37 @@ class OrderRepository
         return $stmt->execute();
     }
 
-    // Tìm kiếm theo ID, tên khách hàng, trạng thái, thời gian
-   public function searchOrders($orderID = null, $customerName = '', $status = '', $fromDate = '', $toDate = '')
+    // Lọc theo trạng thái . ngày tháng . địa chỉ giao hàng
+   public function searchOrders( $status = '', $address = '', $fromDate = '', $toDate = '')
     {
         $sql = "
-            SELECT o.ID, o.status, o.totalPrice, o.createdAt, u.fullname AS customerName, pm.name AS paymentMethod
-            FROM `order` o
-            LEFT JOIN user u ON o.customer = u.ID
-            LEFT JOIN payment p ON p.orderID = o.ID
-            LEFT JOIN paymentmethod pm ON pm.ID = p.paymentMethodID
-            WHERE 1=1
+            SELECT 
+                    o.ID, 
+                    o.status, 
+                    o.totalPrice, 
+                    o.createdAt,
+                    customer.fullname AS customerName, 
+                    approver.fullname AS approverName, 
+                    pm.name AS paymentMethod,
+                    b.address
+                FROM `order` o
+                LEFT JOIN user customer ON o.customer = customer.ID
+                LEFT JOIN user approver ON o.approver = approver.ID
+                LEFT JOIN payment p ON p.orderID = o.ID
+                LEFT JOIN paymentmethod pm ON pm.ID = p.paymentMethodID
+                LEFT JOIN billingdetail b ON o.ID = b.orderID
+                WHERE 1=1
         ";
 
         $params = [];
         $types = "";
 
-        // Lọc theo orderID nếu có
-        if (!empty($orderID)) {
-            $sql .= " AND o.ID = ?";
-            $types .= "i";
-            $params[] = $orderID;
-        }
-
-        // Lọc theo tên khách hàng nếu có
-        if (!empty($customerName)) {
-            $sql .= " AND u.fullname LIKE ?";
+        // Lọc theo địa chỉ nếu có
+        if (!empty($address)) {
+            $sql .= " AND b.address LIKE ?";
             $types .= "s";
-            $params[] = "%" . $customerName . "%";
+            $params[] = "%" . $address . "%";
         }
-
         // Lọc theo trạng thái nếu có
         if (!empty($status)) {
             $sql .= " AND o.status = ?";

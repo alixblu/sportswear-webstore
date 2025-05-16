@@ -138,7 +138,9 @@
                     SELECT r.*, c.content AS commentContent 
                     FROM review r
                     LEFT JOIN comment c ON r.commentID = c.ID
-                    WHERE r.productID = ?
+                    INNER JOIN productVariant pv ON r.productID = pv.ID
+                    INNER JOIN product p ON pv.productID = p.ID
+                    WHERE p.ID = ?
                     ORDER BY r.createdAt DESC
                 ");
         
@@ -164,6 +166,7 @@
                 return [];
             }
         }
+        
         
         public function delete($reviewID) {
             try {
@@ -198,6 +201,92 @@
                 $this->conn->close();
             }
         }
+
+        public function getPendingReviews($userId) {
+            $sql = "
+                SELECT 
+                    p.ID AS productID,
+                    p.name,
+                    p.image,
+                    pv.ID AS variantID,
+                    pv.fullName,
+                    pv.color,
+                    pv.size,
+                    pv.price
+                FROM `order` o
+                JOIN orderdetail od ON o.ID = od.orderID
+                JOIN productvariant pv ON pv.ID = od.productID
+                JOIN product p ON pv.productID = p.ID
+                JOIN useraccount ua ON ua.userID = o.customer
+                LEFT JOIN review r 
+                    ON r.productID = pv.ID AND r.userAccID = ua.ID
+                WHERE o.customer = ?
+                AND o.status = 'delivered'
+                AND r.ID IS NULL
+                GROUP BY p.ID
+
+            ";
+
+        
+            $stmt = $this->conn->prepare($sql);
+            if (!$stmt) {
+                die("Prepare failed: " . $this->conn->error);
+            }
+        
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+        
+            $result = $stmt->get_result();
+            $data = [];
+        
+            while ($row = $result->fetch_assoc()) {
+                $data[] = $row;
+            }
+        
+            $stmt->close();
+            return $data;
+        }
+        
+        public function getReviewedProducts($userAccID) {
+            $sql = "
+                SELECT 
+                    p.ID AS productID,
+                    p.name,
+                    p.image,
+                    pv.ID AS variantID,
+                    pv.fullName,
+                    pv.color,
+                    pv.size,
+                    pv.price,
+                    r.rating,
+                    r.createdAt,
+                    c.content
+                FROM review r
+                JOIN productvariant pv ON r.productID = pv.ID
+                JOIN product p ON pv.productID = p.ID
+                LEFT JOIN comment c ON c.ID = r.commentID
+                WHERE r.userAccID = ?
+                ORDER BY r.createdAt DESC
+            ";
+        
+            $stmt = $this->conn->prepare($sql);
+            if (!$stmt) {
+                die("Prepare failed: " . $this->conn->error);
+            }
+        
+            $stmt->bind_param("i", $userAccID);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            $data = [];
+            while ($row = $result->fetch_assoc()) {
+                $data[] = $row;
+            }
+        
+            $stmt->close();
+            return $data;
+        }
+        
     }
         
 ?>

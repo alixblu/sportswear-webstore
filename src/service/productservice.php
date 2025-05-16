@@ -347,14 +347,44 @@ class ProductService
         }
     }
 
-
-    public function createProduct($postData)
+    /**
+     * Restore a discontinued product
+     * @param int $id Product ID
+     * @return array Response with action taken
+     * @throws Exception If database error occurs
+     */
+    public function restoreProduct($id)
     {
         try {
-            return $this->productRepository->createProduct($postData);
+            if (!is_numeric($id) || $id <= 0) {
+                throw new Exception("Invalid product ID");
+            }
+
+            // Check if product exists
+            $product = $this->productRepository->getProductById($id);
+            if (!$product) {
+                throw new Exception("Product not found");
+            }
+
+            return $this->productRepository->restoreProduct($id);
+        } catch (Exception $e) {
+            error_log("Error in restoreProduct service: " . $e->getMessage());
+            throw new Exception("Failed to restore product: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Insert new product
+     * @return message result_message, int $id of new product
+     * @throws Exception IF db error occurs 
+     */
+    public function createProduct($data)
+    {
+        try {
+            return $this->productRepository->createProduct($data);
         } catch (Exception $e) {
             error_log("Error in createProduct service: " . $e->getMessage());
-            throw new Exception("Failed to create product: " . $e->getMessage());
+            throw new Exception("Không thể tạo sản phẩm");
         }
     }
 }

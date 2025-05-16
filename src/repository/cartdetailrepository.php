@@ -54,6 +54,24 @@ class CartDetailRepository {
         }
     }
 
+    public function findByCartIdAndProductId($cartID, $productID)
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM cartdetail WHERE cartID = ? AND productID = ? LIMIT 1");
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $this->conn->error);
+        }
+
+        $stmt->bind_param("ii", $cartID, $productID);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $data = $result->fetch_assoc();
+        $stmt->close();
+
+        return $data ? $data : null;
+    }
+
+
     public function updateQuantity($cartDetailID, $quantity) {
         try {
             $stmt = $this->conn->prepare("UPDATE cartdetail SET quantity = ? WHERE ID = ?");

@@ -71,40 +71,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 
-/*
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if ($_POST['action'] === 'createProduct') {
-        $postData = [
-            'name'              => $_POST['name'] ?? '',
-            'categoryID'        => $_POST['categoryID'] ?? '',
-            'brandID'           => $_POST['brandID'] ?? '',
-            'discountID'        => ($_POST['discountID'] === '') ? null : $_POST['discountID'],
-            'markup_percentage' => $_POST['markup_percentage'] ?? 0,
-            'description'       => $_POST['description'] ?? '',
-            'image'             => $_POST['image'] ?? '',
-        ];
-        $productController->createProduct($postData);
-    } else if ($_POST['action'] === 'createProductVariants') {
-    } else {
-        echo json_encode(['error' => 'Yêu cầu POST không hợp lệ']);
-    }
-}
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProductImage') {
-    $productId = $_POST['product_id'];
-    if (isset($_FILES['image']) && $productId) {
-        $targetDir = $_SERVER['DOCUMENT_ROOT'] . "/sportswear-webstore/img/products/";
-        $targetFile = $targetDir . $productId . ".jpg"; // Sử dụng .jpg thay vì .png
-
-        // Remove old file if exists
-        if (file_exists($targetFile)) {
-            unlink($targetFile);
+    if (isset($_POST['action']) && $_POST['action'] === 'uploadProductImage') {
+        $productId = $_POST['product_id'];
+        if (!$productId || !isset($_FILES['image'])) {
+            echo json_encode([
+                "status" => 400,
+                "message" => "Thiếu ID sản phẩm hoặc file ảnh"
+            ]);
+            exit;
         }
+        // Tạo thư mục nếu chưa tồn tại
+        $targetDir = $_SERVER['DOCUMENT_ROOT'] . "/sportswear-webstore/img/products/product" . $productId . "/";
+        if (!is_dir($targetDir)) {
+            if (!mkdir($targetDir, 0755, true)) {
+                echo json_encode([
+                    "status" => 500,
+                    "message" => "Không thể tạo thư mục lưu ảnh"
+                ]);
+                exit;
+            }
+        }
+        // Upload ảnh
+        $image = $_FILES['image'];
+        $fileName = basename($image['name']);
+        $targetFile = $targetDir . $fileName;
 
-        // Move uploaded file
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
+        if (move_uploaded_file($image['tmp_name'], $targetFile)) {
             echo json_encode([
                 "status" => 200,
-                "message" => "Hình ảnh được tải lên thành công"
+                "message" => "Hình ảnh đã được tải lên thành công"
             ]);
         } else {
             echo json_encode([
@@ -112,15 +108,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'uploadProduct
                 "message" => "Không thể di chuyển tệp đã tải lên"
             ]);
         }
+    } else if (isset($_GET['action']) && $_GET['action'] === 'createProduct') {
+        $rawData = file_get_contents('php://input');
+        $jsonData = json_decode($rawData, true);
+
+        $productController->createProduct($jsonData);
     } else {
         echo json_encode([
             "status" => 400,
-            "message" => "Không có hình ảnh hoặc ID sản phẩm được cung cấp"
+            "message" => "Không thể thực hiện POST"
         ]);
     }
     exit;
 }
-*/
 
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $putData = json_decode(file_get_contents("php://input"), true);

@@ -88,11 +88,11 @@ class OrderService
         }
     }
 
-    public function searchOrders($orderID = null, $customerName = '', $status = '', $fromDate = '', $toDate = '')
+    public function searchOrders( $status = '',$address = '' ,$fromDate = '', $toDate = '')
     {
         try {
-            if (!empty($orderID) && (!is_numeric($orderID) || $orderID <= 0)) {
-                throw new Exception("Invalid order ID");
+            if (!empty($address) && !is_string($address)) {
+                throw new Exception("Invalid address format");
             }
 
             if (!empty($status) && !in_array($status, ['pending', 'approved', 'delivered', 'canceled'])) {
@@ -107,7 +107,7 @@ class OrderService
                 throw new Exception("Invalid to date");
             }
 
-            return $this->orderRepository->searchOrders($orderID, $customerName, $status, $fromDate, $toDate);
+            return $this->orderRepository->searchOrders( $status,$address, $fromDate, $toDate);
         } catch (Exception $e) {
             throw new Exception("Failed to search orders: " . $e->getMessage());
         }

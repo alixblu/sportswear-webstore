@@ -22,7 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     echo "Thiếu productId.";
                 }
                 break;
-
+            case 'getPendingReviews':
+                $reviewController->getPendingReviews();
+            case 'getReviewedProducts':
+                $reviewController->getReviewedProducts();
             default:
                 echo "Invalid GET action.";
         }
@@ -34,12 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'createReview') {
-
-        $userId = $_POST['userId'] ?? '';
         $productId = $_POST['productId'] ?? '';
         $rating = $_POST['rating'] ?? '';
         $commentContent = $_POST['commentContent'] ?? '';
-        $reviewController->createReview($userId, $productId, $rating, $commentContent);
+        $reviewController->createReview($productId, $rating, $commentContent);
     } else {
         echo "Invalid POST request.";
     }

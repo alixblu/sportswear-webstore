@@ -118,8 +118,29 @@ const getProductVariants = async (id) => {
     return await response.json();
 };
 
-
-// ===================================== Update & Delete product ===================================== 
+// ===================================== Create product ===================================== 
+const createProduct = async (product) => {
+    if(product == null)
+        throw new Error('Không có dữ liệu sản phẩm mới')
+    try{
+        const response = await fetch(`${API_URL}?action=createProduct`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(product),
+        });
+        if (!response.ok) {
+            throw new Error('Không thể tạo sản phẩm');
+        }
+        const data = await response.json();
+        return data.data;
+    } catch(error) {
+        console.error('Lỗi, không thể thêm sp !!!', error)
+        throw error
+    }
+}
+// ===================================== Update product ===================================== 
 const updateProduct = async (product) => {
     if(product == null)
         throw new Error('Không có dữ liệu sản phẩm mới')
@@ -156,6 +177,7 @@ const updateProductStock = async (id) => {
     return await response.json();
 };
 
+// ===================================== Delete product ===================================== 
 const deleteProduct = async (id) => {
     try {
         const response = await fetch(`${API_URL}?action=deleteProduct&id=${id}`, {
@@ -188,45 +210,87 @@ const deleteProduct = async (id) => {
     }
 };
 
-// ===================================== Create product ===================================== 
-/*
-const createProduct = async (data) => {
-    try{
-        const response = await fetch(`${API_URL}?action=createProduct`, {
-            method: 'POST',
-            headers:{
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
+// ===================================== Restore product ===================================== 
+const restoreProduct = async (id) => {
+    try {
+        const formData = new FormData();
+        formData.append('action', 'restoreProduct');
+        formData.append('id', id);
 
-        if(!response.ok)
-            throw new Error("Không thể tạo sản phẩm")
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: formData
+        });
+
+        // First check if the response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Non-JSON response:', text);
+            throw new Error('Server returned non-JSON response');
+        }
+
+        const result = await response.json();
         
-        const data = await response.json()
-        return data
-    }catch (error) {
-        console.error('Lỗi, không thể thêm sản phẩm !!!', error)
+        if (!response.ok) {
+            throw new Error(result.message || 'Không thể khôi phục sản phẩm');
+        }
+
+        if (result.data && result.data.action === 'restored') {
+            return {
+                success: true,
+                action: 'restored',
+                message: 'Restored product successfully'
+            };
+        } else if (result.data && result.data.action === 'not_discontinued') {
+            return {
+                success: false,
+                action: 'not_discontinued',
+                message: 'Sản phẩm không ở trạng thái ngừng kinh doanh'
+            };
+        } else {
+            throw new Error(result.message || 'Không thể khôi phục sản phẩm');
+        }
+    } catch (error) {
+        console.error('Error restoring product:', error);
+        if (error.message === 'Server returned non-JSON response') {
+            throw new Error('Server error occurred. Please try again later.');
+        }
+        throw error;
+    }
+};
+
+// ========================================================================= Upload image of product  =========================================================================
+const uploadProductImageRequest = async (data) => {
+    console.log(data);
+    try{
+        const response = await fetch(`${API_URL}`,{
+            method: "POST",
+            body: data
+        })
+        if(!response.ok)
+            throw new Error('Không thể upload ảnh');
+        return await response.json()
+    } catch (error) {
+        console.error('Lỗi, không thể upload ảnh !!!', error)
         throw error
     }
 }
-const createProductVariants = async (productId) => {
-    const response = await fetch(`${API_URL}?action=createProductVariants&id=${productId}`, {
-        method: 'POST',
-        headers:{
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    })
+// ============================================= Load modal AJAX =============================================
+const loadModal = async (modalName) => {
+    try{
+        const response = await fetch(`/sportswear-webstore/layout/admin/includes/load_modal.php?modal=${modalName}`);
+        const html = await response.text();
+        if(html)
+            return html;
 
-    if(!response.ok)
-        throw new Error("Không thể tạo sản phẩm")
-    
-    const data = await response.json()
-    return data
+        throw new Error("Không tải được file cần thiết");
+        
+    } catch (error){
+        console.error("Không thể tải modal !!!", error);
+        throw error;
+    }
 }
-*/
-
 export {
     getFilteredProducts,
     getProductById,
@@ -235,4 +299,8 @@ export {
     getFilteredProductsAdmin,
     updateProduct,
     deleteProduct,
+    uploadProductImageRequest,
+    createProduct,
+    loadModal,
+    restoreProduct
 };

@@ -138,14 +138,78 @@ class ProductController
 
             if ($result) {
                 if (isset($result['action']) && $result['action'] === 'discontinued') {
-                    ApiResponse::customResponse(['id' => $id, 'action' => 'discontinued'], 200, 
-                        'Product marked as discontinued because it exists in order history');
+                    ApiResponse::customResponse(
+                        ['id' => $id, 'action' => 'discontinued'],
+                        200,
+                        'Product marked as discontinued because it exists in order history'
+                    );
                 } else {
-                    ApiResponse::customResponse(['id' => $id, 'action' => 'deleted'], 200, 
-                        'Product deleted successfully');
+                    ApiResponse::customResponse(
+                        ['id' => $id, 'action' => 'deleted'],
+                        200,
+                        'Product deleted successfully'
+                    );
                 }
             } else {
                 ApiResponse::customResponse($id, 500, 'Failed to process product');
+            }
+        } catch (Exception $e) {
+            ApiResponse::customResponse($id, 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Handle POST request to restore a discontinued product
+     * @param int $id Product ID
+     */
+    public function restoreProduct($id)
+    {
+        try {
+            if (!isset($id) || !is_numeric($id)) {
+                ApiResponse::customResponse($id, 400, 'Invalid product ID');
+                return;
+            }
+
+            $product = $this->productService->getProductById($id);
+            if (!$product) {
+                ApiResponse::customResponse($id, 404, 'Product not found');
+                return;
+            }
+
+            $result = $this->productService->restoreProduct($id);
+
+            if ($result) {
+                if (isset($result['action'])) {
+                    switch ($result['action']) {
+                        case 'restored':
+                            ApiResponse::customResponse(
+                                ['id' => $id, 'action' => 'restored'],
+                                200,
+                                'Product restored successfully'
+                            );
+                            break;
+                        case 'not_discontinued':
+                            ApiResponse::customResponse(
+                                ['id' => $id, 'action' => 'not_discontinued'],
+                                400,
+                                'Product is not discontinued'
+                            );
+                            break;
+                        case 'not_found':
+                            ApiResponse::customResponse(
+                                ['id' => $id, 'action' => 'not_found'],
+                                404,
+                                'Product not found'
+                            );
+                            break;
+                        default:
+                            ApiResponse::customResponse($id, 500, 'Unknown action result');
+                    }
+                } else {
+                    ApiResponse::customResponse($id, 500, 'Invalid response from service');
+                }
+            } else {
+                ApiResponse::customResponse($id, 500, 'Failed to restore product');
             }
         } catch (Exception $e) {
             ApiResponse::customResponse($id, 500, $e->getMessage());
@@ -194,7 +258,7 @@ class ProductController
             return ApiResponse::customResponse($variants, 200, 'Product variants fetched successfully');
         } catch (Exception $e) {
             error_log("Error in getProductVariants controller: " . $e->getMessage());
-            return ApiResponse::customResponse($productId, 500, 'Failed to fetch product variants: ' . $e->getMessage());
+            return ApiResponse::customResponse(null, 500, 'Failed to fetch product variants: ' . $e->getMessage());
         }
     }
 
@@ -329,18 +393,23 @@ class ProductController
             ApiResponse::customApiResponse(null, 500, $e->getMessage());
         }
     }
+
     /**
-     * Create product
-     * @param int $id
-     * @return void
+     * Insert new product
+     * @return message result_message, int $id of new product
+     * @throws Exception IF db error occurs 
      */
-    public function createProduct($postData)
+    public function createProduct($jsonData)
     {
         try {
-            $producID = $this->productService->createProduct($postData);
-            ApiResponse::customApiResponse($producID, 200);
+            if (!$jsonData) {
+                ApiResponse::customResponse(null, 400, "Không nhận được dữ liệu JSON");
+                return;
+            }
+            $result = $this->productService->createProduct($jsonData);
+            ApiResponse::customApiResponse($result, 200);
         } catch (Exception $e) {
-            ApiResponse::customApiResponse(null, 500, $e->getMessage());
+            ApiResponse::customResponse(null, 500, $e->getMessage());
         }
     }
 }

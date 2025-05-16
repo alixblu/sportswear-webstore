@@ -23,11 +23,20 @@ class CartDetailService
                 throw new Exception("Invalid cart ID");
             }
 
-            return $this->cartDetailRepository->add($productID, $quantity, $cartID);
+            $existingDetail = $this->cartDetailRepository->findByCartIdAndProductId($cartID, $productID);
+
+            if ($existingDetail) {
+                $newQuantity = $existingDetail['quantity'] + $quantity;
+                return $this->cartDetailRepository->updateQuantity($existingDetail['ID'], $newQuantity);
+            } else {
+                return $this->cartDetailRepository->add($productID, $quantity, $cartID);
+            }
+
         } catch (Exception $e) {
             throw new Exception("Failed to add cart detail: " . $e->getMessage());
         }
     }
+
 
     public function getCartDetailsByCartID($cartID)
     {

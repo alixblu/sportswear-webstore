@@ -473,7 +473,11 @@ class ProductRepository
      */
     public function deleteProduct($id)
     {
+        $transactionStarted = false;
         try {
+            $this->conn->query("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE");
+            $this->conn->begin_transaction();
+            $transactionStarted = true;
             // Debug log to trace function entry
             error_log("Starting deleteProduct for ID: $id");
 
@@ -492,23 +496,11 @@ class ProductRepository
             $productInfo = $productResult->fetch_assoc();
             error_log("Found product: " . $productInfo['name'] . " (ID: $id)");
 
-            // First check if the product exists in any order
-            $checkQuery = "SELECT COUNT(*) as count FROM orderdetail od 
-                           JOIN productvariant pv ON od.productID = pv.ID 
-                           WHERE pv.productID = ?";
-            $checkStmt = $this->conn->prepare($checkQuery);
-            $checkStmt->bind_param("i", $id);
-            $checkStmt->execute();
-            $checkResult = $checkStmt->get_result();
-            $row = $checkResult->fetch_assoc();
-
-            error_log("Check order result for product ID $id: " . print_r($row, true));
-
             // Start transaction with highest isolation level to prevent interference
             $this->conn->query("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE");
             $this->conn->begin_transaction();
 
-            if ($row['count'] > 0) {
+            if ($productInfo) {
                 error_log("Product $id exists in orders, marking as discontinued");
                 // Product exists in orders, mark as discontinued
                 $updateQuery = "UPDATE product SET status = 'discontinued' WHERE ID = ?";
@@ -537,108 +529,107 @@ class ProductRepository
                 $this->conn->commit();
                 error_log("Transaction committed for discontinued product $id");
                 return ['action' => 'discontinued'];
-            } else {
-                error_log("Product $id doesn't exist in orders, proceeding with deletion");
+            }
 
-                // First check if there are any variants for this product
-                $variantQuery = "SELECT ID FROM productvariant WHERE productID = ?";
-                $variantStmt = $this->conn->prepare($variantQuery);
-                $variantStmt->bind_param("i", $id);
-                $variantStmt->execute();
-                $variantResult = $variantStmt->get_result();
+            // First check if there are any variants for this product
+            $variantQuery = "SELECT ID FROM productvariant WHERE productID = ?";
+            $variantStmt = $this->conn->prepare($variantQuery);
+            $variantStmt->bind_param("i", $id);
+            $variantStmt->execute();
+            $variantResult = $variantStmt->get_result();
 
-                if ($variantResult->num_rows > 0) {
-                    // We have variants to delete
-                    error_log("Found " . $variantResult->num_rows . " variants for product $id");
+            if ($variantResult->num_rows > 0) {
+                // We have variants to delete
+                error_log("Found " . $variantResult->num_rows . " variants for product $id");
 
-                    // Collect all variant IDs
-                    $variantIds = [];
-                    while ($row = $variantResult->fetch_assoc()) {
-                        $variantIds[] = $row['ID'];
-                    }
+                // Collect all variant IDs
+                $variantIds = [];
+                while ($row = $variantResult->fetch_assoc()) {
+                    $variantIds[] = $row['ID'];
+                }
 
-                    // Delete from cartdetail for these variant IDs if any exist
-                    $cartCheckQuery = "SELECT COUNT(*) as count FROM cartdetail WHERE productID IN (" .
+                // Delete from cartdetail for these variant IDs if any exist
+                $cartCheckQuery = "SELECT COUNT(*) as count FROM cartdetail WHERE productID IN (" .
+                    implode(',', array_fill(0, count($variantIds), '?')) . ")";
+                $cartCheckStmt = $this->conn->prepare($cartCheckQuery);
+                $types = str_repeat("i", count($variantIds));
+                $cartCheckStmt->bind_param($types, ...$variantIds);
+                $cartCheckStmt->execute();
+                $cartCheckResult = $cartCheckStmt->get_result();
+                $cartCount = $cartCheckResult->fetch_assoc()['count'];
+
+                error_log("Found $cartCount cart items linked to product variants");
+
+                if ($cartCount > 0) {
+                    // We have cart items to delete
+                    $deleteCartQuery = "DELETE FROM cartdetail WHERE productID IN (" .
                         implode(',', array_fill(0, count($variantIds), '?')) . ")";
-                    $cartCheckStmt = $this->conn->prepare($cartCheckQuery);
-                    $types = str_repeat("i", count($variantIds));
-                    $cartCheckStmt->bind_param($types, ...$variantIds);
-                    $cartCheckStmt->execute();
-                    $cartCheckResult = $cartCheckStmt->get_result();
-                    $cartCount = $cartCheckResult->fetch_assoc()['count'];
-
-                    error_log("Found $cartCount cart items linked to product variants");
-
-                    if ($cartCount > 0) {
-                        // We have cart items to delete
-                        $deleteCartQuery = "DELETE FROM cartdetail WHERE productID IN (" .
-                            implode(',', array_fill(0, count($variantIds), '?')) . ")";
-                        $deleteCartStmt = $this->conn->prepare($deleteCartQuery);
-                        $deleteCartStmt->bind_param($types, ...$variantIds);
-                        $result = $deleteCartStmt->execute();
-
-                        if (!$result) {
-                            throw new Exception("Failed to delete cart items: " . $this->conn->error);
-                        }
-
-                        error_log("Deleted cart items, affected rows: " . $deleteCartStmt->affected_rows);
-                    } else {
-                        error_log("No cart items to delete for product $id");
-                    }
-
-                    // Delete all variants
-                    $deleteVariantsQuery = "DELETE FROM productvariant WHERE productID = ?";
-                    $deleteVariantsStmt = $this->conn->prepare($deleteVariantsQuery);
-                    $deleteVariantsStmt->bind_param("i", $id);
-                    $result = $deleteVariantsStmt->execute();
+                    $deleteCartStmt = $this->conn->prepare($deleteCartQuery);
+                    $deleteCartStmt->bind_param($types, ...$variantIds);
+                    $result = $deleteCartStmt->execute();
 
                     if (!$result) {
-                        throw new Exception("Failed to delete product variants: " . $this->conn->error);
+                        throw new Exception("Failed to delete cart items: " . $this->conn->error);
                     }
 
-                    error_log("Deleted variants, affected rows: " . $deleteVariantsStmt->affected_rows);
+                    error_log("Deleted cart items, affected rows: " . $deleteCartStmt->affected_rows);
                 } else {
-                    error_log("No variants found for product $id");
+                    error_log("No cart items to delete for product $id");
                 }
 
-                // Finally delete the product itself
-                $deleteProductQuery = "DELETE FROM product WHERE ID = ?";
-                $deleteProductStmt = $this->conn->prepare($deleteProductQuery);
-                $deleteProductStmt->bind_param("i", $id);
-                $result = $deleteProductStmt->execute();
+                // Delete all variants
+                $deleteVariantsQuery = "DELETE FROM productvariant WHERE productID = ?";
+                $deleteVariantsStmt = $this->conn->prepare($deleteVariantsQuery);
+                $deleteVariantsStmt->bind_param("i", $id);
+                $result = $deleteVariantsStmt->execute();
 
                 if (!$result) {
-                    throw new Exception("Failed to delete product: " . $this->conn->error);
+                    throw new Exception("Failed to delete product variants: " . $this->conn->error);
                 }
 
-                error_log("Deleted product, affected rows: " . $deleteProductStmt->affected_rows);
-
-                if ($deleteProductStmt->affected_rows === 0) {
-                    throw new Exception("Product deletion reported success but affected 0 rows");
-                }
-
-                // Commit the transaction
-                $this->conn->commit();
-                error_log("Transaction committed for deleted product $id");
-
-                // Verify the product is actually gone
-                $verifyQuery = "SELECT COUNT(*) as count FROM product WHERE ID = ?";
-                $verifyStmt = $this->conn->prepare($verifyQuery);
-                $verifyStmt->bind_param("i", $id);
-                $verifyStmt->execute();
-                $verifyResult = $verifyStmt->get_result();
-                $verifyCount = $verifyResult->fetch_assoc()['count'];
-
-                if ($verifyCount > 0) {
-                    error_log("WARNING: Product $id still exists after deletion!");
-                    return ['action' => 'failed', 'message' => 'Product deletion failed verification'];
-                }
-
-                return ['action' => 'deleted'];
+                error_log("Deleted variants, affected rows: " . $deleteVariantsStmt->affected_rows);
+            } else {
+                error_log("No variants found for product $id");
             }
+
+            // Finally delete the product itself
+            $deleteProductQuery = "DELETE FROM product WHERE ID = ?";
+            $deleteProductStmt = $this->conn->prepare($deleteProductQuery);
+            $deleteProductStmt->bind_param("i", $id);
+            $result = $deleteProductStmt->execute();
+
+            if (!$result) {
+                throw new Exception("Failed to delete product: " . $this->conn->error);
+            }
+
+            error_log("Deleted product, affected rows: " . $deleteProductStmt->affected_rows);
+
+            if ($deleteProductStmt->affected_rows === 0) {
+                throw new Exception("Product deletion reported success but affected 0 rows");
+            }
+
+            // Commit the transaction
+            $this->conn->commit();
+            error_log("Transaction committed for deleted product $id");
+
+            // Verify the product is actually gone
+            $verifyQuery = "SELECT COUNT(*) as count FROM product WHERE ID = ?";
+            $verifyStmt = $this->conn->prepare($verifyQuery);
+            $verifyStmt->bind_param("i", $id);
+            $verifyStmt->execute();
+            $verifyResult = $verifyStmt->get_result();
+            $verifyCount = $verifyResult->fetch_assoc()['count'];
+
+            if ($verifyCount > 0) {
+                error_log("WARNING: Product $id still exists after deletion!");
+                return ['action' => 'failed', 'message' => 'Product deletion failed verification'];
+            }
+            $this->conn->commit();
+            $transactionStarted = false;
+            return ['action' => 'deleted'];
         } catch (Exception $error) {
             // Rollback on error
-            if ($this->conn->inTransaction()) {
+            if ($transactionStarted) {
                 $this->conn->rollback();
                 error_log("Transaction rolled back due to error");
             }
@@ -713,32 +704,114 @@ class ProductRepository
         }
     }
 
+    /**
+     * Restore a discontinued product
+     * @param int $id Product ID
+     * @return array response with action taken
+     * @throws Exception If any errors occurs
+     */
+    public function restoreProduct($id)
+    {
+        try {
+            // Debug log to trace function entry
+            error_log("Starting restoreProduct for ID: $id");
+
+            // First check if the product exists and is discontinued
+            $checkProductQuery = "SELECT ID, name, status FROM product WHERE ID = ?";
+            $checkProductStmt = $this->conn->prepare($checkProductQuery);
+            $checkProductStmt->bind_param("i", $id);
+            $checkProductStmt->execute();
+            $productResult = $checkProductStmt->get_result();
+
+            if ($productResult->num_rows === 0) {
+                error_log("Product with ID $id not found");
+                return ['action' => 'not_found', 'message' => 'Product not found'];
+            }
+
+            error_log("Found discontinued product: " . $productInfo['name'] . " (ID: $id)");
+
+            // Start transaction
+            $this->conn->begin_transaction();
+
+            try {
+                // Update product status to in_stock
+                $updateProductQuery = "UPDATE product SET status = 'in_stock' WHERE ID = ?";
+                $updateProductStmt = $this->conn->prepare($updateProductQuery);
+                $updateProductStmt->bind_param("i", $id);
+                $result = $updateProductStmt->execute();
+
+                if (!$result) {
+                    throw new Exception("Failed to update product status: " . $this->conn->error);
+                }
+
+                error_log("Updated product status to in_stock, affected rows: " . $updateProductStmt->affected_rows);
+
+                // Update all variants to in_stock
+                $updateVariantsQuery = "UPDATE productvariant SET status = 'in_stock' WHERE productID = ?";
+                $updateVariantsStmt = $this->conn->prepare($updateVariantsQuery);
+                $updateVariantsStmt->bind_param("i", $id);
+                $result = $updateVariantsStmt->execute();
+
+                if (!$result) {
+                    throw new Exception("Failed to update product variants: " . $this->conn->error);
+                }
+
+                error_log("Updated variant statuses to in_stock, affected rows: " . $updateVariantsStmt->affected_rows);
+
+                // Commit the transaction
+                $this->conn->commit();
+                error_log("Transaction committed for restored product $id");
+
+                return ['action' => 'restored'];
+            } catch (Exception $e) {
+                // Rollback on error
+                $this->conn->rollback();
+                error_log("Transaction rolled back due to error: " . $e->getMessage());
+                throw $e;
+            }
+        } catch (Exception $error) {
+            error_log("ProductRepository - Error restoring product: " . $error->getMessage());
+            throw new Exception("Failed to restore product: " . $error->getMessage());
+        }
+    }
+    /**
+     * Insert new product
+     * @return message result_message, int $id of new product
+     * @param formData
+     * @throws Exception IF db error occurs 
+     */
     public function createProduct($data)
     {
         try {
-            $query = "INSERT INTO product (name, categoryID, brandID, discountID, markup_percentage, description, image)
-                  VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $query = "
+                INSERT INTO product 
+                (name, categoryID, brandID, markup_percentage, discountID, description, image)
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
+
             $stmt = $this->conn->prepare($query);
             $stmt->bind_param(
-                "siiidss",
+                "siidiss",
                 $data['name'],
                 $data['categoryID'],
                 $data['brandID'],
-                $data['discountID'],
                 $data['markup_percentage'],
+                $data['discountID'],
                 $data['description'],
                 $data['image']
             );
+
             if ($stmt->execute()) {
-                // Get the last inserted ID (product ID)
-                $productID = $this->conn->insert_id;
-                return $productID; // Return the new product ID
+                return [
+                    'status' => 'success',
+                    'message' => 'Thêm sản phẩm thành công',
+                    'product_id' => $this->conn->insert_id
+                ];
             } else {
-                throw new Exception("Error inserting product: " . $stmt->error);
+                throw new Exception("Lỗi khi thêm sản phẩm: " . $stmt->error);
             }
         } catch (Exception $e) {
-            error_log("Error in getDiscountByID: " . $e->getMessage());
-            throw new Exception("Failed to get discount");
+            error_log("Error in createProduct: " . $e->getMessage());
+            throw new Exception("Failed to insert new product");
         }
     }
 }

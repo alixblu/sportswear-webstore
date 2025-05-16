@@ -12,9 +12,9 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="/sportswear-webstore/css/login_regis.css">
-    <script src="/sportswear-webstore/JS/login_regis.js"></script>
-    <script src="./js/client/search.js" defer></script>
+    <link rel="stylesheet" href="/sportswear-webstore/css/auth.css">
+    <script src="/sportswear-webstore/JS/auth.js"></script>
+    <!-- <script src="./js/client/search.js" defer></script> -->
 
 </head>
 </head>
@@ -161,12 +161,13 @@ if (session_status() === PHP_SESSION_NONE) {
                     <?php endif; ?>
                     <?php if (isset($_SESSION['user']['roleid']) && (string)$_SESSION['user']['roleid'] === '05'): ?>
                         <li><a href="#" onclick="userProfileRedirect()"><i class="ri-user-settings-line"></i> Hồ sơ</a></li>
+                        <li><a href="#" onclick="handleLogout(event)"><i class="ri-logout-box-line"></i> Đăng xuất</a></li>
                     <?php endif; ?>
-                    <li><a href="#" onclick="handleLogout(event)"><i class="ri-logout-box-line"></i> Đăng xuất</a></li>
+                    
                 </ul>
             </div>
         <?php else: ?>
-            <?php              include __DIR__ . '/../layout/login_regis.php';?>
+            <?php              include __DIR__ . '/../layout/auth.php';?>
         <?php endif; ?>
     </div>
     <script>
@@ -193,7 +194,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
         function handleLogout(event) {
             event.preventDefault();
-            fetch('/sportswear-webstore/layout/login_regis.php', {
+            fetch('/sportswear-webstore/layout/auth.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'

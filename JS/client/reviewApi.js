@@ -1,4 +1,4 @@
-const REVIEW_API_URL = '../../src/router/reviewRouter.php';
+const REVIEW_API_URL = '/sportswear-webstore/src/router/reviewRouter.php';
 
 const getAllReviews = async () => {
     const response = await fetch(`${REVIEW_API_URL}?action=getAllReviews`, {
@@ -29,10 +29,10 @@ const getReviewsByProductId = async (productId) => {
     return await response.json();
 };
 
-const createReview = async (userId, productId, rating, commentContent) => {
+
+const createReview = async (productId, rating, commentContent) => {
     const formData = new URLSearchParams();
     formData.append('action', 'createReview');
-    formData.append('userId', userId);
     formData.append('productId', productId);
     formData.append('rating', rating);
     formData.append('commentContent', commentContent);
@@ -80,5 +80,26 @@ const deleteReview = async (reviewId) => {
         throw new Error('Không thể xóa đánh giá');
     }
 
+    return await response.json();
+};
+
+const getPendingReviews = async () => {
+    const response = await fetch(`${REVIEW_API_URL}?action=getPendingReviews`, {
+        method: 'GET',
+    });
+    if (!response.ok) {
+        throw new Error('Không thể xóa đánh giá');
+    }
+    return await response.json();
+};
+
+
+const getReviewedProducts = async () => {
+    const response = await fetch(`${REVIEW_API_URL}?action=getReviewedProducts`, {
+        method: 'GET',
+    });
+    if (!response.ok) {
+        throw new Error('Không thể xóa đánh giá');
+    }
     return await response.json();
 };
