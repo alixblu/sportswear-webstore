@@ -46,7 +46,9 @@ const fillDetailModal = (product) => {
     modalElements.markup.value = (product.markup_percentage || '0');
     modalElements.rating.innerHTML = renderStars(product.rating);
     modalElements.stock.value = product.stock || '0';
-    modalElements.status.value = product.status === 'in_stock' ? 'In Stock' : 'Out of Stock';
+    modalElements.status.textContent = product.status === 'in_stock' ? 'In Stock' : 
+                                         product.status === 'out_of_stock' ? 'Out of Stock' : 
+                                         'Discontinued';
     modalElements.description.value = product.description || 'No description available';
     modalElements.basePrice.value = fomartedPrice || '-';
     // Assign the image source
