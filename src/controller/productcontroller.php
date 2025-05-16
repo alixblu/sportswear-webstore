@@ -138,11 +138,17 @@ class ProductController
 
             if ($result) {
                 if (isset($result['action']) && $result['action'] === 'discontinued') {
-                    ApiResponse::customResponse(['id' => $id, 'action' => 'discontinued'], 200, 
-                        'Product marked as discontinued because it exists in order history');
+                    ApiResponse::customResponse(
+                        ['id' => $id, 'action' => 'discontinued'],
+                        200,
+                        'Product marked as discontinued because it exists in order history'
+                    );
                 } else {
-                    ApiResponse::customResponse(['id' => $id, 'action' => 'deleted'], 200, 
-                        'Product deleted successfully');
+                    ApiResponse::customResponse(
+                        ['id' => $id, 'action' => 'deleted'],
+                        200,
+                        'Product deleted successfully'
+                    );
                 }
             } else {
                 ApiResponse::customResponse($id, 500, 'Failed to process product');
@@ -194,7 +200,7 @@ class ProductController
             return ApiResponse::customResponse($variants, 200, 'Product variants fetched successfully');
         } catch (Exception $e) {
             error_log("Error in getProductVariants controller: " . $e->getMessage());
-            return ApiResponse::customResponse($productId, 500, 'Failed to fetch product variants: ' . $e->getMessage());
+            return ApiResponse::customResponse(null, 500, 'Failed to fetch product variants: ' . $e->getMessage());
         }
     }
 
@@ -327,6 +333,25 @@ class ProductController
             ApiResponse::customApiResponse($discount, 200);
         } catch (Exception $e) {
             ApiResponse::customApiResponse(null, 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Insert new product
+     * @return message result_message, int $id of new product
+     * @throws Exception IF db error occurs 
+     */
+    public function createProduct($jsonData)
+    {
+        try {
+            if (!$jsonData) {
+                ApiResponse::customResponse(null, 400, "Không nhận được dữ liệu JSON");
+                return;
+            }
+            $result = $this->productService->createProduct($jsonData);
+            ApiResponse::customApiResponse($result, 200);
+        } catch (Exception $e) {
+            ApiResponse::customResponse(null, 500, $e->getMessage());
         }
     }
 }

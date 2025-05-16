@@ -119,11 +119,11 @@ const getProductVariants = async (id) => {
 };
 
 // ===================================== Create product ===================================== 
-const createProductRequest = async (product) => {
+const createProduct = async (product) => {
     if(product == null)
         throw new Error('Không có dữ liệu sản phẩm mới')
     try{
-        const response = await fetch(`${API_URL}?action=updateProduct&id=${product.ID}`, {
+        const response = await fetch(`${API_URL}?action=createProduct`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -134,7 +134,7 @@ const createProductRequest = async (product) => {
             throw new Error('Không thể tạo sản phẩm');
         }
         const data = await response.json();
-        return data;
+        return data.data;
     } catch(error) {
         console.error('Lỗi, không thể thêm sp !!!', error)
         throw error
@@ -212,6 +212,7 @@ const deleteProduct = async (id) => {
 
 // ========================================================================= Upload image of product  =========================================================================
 const uploadProductImageRequest = async (data) => {
+    console.log(data);
     try{
         const response = await fetch(`${API_URL}`,{
             method: "POST",
@@ -225,6 +226,21 @@ const uploadProductImageRequest = async (data) => {
         throw error
     }
 }
+// ============================================= Load modal AJAX =============================================
+const loadModal = async (modalName) => {
+    try{
+        const response = await fetch(`/sportswear-webstore/layout/admin/includes/load_modal.php?modal=${modalName}`);
+        const html = await response.text();
+        if(html)
+            return html;
+
+        throw new Error("Không tải được file cần thiết");
+        
+    } catch (error){
+        console.error("Không thể tải modal !!!", error);
+        throw error;
+    }
+}
 export {
     getFilteredProducts,
     getProductById,
@@ -234,5 +250,6 @@ export {
     updateProduct,
     deleteProduct,
     uploadProductImageRequest,
-    createProductRequest,
+    createProduct,
+    loadModal,
 };

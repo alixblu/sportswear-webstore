@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="../../css/admin/product.css">
 
     <script src="../../JS/admin/product/product.js" type="module"></script>
-    <a href="../components/product/detail_modal.php"></a>
+    <script src="../../JS/admin/product/helper.js" type="module"></script>
+    <script src="../../JS/admin/product/create.js" type="module"></script>
 </head>
 
 <body>
@@ -84,26 +85,47 @@
                         <img id="modal-product-image" src="" alt="Product image" data-oldname="" data-newname="" />
                     </div>
                     <div class="product-actions">
-                        <button class="btn btn-primary open-edit-form">
-                            <i class="fas fa-edit"></i>
-                            Edit
+                        <div id="img-btn">
+                            <button class="btn btn-outline" onclick="triggerImageUpload()">
+                                <i class="fas fa-image"></i> Change Image
+                            </button>
+                        </div>
+                        <button class="btn btn-primary open-edit-form" onclick="switchEditing()">
+
                         </button>
                         <button class="btn btn-danger delete-product-btn" onclick="confirmDeleteProduct()">
                             <i class="fas fa-trash"></i>
                             Delete
                         </button>
+                        <button class="btn btn-primary" id="submit-update-btn">Save</button>
                         <input type="file" id="changeImageInput" accept="image/*" style="display:none;">
-                        <div id="img-btn" style="display: none;">
-                            <button class="btn btn-outline" id="img-btn" onclick="triggerImageUpload()">
-                                <i class="fas fa-image"></i> Change Image
-                            </button>
-                        </div>
                     </div>
                 </div>
                 <!-- Modals -->
-                <?php include(__DIR__ . '/../components/product/detail_modal.php');     ?>
-                <?php include(__DIR__ . '/../components/product/create_product.php');   ?>
-                <?php include(__DIR__ . '/../components/product/confirm_modal.php');    ?>
+                <div id="modal-content-placeholder">
+                    <!-- Dynamically loaded content will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-content">
+            <div class="confirm-header">
+                <h3 id="confirm-modal-title"> </h3>
+                <button class="modal-close" onclick="document.getElementById('confirmModal').style.display='none'">&times;</button>
+            </div>
+            <div class="confirm-body">
+                <p id="confirmMessage"> <!-- Write message here--> </p>
+            </div>
+            <div class="confirm-footer">
+                <button class="btn btn-outline" onclick="document.getElementById('confirmModal').style.display='none'">Cancel</button>
+                <button id="confirmBtn" class="btn">
+                    Yes
+                    <!-- Create button here :
+                        danger : for delete, while editing
+                        success : for insert new product
+                -->
+                </button>
             </div>
         </div>
     </div>
@@ -128,6 +150,28 @@
                 productImg.setAttribute('data-newname', file.name)
             }
         })
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content and mark tab as active
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        }
+        // Helper to properly display the modal as flex
+        function showConfirmModal() {
+            const modal = document.getElementById('confirmModal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        };
     </script>
 </body>
 

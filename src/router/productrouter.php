@@ -71,10 +71,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $productId = $_POST['product_id'];
-    if ($_POST['action'] === 'uploadProductImage') {
+    if (isset($_POST['action']) && $_POST['action'] === 'uploadProductImage') {
+        $productId = $_POST['product_id'];
         if (!$productId || !isset($_FILES['image'])) {
             echo json_encode([
                 "status" => 400,
@@ -109,6 +108,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "message" => "Không thể di chuyển tệp đã tải lên"
             ]);
         }
+    } else if (isset($_GET['action']) && $_GET['action'] === 'createProduct') {
+        $rawData = file_get_contents('php://input');
+        $jsonData = json_decode($rawData, true);
+
+        $productController->createProduct($jsonData);
     } else {
         echo json_encode([
             "status" => 400,
