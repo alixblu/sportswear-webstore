@@ -642,6 +642,19 @@ async function addRole() {
     }
 
     try {
+        // Get existing roles first
+        const { data: existingRoles } = await AccountService.getAllRoles();
+        const roleExists = existingRoles.some(role => role.name.toLowerCase() === roleName.toLowerCase());
+        if (roleExists) {
+            showToast('Tên vai trò đã tồn tại', 'error');
+            return;
+        }
+
+        if(moduleIds.length === 0) {
+            showToast('Vui lòng chọn ít nhất một module', 'error');
+            return;
+        }
+
         const response = await AccountService.createRole({ name: roleName, moduleIds });
         showToast('Thêm vai trò thành công', 'success');
         closeModal();
