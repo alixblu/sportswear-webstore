@@ -240,6 +240,7 @@
       });
    }
 
+   let quantity = 1;
    function updatePriceStock(variants) {
       const priceEl = document.querySelector('.price');
       const stockEl = document.querySelector('.in-stock');
@@ -260,6 +261,7 @@
             style: 'currency',
             currency: 'VND'
          }).format(match.price);
+         quantity = match.quantity;
          stockEl.textContent = match.quantity > 0 ? `Còn ${match.quantity} sản phẩm` : 'Hết hàng';
       } else {
          priceEl.textContent = 'Price unavailable';
@@ -305,6 +307,11 @@
       plusBtn.addEventListener("click", function() {
          let current = parseInt(qtyInput.value);
          qtyInput.value = current + 1;
+
+         if (current >= quantity) {
+            alert("Vượt quá số lượng sản phẩm có sẵn");
+            qtyInput.value = quantity;
+         }
       });
 
       const sizeButtons = document.querySelectorAll(".size-btn");
