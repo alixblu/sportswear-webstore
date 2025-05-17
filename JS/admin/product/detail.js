@@ -57,7 +57,7 @@ const fillDetailModal = (product) => {
     modalElements.markup.value = (product.markup_percentage || '0');
     modalElements.rating.innerHTML = renderStars(product.rating);
     modalElements.stock.value = product.stock || '0';
-    modalElements.status.textContent = product.status === 'in_stock' ? 'In Stock' : 
+    modalElements.status.value = product.status === 'in_stock' ? 'In Stock' : 
                                          product.status === 'out_of_stock' ? 'Out of Stock' :
                                          product.status === 'discontinued' ? 'Discontinued' : '';
     modalElements.description.value = product.description || 'No description available';
