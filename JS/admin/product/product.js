@@ -2,7 +2,7 @@ import {
     getFilteredProductsAdmin,
     deleteProduct,
     uploadProductImageRequest,
-    createProductRequest,
+
     restoreProduct,
     loadModal,
 } from './api.js'
