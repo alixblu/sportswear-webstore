@@ -17,12 +17,20 @@
   <link rel="stylesheet" href="../../css/admin/style.css" />
   <link rel="stylesheet" href="../../css/admin/header.css" />
   <link rel="stylesheet" href="../../css/admin/pagiantion.css">
-
   <script src="../../JS/admin/table.js"></script>
 </head>
 
 <body>
+  <?php
+  // Start the session to ensure $_SESSION is available
+  session_start();
+  ?>
   <div class="container" id="container">
+
+    <?php if (isset($_SESSION['user']['roleid']) && (string)$_SESSION['user']['roleid'] === '05'): ?>
+      <h1>your role cannot access this page</h1>
+      <a href="/sportswear-webstore/index.php">return to main page</a>
+    <?php elseif (isset($_SESSION['user']['roleid']) && $_SESSION['user']['roleid'] !== '05'): ?>
     <?php include './includes/sidebar.php'; ?>
     <div class="main-content-area">
       <?php include './includes/header.php'; ?>
@@ -37,6 +45,13 @@
       }
       ?>
     </div>
+    <?php else: ?>
+    <div class="login-required">
+      <h1>Please log in to access the admin dashboard</h1>
+      <p>You need to have administrator privileges to view this page.</p>
+      <a href="/sportswear-webstore/index.php">return to main page</a>
+    </div>
+    <?php endif; ?>
   </div>
 </body>
 

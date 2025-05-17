@@ -1,7 +1,6 @@
   <!-- Sidebar -->
 
   <?php
-    session_start(); // Start the session
 
     if (isset($_SESSION['user'])) {
         $userId = $_SESSION['user']['id']; // Assuming user ID is stored in the session
