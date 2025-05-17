@@ -17,7 +17,7 @@
     }
     // Define sidebar items with their corresponding module IDs
     $sidebarItems = [
-        ['id' => 1, 'name' => 'Dashboard', 'icon' => 'fas fa-tachometer-alt', 'type' => 'main', 'page' => 'dashboard'],
+        // ['id' => 1, 'name' => 'Dashboard', 'icon' => 'fas fa-tachometer-alt', 'type' => 'main', 'page' => 'dashboard'],
         ['id' => 2, 'name' => 'Employees', 'icon' => 'fas fa-users', 'type' => 'admin', 'page' => 'user'],
         ['id' => 3, 'name' => 'Products', 'icon' => 'fas fa-box', 'type' => 'admin', 'page' => 'product'],
         // ['id' => 4, 'name' => 'Warehouse', 'icon' => 'fas fa-warehouse', 'type' => 'admin', 'page' => 'warehouse'],
