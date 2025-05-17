@@ -234,7 +234,7 @@ async function updateResults(params = {}) {
                             ${ratingHtml}
                             <span>(${scaledRating.toFixed(1)})</span>
                         </div>
-                        <button class="buy-button" id="idProduct-${product.ID}" ${product.status === 'out_of_stock' ? 'disabled' : ''}>
+                        <button class="buy-button" id="idProduct-${product.productVariantID}" ${product.status === 'out_of_stock' ? 'disabled' : ''}>
                             <i class="fas fa-shopping-cart"></i>
                             ${product.status === 'in_stock' ? 'Thêm vào giỏ' : 'Hết hàng'}
                         </button>
