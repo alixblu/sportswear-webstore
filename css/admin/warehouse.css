@@ -1,0 +1,88 @@
+.search-box input {
+    flex: 1;
+    border: none;
+    /* Remove all borders */
+    background-color: transparent;
+    /* Make the background transparent */
+    outline: none;
+    /* Remove outline when focused */
+    color: #2d3748
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    column-gap: .3rem;
+    border: 1px solid #ccc;
+    border-radius: 100px;
+    height: 1.8rem;
+    padding-left: 7px;
+    max-width: 500px;
+    width: 70%;
+    padding: 20px;
+}
+
+.search-box:focus-within {
+    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+    border-color: rgba(67, 97, 238, 0.3);
+}
+
+.wrapperFilter {
+    max-width: 400px;
+    width: 70%;
+    display: flex;
+    gap: 20px;
+}
+
+.data-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* STT */
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) {
+    width: 3%;
+} 
+/* ID */
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) {
+    width: 8%;
+}
+/* NV nhập */
+.data-table th:nth-child(3),
+.data-table td:nth-child(3) {
+    width: 15%;
+}
+/* NCC */
+.data-table th:nth-child(4),
+.data-table td:nth-child(4) {
+    width: 15%;
+}
+/* Ngày tạo */
+.data-table th:nth-child(5),
+.data-table td:nth-child(5) {
+    width: 15%;
+}
+/* Tổng tiền */
+.data-table th:nth-child(6),
+.data-table td:nth-child(6) {
+    width: 15%;
+}
+/* Trang thai */
+.data-table th:nth-child(7),
+.data-table td:nth-child(7) {
+    width: 10%;
+}
+/* Thao tác */
+.data-table th:nth-child(7),
+.data-table td:nth-child(7) {
+    width: 10%;
+}
+
+.data-table td {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

@@ -27,7 +27,7 @@
     <div class="main-content-area">
       <?php include './includes/header.php'; ?>
       <?php
-      $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard'; // Default to dashboard
+      $page = isset($_GET['page']) ? $_GET['page'] : 'analytics'; // Default to dashboard
       $allowed_pages = ['dashboard', 'user', 'product', 'warehouse', 'orders', 'coupon', 'warranty', 'account', 'analytics', 'sales', 'notifications', 'settings'];
 
       if (in_array($page, $allowed_pages)) {

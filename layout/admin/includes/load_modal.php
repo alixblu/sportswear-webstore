@@ -10,9 +10,6 @@ switch ($modal) {
     case 'create':
         include $basePath . 'product/create_form.php';
         break;
-    case 'confirm':
-        include $basePath . 'product/confirm_modal.php';
-        break;
     default:
         echo "<div>Modal not found</div>";
         break;

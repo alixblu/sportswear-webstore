@@ -22,9 +22,6 @@
                 <button id="createBtn" class="btn btn-outline" onclick="openCreateModal()">
                     <i class="fas fa-plus"></i> New
                 </button>
-                <button id="exportBtn" class="btn btn-outline">
-                    <i class="fas fa-download"></i> Export
-                </button>
             </div>
         </div>
 
@@ -97,7 +94,7 @@
                             <i class="fas fa-trash"></i>
                             Delete
                         </button>
-                        <button class="btn btn-danger delete-product-btn" onclick="confirmRestoreProduct()" display="none">
+                        <button class="btn btn-danger restore-product-btn" onclick="confirmRestoreProduct()" style="display: none;">
                             <i class="fas fa-undo"></i>
                             Restore
                         </button>

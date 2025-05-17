@@ -18,7 +18,7 @@
     }
     // Define sidebar items with their corresponding module IDs
     $sidebarItems = [
-        ['id' => 1, 'name' => 'Dashboard', 'icon' => 'fas fa-tachometer-alt', 'type' => 'main', 'page' => 'dashboard'],
+        ['id' => 9, 'name' => 'Analytics', 'icon' => 'fas fa-chart-line', 'type' => 'report', 'page' => 'analytics'],
         ['id' => 2, 'name' => 'Employees', 'icon' => 'fas fa-users', 'type' => 'admin', 'page' => 'user'],
         ['id' => 3, 'name' => 'Products', 'icon' => 'fas fa-box', 'type' => 'admin', 'page' => 'product'],
         ['id' => 4, 'name' => 'Warehouse', 'icon' => 'fas fa-warehouse', 'type' => 'admin', 'page' => 'warehouse'],
@@ -26,7 +26,6 @@
         ['id' => 6, 'name' => 'Coupon & Discount', 'icon' => 'fas fa-tags', 'type' => 'admin', 'page' => 'coupon'],
         ['id' => 7, 'name' => 'Warranty', 'icon' => 'fas fa-shield-alt', 'type' => 'admin', 'page' => 'warranty'],
         ['id' => 8, 'name' => 'Account & Access', 'icon' => 'fas fa-user-lock', 'type' => 'admin', 'page' => 'account'],
-        ['id' => 9, 'name' => 'Analytics', 'icon' => 'fas fa-chart-line', 'type' => 'report', 'page' => 'analytics'],
         ['id' => 10, 'name' => 'Sales', 'icon' => 'fas fa-dollar-sign', 'type' => 'report', 'page' => 'sales'],
         ['id' => 11, 'name' => 'Notifications', 'icon' => 'fas fa-bell', 'type' => 'admin', 'page' => 'notifications'],
         ['id' => 12, 'name' => 'Settings', 'icon' => 'fas fa-cog', 'type' => 'admin', 'page' => 'settings'],

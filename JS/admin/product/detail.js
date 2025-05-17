@@ -13,6 +13,7 @@ import {
     categoriesList,
     discountsList,
     loadProducts,
+    closeModal,
 } from './product.js'
 import {
     renderStars,
@@ -23,9 +24,19 @@ let currentProduct = null
 // ================================== View detail of product modal ==================================
 // Fill detail fields of product
 const fillDetailModal = (product) => {
+    console.log(product);
+    
     if(brandsList == [] || categoriesList == [] || discountsList == []){
         console.error("Không tìm thấy danh sách hãng / discount / loại sp");
         return
+    }
+    if(product.status == "discontinued"){
+        document.querySelector('.restore-product-btn').style.display = 'block'
+        document.querySelector('.delete-product-btn').style.display = 'none'
+    }
+    else{
+        document.querySelector('.restore-product-btn').style.display = 'none'
+        document.querySelector('.delete-product-btn').style.display = 'block'
     }
     const modalElements = {
             id: document.getElementById('modal-product-id'),
@@ -47,8 +58,8 @@ const fillDetailModal = (product) => {
     modalElements.rating.innerHTML = renderStars(product.rating);
     modalElements.stock.value = product.stock || '0';
     modalElements.status.textContent = product.status === 'in_stock' ? 'In Stock' : 
-                                         product.status === 'out_of_stock' ? 'Out of Stock' : 
-                                         'Discontinued';
+                                         product.status === 'out_of_stock' ? 'Out of Stock' :
+                                         product.status === 'discontinued' ? 'Discontinued' : '';
     modalElements.description.value = product.description || 'No description available';
     modalElements.basePrice.value = fomartedPrice || '-';
     // Assign the image source
@@ -251,6 +262,7 @@ export function clearDetailModal() {
     // Đóng cửa sổ info
     document.getElementById('product-info-section').style.display = 'none';
     currentProduct = null
+    document.querySelector('.restore-product-btn').style.display = 'none'
 }
 
 // ========================================================================== Delete Product ==========================================================================
